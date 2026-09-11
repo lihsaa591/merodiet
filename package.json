@@ -13,7 +13,7 @@
 		"test:unit": "wp-scripts test-unit-js"
 	},
 	"devDependencies": {
-		"@types/react": "^18.3.31",
+		"@types/react": "^19.2.18",
 		"@types/react-dom": "^18.3.7",
 		"@wordpress/scripts": "^34.2.0",
 		"typescript": "^6.0.3"
