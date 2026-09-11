@@ -1,0 +1,27 @@
+{
+	"name": "nutrio",
+	"version": "0.1.0",
+	"description": "Practice management for registered dietitians and nutritionists — meal planning, client compliance tracking, and USDA-backed nutrient calculations.",
+	"license": "GPL-2.0-or-later",
+	"private": true,
+	"scripts": {
+		"build": "wp-scripts build",
+		"start": "wp-scripts start",
+		"lint:js": "wp-scripts lint-js",
+		"check-types": "tsc --noEmit",
+		"format": "wp-scripts format",
+		"test:unit": "wp-scripts test-unit-js"
+	},
+	"devDependencies": {
+		"@types/react": "^18.3.31",
+		"@types/react-dom": "^18.3.7",
+		"@wordpress/scripts": "^34.2.0",
+		"typescript": "^6.0.3"
+	},
+	"dependencies": {
+		"@wordpress/api-fetch": "^7.0.0",
+		"@wordpress/data": "^10.54.0",
+		"@wordpress/element": "^8.6.0",
+		"@wordpress/i18n": "^6.27.0"
+	}
+}
