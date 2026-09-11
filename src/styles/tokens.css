@@ -1,0 +1,78 @@
+/**
+ * Design tokens. See DESIGN.md at the project root for the source of truth
+ * and the rationale behind each decision (palette, shape, status system).
+ */
+:root {
+	--paper: #fafafa;
+	--paper-dim: #f1f1f2;
+	--surface: #ffffff;
+	--surface-raised: #ffffff;
+	--ink: #26262a;
+	--ink-muted: #6d6d74;
+	--ink-faint: #9d9da3;
+	--line: #e7e6ea;
+	--line-strong: #d5d3da;
+	--sage: #6e62a6;
+	--sage-deep: #524683;
+	--sage-wash: #ebe8f5;
+	--clay: #8b8b90;
+	--clay-wash: #f0eff1;
+	--success: #4c9179;
+	--success-wash: #e5f2ed;
+	--warning: #b08a3c;
+	--warning-wash: #f6efdf;
+	--critical: #c1554d;
+	--critical-wash: #fbecea;
+	--radius: 10px;
+	color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme='light']) {
+		--paper: #1c1a20;
+		--paper-dim: #151318;
+		--surface: #242229;
+		--surface-raised: #2b2831;
+		--ink: #e9e6ef;
+		--ink-muted: #a39daf;
+		--ink-faint: #716b7d;
+		--line: #34303b;
+		--line-strong: #423d4a;
+		--sage: #a395d6;
+		--sage-deep: #c7bcea;
+		--sage-wash: #322c44;
+		--clay: #8d889b;
+		--clay-wash: #2b2833;
+		--success: #7fc1a8;
+		--success-wash: #1f332b;
+		--warning: #d8b268;
+		--warning-wash: #362c18;
+		--critical: #e29089;
+		--critical-wash: #3a2422;
+		color-scheme: dark;
+	}
+}
+
+:root[data-theme='dark'] {
+	--paper: #1c1a20;
+	--paper-dim: #151318;
+	--surface: #242229;
+	--surface-raised: #2b2831;
+	--ink: #e9e6ef;
+	--ink-muted: #a39daf;
+	--ink-faint: #716b7d;
+	--line: #34303b;
+	--line-strong: #423d4a;
+	--sage: #a395d6;
+	--sage-deep: #c7bcea;
+	--sage-wash: #322c44;
+	--clay: #8d889b;
+	--clay-wash: #2b2833;
+	--success: #7fc1a8;
+	--success-wash: #1f332b;
+	--warning: #d8b268;
+	--warning-wash: #362c18;
+	--critical: #e29089;
+	--critical-wash: #3a2422;
+	color-scheme: dark;
+}

@@ -1,0 +1,308 @@
+* {
+	box-sizing: border-box;
+}
+
+/*
+ * Full-screen takeover: Nutrio hides the normal wp-admin chrome (side menu,
+ * toolbar, footer) and covers the viewport itself, rather than sitting
+ * inside it like an ordinary plugin settings page. Scoped to this page's
+ * own body class so nothing else in wp-admin is affected; enqueue_style()
+ * already only loads this stylesheet on this exact screen, so the
+ * unscoped selectors below are safe, but the body class is kept as a
+ * second, explicit guard.
+ */
+body.toplevel_page_nutrio #wpadminbar,
+body.toplevel_page_nutrio #adminmenumain,
+body.toplevel_page_nutrio #wpfooter,
+body.toplevel_page_nutrio #screen-meta-links,
+body.toplevel_page_nutrio .notice,
+body.toplevel_page_nutrio .update-nag {
+	display: none !important;
+}
+body.toplevel_page_nutrio html,
+body.toplevel_page_nutrio {
+	background: var(--paper);
+}
+body.toplevel_page_nutrio #wpcontent,
+body.toplevel_page_nutrio #wpbody,
+body.toplevel_page_nutrio #wpbody-content {
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+.nutrio-admin-app {
+	font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+	font-size: 14px;
+	line-height: 1.5;
+	color: var(--ink);
+	background: var(--paper);
+	position: fixed;
+	inset: 0;
+	z-index: 9999;
+	overflow: auto;
+}
+
+.nutrio-admin-app h1,
+.nutrio-admin-app h2,
+.nutrio-admin-app h3,
+.nutrio-admin-app h4 {
+	font-family: 'Public Sans', sans-serif;
+	font-weight: 700;
+	margin: 0;
+	letter-spacing: -0.01em;
+}
+
+.nutrio-mono {
+	font-family: 'IBM Plex Mono', ui-monospace, monospace;
+	font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Shell ---------- */
+.nutrio-shell {
+	display: grid;
+	grid-template-columns: 232px 1fr;
+	min-height: 100vh;
+}
+
+.nutrio-rail {
+	background: var(--paper-dim);
+	border-right: 1px solid var(--line);
+	padding: 20px 14px;
+	display: flex;
+	flex-direction: column;
+	gap: 22px;
+}
+
+.nutrio-wp-back {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--ink-faint);
+	text-decoration: none;
+	padding: 0 6px;
+	margin-bottom: 4px;
+}
+.nutrio-wp-back:hover {
+	color: var(--ink-muted);
+}
+.nutrio-wp-back svg {
+	width: 14px;
+	height: 14px;
+	flex-shrink: 0;
+}
+
+.nutrio-brand {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 0 6px;
+}
+.nutrio-brand-mark {
+	width: 30px;
+	height: 30px;
+	border-radius: 8px;
+	background: var(--sage);
+	color: #fff;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: 700;
+	font-size: 15px;
+	flex-shrink: 0;
+}
+.nutrio-brand-name {
+	font-weight: 700;
+	font-size: 16px;
+	letter-spacing: -0.01em;
+}
+
+.nutrio-nav-group {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+.nutrio-nav-item {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 8px 10px;
+	border-radius: 8px;
+	color: var(--ink-muted);
+	background: transparent;
+	border: none;
+	font-size: 13.5px;
+	font-weight: 500;
+	text-align: left;
+	width: 100%;
+	font-family: inherit;
+	cursor: pointer;
+}
+.nutrio-nav-item:hover {
+	background: var(--surface-raised);
+	color: var(--ink);
+}
+.nutrio-nav-item.is-active {
+	background: var(--sage-wash);
+	color: var(--sage-deep);
+	font-weight: 600;
+}
+.nutrio-nav-item svg {
+	width: 17px;
+	height: 17px;
+	flex-shrink: 0;
+	opacity: 0.85;
+}
+.nutrio-nav-item.is-active svg {
+	opacity: 1;
+}
+.nutrio-nav-item-pro {
+	color: var(--ink-faint);
+}
+.nutrio-nav-item-pro .nutrio-pro-lock {
+	width: 13px;
+	height: 13px;
+	margin-left: auto;
+	opacity: 0.7;
+}
+
+.nutrio-rail-foot {
+	margin-top: auto;
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	padding: 8px 10px;
+	border-radius: 8px;
+	border: 1px solid var(--line);
+	background: var(--surface);
+}
+.nutrio-rail-foot-name {
+	font-size: 12.5px;
+	font-weight: 600;
+}
+.nutrio-rail-foot-role {
+	font-size: 11px;
+	color: var(--ink-faint);
+}
+
+.nutrio-main {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+.nutrio-topbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	/* No horizontal padding: the topbar sits inside .nutrio-view, which
+	   already provides the side gutter -- adding one here too would push
+	   the title/button in further than the panel/table below it. */
+	padding: 14px 0;
+	margin-bottom: 20px;
+	border-bottom: 1px solid var(--line);
+}
+.nutrio-topbar h1 {
+	font-size: 21px;
+}
+.nutrio-topbar-sub {
+	font-size: 12.5px;
+	color: var(--ink-muted);
+	margin-top: 2px;
+}
+.nutrio-view {
+	padding: 26px 28px 40px;
+}
+
+.nutrio-theme-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 30px;
+	height: 30px;
+	border-radius: 8px;
+	border: 1px solid var(--line);
+	background: var(--surface);
+	color: var(--ink-muted);
+	flex-shrink: 0;
+	cursor: pointer;
+}
+.nutrio-theme-toggle:hover {
+	color: var(--ink);
+	border-color: var(--line-strong);
+}
+.nutrio-theme-toggle svg {
+	width: 15px;
+	height: 15px;
+}
+
+/* ---------- Responsive ---------- */
+.nutrio-mobile-menu-btn {
+	display: none;
+}
+.nutrio-rail-scrim {
+	position: fixed;
+	inset: 0;
+	background: rgba(20, 18, 24, 0.4);
+	z-index: 59;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.2s ease;
+}
+.nutrio-rail-scrim.is-open {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+@media (max-width: 900px) {
+	.nutrio-shell {
+		grid-template-columns: 1fr;
+	}
+	.nutrio-mobile-menu-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		position: fixed;
+		top: 14px;
+		left: 14px;
+		z-index: 61;
+		width: 36px;
+		height: 36px;
+		border-radius: 8px;
+		border: 1px solid var(--line);
+		background: var(--surface);
+		color: var(--ink);
+		cursor: pointer;
+	}
+	.nutrio-mobile-menu-btn svg {
+		width: 16px;
+		height: 16px;
+	}
+	.nutrio-rail {
+		position: fixed;
+		top: 0;
+		left: 0;
+		height: 100vh;
+		width: 250px;
+		z-index: 60;
+		transform: translateX(-100%);
+		transition: transform 0.2s ease;
+	}
+	.nutrio-rail.is-open {
+		transform: translateX(0);
+	}
+	.nutrio-topbar {
+		padding-left: 60px;
+	}
+}
+
+@media (max-width: 560px) {
+	.nutrio-view {
+		padding: 20px 16px 32px;
+	}
+	.nutrio-topbar {
+		padding: 14px 0 14px 60px;
+		flex-wrap: wrap;
+		gap: 10px;
+	}
+}
