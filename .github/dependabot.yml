@@ -1,0 +1,51 @@
+version: 2
+updates:
+  # PHP dependencies (composer.json). Opens a PR per update, which CI
+  # then validates against the full PHP 8.1/8.2/8.3 matrix — exactly the
+  # kind of "a transitive dep quietly needs a newer PHP" break this
+  # catches before it reaches a real installation.
+  - package-ecosystem: "composer"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    groups:
+      phpunit-and-testing:
+        patterns:
+          - "phpunit/*"
+          - "brain/monkey"
+          - "*phpunit-polyfills*"
+      wpcs-and-standards:
+        patterns:
+          - "*coding-standards*"
+          - "*phpcompatibility*"
+          - "squizlabs/*"
+      phpstan:
+        patterns:
+          - "phpstan/*"
+          - "*phpstan*"
+
+  # JS build tooling (package.json).
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    groups:
+      wordpress-packages:
+        patterns:
+          - "@wordpress/*"
+    ignore:
+      # typescript-eslint explicitly does not support TS 7.0 yet (fails
+      # at load time, not just a lint mismatch) — see
+      # https://github.com/typescript-eslint/typescript-eslint/issues/10940.
+      # Revisit once that lands upstream; until then this would just
+      # reopen every week with the same failure.
+      - dependency-name: "typescript"
+        versions: [ ">=7.0.0" ]
+
+  # The GitHub Actions used by the CI workflow itself.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

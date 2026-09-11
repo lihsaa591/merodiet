@@ -1,0 +1,54 @@
+<?php
+/**
+ * USDA FoodData Central service provider.
+ *
+ * @package Nutrio
+ */
+
+declare( strict_types=1 );
+
+namespace Nutrio\Providers;
+
+use League\Container\Container;
+use Nutrio\Nutrition\FoodCache;
+use Nutrio\Nutrition\FoodDataClient;
+use Nutrio\Nutrition\FoodDataService;
+
+/**
+ * Binds the food-data stack. The API key is a site option
+ * (`nutrio_usda_api_key`) rather than a config-file constant — it's
+ * per-installation and practitioner-supplied (a future settings screen
+ * writes it), not something that belongs in version-controlled config.
+ */
+final class FoodDataServiceProvider extends AbstractServiceProvider {
+
+	/**
+	 * Bind the food-data client, cache, and orchestrating service.
+	 *
+	 * @param Container $container The DI container.
+	 */
+	public function register( Container $container ): void {
+		$container->add( FoodCache::class )->setShared( true );
+
+		$container->add(
+			FoodDataClient::class,
+			static function () use ( $container ) {
+				$config = $container->get( 'config' );
+
+				return new FoodDataClient(
+					(string) get_option( 'nutrio_usda_api_key', '' ),
+					(string) ( $config['fooddata']['base_url'] ?? 'https://api.nal.usda.gov/fdc/v1' ),
+					(int) ( $config['fooddata']['timeout'] ?? 10 )
+				);
+			}
+		)->setShared( true );
+
+		$container->add(
+			FoodDataService::class,
+			static fn () => new FoodDataService(
+				$container->get( FoodDataClient::class ),
+				$container->get( FoodCache::class )
+			)
+		)->setShared( true );
+	}
+}
