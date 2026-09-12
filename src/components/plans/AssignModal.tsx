@@ -64,25 +64,11 @@ export default function AssignModal( {
 		}
 	};
 
-	const handleScrimClick = ( e: React.MouseEvent< HTMLDivElement > ) => {
-		if ( e.target === e.currentTarget ) {
-			onClose();
-		}
-	};
-
-	const handleScrimKeyDown = ( e: React.KeyboardEvent< HTMLDivElement > ) => {
-		if ( e.key === 'Escape' ) {
-			onClose();
-		}
-	};
-
 	return (
+		// eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
 		<div
 			className={ styles.modalScrim }
-			onClick={ handleScrimClick }
-			onKeyDown={ handleScrimKeyDown }
-			role="presentation"
-			tabIndex={ -1 }
+			onClick={ ( e ) => e.target === e.currentTarget && onClose() }
 		>
 			<div className={ styles.modal }>
 				<h3>{ __( 'Assign to client', 'nutrio' ) }</h3>
