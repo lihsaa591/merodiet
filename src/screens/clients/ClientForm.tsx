@@ -68,15 +68,24 @@ export default function ClientForm( { client, onSubmit, onCancel }: ClientFormPr
 	return (
 		<form onSubmit={ handleSubmit } style={ { display: 'flex', flexDirection: 'column', gap: '16px' } }>
 			<div className="nutrio-field">
-				<label htmlFor="nutrio-first-name">{ __( 'First name', 'nutrio' ) }</label>
+				<label htmlFor="nutrio-first-name">
+					{ __( 'First name', 'nutrio' ) }
+					<RequiredMark />
+				</label>
 				<input id="nutrio-first-name" type="text" value={ values.first_name } onChange={ setField( 'first_name' ) } required />
 			</div>
 			<div className="nutrio-field">
-				<label htmlFor="nutrio-last-name">{ __( 'Last name', 'nutrio' ) }</label>
+				<label htmlFor="nutrio-last-name">
+					{ __( 'Last name', 'nutrio' ) }
+					<RequiredMark />
+				</label>
 				<input id="nutrio-last-name" type="text" value={ values.last_name } onChange={ setField( 'last_name' ) } required />
 			</div>
 			<div className="nutrio-field">
-				<label htmlFor="nutrio-email">{ __( 'Email', 'nutrio' ) }</label>
+				<label htmlFor="nutrio-email">
+					{ __( 'Email', 'nutrio' ) }
+					<RequiredMark />
+				</label>
 				<input id="nutrio-email" type="email" value={ values.email } onChange={ setField( 'email' ) } required />
 			</div>
 			<div className="nutrio-field">
@@ -94,5 +103,18 @@ export default function ClientForm( { client, onSubmit, onCancel }: ClientFormPr
 				</Button>
 			</div>
 		</form>
+	);
+}
+
+/**
+ * A field's `required` attribute already tells assistive tech it's
+ * mandatory — this is purely the sighted-user visual cue, so it's hidden
+ * from the accessibility tree rather than announced twice.
+ */
+function RequiredMark() {
+	return (
+		<span style={ { color: 'var(--critical)' } } aria-hidden="true">
+			{ ' *' }
+		</span>
 	);
 }
