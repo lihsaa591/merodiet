@@ -1,0 +1,93 @@
+.grid {
+	display: grid;
+	grid-template-columns: 1fr 340px;
+	gap: 16px;
+}
+@media (max-width: 900px) {
+	.grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+.ingredientHeader {
+	display: grid;
+	grid-template-columns: 1fr 90px 70px 28px;
+	gap: 10px;
+	font-size: 11px;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--ink-faint);
+	border-bottom: 1px solid var(--line);
+	padding-bottom: 8px;
+	margin-bottom: 4px;
+}
+.ingredientRow {
+	display: grid;
+	grid-template-columns: 1fr 90px 70px 28px;
+	gap: 10px;
+	align-items: center;
+	padding: 9px 0;
+	border-bottom: 1px solid var(--line);
+}
+.ingredientRow:last-child {
+	border-bottom: none;
+}
+.qtyInput {
+	width: 100%;
+	font-family: inherit;
+	font-size: 13px;
+	padding: 5px 8px;
+	border: 1px solid var(--line-strong);
+	border-radius: 6px;
+	background: var(--surface);
+	color: var(--ink);
+}
+.removeBtn {
+	width: 24px;
+	height: 24px;
+	border-radius: 6px;
+	border: 1px solid var(--line-strong);
+	background: var(--surface);
+	color: var(--ink-muted);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+}
+.removeBtn svg {
+	width: 13px;
+	height: 13px;
+}
+
+.nutrientGrid {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 10px;
+}
+.nutrientTile {
+	background: var(--paper-dim);
+	border-radius: 8px;
+	padding: 10px 12px;
+}
+.nutrientVal {
+	font-family: 'IBM Plex Mono', monospace;
+	font-size: 17px;
+	font-weight: 600;
+}
+.nutrientLbl {
+	font-size: 12px;
+	color: var(--ink-muted);
+	font-weight: 600;
+	margin-top: 2px;
+}
+
+.nameRow {
+	display: grid;
+	grid-template-columns: 2fr 100px;
+	gap: 12px;
+}
+@media (max-width: 560px) {
+	.nameRow {
+		grid-template-columns: 1fr;
+	}
+}

@@ -1,0 +1,30 @@
+.result {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 10px 12px;
+	border: 1px solid var(--line);
+	border-radius: 8px;
+	margin-bottom: 8px;
+	cursor: pointer;
+	background: none;
+	width: 100%;
+	text-align: left;
+	font-family: inherit;
+}
+.result:hover {
+	border-color: var(--sage);
+	background: var(--sage-wash);
+}
+.result:disabled {
+	opacity: 0.5;
+	cursor: default;
+}
+.name {
+	font-weight: 600;
+	font-size: 13px;
+}
+.meta {
+	font-size: 11.5px;
+	color: var(--ink-muted);
+}

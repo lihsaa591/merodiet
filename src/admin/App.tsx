@@ -3,6 +3,7 @@ import { __ } from '@wordpress/i18n';
 import Sidebar from './Sidebar';
 import Dashboard from '../screens/dashboard/Dashboard';
 import ClientRoster from '../screens/clients/ClientRoster';
+import RecipeScreen from '../screens/recipes/RecipeScreen';
 import ComingSoon from '../screens/ComingSoon';
 import type { ReactNode } from 'react';
 
@@ -17,11 +18,7 @@ interface View {
 const VIEWS: Record< string, View > = {
 	dashboard: { render: () => <Dashboard /> },
 	clients: { render: () => <ClientRoster /> },
-	recipes: {
-		render: () => (
-			<ComingSoon title={ __( 'Recipe builder', 'nutrio' ) } label={ __( 'Recipe builder coming soon.', 'nutrio' ) } />
-		),
-	},
+	recipes: { render: () => <RecipeScreen /> },
 	plans: {
 		render: () => (
 			<ComingSoon title={ __( 'Meal plans', 'nutrio' ) } label={ __( 'Plan builder coming soon.', 'nutrio' ) } />
