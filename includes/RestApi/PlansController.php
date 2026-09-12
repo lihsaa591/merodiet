@@ -9,9 +9,12 @@ declare( strict_types=1 );
 
 namespace Nutrio\RestApi;
 
+use Nutrio\Nutrition\FoodCache;
 use Nutrio\Nutrition\PlanNutrientResolver;
+use Nutrio\Nutrition\RecipeNutrientResolver;
 use Nutrio\Repositories\ClientRepository;
 use Nutrio\Repositories\PlanRepository;
+use Nutrio\Repositories\RecipeRepository;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -53,7 +56,10 @@ final class PlansController extends AbstractPractitionerController {
 	public function __construct(
 		private readonly PlanRepository $plans,
 		private readonly PlanNutrientResolver $resolver,
-		private readonly ClientRepository $clients
+		private readonly ClientRepository $clients,
+		private readonly FoodCache $food_cache,
+		private readonly RecipeRepository $recipes,
+		private readonly RecipeNutrientResolver $recipe_resolver
 	) {}
 
 	/**
@@ -129,7 +135,7 @@ final class PlansController extends AbstractPractitionerController {
 	public function list_plans(): WP_REST_Response {
 		$plans = $this->plans->all_for_practitioner( $this->current_practitioner_id() );
 
-		return $this->success( array_map( array( $this, 'with_totals' ), $plans ) );
+		return $this->success( array_map( array( $this, 'with_details' ), $plans ) );
 	}
 
 	/**
@@ -155,7 +161,7 @@ final class PlansController extends AbstractPractitionerController {
 		 */
 		$plan = $this->plans->find( $id );
 
-		return $this->success( $this->with_totals( $plan ), 201 );
+		return $this->success( $this->with_details( $plan ), 201 );
 	}
 
 	/**
@@ -171,7 +177,7 @@ final class PlansController extends AbstractPractitionerController {
 			return $owns;
 		}
 
-		return $this->success( $this->with_totals( $plan ) );
+		return $this->success( $this->with_details( $plan ) );
 	}
 
 	/**
@@ -210,7 +216,7 @@ final class PlansController extends AbstractPractitionerController {
 		 */
 		$updated = $this->plans->find( $id );
 
-		return $this->success( $this->with_totals( $updated ) );
+		return $this->success( $this->with_details( $updated ) );
 	}
 
 	/**
@@ -278,24 +284,64 @@ final class PlansController extends AbstractPractitionerController {
 		 */
 		$assigned = $this->plans->find( $id );
 
-		return $this->success( $this->with_totals( $assigned ) );
+		return $this->success( $this->with_details( $assigned ) );
 	}
 
 	/**
-	 * Attach nutrient totals to a plan row — live for a draft, frozen
-	 * for an assigned plan. See class docblock for why the source
-	 * differs by status.
+	 * Attach nutrient totals and full day/item detail to a plan row.
+	 * Totals are live for a draft, frozen for an assigned plan — see
+	 * class docblock for why the source differs by status. Each item
+	 * gets a resolved food_description or recipe_name attached so the
+	 * frontend never has to look up a raw food_id/recipe_id itself.
 	 *
 	 * @param array<string, mixed> $plan Plan row.
 	 *
 	 * @return array<string, mixed>
 	 */
-	private function with_totals( array $plan ): array {
+	private function with_details( array $plan ): array {
 		$plan['nutrient_totals'] = 'assigned' === $plan['status']
 			? $plan['nutrient_snapshot']
 			: $this->resolver->calculate_plan_totals( $plan['id'] );
 
+		$plan['days'] = array_map(
+			fn ( array $day ): array => array(
+				'day_offset' => $day['day_offset'],
+				'items'      => array_map( array( $this, 'with_item_details' ), $this->plans->items_for_day( $day['id'] ) ),
+			),
+			$this->plans->days_for_plan( $plan['id'] )
+		);
+
 		return $plan;
+	}
+
+	/**
+	 * Attach a resolved label (and its source nutrients, for the
+	 * frontend's live per-day estimate) to one plan item.
+	 *
+	 * @param array<string, mixed> $item Raw plan_items row.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function with_item_details( array $item ): array {
+		if ( null !== $item['food_id'] ) {
+			$food                     = $this->food_cache->find( $item['food_id'] );
+			$item['food_description'] = $food['description'] ?? null;
+			$item['nutrients']        = $food['nutrients'] ?? array();
+			$item['recipe_name']      = null;
+			$item['recipe_nutrient_totals_per_serving'] = null;
+
+			return $item;
+		}
+
+		$recipe                      = $this->recipes->find( (int) $item['recipe_id'] );
+		$item['recipe_name']        = $recipe['name'] ?? null;
+		$item['recipe_nutrient_totals_per_serving'] = null === $item['recipe_id']
+			? null
+			: $this->recipe_resolver->calculate_per_serving_totals( (int) $item['recipe_id'] );
+		$item['food_description']   = null;
+		$item['nutrients']          = null;
+
+		return $item;
 	}
 
 	/**
