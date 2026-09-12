@@ -1,3 +1,5 @@
+import styles from './Avatar.module.css';
+
 // Client-identity marker — a colored circle with initials. Deliberately kept
 // (not the left-border-strip alternative a design review proposed) — see the
 // "SUPERSEDED, reverted" note in DESIGN.md.
@@ -21,11 +23,11 @@ interface AvatarProps {
 }
 
 export default function Avatar( { id, firstName, lastName, size = 'md' }: AvatarProps ) {
-	const sizeClass = size === 'sm' ? 'is-sm' : size === 'lg' ? 'is-lg' : '';
+	const sizeClass = size === 'sm' ? styles.sm : size === 'lg' ? styles.lg : '';
 
 	return (
 		<div
-			className={ `nutrio-avatar ${ sizeClass }`.trim() }
+			className={ `${ styles.avatar } ${ sizeClass }`.trim() }
 			style={ { background: colorForId( id ) } }
 		>
 			{ initialsFor( firstName, lastName ) }

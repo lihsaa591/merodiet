@@ -1,0 +1,20 @@
+.iconBtn {
+	width: 28px;
+	height: 28px;
+	border-radius: 6px;
+	border: 1px solid var(--line-strong);
+	background: var(--surface);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--ink-muted);
+	cursor: pointer;
+}
+.iconBtn:hover {
+	color: var(--ink);
+	border-color: var(--ink-faint);
+}
+.iconBtn svg {
+	width: 14px;
+	height: 14px;
+}

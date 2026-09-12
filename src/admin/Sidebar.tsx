@@ -149,7 +149,7 @@ function RailFoot() {
 
 	return (
 		<div className="nutrio-rail-foot">
-			<div className="nutrio-avatar">{ window.nutrioAdmin?.currentUserInitials ?? 'U' }</div>
+			<div className="nutrio-user-avatar">{ window.nutrioAdmin?.currentUserInitials ?? 'U' }</div>
 			<div style={ { flex: 1, minWidth: 0 } }>
 				<div className="nutrio-rail-foot-name">{ window.nutrioAdmin?.currentUserName ?? '' }</div>
 				<div className="nutrio-rail-foot-role">{ __( 'Practitioner', 'nutrio' ) }</div>

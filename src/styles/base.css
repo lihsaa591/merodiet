@@ -46,6 +46,11 @@ body.toplevel_page_nutrio #wpbody-content {
 .nutrio-admin-app h2,
 .nutrio-admin-app h3,
 .nutrio-admin-app h4 {
+	/* Explicit, not inherited: wp-admin's own core CSS has its own (theme-
+	   unaware) heading color rule, which beats plain inheritance from
+	   .nutrio-admin-app regardless of specificity -- this was invisible
+	   text in dark mode until fixed. */
+	color: var(--ink);
 	font-family: 'Public Sans', sans-serif;
 	font-weight: 700;
 	margin: 0;
@@ -185,6 +190,23 @@ body.toplevel_page_nutrio #wpbody-content {
 	font-size: 11px;
 	color: var(--ink-faint);
 }
+/* The current user's own avatar chip in the sidebar footer -- a single
+   pre-computed initials string from PHP, not the Avatar component's
+   first/last-name + client-id contract, so it gets its own small style
+   rather than misusing that component's props. */
+.nutrio-user-avatar {
+	width: 26px;
+	height: 26px;
+	border-radius: 50%;
+	background: var(--sage);
+	color: #fff;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 11px;
+	font-weight: 700;
+	flex-shrink: 0;
+}
 
 .nutrio-main {
 	display: flex;
@@ -285,6 +307,10 @@ body.toplevel_page_nutrio #wpbody-content {
 		height: 100vh;
 		width: 250px;
 		z-index: 60;
+		/* Extra top padding so the rail's own content (starting with the
+		   "Back to WordPress" link) clears the fixed hamburger button
+		   instead of sitting directly underneath it. */
+		padding-top: 60px;
 		transform: translateX(-100%);
 		transition: transform 0.2s ease;
 	}
@@ -304,5 +330,152 @@ body.toplevel_page_nutrio #wpbody-content {
 		padding: 14px 0 14px 60px;
 		flex-wrap: wrap;
 		gap: 10px;
+	}
+}
+
+/* ---------- Pro-lock icon (shared across Button and Sidebar's nav item) ---------- */
+.nutrio-pro-lock {
+	width: 13px;
+	height: 13px;
+	opacity: 0.7;
+}
+
+/* ---------- KPI row (used directly by the Dashboard screen) ---------- */
+.nutrio-kpi-row {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 14px;
+	margin-bottom: 22px;
+}
+.nutrio-kpi {
+	background: var(--surface);
+	border: 1px solid var(--line);
+	border-radius: var(--radius);
+	padding: 16px 18px;
+}
+.nutrio-kpi-label {
+	font-size: 11.5px;
+	color: var(--ink-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+.nutrio-kpi-value {
+	font-size: 28px;
+	font-weight: 700;
+	margin-top: 6px;
+	letter-spacing: -0.01em;
+}
+.nutrio-kpi-delta {
+	font-size: 12px;
+	margin-top: 4px;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+.nutrio-kpi-delta.is-up {
+	color: var(--success);
+}
+.nutrio-kpi-delta.is-warn {
+	color: var(--warning);
+}
+
+@media (max-width: 900px) {
+	.nutrio-kpi-row {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+@media (max-width: 560px) {
+	.nutrio-kpi-row {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* ---------- Table (used directly by the Clients screen) ---------- */
+.nutrio-table-wrap {
+	overflow-x: auto;
+}
+.nutrio-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 13px;
+}
+.nutrio-table th {
+	text-align: left;
+	font-size: 12.5px;
+	color: var(--ink-muted);
+	font-weight: 600;
+	padding: 12px 14px;
+	border-bottom: 1px solid var(--line-strong);
+	white-space: nowrap;
+}
+.nutrio-table td {
+	padding: 12px 14px;
+	border-bottom: 1px solid var(--line);
+	vertical-align: middle;
+}
+.nutrio-table tr:last-child td {
+	border-bottom: none;
+}
+.nutrio-table tbody tr:hover {
+	background: var(--paper-dim);
+}
+.nutrio-cell-name {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-weight: 600;
+}
+.nutrio-row-actions {
+	display: flex;
+	gap: 4px;
+	justify-content: flex-end;
+	opacity: 0;
+}
+.nutrio-table tr:hover .nutrio-row-actions {
+	opacity: 1;
+}
+
+/* ---------- Form fields (used directly by ClientForm) ---------- */
+.nutrio-field {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+.nutrio-field label {
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--ink-muted);
+}
+.nutrio-field input,
+.nutrio-field textarea,
+.nutrio-field select {
+	font-family: inherit;
+	font-size: 13.5px;
+	padding: 9px 11px;
+	border: 1px solid var(--line-strong);
+	border-radius: 8px;
+	background: var(--surface);
+	color: var(--ink);
+}
+.nutrio-field input:focus,
+.nutrio-field textarea:focus,
+.nutrio-field select:focus {
+	outline: 2px solid var(--sage);
+	outline-offset: 1px;
+	border-color: var(--sage);
+}
+.nutrio-field-row {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 12px;
+}
+.nutrio-field-hint {
+	font-size: 11.5px;
+	color: var(--ink-faint);
+}
+
+@media (max-width: 560px) {
+	.nutrio-field-row {
+		grid-template-columns: 1fr;
 	}
 }

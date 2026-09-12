@@ -2,7 +2,6 @@ import { createRoot } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import '../styles/tokens.css';
 import '../styles/base.css';
-import '../styles/components.css';
 import '../store/clients';
 import App from './App';
 

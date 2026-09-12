@@ -1,0 +1,47 @@
+.modalScrim {
+	position: fixed;
+	inset: 0;
+	background: rgba(38, 38, 42, 0.4);
+	z-index: 70;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.modal {
+	background: var(--surface-raised);
+	border-radius: 14px;
+	width: 360px;
+	max-width: calc(100vw - 40px);
+	padding: 26px 26px 22px;
+	text-align: center;
+}
+.modalIcon {
+	width: 44px;
+	height: 44px;
+	border-radius: 12px;
+	margin: 0 auto 16px;
+	background: var(--sage-wash);
+	color: var(--sage-deep);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.modalIcon svg {
+	width: 20px;
+	height: 20px;
+}
+.modal h3 {
+	font-size: 16px;
+	margin-bottom: 6px;
+}
+.modal p {
+	font-size: 13px;
+	color: var(--ink-muted);
+	margin: 0 0 20px;
+	line-height: 1.5;
+}
+.modalActions {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}

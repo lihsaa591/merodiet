@@ -1,0 +1,29 @@
+.chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 3px 9px;
+	border-radius: 999px;
+	font-size: 11px;
+	font-weight: 600;
+}
+.sage {
+	background: var(--sage-wash);
+	color: var(--sage-deep);
+}
+.clay {
+	background: var(--clay-wash);
+	color: var(--clay);
+}
+.success {
+	background: var(--success-wash);
+	color: var(--success);
+}
+.warning {
+	background: var(--warning-wash);
+	color: var(--warning);
+}
+.critical {
+	background: var(--critical-wash);
+	color: var(--critical);
+}

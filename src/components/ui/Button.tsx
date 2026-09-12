@@ -1,9 +1,10 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import styles from './Button.module.css';
 
 const VARIANT_CLASS = {
-	primary: 'nutrio-btn-primary',
-	ghost: 'nutrio-btn-ghost',
-	link: 'nutrio-btn-link',
+	primary: styles.btnPrimary,
+	ghost: styles.btnGhost,
+	link: styles.btnLink,
 };
 
 interface ButtonProps extends ButtonHTMLAttributes< HTMLButtonElement > {
@@ -22,10 +23,10 @@ export default function Button( {
 	...rest
 }: ButtonProps ) {
 	const classes = [
-		'nutrio-btn',
+		styles.btn,
 		VARIANT_CLASS[ variant ] ?? VARIANT_CLASS.primary,
-		destructive ? 'is-destructive' : '',
-		pro ? 'nutrio-btn-pro' : '',
+		destructive ? styles.isDestructive : '',
+		pro ? styles.btnPro : '',
 		className,
 	]
 		.filter( Boolean )
@@ -39,6 +40,9 @@ export default function Button( {
 	);
 }
 
+// Shared across Button and the sidebar's Pro nav item -- stays a plain
+// global class (see base.css) rather than a scoped module, since it's not
+// owned by one component.
 function ProLockIcon() {
 	return (
 		<svg className="nutrio-pro-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

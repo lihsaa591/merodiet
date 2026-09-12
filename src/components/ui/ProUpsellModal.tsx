@@ -1,5 +1,6 @@
 import { __, sprintf } from '@wordpress/i18n';
 import Button from './Button';
+import styles from './ProUpsellModal.module.css';
 
 interface ProUpsellModalProps {
 	isOpen: boolean;
@@ -16,11 +17,11 @@ export default function ProUpsellModal( { isOpen, featureName, onClose }: ProUps
 
 	return (
 		<div
-			className="nutrio-modal-scrim"
+			className={ styles.modalScrim }
 			onClick={ ( e ) => e.target === e.currentTarget && onClose() }
 		>
-			<div className="nutrio-modal">
-				<div className="nutrio-modal-icon">
+			<div className={ styles.modal }>
+				<div className={ styles.modalIcon }>
 					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
 						<rect x="5" y="11" width="14" height="9" rx="2" />
 						<path d="M8 11V8a4 4 0 0 1 8 0v3" />
@@ -34,7 +35,7 @@ export default function ProUpsellModal( { isOpen, featureName, onClose }: ProUps
 						featureName
 					) }
 				</p>
-				<div className="nutrio-modal-actions">
+				<div className={ styles.modalActions }>
 					<Button variant="primary" style={ { justifyContent: 'center' } }>
 						{ __( 'Upgrade to Pro', 'nutrio' ) }
 					</Button>
