@@ -350,7 +350,7 @@ final class PlansController extends AbstractPractitionerController {
 
 		$recipe                      = $this->recipes->find_for_practitioner( (int) $item['recipe_id'], $this->current_practitioner_id() );
 		$item['recipe_name']        = $recipe['name'] ?? null;
-		$item['recipe_nutrient_totals_per_serving'] = null === $item['recipe_id']
+		$item['recipe_nutrient_totals_per_serving'] = null === $recipe
 			? null
 			: $this->recipe_resolver->calculate_per_serving_totals( (int) $item['recipe_id'] );
 		$item['food_description']   = null;
