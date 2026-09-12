@@ -31,6 +31,7 @@ Theme toggle (light/dark) and current-user identity live in the sidebar footer.
 - **Primary content:** rows with avatar + name, email, allergy chips, status pill.
 - **Primary action:** "Add client" (top-right, in the same topbar row as the title), opens a slide-in drawer form.
 - **Empty state:** "No clients yet. Add your first client to get started." + the Add client button.
+- **By design, "Add client" does not create a WordPress user account.** A client here is a lightweight roster record in `wp_nutrio_clients`, deliberately separate from wp-admin → Users. The `clients` table's nullable `user_id` column is reserved for Phase 3 (client portal): an "Invite client" action that creates a real WP user with the `nutrition_client` role, links it via that column, and sends login access — not built yet.
 
 ### Recipes (placeholder)
 - **Purpose:** build/maintain a reusable recipe library with live nutrient totals.
