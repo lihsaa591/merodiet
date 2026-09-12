@@ -39,6 +39,7 @@ return array(
 			\Nutrio\RestApi\RecipesController::class => array(
 				\Nutrio\Repositories\RecipeRepository::class,
 				\Nutrio\Nutrition\RecipeNutrientResolver::class,
+				\Nutrio\Nutrition\FoodCache::class,
 			),
 			\Nutrio\RestApi\PlansController::class   => array(
 				\Nutrio\Repositories\PlanRepository::class,
