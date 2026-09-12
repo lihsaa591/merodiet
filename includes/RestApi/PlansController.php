@@ -135,7 +135,7 @@ final class PlansController extends AbstractPractitionerController {
 	public function list_plans(): WP_REST_Response {
 		$plans = $this->plans->all_for_practitioner( $this->current_practitioner_id() );
 
-		return $this->success( array_map( array( $this, 'with_details' ), $plans ) );
+		return $this->success( array_map( array( $this, 'with_totals' ), $plans ) );
 	}
 
 	/**
@@ -288,20 +288,35 @@ final class PlansController extends AbstractPractitionerController {
 	}
 
 	/**
+	 * Attach nutrient totals to a plan row. Totals are live for a draft,
+	 * frozen for an assigned plan — see class docblock for why the
+	 * source differs by status. Used by list_plans(), which never reads
+	 * per-item detail.
+	 *
+	 * @param array<string, mixed> $plan Plan row.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function with_totals( array $plan ): array {
+		$plan['nutrient_totals'] = 'assigned' === $plan['status']
+			? $plan['nutrient_snapshot']
+			: $this->resolver->calculate_plan_totals( $plan['id'] );
+
+		return $plan;
+	}
+
+	/**
 	 * Attach nutrient totals and full day/item detail to a plan row.
-	 * Totals are live for a draft, frozen for an assigned plan — see
-	 * class docblock for why the source differs by status. Each item
-	 * gets a resolved food_description or recipe_name attached so the
-	 * frontend never has to look up a raw food_id/recipe_id itself.
+	 * Each item gets a resolved food_description or recipe_name attached
+	 * so the frontend never has to look up a raw food_id/recipe_id
+	 * itself. Used by every single-plan response.
 	 *
 	 * @param array<string, mixed> $plan Plan row.
 	 *
 	 * @return array<string, mixed>
 	 */
 	private function with_details( array $plan ): array {
-		$plan['nutrient_totals'] = 'assigned' === $plan['status']
-			? $plan['nutrient_snapshot']
-			: $this->resolver->calculate_plan_totals( $plan['id'] );
+		$plan = $this->with_totals( $plan );
 
 		$plan['days'] = array_map(
 			fn ( array $day ): array => array(
@@ -333,7 +348,7 @@ final class PlansController extends AbstractPractitionerController {
 			return $item;
 		}
 
-		$recipe                      = $this->recipes->find( (int) $item['recipe_id'] );
+		$recipe                      = $this->recipes->find_for_practitioner( (int) $item['recipe_id'], $this->current_practitioner_id() );
 		$item['recipe_name']        = $recipe['name'] ?? null;
 		$item['recipe_nutrient_totals_per_serving'] = null === $item['recipe_id']
 			? null

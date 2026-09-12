@@ -6,7 +6,11 @@ import UnsavedBadge from '../../components/ui/UnsavedBadge';
 import { useGlobalDirtyState } from '../../hooks/useGlobalDirtyState';
 import ItemSearch from './ItemSearch';
 import styles from './PlanBuilder.module.css';
-import { estimateDayNutrients, formatAmount } from '../../utils/nutrients';
+import {
+	estimateDayNutrients,
+	formatAmount,
+	summarizeNutrients,
+} from '../../utils/nutrients';
 import type {
 	MealType,
 	Plan,
@@ -342,25 +346,34 @@ export default function PlanBuilder( {
 		}
 	};
 
-	const summary = activeDay
-		? estimateDayNutrients(
-				activeDay.items.map( ( item ) =>
-					item.food_id
-						? {
-								kind: 'food' as const,
-								quantity_grams: item.quantity_grams ?? 0,
-								nutrients: item.nutrients ?? {},
-						  }
-						: {
-								kind: 'recipe' as const,
-								servings: item.servings ?? 0,
-								nutrient_totals_per_serving:
-									item.recipe_nutrient_totals_per_serving ??
-									{},
-						  }
-				)
-		  )
-		: { kcal: null, protein: null, carbs: null, fat: null };
+	// An assigned plan's totals are a frozen snapshot keyed by day_offset —
+	// never recomputed from in-memory items, unlike the live draft estimate.
+	function computeLiveSummary() {
+		if ( ! activeDay ) {
+			return { kcal: null, protein: null, carbs: null, fat: null };
+		}
+
+		return estimateDayNutrients(
+			activeDay.items.map( ( item ) =>
+				item.food_id
+					? {
+							kind: 'food' as const,
+							quantity_grams: item.quantity_grams ?? 0,
+							nutrients: item.nutrients ?? {},
+					  }
+					: {
+							kind: 'recipe' as const,
+							servings: item.servings ?? 0,
+							nutrient_totals_per_serving:
+								item.recipe_nutrient_totals_per_serving ?? {},
+					  }
+			)
+		);
+	}
+
+	const summary = isReadOnly
+		? summarizeNutrients( plan?.nutrient_totals[ activeDayOffset ] ?? {} )
+		: computeLiveSummary();
 
 	return (
 		<>
