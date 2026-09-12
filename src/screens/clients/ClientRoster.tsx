@@ -172,6 +172,7 @@ export default function ClientRoster() {
         onClose={closeDrawer}
       >
         <ClientForm
+          key={editingClient?.id ?? "new"}
           client={editingClient}
           onSubmit={handleSubmit}
           onCancel={closeDrawer}

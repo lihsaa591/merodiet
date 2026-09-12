@@ -66,7 +66,7 @@ export default function ClientForm( { client, onSubmit, onCancel }: ClientFormPr
 	};
 
 	return (
-		<form onSubmit={ handleSubmit }>
+		<form onSubmit={ handleSubmit } style={ { display: 'flex', flexDirection: 'column', gap: '16px' } }>
 			<div className="nutrio-field">
 				<label htmlFor="nutrio-first-name">{ __( 'First name', 'nutrio' ) }</label>
 				<input id="nutrio-first-name" type="text" value={ values.first_name } onChange={ setField( 'first_name' ) } required />
@@ -85,7 +85,7 @@ export default function ClientForm( { client, onSubmit, onCancel }: ClientFormPr
 				<div className="nutrio-field-hint">{ __( 'Comma-separated', 'nutrio' ) }</div>
 			</div>
 
-			<div style={ { display: 'flex', gap: '10px', marginTop: '16px' } }>
+			<div style={ { display: 'flex', gap: '10px' } }>
 				<Button variant="primary" type="submit" disabled={ isSaving } style={ { flex: 1, justifyContent: 'center' } }>
 					{ client ? __( 'Save changes', 'nutrio' ) : __( 'Add client', 'nutrio' ) }
 				</Button>
