@@ -4,6 +4,7 @@ import '../styles/tokens.css';
 import '../styles/base.css';
 import '../store/clients';
 import '../store/recipes';
+import '../store/plans';
 import App from './App';
 
 const settings = window.nutrioAdmin ?? {};
