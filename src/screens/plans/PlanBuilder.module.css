@@ -1,0 +1,141 @@
+.grid {
+	display: grid;
+	grid-template-columns: 1fr 340px;
+	gap: 16px;
+}
+@media (max-width: 900px) {
+	.grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+.nameRow {
+	display: grid;
+	grid-template-columns: 2fr 1fr 1fr;
+	gap: 12px;
+}
+@media (max-width: 560px) {
+	.nameRow {
+		grid-template-columns: 1fr;
+	}
+}
+
+.dayTabs {
+	display: flex;
+	gap: 6px;
+	overflow-x: auto;
+	margin-bottom: 16px;
+	padding-bottom: 4px;
+}
+.dayTab {
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	font-family: inherit;
+	font-size: 12.5px;
+	font-weight: 600;
+	padding: 8px 14px;
+	border-radius: 8px;
+	border: 1px solid var(--line-strong);
+	background: var(--surface);
+	color: var(--ink-muted);
+	cursor: pointer;
+}
+.dayTab.isActive {
+	background: var(--sage-wash);
+	border-color: var(--sage-deep);
+	color: var(--sage-deep);
+}
+.dayTabDate {
+	font-size: 10.5px;
+	font-weight: 400;
+	color: var(--ink-faint);
+}
+
+.mealSection {
+	margin-bottom: 18px;
+}
+.mealHeader {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	border-bottom: 1px solid var(--line);
+	padding-bottom: 6px;
+	margin-bottom: 4px;
+}
+.mealHeader h3 {
+	font-size: 13px;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--ink-muted);
+}
+.addBtn {
+	font-family: inherit;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--sage-deep);
+	background: none;
+	border: none;
+	cursor: pointer;
+}
+
+.itemRow {
+	display: grid;
+	grid-template-columns: 1fr 70px 40px 28px;
+	gap: 10px;
+	align-items: center;
+	padding: 8px 0;
+	border-bottom: 1px solid var(--line);
+}
+.itemRow:last-child {
+	border-bottom: none;
+}
+.qtyInput {
+	width: 100%;
+	font-family: inherit;
+	font-size: 13px;
+	padding: 5px 8px;
+	border: 1px solid var(--line-strong);
+	border-radius: 6px;
+	background: var(--surface);
+	color: var(--ink);
+}
+.removeBtn {
+	width: 24px;
+	height: 24px;
+	border-radius: 6px;
+	border: 1px solid var(--line-strong);
+	background: var(--surface);
+	color: var(--ink-muted);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+}
+.removeBtn svg {
+	width: 13px;
+	height: 13px;
+}
+
+.nutrientGrid {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 10px;
+}
+.nutrientTile {
+	background: var(--paper-dim);
+	border-radius: 8px;
+	padding: 10px 12px;
+}
+.nutrientVal {
+	font-family: 'IBM Plex Mono', monospace;
+	font-size: 17px;
+	font-weight: 600;
+}
+.nutrientLbl {
+	font-size: 12px;
+	color: var(--ink-muted);
+	font-weight: 600;
+	margin-top: 2px;
+}
