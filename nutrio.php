@@ -35,6 +35,12 @@ if ( ! defined( 'NUTRIO_DEVELOPMENT' ) ) {
 	define( 'NUTRIO_DEVELOPMENT', defined( 'WP_DEBUG' ) && WP_DEBUG );
 }
 
+// Where `npm start` (webpack-dev-server) serves the build from — overridable
+// the same way, in case a setup runs it on a different port.
+if ( NUTRIO_DEVELOPMENT && ! defined( 'NUTRIO_DEV_SERVER_URL' ) ) {
+	define( 'NUTRIO_DEV_SERVER_URL', 'http://localhost:8887' );
+}
+
 // Composer autoloader.
 $nutrio_autoloader = NUTRIO_PATH . 'vendor/autoload.php';
 

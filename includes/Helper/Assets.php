@@ -49,9 +49,15 @@ final class Assets {
 		 */
 		$asset = require $asset_file;
 
+		// In development, load from the running dev server for hot updates
+		// instead of the last-built file.
+		$src = NUTRIO_DEVELOPMENT
+			? NUTRIO_DEV_SERVER_URL . "/{$entry}.js"
+			: rtrim( $build_url, '/' ) . "/{$entry}.js";
+
 		wp_enqueue_script(
 			$handle,
-			rtrim( $build_url, '/' ) . "/{$entry}.js",
+			$src,
 			array_merge( $asset['dependencies'], $extra_deps ),
 			$asset['version'],
 			true

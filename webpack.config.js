@@ -39,4 +39,11 @@ module.exports = {
 	entry: {
 		admin: path.resolve( __dirname, 'src/admin/index.tsx' ),
 	},
+	// wp-admin runs on a different origin than the dev server, so both
+	// cross-origin requests and the HMR client's fetch polling need to be allowed.
+	devServer: {
+		...defaultConfig.devServer,
+		allowedHosts: 'all',
+		headers: { 'Access-Control-Allow-Origin': '*' },
+	},
 };

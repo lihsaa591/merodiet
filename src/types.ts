@@ -77,9 +77,6 @@ declare global {
 			adminUrl?: string;
 			currentUserName?: string;
 			currentUserInitials?: string;
-			// wp_localize_script serializes PHP booleans as the string "1" or
-			// "" — never a real JS boolean — so check truthiness, not `=== true`.
-			isDevelopment?: string;
 		};
 	}
 }
