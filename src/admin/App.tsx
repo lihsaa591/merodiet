@@ -5,6 +5,7 @@ import Sidebar from './Sidebar';
 import Dashboard from '../screens/dashboard/Dashboard';
 import ClientRoster from '../screens/clients/ClientRoster';
 import RecipeScreen from '../screens/recipes/RecipeScreen';
+import PlanScreen from '../screens/plans/PlanScreen';
 import ComingSoon from '../screens/ComingSoon';
 import type { ReactNode } from 'react';
 
@@ -20,14 +21,7 @@ const VIEWS: Record< string, View > = {
 	dashboard: { render: () => <Dashboard /> },
 	clients: { render: () => <ClientRoster /> },
 	recipes: { render: () => <RecipeScreen /> },
-	plans: {
-		render: () => (
-			<ComingSoon
-				title={ __( 'Meal plans', 'nutrio' ) }
-				label={ __( 'Plan builder coming soon.', 'nutrio' ) }
-			/>
-		),
-	},
+	plans: { render: () => <PlanScreen /> },
 	foods: {
 		render: () => (
 			<ComingSoon

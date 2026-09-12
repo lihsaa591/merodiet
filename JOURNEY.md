@@ -11,7 +11,7 @@ Full-screen app (hides the standard wp-admin chrome; a "Back to WordPress" link 
 1. **Dashboard** — practitioner's morning check-in
 2. **Clients** — roster CRUD (built, wired to the live REST API)
 3. **Recipes** — recipe library + builder, backed by live USDA food search (built)
-4. **Plans** — meal-plan list + a dedicated full-screen Plan Builder mode (not yet built — placeholder)
+4. **Plans** — meal-plan list + day-by-day builder, inside the standard sidebar shell (built)
 5. **Food database** — cached USDA lookups (stub page)
 6. **Settings** — USDA API key, practice details (stub page)
 7. **Analytics** *(Pro-locked)* — future advanced reporting, gated by the shared upsell modal
@@ -39,16 +39,13 @@ Theme toggle (light/dark) and current-user identity live in the sidebar footer.
 - **Primary action:** "New recipe" (top-right, own topbar row).
 - **Not yet built — manual ingredient entry:** some ingredients (a client's specific branded product, a homemade blend, a supplement) won't be in USDA's database. Plan is to support it as another food `source` (e.g. `custom`) alongside USDA — same `ResolvedFood`/`RecipeItem` pipeline, practitioner enters name + the 4 macros per 100g, and it's visibly tagged "Custom" (vs. "USDA") in the UI so a saved number's provenance is never ambiguous in a clinical tool.
 
-### Plans (placeholder)
-- **Purpose:** list existing meal plans; open the dedicated full-screen builder to create/edit one.
-- **Primary content:** table of plan/client/date-range/avg. daily kcal/status; clicking a row opens the Plan Builder (per the mockup — not yet implemented).
-- **Primary action:** "New plan" (top-right, own topbar row, once built).
-
-### Plan Builder (full-screen, not a sidebar-nav page — not yet built)
-- **Purpose:** day-by-day meal composition with live nutrient totals and an allergy safety check.
-- **Primary content:** day tabs, meal blocks (breakfast/lunch/dinner) with ingredient/recipe line items, a sticky nutrient-totals panel, an allergy-safety flag.
-- **Primary action:** "Assign to client" (locks the plan, freezes its nutrient snapshot).
-- **Pro-gated action:** "Generate with AI" — locked, opens the shared Pro upsell modal.
+### Plans (built)
+- **Purpose:** list existing meal plans; open a day-by-day builder to create/edit one, then assign it to a client.
+- **Primary content:** table of plan/client/date-range/avg. daily kcal/status; day tabs (auto-generated from the plan's start/end date) with Breakfast/Lunch/Dinner/Snack meal sections, a sticky per-day nutrient-totals panel, an "Assign to client" action.
+- **Primary action:** "New plan" (top-right, own topbar row).
+- **Note:** unlike the original spec, this stays inside the standard sidebar shell (not a separate full-screen mode) — decided during this feature's design pass for consistency with every other screen.
+- **Allergy check:** runs only at the moment of assignment (the builder itself never has a client attached until then) — a case-insensitive substring match of the client's declared allergies against every item's name in the plan. Known limitation: not a real allergen taxonomy (misses synonyms, plurals, category-level allergens like "tree nuts" not auto-catching "almonds").
+- **Assigned plans are read-only.** The backend rejects edits to an assigned plan (409); the builder mirrors that by disabling every input rather than only showing the error after a failed save.
 
 ### Food database (stub)
 - **Purpose:** transparency into the cached USDA lookups recipes draw from.
