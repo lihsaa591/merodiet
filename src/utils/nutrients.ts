@@ -8,11 +8,8 @@ const PROTEIN_ID = '1003';
 const FAT_ID = '1004';
 const CARBS_ID = '1005';
 
-/**
- * Backend stores nutrient amounts as integers scaled x1000 (never floats,
- *  for deterministic math) — this un-scales one value for display.
- * @param amount
- */
+// Backend stores nutrient amounts as integers scaled x1000 (never floats,
+// for deterministic math) — this un-scales one value for display.
 function unscale( amount: number | undefined ): number | null {
 	return amount === undefined ? null : amount / 1000;
 }
@@ -24,12 +21,9 @@ export interface NutrientSummary {
 	fat: number | null;
 }
 
-/**
- * Not every food reports every macro (some USDA entries genuinely lack
- * protein/fat/carb/energy values) — callers must handle `null` rather than
- * assume these are always present.
- * @param totals
- */
+// Not every food reports every macro (some USDA entries genuinely lack
+// protein/fat/carb/energy values) — callers must handle `null` rather than
+// assume these are always present.
 export function summarizeNutrients( totals: NutrientTotals ): NutrientSummary {
 	const energyId = ENERGY_IDS.find( ( id ) => totals[ id ] !== undefined );
 
@@ -41,13 +35,9 @@ export function summarizeNutrients( totals: NutrientTotals ): NutrientSummary {
 	};
 }
 
-/**
- * Live estimate from in-progress ingredients, ahead of the server's
- *  save-computed totals. Nutrients here are raw per-100g values, not
- *  x1000-scaled like the backend's storage format, so no unscale() needed.
- * @param items
- * @param servings
- */
+// Live estimate from in-progress ingredients, ahead of the server's
+// save-computed totals. Nutrients here are raw per-100g values, not
+// x1000-scaled like the backend's storage format, so no unscale() needed.
 export function estimateNutrientsPerServing(
 	items: Pick< RecipeItem, 'quantity_grams' | 'nutrients' >[],
 	servings: number
@@ -88,13 +78,10 @@ interface DayRecipeItem {
 	nutrient_totals_per_serving: NutrientTotals;
 }
 
-/**
- * Live estimate for one plan day, mixing direct-food items (scaled by
- * grams, like a recipe's own ingredients) and recipe items (scaled by
- * number of servings, using that recipe's own already-computed
- * per-serving totals rather than re-deriving them from its ingredients).
- * @param items
- */
+// Live estimate for one plan day, mixing direct-food items (scaled by
+// grams, like a recipe's own ingredients) and recipe items (scaled by
+// number of servings, using that recipe's own already-computed
+// per-serving totals rather than re-deriving them from its ingredients).
 export function estimateDayNutrients(
 	items: ( DayFoodItem | DayRecipeItem )[]
 ): NutrientSummary {
