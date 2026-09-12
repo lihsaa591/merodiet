@@ -1,6 +1,8 @@
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import Button from '../../components/ui/Button';
+import UnsavedBadge from '../../components/ui/UnsavedBadge';
+import { useGlobalDirtyState } from '../../hooks/useGlobalDirtyState';
 import type { Client, ClientInput } from '../../types';
 
 interface FormValues {
@@ -21,6 +23,8 @@ interface ClientFormProps {
 	client?: Client | null;
 	onSubmit: ( data: ClientInput ) => Promise< void >;
 	onCancel: () => void;
+	/** Reports dirty state up so a wrapping Drawer's X/backdrop can also guard against discarding changes. */
+	onDirtyChange?: ( isDirty: boolean ) => void;
 }
 
 /**
@@ -28,7 +32,12 @@ interface ClientFormProps {
  * client record for edit — the only difference the caller needs to
  * handle is which store action it dispatches on submit.
  */
-export default function ClientForm( { client, onSubmit, onCancel }: ClientFormProps ) {
+export default function ClientForm( {
+	client,
+	onSubmit,
+	onCancel,
+	onDirtyChange,
+}: ClientFormProps ) {
 	const [ values, setValues ] = useState< FormValues >( () =>
 		client
 			? {
@@ -40,11 +49,19 @@ export default function ClientForm( { client, onSubmit, onCancel }: ClientFormPr
 			: EMPTY
 	);
 	const [ isSaving, setIsSaving ] = useState( false );
+	const { isDirty, markClean } = useGlobalDirtyState( values );
+
+	useEffect( () => {
+		onDirtyChange?.( isDirty );
+	}, [ isDirty, onDirtyChange ] );
 
 	const setField =
 		( field: keyof FormValues ) =>
 		( event: React.ChangeEvent< HTMLInputElement > ) =>
-			setValues( ( prev ) => ( { ...prev, [ field ]: event.target.value } ) );
+			setValues( ( prev ) => ( {
+				...prev,
+				[ field ]: event.target.value,
+			} ) );
 
 	const handleSubmit = async ( event: React.FormEvent ) => {
 		event.preventDefault();
@@ -60,45 +77,101 @@ export default function ClientForm( { client, onSubmit, onCancel }: ClientFormPr
 					.map( ( item ) => item.trim() )
 					.filter( Boolean ),
 			} );
+			markClean();
 		} finally {
 			setIsSaving( false );
 		}
 	};
 
+	const handleCancel = () => {
+		if (
+			! isDirty ||
+			// eslint-disable-next-line no-alert
+			window.confirm( __( 'Discard unsaved changes?', 'nutrio' ) )
+		) {
+			onCancel();
+		}
+	};
+
 	return (
-		<form onSubmit={ handleSubmit } style={ { display: 'flex', flexDirection: 'column', gap: '16px' } }>
+		<form
+			onSubmit={ handleSubmit }
+			style={ { display: 'flex', flexDirection: 'column', gap: '16px' } }
+		>
 			<div className="nutrio-field">
 				<label htmlFor="nutrio-first-name">
 					{ __( 'First name', 'nutrio' ) }
 					<RequiredMark />
 				</label>
-				<input id="nutrio-first-name" type="text" value={ values.first_name } onChange={ setField( 'first_name' ) } required />
+				<input
+					id="nutrio-first-name"
+					type="text"
+					value={ values.first_name }
+					onChange={ setField( 'first_name' ) }
+					required
+				/>
 			</div>
 			<div className="nutrio-field">
 				<label htmlFor="nutrio-last-name">
 					{ __( 'Last name', 'nutrio' ) }
 					<RequiredMark />
 				</label>
-				<input id="nutrio-last-name" type="text" value={ values.last_name } onChange={ setField( 'last_name' ) } required />
+				<input
+					id="nutrio-last-name"
+					type="text"
+					value={ values.last_name }
+					onChange={ setField( 'last_name' ) }
+					required
+				/>
 			</div>
 			<div className="nutrio-field">
 				<label htmlFor="nutrio-email">
 					{ __( 'Email', 'nutrio' ) }
 					<RequiredMark />
 				</label>
-				<input id="nutrio-email" type="email" value={ values.email } onChange={ setField( 'email' ) } required />
+				<input
+					id="nutrio-email"
+					type="email"
+					value={ values.email }
+					onChange={ setField( 'email' ) }
+					required
+				/>
 			</div>
 			<div className="nutrio-field">
-				<label htmlFor="nutrio-allergies">{ __( 'Allergies & restrictions', 'nutrio' ) }</label>
-				<input id="nutrio-allergies" type="text" value={ values.allergies } onChange={ setField( 'allergies' ) } placeholder={ __( 'Peanuts, shellfish', 'nutrio' ) } />
-				<div className="nutrio-field-hint">{ __( 'Comma-separated', 'nutrio' ) }</div>
+				<label htmlFor="nutrio-allergies">
+					{ __( 'Allergies & restrictions', 'nutrio' ) }
+				</label>
+				<input
+					id="nutrio-allergies"
+					type="text"
+					value={ values.allergies }
+					onChange={ setField( 'allergies' ) }
+					placeholder={ __( 'Peanuts, shellfish', 'nutrio' ) }
+				/>
+				<div className="nutrio-field-hint">
+					{ __( 'Comma-separated', 'nutrio' ) }
+				</div>
 			</div>
 
+			{ isDirty && <UnsavedBadge /> }
+
 			<div style={ { display: 'flex', gap: '10px' } }>
-				<Button variant="primary" type="submit" disabled={ isSaving } style={ { flex: 1, justifyContent: 'center' } }>
-					{ client ? __( 'Save changes', 'nutrio' ) : __( 'Add client', 'nutrio' ) }
+				<Button
+					variant="primary"
+					type="submit"
+					disabled={ isSaving }
+					style={ { flex: 1, justifyContent: 'center' } }
+				>
+					{ client
+						? __( 'Save changes', 'nutrio' )
+						: __( 'Add client', 'nutrio' ) }
 				</Button>
-				<Button variant="ghost" type="button" onClick={ onCancel } disabled={ isSaving }>
+				<Button
+					variant="ghost"
+					type="button"
+					onClick={ handleCancel }
+					disabled={ isSaving }
+				>
 					{ __( 'Cancel', 'nutrio' ) }
 				</Button>
 			</div>

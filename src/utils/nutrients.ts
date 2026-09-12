@@ -1,4 +1,4 @@
-import type { NutrientTotals } from '../types';
+import type { NutrientTotals, RecipeItem } from '../types';
 
 // Same precedence FoodDataNormalizer uses server-side: 1008 (Energy) is
 // preferred, falling back to the Atwater-factor variants some Foundation
@@ -37,6 +37,40 @@ export function summarizeNutrients( totals: NutrientTotals ): NutrientSummary {
 	};
 }
 
-export function formatAmount( value: number | null, unit: string = 'g' ): string {
+/** Live estimate from in-progress ingredients, ahead of the server's
+ *  save-computed totals. Nutrients here are raw per-100g values, not
+ *  x1000-scaled like the backend's storage format, so no unscale() needed. */
+export function estimateNutrientsPerServing(
+	items: Pick< RecipeItem, 'quantity_grams' | 'nutrients' >[],
+	servings: number
+): NutrientSummary {
+	const totals: Record< string, number > = {};
+
+	for ( const item of items ) {
+		for ( const [ nutrientId, nutrient ] of Object.entries(
+			item.nutrients
+		) ) {
+			totals[ nutrientId ] =
+				( totals[ nutrientId ] ?? 0 ) +
+				( nutrient.amount_per_100g * item.quantity_grams ) / 100;
+		}
+	}
+
+	const energyId = ENERGY_IDS.find( ( id ) => totals[ id ] !== undefined );
+	const perServing = ( value: number | undefined ): number | null =>
+		value === undefined ? null : value / Math.max( 1, servings );
+
+	return {
+		kcal: energyId ? perServing( totals[ energyId ] ) : null,
+		protein: perServing( totals[ PROTEIN_ID ] ),
+		carbs: perServing( totals[ CARBS_ID ] ),
+		fat: perServing( totals[ FAT_ID ] ),
+	};
+}
+
+export function formatAmount(
+	value: number | null,
+	unit: string = 'g'
+): string {
 	return value === null ? '—' : `${ Math.round( value * 10 ) / 10 }${ unit }`;
 }

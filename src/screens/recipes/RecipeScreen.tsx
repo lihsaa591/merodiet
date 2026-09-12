@@ -1,6 +1,6 @@
-import { useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { useQueryParam } from '../../hooks/useQueryParam';
 import { STORE_NAME } from '../../store/recipes';
 import RecipeLibrary from './RecipeLibrary';
 import RecipeBuilder from './RecipeBuilder';
@@ -12,8 +12,9 @@ interface RecipesStoreSelectors {
 }
 
 export default function RecipeScreen() {
-	const [ view, setView ] = useState< 'list' | 'builder' >( 'list' );
-	const [ editingId, setEditingId ] = useState< number | null >( null );
+	// `id` in the URL is what makes an open recipe deep-linkable and
+	// refresh-safe — "new" for an unsaved recipe, a numeric id once saved.
+	const [ idParam, setIdParam ] = useQueryParam( 'id' );
 
 	const { recipes, isLoading } = useSelect( ( select ) => {
 		const store = select( STORE_NAME ) as unknown as RecipesStoreSelectors;
@@ -24,48 +25,51 @@ export default function RecipeScreen() {
 		};
 	}, [] );
 
-	const { createRecipe, updateRecipe, deleteRecipe } = useDispatch( STORE_NAME ) as {
+	const { createRecipe, updateRecipe, deleteRecipe } = useDispatch(
+		STORE_NAME
+	) as {
 		createRecipe: ( data: RecipeInput ) => Promise< Recipe >;
-		updateRecipe: ( id: number, data: Partial< RecipeInput > ) => Promise< Recipe >;
+		updateRecipe: (
+			id: number,
+			data: Partial< RecipeInput >
+		) => Promise< Recipe >;
 		deleteRecipe: ( id: number ) => Promise< void >;
 	};
 
-	const editingRecipe = recipes.find( ( recipe ) => recipe.id === editingId ) ?? null;
+	const editingId = idParam && idParam !== 'new' ? Number( idParam ) : null;
+	const editingRecipe =
+		recipes.find( ( recipe ) => recipe.id === editingId ) ?? null;
 
-	const openAdd = () => {
-		setEditingId( null );
-		setView( 'builder' );
-	};
-
-	const openEdit = ( id: number ) => {
-		setEditingId( id );
-		setView( 'builder' );
-	};
-
-	const backToList = () => setView( 'list' );
+	const openAdd = () => setIdParam( 'new' );
+	const openEdit = ( id: number ) => setIdParam( String( id ) );
+	const backToList = () => setIdParam( null );
 
 	const handleSave = async ( data: RecipeInput ) => {
 		if ( editingRecipe ) {
 			await updateRecipe( editingRecipe.id, data );
 		} else {
 			const created = await createRecipe( data );
-			setEditingId( created.id );
+			setIdParam( String( created.id ) );
 			return;
 		}
 		backToList();
 	};
 
 	const handleDelete = ( recipe: Recipe ) => {
-		// eslint-disable-next-line no-alert
-		if ( window.confirm( __( 'Remove this recipe? This cannot be undone.', 'nutrio' ) ) ) {
+		if (
+			// eslint-disable-next-line no-alert
+			window.confirm(
+				__( 'Remove this recipe? This cannot be undone.', 'nutrio' )
+			)
+		) {
 			deleteRecipe( recipe.id );
 		}
 	};
 
-	if ( view === 'builder' ) {
+	if ( idParam !== null ) {
 		return (
 			<RecipeBuilder
-				key={ editingId ?? 'new' }
+				key={ idParam }
 				recipe={ editingRecipe }
 				onSave={ handleSave }
 				onCancel={ backToList }

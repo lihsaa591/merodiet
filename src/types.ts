@@ -25,6 +25,7 @@ export interface RecipeItem {
 	food_id: number;
 	quantity_grams: number;
 	food_description: string | null;
+	nutrients: Record< string, { name: string; unit: string; amount_per_100g: number } >;
 }
 
 export interface Recipe {

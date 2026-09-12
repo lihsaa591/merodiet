@@ -10,7 +10,7 @@ Full-screen app (hides the standard wp-admin chrome; a "Back to WordPress" link 
 
 1. **Dashboard** — practitioner's morning check-in
 2. **Clients** — roster CRUD (built, wired to the live REST API)
-3. **Recipes** — recipe library + builder, backed by live USDA food search (not yet built — placeholder)
+3. **Recipes** — recipe library + builder, backed by live USDA food search (built)
 4. **Plans** — meal-plan list + a dedicated full-screen Plan Builder mode (not yet built — placeholder)
 5. **Food database** — cached USDA lookups (stub page)
 6. **Settings** — USDA API key, practice details (stub page)
@@ -33,10 +33,11 @@ Theme toggle (light/dark) and current-user identity live in the sidebar footer.
 - **Empty state:** "No clients yet. Add your first client to get started." + the Add client button.
 - **By design, "Add client" does not create a WordPress user account.** A client here is a lightweight roster record in `wp_nutrio_clients`, deliberately separate from wp-admin → Users. The `clients` table's nullable `user_id` column is reserved for Phase 3 (client portal): an "Invite client" action that creates a real WP user with the `nutrition_client` role, links it via that column, and sends login access — not built yet.
 
-### Recipes (placeholder)
+### Recipes (built)
 - **Purpose:** build/maintain a reusable recipe library with live nutrient totals.
-- **Primary content:** ingredient list + per-serving nutrient tiles on the left; live USDA food search on the right (per the mockup — not yet implemented).
-- **Primary action:** "New recipe" (top-right, own topbar row, once built).
+- **Primary content:** ingredient list + per-serving nutrient tiles on the left (updates live as ingredients change, ahead of the server's authoritative save-computed totals); live USDA food search on the right.
+- **Primary action:** "New recipe" (top-right, own topbar row).
+- **Not yet built — manual ingredient entry:** some ingredients (a client's specific branded product, a homemade blend, a supplement) won't be in USDA's database. Plan is to support it as another food `source` (e.g. `custom`) alongside USDA — same `ResolvedFood`/`RecipeItem` pipeline, practitioner enters name + the 4 macros per 100g, and it's visibly tagged "Custom" (vs. "USDA") in the UI so a saved number's provenance is never ambiguous in a clinical tool.
 
 ### Plans (placeholder)
 - **Purpose:** list existing meal plans; open the dedicated full-screen builder to create/edit one.

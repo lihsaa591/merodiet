@@ -217,6 +217,7 @@ final class RecipesController extends AbstractPractitionerController {
 			function ( array $item ): array {
 				$food                     = $this->food_cache->find( $item['food_id'] );
 				$item['food_description'] = $food['description'] ?? null;
+				$item['nutrients']        = $food['nutrients'] ?? array();
 
 				return $item;
 			},
