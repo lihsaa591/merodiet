@@ -73,3 +73,16 @@ export function assignPlan( id: number, clientId: number ) {
 		return plan;
 	};
 }
+
+export function unassignPlan( id: number ) {
+	return async ( { dispatch }: ThunkArgs ) => {
+		const plan: Plan = await apiFetch( {
+			path: `/nutrio/v1/plans/${ id }/unassign`,
+			method: 'POST',
+		} );
+
+		dispatch.receivePlan( plan );
+
+		return plan;
+	};
+}

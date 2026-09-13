@@ -1,0 +1,31 @@
+.scrim {
+	position: fixed;
+	inset: 0;
+	background: rgba(38, 38, 42, 0.4);
+	z-index: 80;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.modal {
+	background: var(--surface-raised);
+	border-radius: 14px;
+	width: 380px;
+	max-width: calc(100vw - 40px);
+	padding: 24px;
+}
+.modal h3 {
+	font-size: 16px;
+	margin-bottom: 8px;
+}
+.modal p {
+	font-size: 13.5px;
+	color: var(--ink-muted);
+	line-height: 1.55;
+	margin: 0 0 20px;
+}
+.actions {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}

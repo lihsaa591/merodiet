@@ -317,19 +317,31 @@ body.toplevel_page_nutrio #wpbody-content {
 	.nutrio-rail.is-open {
 		transform: translateX(0);
 	}
-	.nutrio-topbar {
-		padding-left: 60px;
+	/* Clears vertical space above the topbar for the fixed hamburger button,
+	   instead of the old approach of padding the topbar itself sideways —
+	   that pushed the whole title+actions row right instead of just moving
+	   it down, wasting width the action buttons need on a narrow screen. */
+	.nutrio-view {
+		padding-top: 70px;
 	}
 }
 
 @media (max-width: 560px) {
 	.nutrio-view {
-		padding: 20px 16px 32px;
+		padding: 70px 16px 32px;
 	}
 	.nutrio-topbar {
-		padding: 14px 0 14px 60px;
-		flex-wrap: wrap;
+		flex-direction: column;
+		align-items: flex-start;
+		padding: 14px 0;
 		gap: 10px;
+	}
+	/* Every screen's topbar is title-wrapper first, action-buttons-wrapper
+	   last (see DESIGN.md) — let the actions wrap onto their own line(s)
+	   instead of overflowing the viewport. */
+	.nutrio-topbar > *:last-child {
+		width: 100%;
+		flex-wrap: wrap;
 	}
 }
 
@@ -429,10 +441,17 @@ body.toplevel_page_nutrio #wpbody-content {
 	display: flex;
 	gap: 4px;
 	justify-content: flex-end;
-	opacity: 0;
 }
-.nutrio-table tr:hover .nutrio-row-actions {
-	opacity: 1;
+/* Hidden-until-hover only makes sense with a pointer that can hover — a
+   touch device has no hover state, so these would otherwise be invisible
+   and unreachable there entirely. */
+@media (hover: hover) {
+	.nutrio-row-actions {
+		opacity: 0;
+	}
+	.nutrio-table tr:hover .nutrio-row-actions {
+		opacity: 1;
+	}
 }
 
 /* ---------- Form fields (used directly by ClientForm) ---------- */
@@ -463,6 +482,26 @@ body.toplevel_page_nutrio #wpbody-content {
 	outline: 2px solid var(--sage);
 	outline-offset: 1px;
 	border-color: var(--sage);
+}
+/* A <select> ignores most of the box styling above until the browser's own
+   chrome is switched off — appearance:none, plus a drawn-in chevron since
+   that also removes the native dropdown arrow. */
+.nutrio-field select {
+	appearance: none;
+	-webkit-appearance: none;
+	padding-right: 32px;
+	background-repeat: no-repeat;
+	background-position: right 12px center;
+	background-size: 12px;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236d6d74' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme='light']) .nutrio-field select {
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a39daf' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+	}
+}
+:root[data-theme='dark'] .nutrio-field select {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a39daf' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
 }
 .nutrio-field-row {
 	display: grid;

@@ -1,6 +1,8 @@
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { hasUnsavedChanges } from '../hooks/useGlobalDirtyState';
+import { confirmDialog } from '../utils/confirmDialog';
+import ConfirmDialogHost from '../components/ui/ConfirmDialogHost';
 import Sidebar from './Sidebar';
 import Dashboard from '../screens/dashboard/Dashboard';
 import ClientRoster from '../screens/clients/ClientRoster';
@@ -60,22 +62,34 @@ export default function App() {
 	const view = VIEWS[ activeView ] ?? VIEWS.dashboard;
 
 	// Keep the browser's back/forward buttons working — but if the current
-	// screen has unsaved changes, confirm first and, if declined, push the
-	// old URL straight back on (the browser's own history already moved).
+	// screen has unsaved changes, revert the URL immediately (the browser's
+	// own history already moved before we can ask anything) and only follow
+	// through once the async confirm resolves.
 	useEffect( () => {
-		const onPopState = () => {
-			if (
-				hasUnsavedChanges() &&
-				// eslint-disable-next-line no-alert
-				! window.confirm( __( 'Discard unsaved changes?', 'nutrio' ) )
-			) {
-				const url = new URL( window.location.href );
-				url.searchParams.set( 'view', activeView );
-				window.history.pushState( { view: activeView }, '', url );
+		const onPopState = async () => {
+			const targetView = viewFromLocation();
+
+			if ( ! hasUnsavedChanges() ) {
+				setActiveView( targetView );
 				return;
 			}
 
-			setActiveView( viewFromLocation() );
+			const revertUrl = new URL( window.location.href );
+			revertUrl.searchParams.set( 'view', activeView );
+			window.history.pushState( { view: activeView }, '', revertUrl );
+
+			const discard = await confirmDialog( {
+				message: __( 'Discard unsaved changes?', 'nutrio' ),
+				confirmLabel: __( 'Discard', 'nutrio' ),
+				destructive: true,
+			} );
+
+			if ( discard ) {
+				const url = new URL( window.location.href );
+				url.searchParams.set( 'view', targetView );
+				window.history.pushState( { view: targetView }, '', url );
+				setActiveView( targetView );
+			}
 		};
 
 		window.addEventListener( 'popstate', onPopState );
@@ -98,13 +112,16 @@ export default function App() {
 			window.removeEventListener( 'beforeunload', onBeforeUnload );
 	}, [] );
 
-	const selectView = ( id: string ) => {
-		if (
-			hasUnsavedChanges() &&
-			// eslint-disable-next-line no-alert
-			! window.confirm( __( 'Discard unsaved changes?', 'nutrio' ) )
-		) {
-			return;
+	const selectView = async ( id: string ) => {
+		if ( hasUnsavedChanges() ) {
+			const discard = await confirmDialog( {
+				message: __( 'Discard unsaved changes?', 'nutrio' ),
+				confirmLabel: __( 'Discard', 'nutrio' ),
+				destructive: true,
+			} );
+			if ( ! discard ) {
+				return;
+			}
 		}
 
 		setActiveView( id );
@@ -150,6 +167,7 @@ export default function App() {
 					<div className="nutrio-view">{ view.render() }</div>
 				</div>
 			</div>
+			<ConfirmDialogHost />
 		</div>
 	);
 }

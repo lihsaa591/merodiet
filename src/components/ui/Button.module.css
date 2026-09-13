@@ -39,8 +39,19 @@
 	font-weight: 600;
 	padding: 6px 8px;
 }
-.isDestructive {
+/* Recolors the button itself, not just its text — a destructive action
+   needs its own solid color, not critical-colored text sitting on the
+   primary accent background. */
+.isDestructive.btnPrimary {
+	background: var(--critical);
+	color: #fff;
+}
+.isDestructive.btnPrimary:hover {
+	filter: brightness(0.92);
+}
+.isDestructive.btnGhost {
 	color: var(--critical);
+	border-color: var(--critical);
 }
 .btnPro :global(.nutrio-pro-lock) {
 	width: 13px;

@@ -6,8 +6,8 @@ interface DrawerProps {
 	isOpen: boolean;
 	title: string;
 	onClose: () => void;
-	/** Return false to block closing (e.g. unsaved changes) — checked before the X button and backdrop click. */
-	confirmClose?: () => boolean;
+	/** Return (or resolve to) false to block closing (e.g. unsaved changes) — checked before the X button and backdrop click. */
+	confirmClose?: () => boolean | Promise< boolean >;
 	footer?: ReactNode;
 	children: ReactNode;
 }
@@ -20,8 +20,8 @@ export default function Drawer( {
 	footer,
 	children,
 }: DrawerProps ) {
-	const handleClose = () => {
-		if ( ! confirmClose || confirmClose() ) {
+	const handleClose = async () => {
+		if ( ! confirmClose || ( await confirmClose() ) ) {
 			onClose();
 		}
 	};

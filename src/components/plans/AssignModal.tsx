@@ -1,6 +1,7 @@
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import Button from '../ui/Button';
+import Chip from '../ui/Chip';
 import styles from './AssignModal.module.css';
 import type { Client, Plan } from '../../types';
 
@@ -100,6 +101,30 @@ export default function AssignModal( {
 					</select>
 				</div>
 
+				{ selectedClient && selectedClient.allergies.length > 0 && (
+					<div
+						className="nutrio-field"
+						style={ { marginBottom: '14px' } }
+					>
+						<div className="nutrio-field-hint">
+							{ __( "Client's declared allergies", 'nutrio' ) }
+						</div>
+						<div
+							style={ {
+								display: 'flex',
+								flexWrap: 'wrap',
+								gap: '6px',
+							} }
+						>
+							{ selectedClient.allergies.map( ( allergy ) => (
+								<Chip key={ allergy } tone="clay">
+									{ allergy }
+								</Chip>
+							) ) }
+						</div>
+					</div>
+				) }
+
 				{ conflicts.length > 0 && (
 					<p className={ styles.conflictWarning }>
 						{ sprintf(
@@ -109,6 +134,15 @@ export default function AssignModal( {
 								'nutrio'
 							),
 							conflicts.join( ', ' )
+						) }
+					</p>
+				) }
+
+				{ selectedClient && (
+					<p className={ styles.lockNotice }>
+						{ __(
+							'Once assigned, this plan becomes read-only — its numbers are frozen and it can no longer be edited directly. To make changes later, unassign it or duplicate it as a new plan.',
+							'nutrio'
 						) }
 					</p>
 				) }

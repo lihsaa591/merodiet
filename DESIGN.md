@@ -24,9 +24,9 @@ Nutrio is a practice-management tool for registered dietitians/nutritionists —
 | `--ink-faint` | `#9D9DA3` | `#716B7D` | tertiary/placeholder text |
 | `--line` | `#E7E6EA` | `#34303B` | default border |
 | `--line-strong` | `#D5D3DA` | `#423D4A` | emphasized border (inputs, active states) |
-| `--sage` (accent) | `#6E62A6` | `#A395D6` | primary accent — buttons, active nav, links |
-| `--sage-deep` | `#524683` | `#C7BCEB` | accent hover/pressed |
-| `--sage-wash` | `#EBE8F5` | `#322C44` | accent-tinted background (active nav, chips) |
+| `--sage` (accent) | `#567A5D` | `#7FA686` | primary accent — buttons, active nav, links |
+| `--sage-deep` | `#3F5E45` | `#A2C4A7` | accent hover/pressed |
+| `--sage-wash` | `#E6EFE7` | `#25322A` | accent-tinted background (active nav, chips) |
 | `--clay` (neutral secondary) | `#8B8B90` | `#8D889B` | neutral secondary accent, avatars/badges without semantic meaning |
 | `--success` / `-wash` | `#4C9179` / `#E5F2ED` | `#7FC1A8` / `#1F332B` | positive semantic state |
 | `--warning` / `-wash` | `#B08A3C` / `#F6EFDF` | `#D8B268` / `#362C18` | caution semantic state |

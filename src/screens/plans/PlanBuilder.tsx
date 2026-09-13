@@ -1,9 +1,11 @@
 import { useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import Button from '../../components/ui/Button';
 import Panel, { PanelBody, PanelHead } from '../../components/ui/Panel';
 import UnsavedBadge from '../../components/ui/UnsavedBadge';
 import { useGlobalDirtyState } from '../../hooks/useGlobalDirtyState';
+import { alertDialog, confirmDialog } from '../../utils/confirmDialog';
+import { formatShortDate } from '../../utils/date';
 import ItemSearch from './ItemSearch';
 import styles from './PlanBuilder.module.css';
 import {
@@ -45,6 +47,8 @@ interface PlanBuilderProps {
 	onSave: ( data: PlanInput ) => Promise< void >;
 	onCancel: () => void;
 	onAssignClick: () => void;
+	onDuplicateClick: () => void;
+	onUnassignClick: () => void;
 }
 
 // One draft day per date between start/end (inclusive) — see spec's "auto-generate from dates" decision.
@@ -56,6 +60,11 @@ function daysBetween( startDate: string, endDate: string ): number {
 	);
 	return Math.max( 1, diffDays + 1 );
 }
+
+// Real day-by-day plans run a week or two, not months — this is a backstop
+// against an accidental huge range, not a normal-use limit.
+const MAX_PLAN_DAYS = 90;
+const DAYS_PER_WEEK = 7;
 
 function addDays( dateStr: string, days: number ): string {
 	const date = new Date( dateStr );
@@ -85,6 +94,8 @@ export default function PlanBuilder( {
 	onSave,
 	onCancel,
 	onAssignClick,
+	onDuplicateClick,
+	onUnassignClick,
 }: PlanBuilderProps ) {
 	const isReadOnly = plan?.status === 'assigned';
 
@@ -107,6 +118,10 @@ export default function PlanBuilder( {
 	const [ activeDayOffset, setActiveDayOffset ] = useState( 0 );
 	const [ addingTo, setAddingTo ] = useState< MealType | null >( null );
 	const [ isSaving, setIsSaving ] = useState( false );
+	const [ isCopyPanelOpen, setCopyPanelOpen ] = useState( false );
+	const [ copyTargets, setCopyTargets ] = useState< Set< number > >(
+		new Set()
+	);
 
 	const { isDirty, markClean } = useGlobalDirtyState( {
 		title,
@@ -116,21 +131,33 @@ export default function PlanBuilder( {
 	} );
 
 	// Regenerate day tabs from the date range, keeping items on days that still exist.
-	const applyDateRange = ( newStart: string, newEnd: string ) => {
+	const applyDateRange = async ( newStart: string, newEnd: string ) => {
 		const count = daysBetween( newStart, newEnd );
+
+		if ( count > MAX_PLAN_DAYS ) {
+			await alertDialog( {
+				message: __(
+					'Plans can’t span more than 90 days — for a longer program, build one plan per stretch and duplicate between them.',
+					'nutrio'
+				),
+			} );
+			return;
+		}
+
 		const droppedItems = days.filter(
 			( d ) => d.day_offset >= count && d.items.length > 0
 		);
 
 		if (
 			droppedItems.length > 0 &&
-			// eslint-disable-next-line no-alert
-			! window.confirm(
-				__(
+			! ( await confirmDialog( {
+				message: __(
 					'Shortening the date range will remove items already added on the dropped days. Continue?',
 					'nutrio'
-				)
-			)
+				),
+				confirmLabel: __( 'Continue', 'nutrio' ),
+				destructive: true,
+			} ) )
 		) {
 			return;
 		}
@@ -158,6 +185,19 @@ export default function PlanBuilder( {
 
 	const activeDay =
 		days.find( ( d ) => d.day_offset === activeDayOffset ) ?? days[ 0 ];
+
+	// Beyond a week, a flat scrolling row of day tabs stops being usable —
+	// group into weeks instead, showing only the active week's days below.
+	const activeWeekIndex = Math.floor( activeDayOffset / DAYS_PER_WEEK );
+	const weekCount = Math.ceil( days.length / DAYS_PER_WEEK );
+	const visibleDays =
+		days.length > DAYS_PER_WEEK
+			? days.filter(
+					( d ) =>
+						Math.floor( d.day_offset / DAYS_PER_WEEK ) ===
+						activeWeekIndex
+			  )
+			: days;
 
 	const addFoodItem = ( food: ResolvedFood ) => {
 		if ( ! addingTo ) {
@@ -309,6 +349,58 @@ export default function PlanBuilder( {
 		);
 	};
 
+	const toggleCopyTarget = ( dayOffset: number ) => {
+		setCopyTargets( ( prev ) => {
+			const next = new Set( prev );
+			if ( next.has( dayOffset ) ) {
+				next.delete( dayOffset );
+			} else {
+				next.add( dayOffset );
+			}
+			return next;
+		} );
+	};
+
+	const applyCopyToSelectedDays = async () => {
+		if ( copyTargets.size === 0 || ! activeDay ) {
+			setCopyPanelOpen( false );
+			return;
+		}
+
+		const overwritesExisting = days.some(
+			( day ) => copyTargets.has( day.day_offset ) && day.items.length > 0
+		);
+
+		if (
+			overwritesExisting &&
+			! ( await confirmDialog( {
+				message: __(
+					'This replaces any meals already on the selected day(s) with today’s meals. Continue?',
+					'nutrio'
+				),
+				confirmLabel: __( 'Continue', 'nutrio' ),
+				destructive: true,
+			} ) )
+		) {
+			return;
+		}
+
+		setDays( ( prev ) =>
+			prev.map( ( day ) =>
+				copyTargets.has( day.day_offset )
+					? {
+							...day,
+							items: activeDay.items.map( ( item ) => ( {
+								...item,
+							} ) ),
+					  }
+					: day
+			)
+		);
+		setCopyTargets( new Set() );
+		setCopyPanelOpen( false );
+	};
+
 	const handleSave = async () => {
 		setIsSaving( true );
 		try {
@@ -336,11 +428,14 @@ export default function PlanBuilder( {
 		}
 	};
 
-	const handleCancel = () => {
+	const handleCancel = async () => {
 		if (
 			! isDirty ||
-			// eslint-disable-next-line no-alert
-			window.confirm( __( 'Discard unsaved changes?', 'nutrio' ) )
+			( await confirmDialog( {
+				message: __( 'Discard unsaved changes?', 'nutrio' ),
+				confirmLabel: __( 'Discard', 'nutrio' ),
+				destructive: true,
+			} ) )
 		) {
 			onCancel();
 		}
@@ -428,6 +523,16 @@ export default function PlanBuilder( {
 							{ __( 'Assign to client', 'nutrio' ) }
 						</Button>
 					) }
+					{ isReadOnly && (
+						<Button variant="ghost" onClick={ onUnassignClick }>
+							{ __( 'Unassign', 'nutrio' ) }
+						</Button>
+					) }
+					{ isReadOnly && (
+						<Button variant="primary" onClick={ onDuplicateClick }>
+							{ __( 'Duplicate as new plan', 'nutrio' ) }
+						</Button>
+					) }
 				</div>
 			</div>
 
@@ -488,26 +593,261 @@ export default function PlanBuilder( {
 							</div>
 						</div>
 
-						<div className={ styles.dayTabs }>
-							{ days.map( ( day ) => (
-								<button
-									key={ day.day_offset }
-									className={ `${ styles.dayTab } ${
-										day.day_offset === activeDayOffset
-											? styles.isActive
-											: ''
-									}`.trim() }
-									onClick={ () =>
-										setActiveDayOffset( day.day_offset )
-									}
-								>
-									{ __( 'Day', 'nutrio' ) }{ ' ' }
-									{ day.day_offset + 1 }
-									<span className={ styles.dayTabDate }>
-										{ addDays( startDate, day.day_offset ) }
-									</span>
-								</button>
-							) ) }
+						{ days.length > DAYS_PER_WEEK && (
+							<div className={ styles.weekTabs }>
+								{ Array.from( { length: weekCount } ).map(
+									( _, weekIndex ) => (
+										<button
+											key={ weekIndex }
+											className={ `${ styles.weekTab } ${
+												weekIndex === activeWeekIndex
+													? styles.isActive
+													: ''
+											}`.trim() }
+											onClick={ () =>
+												setActiveDayOffset(
+													weekIndex * DAYS_PER_WEEK
+												)
+											}
+										>
+											{ __( 'Week', 'nutrio' ) }{ ' ' }
+											{ weekIndex + 1 }
+											<span
+												className={ styles.weekTabDate }
+											>
+												{ formatShortDate(
+													addDays(
+														startDate,
+														weekIndex *
+															DAYS_PER_WEEK
+													)
+												) }
+											</span>
+										</button>
+									)
+								) }
+							</div>
+						) }
+
+						<div className={ styles.dayTabsRow }>
+							<div className={ styles.dayTabs }>
+								{ visibleDays.map( ( day ) => (
+									<button
+										key={ day.day_offset }
+										className={ `${ styles.dayTab } ${
+											day.day_offset === activeDayOffset
+												? styles.isActive
+												: ''
+										}`.trim() }
+										onClick={ () =>
+											setActiveDayOffset( day.day_offset )
+										}
+									>
+										{ __( 'Day', 'nutrio' ) }{ ' ' }
+										{ day.day_offset + 1 }
+										<span className={ styles.dayTabDate }>
+											{ formatShortDate(
+												addDays(
+													startDate,
+													day.day_offset
+												)
+											) }
+										</span>
+									</button>
+								) ) }
+							</div>
+
+							{ ! isReadOnly && days.length > 1 && (
+								<div className={ styles.copyWrap }>
+									<button
+										className={ styles.copyTrigger }
+										aria-label={ __(
+											'Repeat this day on other days',
+											'nutrio'
+										) }
+										onClick={ () =>
+											setCopyPanelOpen(
+												( open ) => ! open
+											)
+										}
+									>
+										<CopyIcon />
+										{ __( 'Repeat day', 'nutrio' ) }
+									</button>
+
+									{ isCopyPanelOpen && (
+										<div className={ styles.copyPanel }>
+											<div
+												className={
+													styles.copyPanelHead
+												}
+											>
+												<span
+													className={
+														styles.copyPanelTitle
+													}
+												>
+													{ sprintf(
+														/* translators: %d: the day number (1-based) currently being copied */
+														__(
+															'Repeat Day %d on…',
+															'nutrio'
+														),
+														activeDayOffset + 1
+													) }
+												</span>
+												<div
+													className={
+														styles.copyPanelQuick
+													}
+												>
+													<button
+														onClick={ () =>
+															setCopyTargets(
+																new Set(
+																	days
+																		.filter(
+																			(
+																				day
+																			) =>
+																				day.day_offset !==
+																				activeDayOffset
+																		)
+																		.map(
+																			(
+																				day
+																			) =>
+																				day.day_offset
+																		)
+																)
+															)
+														}
+													>
+														{ __(
+															'All',
+															'nutrio'
+														) }
+													</button>
+													<button
+														onClick={ () =>
+															setCopyTargets(
+																new Set()
+															)
+														}
+													>
+														{ __(
+															'Clear',
+															'nutrio'
+														) }
+													</button>
+												</div>
+											</div>
+
+											<div
+												className={
+													styles.copyPanelChips
+												}
+											>
+												{ days
+													.filter(
+														( day ) =>
+															day.day_offset !==
+															activeDayOffset
+													)
+													.map( ( day ) => (
+														<button
+															key={
+																day.day_offset
+															}
+															className={ `${
+																styles.copyChip
+															} ${
+																copyTargets.has(
+																	day.day_offset
+																)
+																	? styles.isActive
+																	: ''
+															}`.trim() }
+															onClick={ () =>
+																toggleCopyTarget(
+																	day.day_offset
+																)
+															}
+														>
+															{ __(
+																'Day',
+																'nutrio'
+															) }{ ' ' }
+															{ day.day_offset +
+																1 }
+														</button>
+													) ) }
+											</div>
+
+											<div
+												className={
+													styles.copyPanelFoot
+												}
+											>
+												<span
+													className={
+														styles.copyPanelCount
+													}
+												>
+													{ sprintf(
+														/* translators: %d: number of days selected to copy into */
+														_n(
+															'%d day selected',
+															'%d days selected',
+															copyTargets.size,
+															'nutrio'
+														),
+														copyTargets.size
+													) }
+												</span>
+												<div
+													style={ {
+														display: 'flex',
+														gap: '8px',
+													} }
+												>
+													<Button
+														variant="ghost"
+														onClick={ () => {
+															setCopyPanelOpen(
+																false
+															);
+															setCopyTargets(
+																new Set()
+															);
+														} }
+													>
+														{ __(
+															'Cancel',
+															'nutrio'
+														) }
+													</Button>
+													<Button
+														variant="primary"
+														onClick={
+															applyCopyToSelectedDays
+														}
+														disabled={
+															copyTargets.size ===
+															0
+														}
+													>
+														{ __(
+															'Repeat',
+															'nutrio'
+														) }
+													</Button>
+												</div>
+											</div>
+										</div>
+									) }
+								</div>
+							) }
 						</div>
 
 						{ MEAL_TYPES.map( ( meal ) => {
@@ -728,5 +1068,19 @@ export default function PlanBuilder( {
 				) }
 			</div>
 		</>
+	);
+}
+
+function CopyIcon() {
+	return (
+		<svg
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2"
+		>
+			<rect x="9" y="9" width="12" height="12" rx="2" />
+			<path d="M5 15V5a2 2 0 0 1 2-2h10" />
+		</svg>
 	);
 }

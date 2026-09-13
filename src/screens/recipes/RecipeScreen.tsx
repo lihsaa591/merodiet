@@ -1,7 +1,8 @@
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useQueryParam } from '../../hooks/useQueryParam';
 import { STORE_NAME } from '../../store/recipes';
+import { confirmDialog } from '../../utils/confirmDialog';
 import RecipeLibrary from './RecipeLibrary';
 import RecipeBuilder from './RecipeBuilder';
 import type { Recipe, RecipeInput } from '../../types';
@@ -55,14 +56,37 @@ export default function RecipeScreen() {
 		backToList();
 	};
 
-	const handleDelete = ( recipe: Recipe ) => {
-		if (
-			// eslint-disable-next-line no-alert
-			window.confirm(
-				__( 'Remove this recipe? This cannot be undone.', 'nutrio' )
-			)
-		) {
+	const handleDelete = async ( recipe: Recipe ) => {
+		const confirmed = await confirmDialog( {
+			message: __(
+				'Remove this recipe? This cannot be undone.',
+				'nutrio'
+			),
+			confirmLabel: __( 'Remove', 'nutrio' ),
+			destructive: true,
+		} );
+		if ( confirmed ) {
 			deleteRecipe( recipe.id );
+		}
+	};
+
+	const handleBulkDelete = async ( selected: Recipe[] ) => {
+		const confirmed = await confirmDialog( {
+			message: sprintf(
+				/* translators: %d: number of recipes being removed */
+				__(
+					'Remove %d selected recipe(s)? This cannot be undone.',
+					'nutrio'
+				),
+				selected.length
+			),
+			confirmLabel: __( 'Remove', 'nutrio' ),
+			destructive: true,
+		} );
+		if ( confirmed ) {
+			await Promise.allSettled(
+				selected.map( ( r ) => deleteRecipe( r.id ) )
+			);
 		}
 	};
 
@@ -84,6 +108,7 @@ export default function RecipeScreen() {
 			onAdd={ openAdd }
 			onEdit={ openEdit }
 			onDelete={ handleDelete }
+			onBulkDelete={ handleBulkDelete }
 		/>
 	);
 }

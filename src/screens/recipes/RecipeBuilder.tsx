@@ -6,6 +6,7 @@ import UnsavedBadge from '../../components/ui/UnsavedBadge';
 import FoodSearch from './FoodSearch';
 import styles from './RecipeBuilder.module.css';
 import { useGlobalDirtyState } from '../../hooks/useGlobalDirtyState';
+import { confirmDialog } from '../../utils/confirmDialog';
 import {
 	estimateNutrientsPerServing,
 	formatAmount,
@@ -90,11 +91,14 @@ export default function RecipeBuilder( {
 		}
 	};
 
-	const handleCancel = () => {
+	const handleCancel = async () => {
 		if (
 			! isDirty ||
-			// eslint-disable-next-line no-alert
-			window.confirm( __( 'Discard unsaved changes?', 'nutrio' ) )
+			( await confirmDialog( {
+				message: __( 'Discard unsaved changes?', 'nutrio' ),
+				confirmLabel: __( 'Discard', 'nutrio' ),
+				destructive: true,
+			} ) )
 		) {
 			onCancel();
 		}

@@ -1,9 +1,12 @@
 import { useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { STORE_NAME } from '../../store/clients';
+import { confirmDialog } from '../../utils/confirmDialog';
+import { useBulkSelection } from '../../hooks/useBulkSelection';
 import Panel, { PanelBody } from '../../components/ui/Panel';
 import Button from '../../components/ui/Button';
+import BulkActionBar from '../../components/ui/BulkActionBar';
 import Chip from '../../components/ui/Chip';
 import Avatar from '../../components/ui/Avatar';
 import IconButton from '../../components/ui/IconButton';
@@ -44,6 +47,8 @@ export default function ClientRoster() {
 	const editingClient =
 		clients.find( ( client ) => client.id === editingId ) ?? null;
 
+	const bulk = useBulkSelection( clients );
+
 	const openAdd = () => {
 		setEditingId( null );
 		setDrawerOpen( true );
@@ -65,15 +70,46 @@ export default function ClientRoster() {
 		closeDrawer();
 	};
 
-	const handleDelete = ( client: Client ) => {
-		if (
-			// eslint-disable-next-line no-alert
-			window.confirm(
-				__( 'Remove this client? This cannot be undone.', 'nutrio' )
-			)
-		) {
+	const handleDelete = async ( client: Client ) => {
+		const confirmed = await confirmDialog( {
+			message: __(
+				'Remove this client? This cannot be undone.',
+				'nutrio'
+			),
+			confirmLabel: __( 'Remove', 'nutrio' ),
+			destructive: true,
+		} );
+		if ( confirmed ) {
 			deleteClient( client.id );
 		}
+	};
+
+	const handleBulkDelete = async () => {
+		const confirmed = await confirmDialog( {
+			message: sprintf(
+				/* translators: %d: number of clients being removed */
+				__(
+					'Remove %d selected client(s)? This cannot be undone.',
+					'nutrio'
+				),
+				bulk.count
+			),
+			confirmLabel: __( 'Remove', 'nutrio' ),
+			destructive: true,
+		} );
+		if ( confirmed ) {
+			await Promise.allSettled(
+				bulk.selectedItems.map( ( c ) => deleteClient( c.id ) )
+			);
+			bulk.clear();
+		}
+	};
+
+	const handleBulkMarkStatus = async ( status: 'active' | 'paused' ) => {
+		await Promise.allSettled(
+			bulk.selectedItems.map( ( c ) => updateClient( c.id, { status } ) )
+		);
+		bulk.clear();
 	};
 
 	return (
@@ -102,99 +138,171 @@ export default function ClientRoster() {
 					) }
 
 					{ ! isLoading && clients.length > 0 && (
-						<table className="nutrio-table">
-							<thead>
-								<tr>
-									<th>{ __( 'Name', 'nutrio' ) }</th>
-									<th>{ __( 'Email', 'nutrio' ) }</th>
-									<th>{ __( 'Allergies', 'nutrio' ) }</th>
-									<th>{ __( 'Status', 'nutrio' ) }</th>
-									<th></th>
-								</tr>
-							</thead>
-							<tbody>
-								{ clients.map( ( client ) => (
-									<tr key={ client.id }>
-										<td>
-											<div className="nutrio-cell-name">
-												<Avatar
-													id={ client.id }
-													firstName={
-														client.first_name
+						<>
+							<BulkActionBar
+								count={ bulk.count }
+								onClear={ bulk.clear }
+							>
+								<Button
+									variant="ghost"
+									onClick={ () =>
+										handleBulkMarkStatus( 'active' )
+									}
+								>
+									{ __( 'Mark active', 'nutrio' ) }
+								</Button>
+								<Button
+									variant="ghost"
+									onClick={ () =>
+										handleBulkMarkStatus( 'paused' )
+									}
+								>
+									{ __( 'Mark paused', 'nutrio' ) }
+								</Button>
+								<Button
+									variant="primary"
+									destructive
+									onClick={ handleBulkDelete }
+								>
+									{ __( 'Delete selected', 'nutrio' ) }
+								</Button>
+							</BulkActionBar>
+
+							<table className="nutrio-table">
+								<thead>
+									<tr>
+										<th>
+											<input
+												type="checkbox"
+												checked={ bulk.isAllSelected }
+												ref={ ( el ) => {
+													if ( el ) {
+														el.indeterminate =
+															bulk.isSomeSelected;
 													}
-													lastName={
-														client.last_name
-													}
-												/>
-												{ client.first_name }{ ' ' }
-												{ client.last_name }
-											</div>
-										</td>
-										<td>{ client.email }</td>
-										<td>
-											{ ( client.allergies ?? [] )
-												.length > 0 ? (
-												client.allergies.map(
-													( allergy ) => (
-														<Chip
-															key={ allergy }
-															tone="clay"
-														>
-															{ allergy }
-														</Chip>
-													)
-												)
-											) : (
-												<span
-													style={ {
-														color: 'var(--ink-faint)',
-													} }
-												>
-													—
-												</span>
-											) }
-										</td>
-										<td>
-											<Chip
-												tone={
-													client.status === 'active'
-														? 'success'
-														: 'clay'
-												}
-											>
-												{ client.status }
-											</Chip>
-										</td>
-										<td>
-											<div className="nutrio-row-actions">
-												<IconButton
-													label={ __(
-														'Edit client',
-														'nutrio'
-													) }
-													onClick={ () =>
-														openEdit( client.id )
-													}
-												>
-													<EditIcon />
-												</IconButton>
-												<IconButton
-													label={ __(
-														'Remove client',
-														'nutrio'
-													) }
-													onClick={ () =>
-														handleDelete( client )
-													}
-												>
-													<TrashIcon />
-												</IconButton>
-											</div>
-										</td>
+												} }
+												onChange={ bulk.toggleAll }
+												aria-label={ __(
+													'Select all clients',
+													'nutrio'
+												) }
+											/>
+										</th>
+										<th>{ __( 'Name', 'nutrio' ) }</th>
+										<th>{ __( 'Email', 'nutrio' ) }</th>
+										<th>{ __( 'Allergies', 'nutrio' ) }</th>
+										<th>{ __( 'Status', 'nutrio' ) }</th>
+										<th></th>
 									</tr>
-								) ) }
-							</tbody>
-						</table>
+								</thead>
+								<tbody>
+									{ clients.map( ( client ) => (
+										<tr key={ client.id }>
+											<td>
+												<input
+													type="checkbox"
+													checked={ bulk.isSelected(
+														client.id
+													) }
+													onChange={ () =>
+														bulk.toggle( client.id )
+													}
+													aria-label={ sprintf(
+														/* translators: %s: client's full name */
+														__(
+															'Select %s',
+															'nutrio'
+														),
+														`${ client.first_name } ${ client.last_name }`
+													) }
+												/>
+											</td>
+											<td>
+												<div className="nutrio-cell-name">
+													<Avatar
+														id={ client.id }
+														firstName={
+															client.first_name
+														}
+														lastName={
+															client.last_name
+														}
+													/>
+													{ client.first_name }{ ' ' }
+													{ client.last_name }
+												</div>
+											</td>
+											<td>{ client.email }</td>
+											<td>
+												{ ( client.allergies ?? [] )
+													.length > 0 ? (
+													client.allergies.map(
+														( allergy ) => (
+															<Chip
+																key={ allergy }
+																tone="clay"
+															>
+																{ allergy }
+															</Chip>
+														)
+													)
+												) : (
+													<span
+														style={ {
+															color: 'var(--ink-faint)',
+														} }
+													>
+														—
+													</span>
+												) }
+											</td>
+											<td>
+												<Chip
+													tone={
+														client.status ===
+														'active'
+															? 'success'
+															: 'clay'
+													}
+												>
+													{ client.status }
+												</Chip>
+											</td>
+											<td>
+												<div className="nutrio-row-actions">
+													<IconButton
+														label={ __(
+															'Edit client',
+															'nutrio'
+														) }
+														onClick={ () =>
+															openEdit(
+																client.id
+															)
+														}
+													>
+														<EditIcon />
+													</IconButton>
+													<IconButton
+														label={ __(
+															'Remove client',
+															'nutrio'
+														) }
+														onClick={ () =>
+															handleDelete(
+																client
+															)
+														}
+													>
+														<TrashIcon />
+													</IconButton>
+												</div>
+											</td>
+										</tr>
+									) ) }
+								</tbody>
+							</table>
+						</>
 					) }
 				</PanelBody>
 			</Panel>
@@ -207,10 +315,13 @@ export default function ClientRoster() {
 						: __( 'Add client', 'nutrio' )
 				}
 				onClose={ closeDrawer }
-				confirmClose={ () =>
+				confirmClose={ async () =>
 					! isFormDirty ||
-					// eslint-disable-next-line no-alert
-					window.confirm( __( 'Discard unsaved changes?', 'nutrio' ) )
+					confirmDialog( {
+						message: __( 'Discard unsaved changes?', 'nutrio' ),
+						confirmLabel: __( 'Discard', 'nutrio' ),
+						destructive: true,
+					} )
 				}
 			>
 				<ClientForm

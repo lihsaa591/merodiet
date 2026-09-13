@@ -15,6 +15,8 @@ export interface Client {
 
 export type ClientInput = Pick< Client, 'first_name' | 'last_name' | 'email' > & {
 	allergies?: string[];
+	/** Not set by the create/edit form — only used for the bulk "Mark active"/"Mark paused" action. */
+	status?: 'active' | 'paused';
 };
 
 /** Nutrient amounts keyed by USDA nutrient ID, e.g. { "1008": 165 } for kcal. */

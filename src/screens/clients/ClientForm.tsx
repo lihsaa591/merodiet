@@ -3,6 +3,7 @@ import { __ } from '@wordpress/i18n';
 import Button from '../../components/ui/Button';
 import UnsavedBadge from '../../components/ui/UnsavedBadge';
 import { useGlobalDirtyState } from '../../hooks/useGlobalDirtyState';
+import { confirmDialog } from '../../utils/confirmDialog';
 import type { Client, ClientInput } from '../../types';
 
 interface FormValues {
@@ -83,11 +84,14 @@ export default function ClientForm( {
 		}
 	};
 
-	const handleCancel = () => {
+	const handleCancel = async () => {
 		if (
 			! isDirty ||
-			// eslint-disable-next-line no-alert
-			window.confirm( __( 'Discard unsaved changes?', 'nutrio' ) )
+			( await confirmDialog( {
+				message: __( 'Discard unsaved changes?', 'nutrio' ),
+				confirmLabel: __( 'Discard', 'nutrio' ),
+				destructive: true,
+			} ) )
 		) {
 			onCancel();
 		}

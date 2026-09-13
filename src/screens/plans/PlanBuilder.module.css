@@ -20,11 +20,50 @@
 	}
 }
 
-.dayTabs {
+.weekTabs {
 	display: flex;
 	gap: 6px;
 	overflow-x: auto;
+	margin-bottom: 10px;
+	padding-bottom: 4px;
+}
+.weekTab {
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	font-family: inherit;
+	font-size: 11.5px;
+	font-weight: 600;
+	padding: 6px 12px;
+	border-radius: 999px;
+	border: 1px solid var(--line);
+	background: var(--paper-dim);
+	color: var(--ink-faint);
+	cursor: pointer;
+}
+.weekTab.isActive {
+	background: var(--ink);
+	border-color: var(--ink);
+	color: var(--surface);
+}
+.weekTabDate {
+	font-size: 9.5px;
+	font-weight: 400;
+}
+
+.dayTabsRow {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
 	margin-bottom: 16px;
+}
+.dayTabs {
+	display: flex;
+	flex: 1;
+	min-width: 0;
+	gap: 6px;
+	overflow-x: auto;
 	padding-bottom: 4px;
 }
 .dayTab {
@@ -50,6 +89,112 @@
 .dayTabDate {
 	font-size: 10.5px;
 	font-weight: 400;
+	color: var(--ink-faint);
+}
+
+.copyWrap {
+	position: relative;
+	flex-shrink: 0;
+}
+.copyTrigger {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	height: 38px;
+	font-family: inherit;
+	font-size: 12.5px;
+	font-weight: 600;
+	padding: 0 12px;
+	border-radius: 8px;
+	border: 1px dashed var(--line-strong);
+	background: var(--surface);
+	color: var(--ink-muted);
+	cursor: pointer;
+	white-space: nowrap;
+}
+.copyTrigger:hover {
+	border-style: solid;
+	border-color: var(--sage);
+	color: var(--sage-deep);
+}
+.copyTrigger svg {
+	width: 14px;
+	height: 14px;
+}
+
+.copyPanel {
+	position: absolute;
+	top: calc(100% + 8px);
+	right: 0;
+	z-index: 5;
+	width: 300px;
+	padding: 14px;
+	border: 1px solid var(--line);
+	border-radius: 12px;
+	background: var(--surface-raised);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+.copyPanelHead {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 8px;
+	margin-bottom: 10px;
+}
+.copyPanelTitle {
+	font-size: 13px;
+	font-weight: 700;
+	color: var(--ink);
+}
+.copyPanelQuick {
+	display: flex;
+	gap: 8px;
+	flex-shrink: 0;
+}
+.copyPanelQuick button {
+	font-family: inherit;
+	font-size: 11.5px;
+	font-weight: 600;
+	color: var(--sage-deep);
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 0;
+}
+.copyPanelChips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	max-height: 160px;
+	overflow-y: auto;
+	margin-bottom: 12px;
+}
+.copyChip {
+	font-family: inherit;
+	font-size: 12px;
+	font-weight: 600;
+	padding: 6px 12px;
+	border-radius: 999px;
+	border: 1px solid var(--line-strong);
+	background: var(--surface);
+	color: var(--ink-muted);
+	cursor: pointer;
+}
+.copyChip.isActive {
+	background: var(--sage-wash);
+	border-color: var(--sage-deep);
+	color: var(--sage-deep);
+}
+.copyPanelFoot {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	padding-top: 10px;
+	border-top: 1px solid var(--line);
+}
+.copyPanelCount {
+	font-size: 11.5px;
 	color: var(--ink-faint);
 }
 
