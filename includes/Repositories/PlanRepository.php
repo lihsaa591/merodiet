@@ -302,6 +302,32 @@ class PlanRepository {
 	}
 
 	/**
+	 * Revert an assigned plan back to a draft — clears the client link,
+	 * assignment timestamp, and frozen snapshot, so it becomes freely
+	 * editable again. Used when a plan was assigned in error or needs a
+	 * correction before the client has acted on it.
+	 *
+	 * @param int $id Internal plan ID.
+	 */
+	public function unassign( int $id ): bool {
+		global $wpdb;
+
+		$updated = $wpdb->update(
+			$wpdb->prefix . 'nutrio_plans',
+			array(
+				'client_id'         => null,
+				'status'            => 'draft',
+				'assigned_at'       => null,
+				'nutrient_snapshot' => null,
+				'updated_at'        => current_time( 'mysql' ),
+			),
+			array( 'id' => $id )
+		);
+
+		return false !== $updated;
+	}
+
+	/**
 	 * Delete a plan and its days/items.
 	 *
 	 * @param int $id Internal plan ID.

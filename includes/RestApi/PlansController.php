@@ -127,6 +127,15 @@ final class PlansController extends AbstractPractitionerController {
 			),
 			required_capability: 'manage_nutrio_plans'
 		);
+
+		$this->register_route(
+			'/(?P<id>\d+)/unassign',
+			array(
+				'methods'  => WP_REST_Server::CREATABLE,
+				'callback' => array( $this, 'unassign_plan' ),
+			),
+			required_capability: 'manage_nutrio_plans'
+		);
 	}
 
 	/**
@@ -285,6 +294,38 @@ final class PlansController extends AbstractPractitionerController {
 		$assigned = $this->plans->find( $id );
 
 		return $this->success( $this->with_details( $assigned ) );
+	}
+
+	/**
+	 * POST /plans/{id}/unassign — revert an assigned plan back to a draft,
+	 * so a mistaken or since-outdated assignment can be corrected and
+	 * reassigned, rather than left as a permanent dead end.
+	 *
+	 * @param WP_REST_Request $request The current request.
+	 */
+	public function unassign_plan( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$id   = (int) $request->get_param( 'id' );
+		$plan = $this->plans->find_for_practitioner( $id, $this->current_practitioner_id() );
+		$owns = $this->assert_owns( $plan );
+
+		if ( true !== $owns ) {
+			return $owns;
+		}
+
+		if ( 'assigned' !== $plan['status'] ) {
+			return $this->error( 'nutrio_plan_not_assigned', __( 'This plan is not currently assigned.', 'nutrio' ), 409 );
+		}
+
+		$this->plans->unassign( $id );
+
+		/**
+		 * The just-unassigned plan.
+		 *
+		 * @var array<string, mixed> $updated
+		 */
+		$updated = $this->plans->find( $id );
+
+		return $this->success( $this->with_details( $updated ) );
 	}
 
 	/**
