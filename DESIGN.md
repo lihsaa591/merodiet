@@ -4,11 +4,11 @@
 
 ## Identity
 
-Nutrio is a practice-management tool for registered dietitians/nutritionists — client roster, USDA-backed recipe/nutrient data, meal-plan building. The visual identity is calm and clinical without being cold: a muted steel-blue accent against a neutral white/gray base with a warm tan wash, flat bordered surfaces (no drop shadows), one quiet sans-serif typeface throughout.
+Nutrio is a practice-management tool for registered dietitians/nutritionists — client roster, USDA-backed recipe/nutrient data, meal-plan building. The visual identity is calm and clinical without being cold: a muted steel-blue accent with a matching pale blue-gray wash against a neutral white/gray base, flat bordered surfaces (no drop shadows), one quiet sans-serif typeface throughout.
 
 **Pins (do not re-litigate without explicit user request):**
 - Accent hue: muted steel/slate blue (`--sage`), not green — deliberately chosen to avoid any resemblance to AllCoach's (a sibling product) green brand identity, which would read as a conflict of interest
-- Palette reference: adapted from the "PURE" mood board (`@verveandcolor`, tags: optimistic/inviting/authentic/trustworthy) — the board's light blue (`#74AFCC`) and warm tan (`#E1D2BD`) set the direction; both were deepened/adjusted from the board's exact values to meet WCAG AA contrast as solid button fills, not just as light accents
+- Palette reference: adapted from the "PURE" mood board (`@verveandcolor`, tags: optimistic/inviting/authentic/trustworthy) — the board's light blue (`#74AFCC`, deepened for AA contrast as a solid button fill) and its own paler blue-gray tint (`#D7E2E8`) for the wash, so accent and wash stay in the same hue family instead of mixing in the board's separate tan/taupe swatches
 - Type: single humanist sans family (no separate display serif) — chosen specifically to avoid a "trying too hard" feel
 - Surfaces: flat, bordered, no box-shadow except on genuinely floating elements (modals, dropdowns)
 
@@ -27,7 +27,7 @@ Nutrio is a practice-management tool for registered dietitians/nutritionists —
 | `--line-strong` | `#D5D3DA` | `#423D4A` | emphasized border (inputs, active states) |
 | `--sage` (accent) | `#2E6883` | `#3A7591` | primary accent — buttons, active nav, links |
 | `--sage-deep` | `#1F4F63` | `#5AA0BF` | accent hover/pressed |
-| `--sage-wash` | `#E1D2BD` | `#22303A` | accent-tinted background (active nav, chips) |
+| `--sage-wash` | `#D7E2E8` | `#22303A` | accent-tinted background (active nav, chips) |
 | `--clay` (neutral secondary) | `#8B8B90` | `#8D889B` | neutral secondary accent, avatars/badges without semantic meaning |
 | `--success` / `-wash` | `#4C9179` / `#E5F2ED` | `#7FC1A8` / `#1F332B` | positive semantic state |
 | `--warning` / `-wash` | `#B08A3C` / `#F6EFDF` | `#D8B268` / `#362C18` | caution semantic state |
