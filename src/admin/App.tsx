@@ -8,7 +8,8 @@ import Dashboard from '../screens/dashboard/Dashboard';
 import ClientRoster from '../screens/clients/ClientRoster';
 import RecipeScreen from '../screens/recipes/RecipeScreen';
 import PlanScreen from '../screens/plans/PlanScreen';
-import ComingSoon from '../screens/ComingSoon';
+import CustomFoods from '../screens/foods/CustomFoods';
+import Settings from '../screens/settings/Settings';
 import type { ReactNode } from 'react';
 
 interface View {
@@ -24,28 +25,8 @@ const VIEWS: Record< string, View > = {
 	clients: { render: () => <ClientRoster /> },
 	recipes: { render: () => <RecipeScreen /> },
 	plans: { render: () => <PlanScreen /> },
-	foods: {
-		render: () => (
-			<ComingSoon
-				title={ __( 'Food database', 'nutrio' ) }
-				label={ __(
-					'Cached USDA lookups, shared across your recipes.',
-					'nutrio'
-				) }
-			/>
-		),
-	},
-	settings: {
-		render: () => (
-			<ComingSoon
-				title={ __( 'Settings', 'nutrio' ) }
-				label={ __(
-					'USDA API key, practice details, licensing.',
-					'nutrio'
-				) }
-			/>
-		),
-	},
+	foods: { render: () => <CustomFoods /> },
+	settings: { render: () => <Settings /> },
 };
 
 /** Reads ?view= from the current URL, falling back to 'dashboard'. */

@@ -48,13 +48,17 @@ Theme toggle (light/dark) and current-user identity live in the sidebar footer.
 - **Allergy check:** runs only at the moment of assignment (the builder itself never has a client attached until then) — a case-insensitive substring match of the client's declared allergies against every item's name in the plan. Known limitation: not a real allergen taxonomy (misses synonyms, plurals, category-level allergens like "tree nuts" not auto-catching "almonds").
 - **Assigned plans are read-only.** The backend rejects edits to an assigned plan (409); the builder mirrors that by disabling every input rather than only showing the error after a failed save.
 
-### Food database (stub)
-- **Purpose:** transparency into the cached USDA lookups recipes draw from.
-- **Primary content:** deferred — currently a single explanatory placeholder line.
+### Food database → Custom foods (built)
+- **Purpose:** manual entry for ingredients not in USDA's database — a client's specific branded product, a homemade blend. Repurposed from the originally-planned "browse the USDA cache" concept (low value: a read-only list with no action) into something that actually closes a known gap.
+- **Primary content:** table of the current practitioner's own custom foods (Name, Calories, Protein, Carbs, Fat) + a Drawer form (Name required, ~13 curated optional nutrient fields grouped Macros / Vitamins & minerals). Custom foods are scoped per-practitioner — one practitioner's entries aren't visible to another.
+- **Primary action:** "Add custom food" (top-right, own topbar row).
+- **Integration point:** the Recipe builder's ingredient search (`FoodSearch`) has a "USDA" / "My custom foods" toggle, so a custom food is usable in a recipe the same way a USDA food is.
+- **Deleting a custom food still used in a recipe is blocked** (409), the same pattern as an assigned plan blocking edits — silently orphaning a recipe's nutrient total would be worse than refusing the delete.
+- **Not USDA cache browsing.** There's still no UI to inspect the raw USDA-sourced cache (`wp_nutrio_foods` rows with `source = 'usda'`) — that idea was deliberately dropped as low-value; see this feature's design discussion for the reasoning.
 
-### Settings (stub)
-- **Purpose:** USDA API key and practice-level configuration.
-- **Primary content:** USDA API key field today; practice details and licensing deferred.
+### Settings (built)
+- **Purpose:** USDA API key today; practice details and licensing still deferred.
+- **Primary content:** single section (no tabs yet — added only once there's a second section worth grouping). Shows a masked preview (`••••1234`) if a key is already set, with a "Replace key"/"Add key" action that reveals the input. The raw key is never sent back to the browser once saved.
 
 ## Responsiveness (applies to every page above)
 

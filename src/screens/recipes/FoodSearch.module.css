@@ -1,3 +1,24 @@
+.tabs {
+	display: flex;
+	gap: 6px;
+	margin-bottom: 10px;
+}
+.tab {
+	font-family: inherit;
+	font-size: 12px;
+	font-weight: 600;
+	padding: 6px 12px;
+	border-radius: 8px;
+	border: 1px solid var(--line-strong);
+	background: none;
+	color: var(--ink-muted);
+	cursor: pointer;
+}
+.tab.isActive {
+	background: var(--sage-wash);
+	border-color: var(--sage-deep);
+	color: var(--sage-deep);
+}
 .result {
 	display: flex;
 	align-items: center;

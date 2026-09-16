@@ -5,6 +5,7 @@ import '../styles/base.css';
 import '../store/clients';
 import '../store/recipes';
 import '../store/plans';
+import '../store/customFoods';
 import App from './App';
 
 const settings = window.nutrioAdmin ?? {};

@@ -13,7 +13,10 @@ export interface Client {
 	updated_at: string;
 }
 
-export type ClientInput = Pick< Client, 'first_name' | 'last_name' | 'email' > & {
+export type ClientInput = Pick<
+	Client,
+	'first_name' | 'last_name' | 'email'
+> & {
 	allergies?: string[];
 	/** Not set by the create/edit form — only used for the bulk "Mark active"/"Mark paused" action. */
 	status?: 'active' | 'paused';
@@ -31,12 +34,52 @@ export interface PaginatedResponse< T > {
 	total_pages: number;
 }
 
+// Curated, optional nutrient fields a custom food can carry — see
+// CustomFoodNutrientMap on the backend for the USDA-nutrient-ID mapping
+// behind each one. Missing fields simply weren't entered, same as a USDA
+// food that doesn't report a given nutrient.
+export interface CustomFoodNutrientFields {
+	calories?: number;
+	protein?: number;
+	carbs?: number;
+	fat?: number;
+	saturated_fat?: number;
+	fiber?: number;
+	sugar?: number;
+	sodium?: number;
+	cholesterol?: number;
+	potassium?: number;
+	calcium?: number;
+	iron?: number;
+	vitamin_c?: number;
+	vitamin_d?: number;
+}
+
+export interface CustomFood extends CustomFoodNutrientFields {
+	id: number;
+	created_by: number;
+	name: string;
+	/** Raw nutrient-ID-keyed map — same shape as ResolvedFood['nutrients'], so a custom food can be added to a recipe like any USDA food. */
+	nutrients: Record<
+		string,
+		{ name: string; unit: string; amount_per_100g: number }
+	>;
+	updated_at: string;
+}
+
+export type CustomFoodInput = CustomFoodNutrientFields & {
+	name: string;
+};
+
 export interface RecipeItem {
 	id: number;
 	food_id: number;
 	quantity_grams: number;
 	food_description: string | null;
-	nutrients: Record< string, { name: string; unit: string; amount_per_100g: number } >;
+	nutrients: Record<
+		string,
+		{ name: string; unit: string; amount_per_100g: number }
+	>;
 }
 
 export interface Recipe {
@@ -73,7 +116,10 @@ export interface PlanItem {
 	quantity_grams: number | null;
 	servings: number | null;
 	food_description: string | null;
-	nutrients: Record< string, { name: string; unit: string; amount_per_100g: number } > | null;
+	nutrients: Record<
+		string,
+		{ name: string; unit: string; amount_per_100g: number }
+	> | null;
 	recipe_name: string | null;
 	recipe_nutrient_totals_per_serving: NutrientTotals | null;
 }
@@ -126,7 +172,10 @@ export interface ResolvedFood {
 	source_id: number;
 	description: string;
 	data_type: string;
-	nutrients: Record< string, { name: string; unit: string; amount_per_100g: number } >;
+	nutrients: Record<
+		string,
+		{ name: string; unit: string; amount_per_100g: number }
+	>;
 }
 
 /** One row from GET /foods/search — the raw USDA search result shape. */
