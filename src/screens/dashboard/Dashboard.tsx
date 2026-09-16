@@ -1,13 +1,14 @@
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { STORE_NAME } from '../../store/clients';
+import { STORE_NAME as RECIPES_STORE } from '../../store/recipes';
 import Panel, { PanelBody, PanelHead } from '../../components/ui/Panel';
 import Avatar from '../../components/ui/Avatar';
-import type { Client } from '../../types';
+import type { Client, Recipe } from '../../types';
 
 // Compliance and activity are placeholder content — Nutrio has no log-entry
-// or plan-status endpoints yet (that's Phase 3+). Active clients below is
-// the one KPI already backed by real data.
+// or plan-status endpoints yet (that's Phase 3+). Active clients and Recipe
+// library are the two KPIs already backed by real data.
 interface ComplianceEntry {
 	id: number;
 	firstName: string;
@@ -52,6 +53,11 @@ interface ClientsStoreSelectors {
 	getClientsTotal: () => number;
 }
 
+interface RecipesStoreSelectors {
+	getRecipes: () => Recipe[];
+	getRecipesTotal: () => number;
+}
+
 export default function Dashboard() {
 	const clientCount = useSelect( ( select ) => {
 		const store = select( STORE_NAME ) as unknown as ClientsStoreSelectors;
@@ -59,6 +65,14 @@ export default function Dashboard() {
 		// populated once that fetch resolves.
 		store.getClients();
 		return store.getClientsTotal();
+	}, [] );
+
+	const recipeCount = useSelect( ( select ) => {
+		const store = select(
+			RECIPES_STORE
+		) as unknown as RecipesStoreSelectors;
+		store.getRecipes();
+		return store.getRecipesTotal();
 	}, [] );
 
 	return (
@@ -97,9 +111,7 @@ export default function Dashboard() {
 				/>
 				<Kpi
 					label={ __( 'Recipe library', 'nutrio' ) }
-					value="46"
-					delta="+4 this week"
-					tone="up"
+					value={ recipeCount }
 				/>
 			</div>
 

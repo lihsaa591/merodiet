@@ -17,6 +17,10 @@ export function getRecipesPage( state: State, page: number ): Recipe[] {
 	return ( state.pages[ page ] ?? [] ).map( ( id ) => state.byId[ id ] );
 }
 
+export function getRecipesTotal( state: State ): number {
+	return state.total;
+}
+
 export function getRecipesTotalPages( state: State ): number {
 	return state.totalPages;
 }
