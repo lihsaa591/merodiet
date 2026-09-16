@@ -55,6 +55,7 @@ final class RecipesController extends AbstractPractitionerController {
 			array(
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( $this, 'list_recipes' ),
+				'args'     => self::pagination_route_args(),
 			),
 			required_capability: 'manage_nutrio_recipes'
 		);
@@ -99,12 +100,20 @@ final class RecipesController extends AbstractPractitionerController {
 	}
 
 	/**
-	 * GET /recipes — the current practitioner's full library.
+	 * GET /recipes — a page of the current practitioner's library.
+	 *
+	 * @param WP_REST_Request $request The current request.
 	 */
-	public function list_recipes(): WP_REST_Response {
-		$recipes = $this->recipes->all_for_practitioner( $this->current_practitioner_id() );
+	public function list_recipes( WP_REST_Request $request ): WP_REST_Response {
+		[
+			'page'     => $page,
+			'per_page' => $per_page,
+		] = $this->pagination_args( $request );
 
-		return $this->success( array_map( array( $this, 'with_details' ), $recipes ) );
+		$result = $this->recipes->all_for_practitioner( $this->current_practitioner_id(), $page, $per_page );
+		$items  = array_map( array( $this, 'with_details' ), $result['items'] );
+
+		return $this->success( $this->paginated_response( $items, $result['total'], $page, $per_page ) );
 	}
 
 	/**

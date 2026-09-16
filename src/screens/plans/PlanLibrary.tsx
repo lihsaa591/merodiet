@@ -4,6 +4,7 @@ import Button from '../../components/ui/Button';
 import BulkActionBar from '../../components/ui/BulkActionBar';
 import IconButton from '../../components/ui/IconButton';
 import Chip from '../../components/ui/Chip';
+import Pagination from '../../components/ui/Pagination';
 import { useBulkSelection } from '../../hooks/useBulkSelection';
 import { formatAmount, summarizeNutrients } from '../../utils/nutrients';
 import { formatDate } from '../../utils/date';
@@ -13,6 +14,9 @@ interface PlanLibraryProps {
 	plans: Plan[];
 	clients: Client[];
 	isLoading: boolean;
+	page: number;
+	totalPages: number;
+	onPageChange: ( page: number ) => void;
 	onAdd: () => void;
 	onEdit: ( id: number ) => void;
 	onDelete: ( plan: Plan ) => void;
@@ -24,6 +28,9 @@ export default function PlanLibrary( {
 	plans,
 	clients,
 	isLoading,
+	page,
+	totalPages,
+	onPageChange,
 	onAdd,
 	onEdit,
 	onDelete,
@@ -275,6 +282,12 @@ export default function PlanLibrary( {
 					) }
 				</PanelBody>
 			</Panel>
+
+			<Pagination
+				page={ page }
+				totalPages={ totalPages }
+				onPageChange={ onPageChange }
+			/>
 		</>
 	);
 }

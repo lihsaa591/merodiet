@@ -10,6 +10,7 @@ declare( strict_types=1 );
 namespace Nutrio\RestApi;
 
 use WP_Error;
+use WP_REST_Request;
 // AbstractController lives in this same namespace (Nutrio\RestApi) —
 // no use import needed.
 
@@ -62,5 +63,64 @@ abstract class AbstractPractitionerController extends AbstractController {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Parses and bounds-checks page/per_page from a list request — page
+	 * is at least 1, per_page is clamped to 1-100 (a stray ?per_page=99999
+	 * shouldn't be able to force one query to return everything).
+	 *
+	 * @param WP_REST_Request $request The current request.
+	 *
+	 * @return array{page: int, per_page: int}
+	 */
+	protected function pagination_args( WP_REST_Request $request ): array {
+		$page     = max( 1, (int) ( $request->get_param( 'page' ) ?? 1 ) );
+		$per_page = min( 100, max( 1, (int) ( $request->get_param( 'per_page' ) ?? 20 ) ) );
+
+		return array(
+			'page'     => $page,
+			'per_page' => $per_page,
+		);
+	}
+
+	/**
+	 * Standard REST arg schema for a paginated list route — shared so
+	 * every list endpoint accepts/validates page/per_page identically.
+	 *
+	 * @return array<string, array<string, mixed>>
+	 */
+	protected static function pagination_route_args(): array {
+		return array(
+			'page'     => array(
+				'type'    => 'integer',
+				'default' => 1,
+			),
+			'per_page' => array(
+				'type'    => 'integer',
+				'default' => 20,
+			),
+		);
+	}
+
+	/**
+	 * Wraps a repository's {items, total} pagination result with the
+	 * page/per_page/total_pages metadata every list response returns.
+	 *
+	 * @param array<int, array<string, mixed>> $items    The current page's rows.
+	 * @param int                               $total    Total rows across all pages.
+	 * @param int                               $page     Current page number.
+	 * @param int                               $per_page Rows per page.
+	 *
+	 * @return array{items: array<int, array<string, mixed>>, total: int, page: int, per_page: int, total_pages: int}
+	 */
+	protected function paginated_response( array $items, int $total, int $page, int $per_page ): array {
+		return array(
+			'items'       => $items,
+			'total'       => $total,
+			'page'        => $page,
+			'per_page'    => $per_page,
+			'total_pages' => (int) max( 1, ceil( $total / $per_page ) ),
+		);
 	}
 }

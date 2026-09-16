@@ -11,27 +11,38 @@ import Chip from '../../components/ui/Chip';
 import Avatar from '../../components/ui/Avatar';
 import IconButton from '../../components/ui/IconButton';
 import Drawer from '../../components/ui/Drawer';
+import Pagination from '../../components/ui/Pagination';
 import ClientForm from './ClientForm';
 import type { Client, ClientInput } from '../../types';
 
 interface ClientsStoreSelectors {
-	getClients: () => Client[];
-	hasFinishedResolution: ( selector: string ) => boolean;
+	getClientsPage: ( page: number ) => Client[];
+	getClientsTotalPages: () => number;
+	hasFinishedResolution: ( selector: string, args?: unknown[] ) => boolean;
 }
 
 export default function ClientRoster() {
 	const [ isDrawerOpen, setDrawerOpen ] = useState( false );
 	const [ editingId, setEditingId ] = useState< number | null >( null );
 	const [ isFormDirty, setFormDirty ] = useState( false );
+	const [ page, setPage ] = useState( 1 );
 
-	const { clients, isLoading } = useSelect( ( select ) => {
-		const store = select( STORE_NAME ) as unknown as ClientsStoreSelectors;
+	const { clients, totalPages, isLoading } = useSelect(
+		( select ) => {
+			const store = select(
+				STORE_NAME
+			) as unknown as ClientsStoreSelectors;
 
-		return {
-			clients: store.getClients(),
-			isLoading: ! store.hasFinishedResolution( 'getClients' ),
-		};
-	}, [] );
+			return {
+				clients: store.getClientsPage( page ),
+				totalPages: store.getClientsTotalPages(),
+				isLoading: ! store.hasFinishedResolution( 'getClientsPage', [
+					page,
+				] ),
+			};
+		},
+		[ page ]
+	);
 
 	const { createClient, updateClient, deleteClient } = useDispatch(
 		STORE_NAME
@@ -306,6 +317,12 @@ export default function ClientRoster() {
 					) }
 				</PanelBody>
 			</Panel>
+
+			<Pagination
+				page={ page }
+				totalPages={ totalPages }
+				onPageChange={ setPage }
+			/>
 
 			<Drawer
 				isOpen={ isDrawerOpen }

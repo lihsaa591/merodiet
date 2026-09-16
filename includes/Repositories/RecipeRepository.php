@@ -96,26 +96,42 @@ class RecipeRepository {
 	}
 
 	/**
-	 * All recipes belonging to a practitioner, alphabetical by name.
+	 * A page of recipes belonging to a practitioner, alphabetical by name,
+	 * plus the total count across all pages.
 	 *
 	 * @param int $practitioner_user_id Owning practitioner's user ID.
+	 * @param int $page                 1-indexed page number.
+	 * @param int $per_page             Rows per page.
 	 *
-	 * @return array<int, array<string, mixed>>
+	 * @return array{items: array<int, array<string, mixed>>, total: int}
 	 */
-	public function all_for_practitioner( int $practitioner_user_id ): array {
+	public function all_for_practitioner( int $practitioner_user_id, int $page = 1, int $per_page = 20 ): array {
 		global $wpdb;
+
+		$table = $wpdb->prefix . 'nutrio_recipes';
+
+		$total = (int) $wpdb->get_var(
+			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE practitioner_user_id = %d", $practitioner_user_id ) // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
+		);
+
+		$offset = max( 0, ( $page - 1 ) * $per_page );
 
 		$found = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT * FROM {$wpdb->prefix}nutrio_recipes WHERE practitioner_user_id = %d ORDER BY name", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
-				$practitioner_user_id
+				"SELECT * FROM {$table} WHERE practitioner_user_id = %d ORDER BY name LIMIT %d OFFSET %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; values are parameterized.
+				$practitioner_user_id,
+				$per_page,
+				$offset
 			),
 			ARRAY_A
 		);
 
 		$rows = null === $found ? array() : $found;
 
-		return array_map( array( $this, 'hydrate' ), $rows );
+		return array(
+			'items' => array_map( array( $this, 'hydrate' ), $rows ),
+			'total' => $total,
+		);
 	}
 
 	/**

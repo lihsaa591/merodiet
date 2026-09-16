@@ -2,11 +2,17 @@ import type { Plan } from '../../types';
 
 interface State {
 	byId: Record< number, Plan >;
-	allIds: number[];
+	pages: Record< number, number[] >;
+	total: number;
+	totalPages: number;
 }
 
-export function getPlans( state: State ): Plan[] {
-	return state.allIds.map( ( id ) => state.byId[ id ] );
+export function getPlansPage( state: State, page: number ): Plan[] {
+	return ( state.pages[ page ] ?? [] ).map( ( id ) => state.byId[ id ] );
+}
+
+export function getPlansTotalPages( state: State ): number {
+	return state.totalPages;
 }
 
 export function getPlan( state: State, id: number ): Plan | null {

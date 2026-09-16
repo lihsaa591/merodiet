@@ -3,6 +3,7 @@ import Panel, { PanelBody } from '../../components/ui/Panel';
 import Button from '../../components/ui/Button';
 import BulkActionBar from '../../components/ui/BulkActionBar';
 import IconButton from '../../components/ui/IconButton';
+import Pagination from '../../components/ui/Pagination';
 import { useBulkSelection } from '../../hooks/useBulkSelection';
 import { formatAmount, summarizeNutrients } from '../../utils/nutrients';
 import type { Recipe } from '../../types';
@@ -10,6 +11,9 @@ import type { Recipe } from '../../types';
 interface RecipeLibraryProps {
 	recipes: Recipe[];
 	isLoading: boolean;
+	page: number;
+	totalPages: number;
+	onPageChange: ( page: number ) => void;
 	onAdd: () => void;
 	onEdit: ( id: number ) => void;
 	onDelete: ( recipe: Recipe ) => void;
@@ -19,6 +23,9 @@ interface RecipeLibraryProps {
 export default function RecipeLibrary( {
 	recipes,
 	isLoading,
+	page,
+	totalPages,
+	onPageChange,
 	onAdd,
 	onEdit,
 	onDelete,
@@ -183,6 +190,12 @@ export default function RecipeLibrary( {
 					) }
 				</PanelBody>
 			</Panel>
+
+			<Pagination
+				page={ page }
+				totalPages={ totalPages }
+				onPageChange={ onPageChange }
+			/>
 		</>
 	);
 }

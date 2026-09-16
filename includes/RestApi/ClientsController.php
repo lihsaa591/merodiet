@@ -47,6 +47,7 @@ final class ClientsController extends AbstractPractitionerController {
 			array(
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( $this, 'list_clients' ),
+				'args'     => self::pagination_route_args(),
 			),
 			required_capability: 'manage_nutrio_clients'
 		);
@@ -91,10 +92,19 @@ final class ClientsController extends AbstractPractitionerController {
 	}
 
 	/**
-	 * GET /clients — the current practitioner's full roster.
+	 * GET /clients — a page of the current practitioner's roster.
+	 *
+	 * @param WP_REST_Request $request The current request.
 	 */
-	public function list_clients(): WP_REST_Response {
-		return $this->success( $this->clients->all_for_practitioner( $this->current_practitioner_id() ) );
+	public function list_clients( WP_REST_Request $request ): WP_REST_Response {
+		[
+			'page'     => $page,
+			'per_page' => $per_page,
+		] = $this->pagination_args( $request );
+
+		$result = $this->clients->all_for_practitioner( $this->current_practitioner_id(), $page, $per_page );
+
+		return $this->success( $this->paginated_response( $result['items'], $result['total'], $page, $per_page ) );
 	}
 
 	/**

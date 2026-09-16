@@ -1,3 +1,4 @@
+import { useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useQueryParam } from '../../hooks/useQueryParam';
@@ -8,23 +9,47 @@ import RecipeBuilder from './RecipeBuilder';
 import type { Recipe, RecipeInput } from '../../types';
 
 interface RecipesStoreSelectors {
-	getRecipes: () => Recipe[];
-	hasFinishedResolution: ( selector: string ) => boolean;
+	getRecipesPage: ( page: number ) => Recipe[];
+	getRecipesTotalPages: () => number;
+	getRecipe: ( id: number ) => Recipe | null;
+	hasFinishedResolution: ( selector: string, args?: unknown[] ) => boolean;
 }
 
 export default function RecipeScreen() {
 	// `id` in the URL is what makes an open recipe deep-linkable and
 	// refresh-safe — "new" for an unsaved recipe, a numeric id once saved.
 	const [ idParam, setIdParam ] = useQueryParam( 'id' );
+	const [ page, setPage ] = useState( 1 );
 
-	const { recipes, isLoading } = useSelect( ( select ) => {
-		const store = select( STORE_NAME ) as unknown as RecipesStoreSelectors;
+	const editingId = idParam && idParam !== 'new' ? Number( idParam ) : null;
 
-		return {
-			recipes: store.getRecipes(),
-			isLoading: ! store.hasFinishedResolution( 'getRecipes' ),
-		};
-	}, [] );
+	const {
+		recipes,
+		totalPages,
+		isLoading,
+		editingRecipe,
+		isEditingRecipeLoading,
+	} = useSelect(
+		( select ) => {
+			const store = select(
+				STORE_NAME
+			) as unknown as RecipesStoreSelectors;
+
+			return {
+				recipes: store.getRecipesPage( page ),
+				totalPages: store.getRecipesTotalPages(),
+				isLoading: ! store.hasFinishedResolution( 'getRecipesPage', [
+					page,
+				] ),
+				editingRecipe:
+					editingId !== null ? store.getRecipe( editingId ) : null,
+				isEditingRecipeLoading:
+					editingId !== null &&
+					! store.hasFinishedResolution( 'getRecipe', [ editingId ] ),
+			};
+		},
+		[ editingId, page ]
+	);
 
 	const { createRecipe, updateRecipe, deleteRecipe } = useDispatch(
 		STORE_NAME
@@ -36,10 +61,6 @@ export default function RecipeScreen() {
 		) => Promise< Recipe >;
 		deleteRecipe: ( id: number ) => Promise< void >;
 	};
-
-	const editingId = idParam && idParam !== 'new' ? Number( idParam ) : null;
-	const editingRecipe =
-		recipes.find( ( recipe ) => recipe.id === editingId ) ?? null;
 
 	const openAdd = () => setIdParam( 'new' );
 	const openEdit = ( id: number ) => setIdParam( String( id ) );
@@ -91,6 +112,13 @@ export default function RecipeScreen() {
 	};
 
 	if ( idParam !== null ) {
+		if (
+			isEditingRecipeLoading ||
+			( editingId !== null && ! editingRecipe )
+		) {
+			return <p>{ __( 'Loading…', 'nutrio' ) }</p>;
+		}
+
 		return (
 			<RecipeBuilder
 				key={ idParam }
@@ -105,6 +133,9 @@ export default function RecipeScreen() {
 		<RecipeLibrary
 			recipes={ recipes }
 			isLoading={ isLoading }
+			page={ page }
+			totalPages={ totalPages }
+			onPageChange={ setPage }
 			onAdd={ openAdd }
 			onEdit={ openEdit }
 			onDelete={ handleDelete }

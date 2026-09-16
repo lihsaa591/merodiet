@@ -1,8 +1,27 @@
 import apiFetch from '@wordpress/api-fetch';
 import type { Client, ClientInput } from '../../types';
 
-export function receiveClients( clients: Client[] ) {
-	return { type: 'RECEIVE_CLIENTS' as const, clients };
+export function receiveClients(
+	clients: Client[],
+	total: number,
+	totalPages: number
+) {
+	return { type: 'RECEIVE_CLIENTS' as const, clients, total, totalPages };
+}
+
+export function receiveClientsPage(
+	page: number,
+	clients: Client[],
+	total: number,
+	totalPages: number
+) {
+	return {
+		type: 'RECEIVE_CLIENTS_PAGE' as const,
+		page,
+		clients,
+		total,
+		totalPages,
+	};
 }
 
 export function receiveClient( client: Client ) {
@@ -17,6 +36,10 @@ interface ThunkArgs {
 	dispatch: {
 		receiveClient: ( client: Client ) => void;
 		removeClient: ( id: number ) => void;
+		invalidateResolution: (
+			selectorName: string,
+			args?: unknown[]
+		) => void;
 	};
 }
 
@@ -31,6 +54,11 @@ export function createClient( data: ClientInput ) {
 		} );
 
 		dispatch.receiveClient( client );
+		// Creating a client returns straight to the roster (unlike Recipes/
+		// Plans, which navigate into an editor first) — page 1 needs to
+		// reflect it immediately, so force that page to actually re-fetch.
+		dispatch.invalidateResolution( 'getClientsPage', [ 1 ] );
+		dispatch.invalidateResolution( 'getClients', [] );
 
 		return client;
 	};

@@ -22,6 +22,15 @@ export type ClientInput = Pick< Client, 'first_name' | 'last_name' | 'email' > &
 /** Nutrient amounts keyed by USDA nutrient ID, e.g. { "1008": 165 } for kcal. */
 export type NutrientTotals = Record< string, number >;
 
+/** The shape every paginated list endpoint (clients/recipes/plans) responds with. */
+export interface PaginatedResponse< T > {
+	items: T[];
+	total: number;
+	page: number;
+	per_page: number;
+	total_pages: number;
+}
+
 export interface RecipeItem {
 	id: number;
 	food_id: number;

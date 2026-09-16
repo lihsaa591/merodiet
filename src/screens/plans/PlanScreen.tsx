@@ -11,7 +11,8 @@ import PlanBuilder from './PlanBuilder';
 import type { Client, Plan, PlanInput } from '../../types';
 
 interface PlansStoreSelectors {
-	getPlans: () => Plan[];
+	getPlansPage: ( page: number ) => Plan[];
+	getPlansTotalPages: () => number;
 	getPlan: ( id: number ) => Plan | null;
 	hasFinishedResolution: ( selector: string, args?: unknown[] ) => boolean;
 }
@@ -23,10 +24,18 @@ interface ClientsStoreSelectors {
 export default function PlanScreen() {
 	const [ idParam, setIdParam ] = useQueryParam( 'id' );
 	const [ isAssignModalOpen, setAssignModalOpen ] = useState( false );
+	const [ page, setPage ] = useState( 1 );
 
 	const editingId = idParam && idParam !== 'new' ? Number( idParam ) : null;
 
-	const { plans, isLoading, clients, isEditingPlanLoading } = useSelect(
+	const {
+		plans,
+		totalPages,
+		isLoading,
+		clients,
+		editingPlan,
+		isEditingPlanLoading,
+	} = useSelect(
 		( select ) => {
 			const plansStore = select(
 				STORE_NAME
@@ -35,17 +44,19 @@ export default function PlanScreen() {
 				CLIENTS_STORE
 			) as unknown as ClientsStoreSelectors;
 
-			// list_plans only returns totals, not days/items (an N+1 query the
-			// list view never reads) — opening a specific plan for editing
-			// needs the full detail, so fetch it via its own resolver.
-			if ( editingId !== null ) {
-				plansStore.getPlan( editingId );
-			}
-
 			return {
-				plans: plansStore.getPlans(),
-				isLoading: ! plansStore.hasFinishedResolution( 'getPlans' ),
+				plans: plansStore.getPlansPage( page ),
+				totalPages: plansStore.getPlansTotalPages(),
+				isLoading: ! plansStore.hasFinishedResolution( 'getPlansPage', [
+					page,
+				] ),
 				clients: clientsStore.getClients(),
+				// list_plans only returns totals, not days/items (an N+1 query
+				// the list view never reads) — opening a specific plan for
+				// editing needs the full detail, fetched via its own resolver,
+				// and looked up independently of whichever page is displayed.
+				editingPlan:
+					editingId !== null ? plansStore.getPlan( editingId ) : null,
 				isEditingPlanLoading:
 					editingId !== null &&
 					! plansStore.hasFinishedResolution( 'getPlan', [
@@ -53,7 +64,7 @@ export default function PlanScreen() {
 					] ),
 			};
 		},
-		[ editingId ]
+		[ editingId, page ]
 	);
 
 	const { createPlan, updatePlan, deletePlan, assignPlan, unassignPlan } =
@@ -67,8 +78,6 @@ export default function PlanScreen() {
 			assignPlan: ( id: number, clientId: number ) => Promise< Plan >;
 			unassignPlan: ( id: number ) => Promise< Plan >;
 		};
-
-	const editingPlan = plans.find( ( plan ) => plan.id === editingId ) ?? null;
 
 	const openAdd = () => setIdParam( 'new' );
 	const openEdit = ( id: number ) => setIdParam( String( id ) );
@@ -223,6 +232,9 @@ export default function PlanScreen() {
 			plans={ plans }
 			clients={ clients }
 			isLoading={ isLoading }
+			page={ page }
+			totalPages={ totalPages }
+			onPageChange={ setPage }
 			onAdd={ openAdd }
 			onEdit={ openEdit }
 			onDelete={ handleDelete }

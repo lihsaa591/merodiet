@@ -1,8 +1,27 @@
 import apiFetch from '@wordpress/api-fetch';
 import type { Recipe, RecipeInput } from '../../types';
 
-export function receiveRecipes( recipes: Recipe[] ) {
-	return { type: 'RECEIVE_RECIPES' as const, recipes };
+export function receiveRecipes(
+	recipes: Recipe[],
+	total: number,
+	totalPages: number
+) {
+	return { type: 'RECEIVE_RECIPES' as const, recipes, total, totalPages };
+}
+
+export function receiveRecipesPage(
+	page: number,
+	recipes: Recipe[],
+	total: number,
+	totalPages: number
+) {
+	return {
+		type: 'RECEIVE_RECIPES_PAGE' as const,
+		page,
+		recipes,
+		total,
+		totalPages,
+	};
 }
 
 export function receiveRecipe( recipe: Recipe ) {
@@ -17,6 +36,10 @@ interface ThunkArgs {
 	dispatch: {
 		receiveRecipe: ( recipe: Recipe ) => void;
 		removeRecipe: ( id: number ) => void;
+		invalidateResolution: (
+			selectorName: string,
+			args?: unknown[]
+		) => void;
 	};
 }
 
@@ -30,6 +53,8 @@ export function createRecipe( data: RecipeInput ) {
 		} );
 
 		dispatch.receiveRecipe( recipe );
+		dispatch.invalidateResolution( 'getRecipesPage', [ 1 ] );
+		dispatch.invalidateResolution( 'getRecipes', [] );
 
 		return recipe;
 	};

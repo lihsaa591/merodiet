@@ -17,21 +17,49 @@ interface ComplianceEntry {
 }
 
 const PLACEHOLDER_COMPLIANCE: ComplianceEntry[] = [
-	{ id: 1, firstName: 'Sam', lastName: 'Rivera', goal: 'Weight management', percent: 92 },
-	{ id: 2, firstName: 'Jordan', lastName: 'Mackey', goal: 'Type 2 diabetes', percent: 78 },
-	{ id: 3, firstName: 'Elena', lastName: 'Cho', goal: 'Prenatal', percent: 54 },
-	{ id: 4, firstName: 'Theo', lastName: 'Novak', goal: 'Sports performance', percent: 21 },
+	{
+		id: 1,
+		firstName: 'Sam',
+		lastName: 'Rivera',
+		goal: 'Weight management',
+		percent: 92,
+	},
+	{
+		id: 2,
+		firstName: 'Jordan',
+		lastName: 'Mackey',
+		goal: 'Type 2 diabetes',
+		percent: 78,
+	},
+	{
+		id: 3,
+		firstName: 'Elena',
+		lastName: 'Cho',
+		goal: 'Prenatal',
+		percent: 54,
+	},
+	{
+		id: 4,
+		firstName: 'Theo',
+		lastName: 'Novak',
+		goal: 'Sports performance',
+		percent: 21,
+	},
 ];
 
 interface ClientsStoreSelectors {
 	getClients: () => Client[];
+	getClientsTotal: () => number;
 }
 
 export default function Dashboard() {
-	const clientCount = useSelect(
-		( select ) => ( select( STORE_NAME ) as unknown as ClientsStoreSelectors ).getClients().length,
-		[]
-	);
+	const clientCount = useSelect( ( select ) => {
+		const store = select( STORE_NAME ) as unknown as ClientsStoreSelectors;
+		// Triggers the same resolver getClients() uses, so the total is
+		// populated once that fetch resolves.
+		store.getClients();
+		return store.getClientsTotal();
+	}, [] );
 
 	return (
 		<>
@@ -39,7 +67,11 @@ export default function Dashboard() {
 				<div>
 					<h1>{ __( 'Good morning', 'nutrio' ) }</h1>
 					<div className="nutrio-topbar-sub">
-						{ new Date().toLocaleDateString( undefined, { weekday: 'long', month: 'long', day: 'numeric' } ) }
+						{ new Date().toLocaleDateString( undefined, {
+							weekday: 'long',
+							month: 'long',
+							day: 'numeric',
+						} ) }
 						{ ' · ' }
 						{ clientCount } { __( 'active clients', 'nutrio' ) }
 					</div>
@@ -47,15 +79,35 @@ export default function Dashboard() {
 			</div>
 
 			<div className="nutrio-kpi-row">
-				<Kpi label={ __( 'Active clients', 'nutrio' ) } value={ clientCount } />
-				<Kpi label={ __( 'Logged today', 'nutrio' ) } value="8/12" delta="67% compliance" tone="up" />
-				<Kpi label={ __( 'Plans awaiting review', 'nutrio' ) } value="3" delta="needs approval" tone="warn" />
-				<Kpi label={ __( 'Recipe library', 'nutrio' ) } value="46" delta="+4 this week" tone="up" />
+				<Kpi
+					label={ __( 'Active clients', 'nutrio' ) }
+					value={ clientCount }
+				/>
+				<Kpi
+					label={ __( 'Logged today', 'nutrio' ) }
+					value="8/12"
+					delta="67% compliance"
+					tone="up"
+				/>
+				<Kpi
+					label={ __( 'Plans awaiting review', 'nutrio' ) }
+					value="3"
+					delta="needs approval"
+					tone="warn"
+				/>
+				<Kpi
+					label={ __( 'Recipe library', 'nutrio' ) }
+					value="46"
+					delta="+4 this week"
+					tone="up"
+				/>
 			</div>
 
 			<Panel>
 				<PanelHead>
-					<h3>{ __( 'Client compliance, last 7 days', 'nutrio' ) }</h3>
+					<h3>
+						{ __( 'Client compliance, last 7 days', 'nutrio' ) }
+					</h3>
 				</PanelHead>
 				<PanelBody>
 					{ PLACEHOLDER_COMPLIANCE.map( ( client ) => (
@@ -79,30 +131,87 @@ function Kpi( { label, value, delta, tone }: KpiProps ) {
 		<div className="nutrio-kpi">
 			<div className="nutrio-kpi-label">{ label }</div>
 			<div className="nutrio-kpi-value">{ value }</div>
-			{ delta && <div className={ `nutrio-kpi-delta ${ tone ? `is-${ tone }` : '' }`.trim() }>{ delta }</div> }
+			{ delta && (
+				<div
+					className={ `nutrio-kpi-delta ${
+						tone ? `is-${ tone }` : ''
+					}`.trim() }
+				>
+					{ delta }
+				</div>
+			) }
 		</div>
 	);
 }
 
 function ComplianceRow( { client }: { client: ComplianceEntry } ) {
-	const barTone = client.percent >= 70 ? 'var(--success)' : client.percent >= 40 ? 'var(--warning)' : 'var(--critical)';
+	const barTone =
+		client.percent >= 70
+			? 'var(--success)'
+			: client.percent >= 40
+			? 'var(--warning)'
+			: 'var(--critical)';
 
 	return (
-		<div style={ { display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 0', borderBottom: '1px solid var(--line)' } }>
-			<Avatar id={ client.id } firstName={ client.firstName } lastName={ client.lastName } size="lg" />
+		<div
+			style={ {
+				display: 'flex',
+				alignItems: 'center',
+				gap: '12px',
+				padding: '10px 0',
+				borderBottom: '1px solid var(--line)',
+			} }
+		>
+			<Avatar
+				id={ client.id }
+				firstName={ client.firstName }
+				lastName={ client.lastName }
+				size="lg"
+			/>
 			<div style={ { width: '110px', minWidth: 0 } }>
 				<div
-					style={ { fontWeight: 600, fontSize: '13.5px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' } }
+					style={ {
+						fontWeight: 600,
+						fontSize: '13.5px',
+						whiteSpace: 'nowrap',
+						overflow: 'hidden',
+						textOverflow: 'ellipsis',
+					} }
 					title={ `${ client.firstName } ${ client.lastName }` }
 				>
 					{ client.firstName } { client.lastName }
 				</div>
-				<div style={ { fontSize: '12px', color: 'var(--ink-muted)' } }>{ client.goal }</div>
+				<div style={ { fontSize: '12px', color: 'var(--ink-muted)' } }>
+					{ client.goal }
+				</div>
 			</div>
-			<div style={ { flex: 1, height: '6px', borderRadius: '4px', background: 'var(--paper-dim)', overflow: 'hidden' } }>
-				<div style={ { height: '100%', borderRadius: '4px', width: `${ client.percent }%`, background: barTone } } />
+			<div
+				style={ {
+					flex: 1,
+					height: '6px',
+					borderRadius: '4px',
+					background: 'var(--paper-dim)',
+					overflow: 'hidden',
+				} }
+			>
+				<div
+					style={ {
+						height: '100%',
+						borderRadius: '4px',
+						width: `${ client.percent }%`,
+						background: barTone,
+					} }
+				/>
 			</div>
-			<div className="nutrio-mono" style={ { fontSize: '12.5px', fontWeight: 700, width: '34px', textAlign: 'right' } }>
+			<div
+				className="nutrio-mono"
+				style={ {
+					fontSize: '12.5px',
+					fontWeight: 700,
+					width: '34px',
+					textAlign: 'right',
+				} }
+			>
 				{ client.percent }%
 			</div>
 		</div>

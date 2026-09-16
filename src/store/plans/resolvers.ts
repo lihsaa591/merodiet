@@ -1,18 +1,30 @@
 import apiFetch from '@wordpress/api-fetch';
-import type { Plan } from '../../types';
+import type { PaginatedResponse, Plan } from '../../types';
 
 interface ThunkArgs {
 	dispatch: {
-		receivePlans: ( plans: Plan[] ) => void;
+		receivePlansPage: (
+			page: number,
+			plans: Plan[],
+			total: number,
+			totalPages: number
+		) => void;
 		receivePlan: ( plan: Plan ) => void;
 	};
 }
 
-export function getPlans() {
+export function getPlansPage( page: number ) {
 	return async ( { dispatch }: ThunkArgs ) => {
-		const plans: Plan[] = await apiFetch( { path: '/nutrio/v1/plans' } );
+		const response: PaginatedResponse< Plan > = await apiFetch( {
+			path: `/nutrio/v1/plans?page=${ page }&per_page=20`,
+		} );
 
-		dispatch.receivePlans( plans );
+		dispatch.receivePlansPage(
+			page,
+			response.items,
+			response.total,
+			response.total_pages
+		);
 	};
 }
 
