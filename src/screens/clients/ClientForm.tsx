@@ -11,6 +11,8 @@ interface FormValues {
 	last_name: string;
 	email: string;
 	allergies: string;
+	goals: string;
+	dietary_restrictions: string;
 }
 
 const EMPTY: FormValues = {
@@ -18,6 +20,8 @@ const EMPTY: FormValues = {
 	last_name: '',
 	email: '',
 	allergies: '',
+	goals: '',
+	dietary_restrictions: '',
 };
 
 interface ClientFormProps {
@@ -28,11 +32,9 @@ interface ClientFormProps {
 	onDirtyChange?: ( isDirty: boolean ) => void;
 }
 
-/**
- * Shared create/edit form. `client` is null for create, or an existing
- * client record for edit — the only difference the caller needs to
- * handle is which store action it dispatches on submit.
- */
+// Shared create/edit form. `client` is null for create, or an existing
+// client record for edit — the only difference the caller needs to
+// handle is which store action it dispatches on submit.
 export default function ClientForm( {
 	client,
 	onSubmit,
@@ -46,6 +48,8 @@ export default function ClientForm( {
 					last_name: client.last_name,
 					email: client.email,
 					allergies: ( client.allergies ?? [] ).join( ', ' ),
+					goals: client.goals ?? '',
+					dietary_restrictions: client.dietary_restrictions ?? '',
 			  }
 			: EMPTY
 	);
@@ -58,7 +62,9 @@ export default function ClientForm( {
 
 	const setField =
 		( field: keyof FormValues ) =>
-		( event: React.ChangeEvent< HTMLInputElement > ) =>
+		(
+			event: React.ChangeEvent< HTMLInputElement | HTMLTextAreaElement >
+		) =>
 			setValues( ( prev ) => ( {
 				...prev,
 				[ field ]: event.target.value,
@@ -77,6 +83,8 @@ export default function ClientForm( {
 					.split( ',' )
 					.map( ( item ) => item.trim() )
 					.filter( Boolean ),
+				goals: values.goals,
+				dietary_restrictions: values.dietary_restrictions,
 			} );
 			markClean();
 		} finally {
@@ -143,7 +151,7 @@ export default function ClientForm( {
 			</div>
 			<div className="nutrio-field">
 				<label htmlFor="nutrio-allergies">
-					{ __( 'Allergies & restrictions', 'nutrio' ) }
+					{ __( 'Allergies', 'nutrio' ) }
 				</label>
 				<input
 					id="nutrio-allergies"
@@ -155,6 +163,36 @@ export default function ClientForm( {
 				<div className="nutrio-field-hint">
 					{ __( 'Comma-separated', 'nutrio' ) }
 				</div>
+			</div>
+			<div className="nutrio-field">
+				<label htmlFor="nutrio-dietary-restrictions">
+					{ __( 'Dietary restrictions', 'nutrio' ) }
+				</label>
+				<textarea
+					id="nutrio-dietary-restrictions"
+					rows={ 2 }
+					value={ values.dietary_restrictions }
+					onChange={ setField( 'dietary_restrictions' ) }
+					placeholder={ __(
+						'Vegetarian, low-sodium, halal…',
+						'nutrio'
+					) }
+				/>
+			</div>
+			<div className="nutrio-field">
+				<label htmlFor="nutrio-goals">
+					{ __( 'Goals', 'nutrio' ) }
+				</label>
+				<textarea
+					id="nutrio-goals"
+					rows={ 3 }
+					value={ values.goals }
+					onChange={ setField( 'goals' ) }
+					placeholder={ __(
+						'Weight management, improve energy levels…',
+						'nutrio'
+					) }
+				/>
 			</div>
 
 			{ isDirty && <UnsavedBadge /> }
