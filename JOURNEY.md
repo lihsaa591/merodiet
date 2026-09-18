@@ -55,6 +55,7 @@ Theme toggle (light/dark) and current-user identity live in the sidebar footer.
 - **Integration point:** the Recipe builder's ingredient search (`FoodSearch`) has a "USDA" / "My custom foods" toggle, so a custom food is usable in a recipe the same way a USDA food is.
 - **Deleting a custom food still used in a recipe is blocked** (409), the same pattern as an assigned plan blocking edits — silently orphaning a recipe's nutrient total would be worse than refusing the delete.
 - **Not USDA cache browsing.** There's still no UI to inspect the raw USDA-sourced cache (`wp_nutrio_foods` rows with `source = 'usda'`) — that idea was deliberately dropped as low-value; see this feature's design discussion for the reasoning.
+- **Not yet built — bulk import.** One-at-a-time entry only for now; a future pass should let a practitioner import custom foods in bulk (e.g. a CSV of a client's regular branded products) instead of hand-typing each one through the drawer form.
 
 ### Settings (built)
 - **Purpose:** USDA API key today; practice details and licensing still deferred.
