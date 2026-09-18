@@ -10,6 +10,7 @@ import { confirmDialog } from '../../utils/confirmDialog';
 import {
 	estimateNutrientsPerServing,
 	formatAmount,
+	listExtraNutrients,
 } from '../../utils/nutrients';
 import type { Recipe, RecipeInput, ResolvedFood } from '../../types';
 
@@ -107,6 +108,9 @@ export default function RecipeBuilder( {
 	// Live estimate from the current draft — updates instantly as ingredients
 	// change, ahead of the authoritative totals the server computes on save.
 	const summary = estimateNutrientsPerServing( items, servings );
+	// Only whichever of fiber/sodium/vitamins/etc. the current ingredients
+	// actually report — not every food has every one of these.
+	const extraNutrients = listExtraNutrients( summary );
 
 	return (
 		<>
@@ -322,13 +326,40 @@ export default function RecipeBuilder( {
 									</div>
 								</div>
 							) }
+							{ extraNutrients.length > 0 && (
+								<div
+									className={ styles.nutrientGrid }
+									style={ { marginTop: '10px' } }
+								>
+									{ extraNutrients.map( ( nutrient ) => (
+										<div
+											className={ styles.nutrientTile }
+											key={ nutrient.key }
+										>
+											<div
+												className={ styles.nutrientVal }
+											>
+												{ formatAmount(
+													nutrient.value,
+													` ${ nutrient.unit }`
+												) }
+											</div>
+											<div
+												className={ styles.nutrientLbl }
+											>
+												{ nutrient.label }
+											</div>
+										</div>
+									) ) }
+								</div>
+							) }
 						</div>
 					</PanelBody>
 				</Panel>
 
 				<Panel>
 					<PanelHead>
-						<h3>{ __( 'Search USDA foods', 'nutrio' ) }</h3>
+						<h3>{ __( 'Search foods', 'nutrio' ) }</h3>
 					</PanelHead>
 					<PanelBody>
 						<FoodSearch onResolve={ addItem } />
