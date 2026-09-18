@@ -1,7 +1,8 @@
-import { useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useQueryParam } from '../../hooks/useQueryParam';
+import { usePagination } from '../../hooks/usePagination';
+import { useShowFilters } from '../../hooks/useShowFilters';
 import { STORE_NAME } from '../../store/recipes';
 import { confirmDialog } from '../../utils/confirmDialog';
 import RecipeLibrary from './RecipeLibrary';
@@ -9,22 +10,31 @@ import RecipeBuilder from './RecipeBuilder';
 import type { Recipe, RecipeInput } from '../../types';
 
 interface RecipesStoreSelectors {
-	getRecipesPage: ( page: number ) => Recipe[];
+	getRecipesPage: (
+		page: number,
+		perPage: number,
+		filters: Record< string, string >
+	) => Recipe[];
+	getRecipesTotal: () => number;
 	getRecipesTotalPages: () => number;
 	getRecipe: ( id: number ) => Recipe | null;
 	hasFinishedResolution: ( selector: string, args?: unknown[] ) => boolean;
 }
 
+const RECIPE_FILTER_DEFAULTS = { search: '' };
+
 export default function RecipeScreen() {
 	// `id` in the URL is what makes an open recipe deep-linkable and
 	// refresh-safe — "new" for an unsaved recipe, a numeric id once saved.
 	const [ idParam, setIdParam ] = useQueryParam( 'id' );
-	const [ page, setPage ] = useState( 1 );
+	const { page, perPage, filters, setPage, setPerPage, setFilter } =
+		usePagination( 'recipes', { filterDefaults: RECIPE_FILTER_DEFAULTS } );
 
 	const editingId = idParam && idParam !== 'new' ? Number( idParam ) : null;
 
 	const {
 		recipes,
+		total,
 		totalPages,
 		isLoading,
 		editingRecipe,
@@ -36,10 +46,13 @@ export default function RecipeScreen() {
 			) as unknown as RecipesStoreSelectors;
 
 			return {
-				recipes: store.getRecipesPage( page ),
+				recipes: store.getRecipesPage( page, perPage, filters ),
+				total: store.getRecipesTotal(),
 				totalPages: store.getRecipesTotalPages(),
 				isLoading: ! store.hasFinishedResolution( 'getRecipesPage', [
 					page,
+					perPage,
+					filters,
 				] ),
 				editingRecipe:
 					editingId !== null ? store.getRecipe( editingId ) : null,
@@ -48,8 +61,11 @@ export default function RecipeScreen() {
 					! store.hasFinishedResolution( 'getRecipe', [ editingId ] ),
 			};
 		},
-		[ editingId, page ]
+		[ editingId, page, perPage, filters ]
 	);
+
+	const isFiltering = Boolean( filters.search );
+	const showFilters = useShowFilters( total, isFiltering );
 
 	const { createRecipe, updateRecipe, deleteRecipe } = useDispatch(
 		STORE_NAME
@@ -136,6 +152,13 @@ export default function RecipeScreen() {
 			page={ page }
 			totalPages={ totalPages }
 			onPageChange={ setPage }
+			total={ total }
+			perPage={ perPage }
+			onPerPageChange={ setPerPage }
+			search={ filters.search }
+			onSearchChange={ ( value ) => setFilter( 'search', value ) }
+			showFilters={ showFilters }
+			isFiltering={ isFiltering }
 			onAdd={ openAdd }
 			onEdit={ openEdit }
 			onDelete={ handleDelete }

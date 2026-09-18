@@ -1,0 +1,46 @@
+.bar {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 14px;
+}
+.searchWrap {
+	flex: 1;
+	max-width: 320px;
+}
+.searchWrap :global(.nutrio-field) {
+	margin: 0;
+}
+.searchWrap input {
+	box-sizing: border-box;
+	width: 100%;
+	height: 35px;
+	padding: 0 12px;
+	font-size: 13.5px;
+}
+.statusWrap :global(.nutrio-field) {
+	margin: 0;
+}
+.statusWrap select {
+	box-sizing: border-box;
+	height: 35px;
+	padding: 0 30px 0 12px;
+	font-size: 13.5px;
+	background-position: right 11px center;
+}
+
+@media (max-width: 560px) {
+	.bar {
+		flex-wrap: wrap;
+	}
+	.searchWrap {
+		max-width: none;
+		flex: 1 1 100%;
+	}
+	.statusWrap {
+		flex: 1 1 100%;
+	}
+	.statusWrap select {
+		width: 100%;
+	}
+}

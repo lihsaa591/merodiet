@@ -9,6 +9,8 @@ declare( strict_types=1 );
 
 namespace Nutrio\Repositories;
 
+use Nutrio\Database\QueryFilters;
+
 /**
  * A plan's days and items are replaced wholesale on update (delete-all
  * then re-insert), the same approach RecipeRepository takes for
@@ -100,34 +102,48 @@ class PlanRepository {
 
 	/**
 	 * A page of plans belonging to a practitioner, most recently created
-	 * first, plus the total count across all pages.
+	 * first, plus the total count across all pages. $filters is
+	 * deliberately open-ended — see QueryFilters — today supports
+	 * 'search' (title) and 'status' (exact match); a future filter is one
+	 * more QueryFilters call here, not a signature change.
 	 *
-	 * @param int $practitioner_user_id Owning practitioner's user ID.
-	 * @param int $page                 1-indexed page number.
-	 * @param int $per_page             Rows per page.
+	 * @param int                   $practitioner_user_id Owning practitioner's user ID.
+	 * @param int                   $page                 1-indexed page number.
+	 * @param int                   $per_page             Rows per page.
+	 * @param array<string, string> $filters              Optional filters — 'search', 'status'.
 	 *
 	 * @return array{items: array<int, array<string, mixed>>, total: int}
 	 */
-	public function all_for_practitioner( int $practitioner_user_id, int $page = 1, int $per_page = 20 ): array {
+	public function all_for_practitioner( int $practitioner_user_id, int $page = 1, int $per_page = 10, array $filters = array() ): array {
 		global $wpdb;
 
 		$table = $wpdb->prefix . 'nutrio_plans';
 
+		$params = array( $practitioner_user_id );
+
+		$where = QueryFilters::combine(
+			'practitioner_user_id = %d',
+			array(
+				QueryFilters::search_clause( $filters, 'search', array( 'title' ), $params ),
+				QueryFilters::exact_clause( $filters, 'status', 'status', $params ),
+			)
+		);
+
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders -- table name and WHERE clause are built from fixed strings and caller-supplied literals, not user input; every value is bound via prepare()'s own placeholders. phpcs's static count of "%s"/"%d" tokens can't see through the ...$params spread.
 		$total = (int) $wpdb->get_var(
-			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE practitioner_user_id = %d", $practitioner_user_id ) // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
+			$wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE {$where}", ...$params )
 		);
 
 		$offset = max( 0, ( $page - 1 ) * $per_page );
 
 		$found = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT * FROM {$table} WHERE practitioner_user_id = %d ORDER BY created_at DESC LIMIT %d OFFSET %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; values are parameterized.
-				$practitioner_user_id,
-				$per_page,
-				$offset
+				"SELECT * FROM {$table} WHERE {$where} ORDER BY created_at DESC LIMIT %d OFFSET %d",
+				...array_merge( $params, array( $per_page, $offset ) )
 			),
 			ARRAY_A
 		);
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders
 
 		$rows = null === $found ? array() : $found;
 

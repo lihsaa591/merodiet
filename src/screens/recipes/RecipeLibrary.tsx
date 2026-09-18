@@ -4,8 +4,10 @@ import Button from '../../components/ui/Button';
 import BulkActionBar from '../../components/ui/BulkActionBar';
 import IconButton from '../../components/ui/IconButton';
 import Pagination from '../../components/ui/Pagination';
+import ListFilters from '../../components/ui/ListFilters';
 import { useBulkSelection } from '../../hooks/useBulkSelection';
 import { formatAmount, summarizeNutrients } from '../../utils/nutrients';
+import { formatDateTime } from '../../utils/date';
 import type { Recipe } from '../../types';
 
 interface RecipeLibraryProps {
@@ -14,6 +16,13 @@ interface RecipeLibraryProps {
 	page: number;
 	totalPages: number;
 	onPageChange: ( page: number ) => void;
+	total: number;
+	perPage: number;
+	onPerPageChange: ( perPage: number ) => void;
+	search: string;
+	onSearchChange: ( value: string ) => void;
+	showFilters: boolean;
+	isFiltering: boolean;
 	onAdd: () => void;
 	onEdit: ( id: number ) => void;
 	onDelete: ( recipe: Recipe ) => void;
@@ -26,6 +35,13 @@ export default function RecipeLibrary( {
 	page,
 	totalPages,
 	onPageChange,
+	total,
+	perPage,
+	onPerPageChange,
+	search,
+	onSearchChange,
+	showFilters,
+	isFiltering,
 	onAdd,
 	onEdit,
 	onDelete,
@@ -48,16 +64,29 @@ export default function RecipeLibrary( {
 				</Button>
 			</div>
 
+			{ showFilters && (
+				<ListFilters
+					search={ search }
+					onSearchChange={ onSearchChange }
+					searchPlaceholder={ __( 'Search recipes…', 'nutrio' ) }
+				/>
+			) }
+
 			<Panel>
 				<PanelBody className="nutrio-table-wrap">
 					{ isLoading && <p>{ __( 'Loading…', 'nutrio' ) }</p> }
 
 					{ ! isLoading && recipes.length === 0 && (
 						<p>
-							{ __(
-								'No recipes yet. Add your first recipe to start building your library.',
-								'nutrio'
-							) }
+							{ isFiltering
+								? __(
+										'No recipes match your search.',
+										'nutrio'
+								  )
+								: __(
+										'No recipes yet. Add your first recipe to start building your library.',
+										'nutrio'
+								  ) }
 						</p>
 					) }
 
@@ -105,6 +134,7 @@ export default function RecipeLibrary( {
 										<th>
 											{ __( 'Kcal / serving', 'nutrio' ) }
 										</th>
+										<th>{ __( 'Updated', 'nutrio' ) }</th>
 										<th></th>
 									</tr>
 								</thead>
@@ -152,6 +182,11 @@ export default function RecipeLibrary( {
 													) }
 												</td>
 												<td>
+													{ formatDateTime(
+														recipe.updated_at
+													) }
+												</td>
+												<td>
 													<div className="nutrio-row-actions">
 														<IconButton
 															label={ __(
@@ -195,6 +230,9 @@ export default function RecipeLibrary( {
 				page={ page }
 				totalPages={ totalPages }
 				onPageChange={ onPageChange }
+				total={ total }
+				perPage={ perPage }
+				onPerPageChange={ onPerPageChange }
 			/>
 		</>
 	);

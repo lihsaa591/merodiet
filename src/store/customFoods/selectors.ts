@@ -1,9 +1,10 @@
+import { pageKey } from './reducer';
 import type { CustomFood } from '../../types';
 
 interface State {
 	byId: Record< number, CustomFood >;
 	allIds: number[];
-	pages: Record< number, number[] >;
+	pages: Record< string, number[] >;
 	total: number;
 	totalPages: number;
 }
@@ -13,8 +14,15 @@ export function getCustomFoods( state: State ): CustomFood[] {
 	return state.allIds.map( ( id ) => state.byId[ id ] );
 }
 
-export function getCustomFoodsPage( state: State, page: number ): CustomFood[] {
-	return ( state.pages[ page ] ?? [] ).map( ( id ) => state.byId[ id ] );
+export function getCustomFoodsPage(
+	state: State,
+	page: number,
+	perPage: number = 10,
+	filters: Record< string, string > = {}
+): CustomFood[] {
+	return ( state.pages[ pageKey( page, perPage, filters ) ] ?? [] ).map(
+		( id ) => state.byId[ id ]
+	);
 }
 
 export function getCustomFoodsTotal( state: State ): number {

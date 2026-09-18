@@ -18,6 +18,8 @@ export type ClientInput = Pick<
 	'first_name' | 'last_name' | 'email'
 > & {
 	allergies?: string[];
+	goals?: string;
+	dietary_restrictions?: string;
 	/** Not set by the create/edit form — only used for the bulk "Mark active"/"Mark paused" action. */
 	status?: 'active' | 'paused';
 };
@@ -185,6 +187,12 @@ export interface FoodSearchResult {
 	dataType: string;
 }
 
+/** The shape GET /foods/search responds with — a "load more" batch, not a full page list. */
+export interface FoodSearchResponse {
+	items: FoodSearchResult[];
+	has_more: boolean;
+}
+
 declare global {
 	interface Window {
 		nutrioAdmin?: {
@@ -194,6 +202,10 @@ declare global {
 			adminUrl?: string;
 			currentUserName?: string;
 			currentUserInitials?: string;
+			/** This site's Settings → General → Date Format, a PHP date() format string (e.g. "F j, Y"). */
+			dateFormat?: string;
+			/** This site's Settings → General → Time Format, a PHP date() format string (e.g. "g:i a"). */
+			timeFormat?: string;
 		};
 	}
 }

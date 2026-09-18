@@ -128,6 +128,12 @@ final class AdminPage {
 				'adminUrl'            => esc_url_raw( admin_url() ),
 				'currentUserName'     => $current_user->display_name,
 				'currentUserInitials' => self::initials( $current_user->display_name ),
+				// This site's own Settings → General → Date/Time Format (PHP
+				// date() format strings, e.g. "F j, Y" / "g:i a") — every
+				// date/time shown in the admin app should follow them rather
+				// than a hardcoded style.
+				'dateFormat'          => get_option( 'date_format', 'F j, Y' ),
+				'timeFormat'          => get_option( 'time_format', 'g:i a' ),
 			)
 		);
 	}

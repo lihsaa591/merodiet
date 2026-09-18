@@ -76,7 +76,7 @@ abstract class AbstractPractitionerController extends AbstractController {
 	 */
 	protected function pagination_args( WP_REST_Request $request ): array {
 		$page     = max( 1, (int) ( $request->get_param( 'page' ) ?? 1 ) );
-		$per_page = min( 100, max( 1, (int) ( $request->get_param( 'per_page' ) ?? 20 ) ) );
+		$per_page = min( 100, max( 1, (int) ( $request->get_param( 'per_page' ) ?? 10 ) ) );
 
 		return array(
 			'page'     => $page,
@@ -98,9 +98,55 @@ abstract class AbstractPractitionerController extends AbstractController {
 			),
 			'per_page' => array(
 				'type'    => 'integer',
-				'default' => 20,
+				'default' => 10,
 			),
 		);
+	}
+
+	/**
+	 * Parses a list request's filter params into the shape a
+	 * repository's all_for_practitioner( ..., $filters ) expects —
+	 * every key present, sanitized to a plain string, with an empty
+	 * string for anything not supplied (QueryFilters treats '' the
+	 * same as "not filtering on this"). Keeping filter-extraction here
+	 * rather than repeated per-controller means adding a new filter to
+	 * a list endpoint is one entry in $keys, not new parsing code.
+	 *
+	 * @param WP_REST_Request $request The current request.
+	 * @param string[]        $keys    Filter names this endpoint supports, e.g. ['search', 'status'].
+	 *
+	 * @return array<string, string>
+	 */
+	protected function filter_args( WP_REST_Request $request, array $keys ): array {
+		$filters = array();
+
+		foreach ( $keys as $key ) {
+			$filters[ $key ] = (string) ( $request->get_param( $key ) ?? '' );
+		}
+
+		return $filters;
+	}
+
+	/**
+	 * Standard REST arg schema for a list route's filter params — every
+	 * one a plain, optional string. Use alongside pagination_route_args()
+	 * in a list route's 'args'.
+	 *
+	 * @param string[] $keys Filter names this endpoint supports, e.g. ['search', 'status'].
+	 *
+	 * @return array<string, array<string, mixed>>
+	 */
+	protected static function filter_route_args( array $keys ): array {
+		$args = array();
+
+		foreach ( $keys as $key ) {
+			$args[ $key ] = array(
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			);
+		}
+
+		return $args;
 	}
 
 	/**
@@ -108,9 +154,9 @@ abstract class AbstractPractitionerController extends AbstractController {
 	 * page/per_page/total_pages metadata every list response returns.
 	 *
 	 * @param array<int, array<string, mixed>> $items    The current page's rows.
-	 * @param int                               $total    Total rows across all pages.
-	 * @param int                               $page     Current page number.
-	 * @param int                               $per_page Rows per page.
+	 * @param int                              $total    Total rows across all pages.
+	 * @param int                              $page     Current page number.
+	 * @param int                              $per_page Rows per page.
 	 *
 	 * @return array{items: array<int, array<string, mixed>>, total: int, page: int, per_page: int, total_pages: int}
 	 */

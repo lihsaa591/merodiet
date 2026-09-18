@@ -111,6 +111,22 @@ export default function App() {
 		const url = new URL( window.location.href );
 		url.searchParams.set( 'view', id );
 		url.searchParams.delete( 'id' ); // don't carry a stale id into a different screen
+
+		// Same idea for pagination and filters — each list screen's
+		// usePagination() writes its own `${prefix}_page` / `${prefix}_per_page`
+		// / `${prefix}_filter_*` keys (see that hook), which would otherwise
+		// just accumulate in the URL forever as the practitioner visits more
+		// screens.
+		for ( const key of Array.from( url.searchParams.keys() ) ) {
+			if (
+				key.endsWith( '_page' ) ||
+				key.endsWith( '_per_page' ) ||
+				key.includes( '_filter_' )
+			) {
+				url.searchParams.delete( key );
+			}
+		}
+
 		window.history.pushState( { view: id }, '', url );
 	};
 

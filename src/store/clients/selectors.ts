@@ -1,9 +1,10 @@
+import { pageKey } from './reducer';
 import type { Client } from '../../types';
 
 interface State {
 	byId: Record< number, Client >;
 	allIds: number[];
-	pages: Record< number, number[] >;
+	pages: Record< string, number[] >;
 	total: number;
 	totalPages: number;
 }
@@ -13,8 +14,15 @@ export function getClients( state: State ): Client[] {
 	return state.allIds.map( ( id ) => state.byId[ id ] );
 }
 
-export function getClientsPage( state: State, page: number ): Client[] {
-	return ( state.pages[ page ] ?? [] ).map( ( id ) => state.byId[ id ] );
+export function getClientsPage(
+	state: State,
+	page: number,
+	perPage: number = 10,
+	filters: Record< string, string > = {}
+): Client[] {
+	return ( state.pages[ pageKey( page, perPage, filters ) ] ?? [] ).map(
+		( id ) => state.byId[ id ]
+	);
 }
 
 export function getClientsTotal( state: State ): number {

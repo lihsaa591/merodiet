@@ -1,8 +1,15 @@
 import type { Plan } from '../../types';
 
+/**
+ * `pages` is keyed by pageKey(page, perPage, filters) rather than by page
+ * number alone — otherwise page 1 under one filter/search combo would
+ * silently overwrite page 1's cache for a different combo, and switching
+ * back to the first combo would show the second's stale rows (see
+ * src/store/clients/reducer.ts's docblock for the full reasoning).
+ */
 interface State {
 	byId: Record< number, Plan >;
-	pages: Record< number, number[] >;
+	pages: Record< string, number[] >;
 	total: number;
 	totalPages: number;
 }
@@ -14,10 +21,24 @@ const DEFAULT_STATE: State = {
 	totalPages: 1,
 };
 
+export function pageKey(
+	page: number,
+	perPage: number,
+	filters: Record< string, string >
+): string {
+	const sorted = Object.entries( filters ).sort( ( [ a ], [ b ] ) =>
+		a.localeCompare( b )
+	);
+
+	return `${ page }|${ perPage }|${ JSON.stringify( sorted ) }`;
+}
+
 type Action =
 	| {
 			type: 'RECEIVE_PLANS_PAGE';
 			page: number;
+			perPage: number;
+			filters: Record< string, string >;
 			plans: Plan[];
 			total: number;
 			totalPages: number;
@@ -41,7 +62,8 @@ export default function reducer(
 				byId,
 				pages: {
 					...state.pages,
-					[ action.page ]: action.plans.map( ( plan ) => plan.id ),
+					[ pageKey( action.page, action.perPage, action.filters ) ]:
+						action.plans.map( ( plan ) => plan.id ),
 				},
 				total: action.total,
 				totalPages: action.totalPages,
@@ -59,11 +81,9 @@ export default function reducer(
 			const byId = { ...state.byId };
 			delete byId[ action.id ];
 
-			const pages: Record< number, number[] > = {};
-			for ( const [ page, ids ] of Object.entries( state.pages ) ) {
-				pages[ Number( page ) ] = ids.filter(
-					( id ) => id !== action.id
-				);
+			const pages: Record< string, number[] > = {};
+			for ( const [ key, ids ] of Object.entries( state.pages ) ) {
+				pages[ key ] = ids.filter( ( id ) => id !== action.id );
 			}
 
 			return { ...state, byId, pages };

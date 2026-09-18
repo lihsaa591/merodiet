@@ -34,6 +34,13 @@ final class CustomFoodsController extends AbstractPractitionerController {
 	protected string $rest_base = 'custom-foods';
 
 	/**
+	 * Filters the list route accepts — see AbstractPractitionerController::filter_args().
+	 *
+	 * @var string[]
+	 */
+	private const LIST_FILTERS = array( 'search' );
+
+	/**
 	 * Construct with the repository this controller reads/writes through.
 	 *
 	 * @param CustomFoodRepository $foods The custom-food data access layer.
@@ -49,7 +56,10 @@ final class CustomFoodsController extends AbstractPractitionerController {
 			array(
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( $this, 'list_foods' ),
-				'args'     => self::pagination_route_args(),
+				'args'     => array_merge(
+					self::pagination_route_args(),
+					self::filter_route_args( self::LIST_FILTERS )
+				),
 			),
 			required_capability: 'manage_nutrio_foods'
 		);
@@ -95,7 +105,12 @@ final class CustomFoodsController extends AbstractPractitionerController {
 			'per_page' => $per_page,
 		] = $this->pagination_args( $request );
 
-		$result = $this->foods->all_for_practitioner( $this->current_practitioner_id(), $page, $per_page );
+		$result = $this->foods->all_for_practitioner(
+			$this->current_practitioner_id(),
+			$page,
+			$per_page,
+			$this->filter_args( $request, self::LIST_FILTERS )
+		);
 
 		return $this->success( $this->paginated_response( $result['items'], $result['total'], $page, $per_page ) );
 	}

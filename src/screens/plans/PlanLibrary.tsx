@@ -5,6 +5,9 @@ import BulkActionBar from '../../components/ui/BulkActionBar';
 import IconButton from '../../components/ui/IconButton';
 import Chip from '../../components/ui/Chip';
 import Pagination from '../../components/ui/Pagination';
+import ListFilters, {
+	type StatusFilterOption,
+} from '../../components/ui/ListFilters';
 import { useBulkSelection } from '../../hooks/useBulkSelection';
 import { formatAmount, summarizeNutrients } from '../../utils/nutrients';
 import { formatDate } from '../../utils/date';
@@ -17,6 +20,16 @@ interface PlanLibraryProps {
 	page: number;
 	totalPages: number;
 	onPageChange: ( page: number ) => void;
+	total: number;
+	perPage: number;
+	onPerPageChange: ( perPage: number ) => void;
+	search: string;
+	onSearchChange: ( value: string ) => void;
+	status: string;
+	onStatusChange: ( value: string ) => void;
+	statusOptions: StatusFilterOption[];
+	showFilters: boolean;
+	isFiltering: boolean;
 	onAdd: () => void;
 	onEdit: ( id: number ) => void;
 	onDelete: ( plan: Plan ) => void;
@@ -31,6 +44,16 @@ export default function PlanLibrary( {
 	page,
 	totalPages,
 	onPageChange,
+	total,
+	perPage,
+	onPerPageChange,
+	search,
+	onSearchChange,
+	status,
+	onStatusChange,
+	statusOptions,
+	showFilters,
+	isFiltering,
 	onAdd,
 	onEdit,
 	onDelete,
@@ -78,16 +101,29 @@ export default function PlanLibrary( {
 				</Button>
 			</div>
 
+			{ showFilters && (
+				<ListFilters
+					search={ search }
+					onSearchChange={ onSearchChange }
+					searchPlaceholder={ __( 'Search plans…', 'nutrio' ) }
+					status={ status }
+					onStatusChange={ onStatusChange }
+					statusOptions={ statusOptions }
+				/>
+			) }
+
 			<Panel>
 				<PanelBody className="nutrio-table-wrap">
 					{ isLoading && <p>{ __( 'Loading…', 'nutrio' ) }</p> }
 
 					{ ! isLoading && plans.length === 0 && (
 						<p>
-							{ __(
-								'No plans yet. Build your first plan to start assigning nutrition to clients.',
-								'nutrio'
-							) }
+							{ isFiltering
+								? __( 'No plans match your search.', 'nutrio' )
+								: __(
+										'No plans yet. Build your first plan to start assigning nutrition to clients.',
+										'nutrio'
+								  ) }
 						</p>
 					) }
 
@@ -287,6 +323,9 @@ export default function PlanLibrary( {
 				page={ page }
 				totalPages={ totalPages }
 				onPageChange={ onPageChange }
+				total={ total }
+				perPage={ perPage }
+				onPerPageChange={ onPerPageChange }
 			/>
 		</>
 	);

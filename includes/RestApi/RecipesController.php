@@ -34,6 +34,13 @@ final class RecipesController extends AbstractPractitionerController {
 	protected string $rest_base = 'recipes';
 
 	/**
+	 * Filters the list route accepts — see AbstractPractitionerController::filter_args().
+	 *
+	 * @var string[]
+	 */
+	private const LIST_FILTERS = array( 'search' );
+
+	/**
 	 * Construct with the repository and resolver this controller reads through.
 	 *
 	 * @param RecipeRepository       $recipes    The recipe library data access layer.
@@ -55,7 +62,10 @@ final class RecipesController extends AbstractPractitionerController {
 			array(
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( $this, 'list_recipes' ),
-				'args'     => self::pagination_route_args(),
+				'args'     => array_merge(
+					self::pagination_route_args(),
+					self::filter_route_args( self::LIST_FILTERS )
+				),
 			),
 			required_capability: 'manage_nutrio_recipes'
 		);
@@ -110,7 +120,12 @@ final class RecipesController extends AbstractPractitionerController {
 			'per_page' => $per_page,
 		] = $this->pagination_args( $request );
 
-		$result = $this->recipes->all_for_practitioner( $this->current_practitioner_id(), $page, $per_page );
+		$result = $this->recipes->all_for_practitioner(
+			$this->current_practitioner_id(),
+			$page,
+			$per_page,
+			$this->filter_args( $request, self::LIST_FILTERS )
+		);
 		$items  = array_map( array( $this, 'with_details' ), $result['items'] );
 
 		return $this->success( $this->paginated_response( $items, $result['total'], $page, $per_page ) );

@@ -2,6 +2,8 @@ import { useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useQueryParam } from '../../hooks/useQueryParam';
+import { usePagination } from '../../hooks/usePagination';
+import { useShowFilters } from '../../hooks/useShowFilters';
 import { STORE_NAME } from '../../store/plans';
 import { confirmDialog } from '../../utils/confirmDialog';
 import { STORE_NAME as CLIENTS_STORE } from '../../store/clients';
@@ -11,7 +13,12 @@ import PlanBuilder from './PlanBuilder';
 import type { Client, Plan, PlanInput } from '../../types';
 
 interface PlansStoreSelectors {
-	getPlansPage: ( page: number ) => Plan[];
+	getPlansPage: (
+		page: number,
+		perPage: number,
+		filters: Record< string, string >
+	) => Plan[];
+	getPlansTotal: () => number;
 	getPlansTotalPages: () => number;
 	getPlan: ( id: number ) => Plan | null;
 	hasFinishedResolution: ( selector: string, args?: unknown[] ) => boolean;
@@ -21,15 +28,24 @@ interface ClientsStoreSelectors {
 	getClients: () => Client[];
 }
 
+const PLAN_FILTER_DEFAULTS = { search: '', status: '' };
+const PLAN_STATUS_OPTIONS = [
+	{ value: '', label: __( 'All statuses', 'nutrio' ) },
+	{ value: 'draft', label: __( 'Draft', 'nutrio' ) },
+	{ value: 'assigned', label: __( 'Assigned', 'nutrio' ) },
+];
+
 export default function PlanScreen() {
 	const [ idParam, setIdParam ] = useQueryParam( 'id' );
 	const [ isAssignModalOpen, setAssignModalOpen ] = useState( false );
-	const [ page, setPage ] = useState( 1 );
+	const { page, perPage, filters, setPage, setPerPage, setFilter } =
+		usePagination( 'plans', { filterDefaults: PLAN_FILTER_DEFAULTS } );
 
 	const editingId = idParam && idParam !== 'new' ? Number( idParam ) : null;
 
 	const {
 		plans,
+		total,
 		totalPages,
 		isLoading,
 		clients,
@@ -45,10 +61,13 @@ export default function PlanScreen() {
 			) as unknown as ClientsStoreSelectors;
 
 			return {
-				plans: plansStore.getPlansPage( page ),
+				plans: plansStore.getPlansPage( page, perPage, filters ),
+				total: plansStore.getPlansTotal(),
 				totalPages: plansStore.getPlansTotalPages(),
 				isLoading: ! plansStore.hasFinishedResolution( 'getPlansPage', [
 					page,
+					perPage,
+					filters,
 				] ),
 				clients: clientsStore.getClients(),
 				// list_plans only returns totals, not days/items (an N+1 query
@@ -64,8 +83,11 @@ export default function PlanScreen() {
 					] ),
 			};
 		},
-		[ editingId, page ]
+		[ editingId, page, perPage, filters ]
 	);
+
+	const isFiltering = Boolean( filters.search || filters.status );
+	const showFilters = useShowFilters( total, isFiltering );
 
 	const { createPlan, updatePlan, deletePlan, assignPlan, unassignPlan } =
 		useDispatch( STORE_NAME ) as {
@@ -235,6 +257,16 @@ export default function PlanScreen() {
 			page={ page }
 			totalPages={ totalPages }
 			onPageChange={ setPage }
+			total={ total }
+			perPage={ perPage }
+			onPerPageChange={ setPerPage }
+			search={ filters.search }
+			onSearchChange={ ( value ) => setFilter( 'search', value ) }
+			status={ filters.status }
+			onStatusChange={ ( value ) => setFilter( 'status', value ) }
+			statusOptions={ PLAN_STATUS_OPTIONS }
+			showFilters={ showFilters }
+			isFiltering={ isFiltering }
 			onAdd={ openAdd }
 			onEdit={ openEdit }
 			onDelete={ handleDelete }

@@ -10,6 +10,8 @@ interface ThunkArgs {
 		) => void;
 		receiveRecipesPage: (
 			page: number,
+			perPage: number,
+			filters: Record< string, string >,
 			recipes: Recipe[],
 			total: number,
 			totalPages: number
@@ -39,14 +41,25 @@ export function getRecipes() {
 	};
 }
 
-export function getRecipesPage( page: number ) {
+export function getRecipesPage(
+	page: number,
+	perPage: number = 10,
+	filters: Record< string, string > = {}
+) {
 	return async ( { dispatch }: ThunkArgs ) => {
+		const params = new URLSearchParams( {
+			page: String( page ),
+			per_page: String( perPage ),
+			...filters,
+		} );
 		const response: PaginatedResponse< Recipe > = await apiFetch( {
-			path: `/nutrio/v1/recipes?page=${ page }&per_page=20`,
+			path: `/nutrio/v1/recipes?${ params.toString() }`,
 		} );
 
 		dispatch.receiveRecipesPage(
 			page,
+			perPage,
+			filters,
 			response.items,
 			response.total,
 			response.total_pages

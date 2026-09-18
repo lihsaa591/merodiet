@@ -32,6 +32,13 @@ final class ClientsController extends AbstractPractitionerController {
 	protected string $rest_base = 'clients';
 
 	/**
+	 * Filters the list route accepts — see AbstractPractitionerController::filter_args().
+	 *
+	 * @var string[]
+	 */
+	private const LIST_FILTERS = array( 'search', 'status' );
+
+	/**
 	 * Construct with the repository this controller reads/writes through.
 	 *
 	 * @param ClientRepository $clients The client roster data access layer.
@@ -47,7 +54,10 @@ final class ClientsController extends AbstractPractitionerController {
 			array(
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( $this, 'list_clients' ),
-				'args'     => self::pagination_route_args(),
+				'args'     => array_merge(
+					self::pagination_route_args(),
+					self::filter_route_args( self::LIST_FILTERS )
+				),
 			),
 			required_capability: 'manage_nutrio_clients'
 		);
@@ -102,7 +112,12 @@ final class ClientsController extends AbstractPractitionerController {
 			'per_page' => $per_page,
 		] = $this->pagination_args( $request );
 
-		$result = $this->clients->all_for_practitioner( $this->current_practitioner_id(), $page, $per_page );
+		$result = $this->clients->all_for_practitioner(
+			$this->current_practitioner_id(),
+			$page,
+			$per_page,
+			$this->filter_args( $request, self::LIST_FILTERS )
+		);
 
 		return $this->success( $this->paginated_response( $result['items'], $result['total'], $page, $per_page ) );
 	}

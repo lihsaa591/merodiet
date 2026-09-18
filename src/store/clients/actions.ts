@@ -11,6 +11,8 @@ export function receiveClients(
 
 export function receiveClientsPage(
 	page: number,
+	perPage: number,
+	filters: Record< string, string >,
 	clients: Client[],
 	total: number,
 	totalPages: number
@@ -18,6 +20,8 @@ export function receiveClientsPage(
 	return {
 		type: 'RECEIVE_CLIENTS_PAGE' as const,
 		page,
+		perPage,
+		filters,
 		clients,
 		total,
 		totalPages,
@@ -36,10 +40,13 @@ interface ThunkArgs {
 	dispatch: {
 		receiveClient: ( client: Client ) => void;
 		removeClient: ( id: number ) => void;
-		invalidateResolution: (
-			selectorName: string,
-			args?: unknown[]
-		) => void;
+		// Invalidates every cached resolution of a selector, regardless of
+		// the args each was resolved with — the right tool here since
+		// getClientsPage() is called with a (page, perPage) pair, and we
+		// don't know which perPage the practitioner currently has active.
+		// invalidateResolution(name, [exactArgs]) would only invalidate one
+		// specific args tuple and silently miss the rest.
+		invalidateResolutionForStoreSelector: ( selectorName: string ) => void;
 	};
 }
 
@@ -56,9 +63,9 @@ export function createClient( data: ClientInput ) {
 		dispatch.receiveClient( client );
 		// Creating a client returns straight to the roster (unlike Recipes/
 		// Plans, which navigate into an editor first) — page 1 needs to
-		// reflect it immediately, so force that page to actually re-fetch.
-		dispatch.invalidateResolution( 'getClientsPage', [ 1 ] );
-		dispatch.invalidateResolution( 'getClients', [] );
+		// reflect it immediately, so force it to actually re-fetch.
+		dispatch.invalidateResolutionForStoreSelector( 'getClientsPage' );
+		dispatch.invalidateResolutionForStoreSelector( 'getClients' );
 
 		return client;
 	};

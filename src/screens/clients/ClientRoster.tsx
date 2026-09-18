@@ -4,6 +4,8 @@ import { __, sprintf } from '@wordpress/i18n';
 import { STORE_NAME } from '../../store/clients';
 import { confirmDialog } from '../../utils/confirmDialog';
 import { useBulkSelection } from '../../hooks/useBulkSelection';
+import { usePagination } from '../../hooks/usePagination';
+import { useShowFilters } from '../../hooks/useShowFilters';
 import Panel, { PanelBody } from '../../components/ui/Panel';
 import Button from '../../components/ui/Button';
 import BulkActionBar from '../../components/ui/BulkActionBar';
@@ -12,37 +14,58 @@ import Avatar from '../../components/ui/Avatar';
 import IconButton from '../../components/ui/IconButton';
 import Drawer from '../../components/ui/Drawer';
 import Pagination from '../../components/ui/Pagination';
+import ListFilters from '../../components/ui/ListFilters';
 import ClientForm from './ClientForm';
+import { formatDateTime } from '../../utils/date';
 import type { Client, ClientInput } from '../../types';
 
 interface ClientsStoreSelectors {
-	getClientsPage: ( page: number ) => Client[];
+	getClientsPage: (
+		page: number,
+		perPage: number,
+		filters: Record< string, string >
+	) => Client[];
+	getClientsTotal: () => number;
 	getClientsTotalPages: () => number;
 	hasFinishedResolution: ( selector: string, args?: unknown[] ) => boolean;
 }
+
+const CLIENT_FILTER_DEFAULTS = { search: '', status: '' };
+const CLIENT_STATUS_OPTIONS = [
+	{ value: '', label: __( 'All statuses', 'nutrio' ) },
+	{ value: 'active', label: __( 'Active', 'nutrio' ) },
+	{ value: 'paused', label: __( 'Paused', 'nutrio' ) },
+];
 
 export default function ClientRoster() {
 	const [ isDrawerOpen, setDrawerOpen ] = useState( false );
 	const [ editingId, setEditingId ] = useState< number | null >( null );
 	const [ isFormDirty, setFormDirty ] = useState( false );
-	const [ page, setPage ] = useState( 1 );
+	const { page, perPage, filters, setPage, setPerPage, setFilter } =
+		usePagination( 'clients', { filterDefaults: CLIENT_FILTER_DEFAULTS } );
 
-	const { clients, totalPages, isLoading } = useSelect(
+	const { clients, total, totalPages, isLoading } = useSelect(
 		( select ) => {
 			const store = select(
 				STORE_NAME
 			) as unknown as ClientsStoreSelectors;
 
 			return {
-				clients: store.getClientsPage( page ),
+				clients: store.getClientsPage( page, perPage, filters ),
+				total: store.getClientsTotal(),
 				totalPages: store.getClientsTotalPages(),
 				isLoading: ! store.hasFinishedResolution( 'getClientsPage', [
 					page,
+					perPage,
+					filters,
 				] ),
 			};
 		},
-		[ page ]
+		[ page, perPage, filters ]
 	);
+
+	const isFiltering = Boolean( filters.search || filters.status );
+	const showFilters = useShowFilters( total, isFiltering );
 
 	const { createClient, updateClient, deleteClient } = useDispatch(
 		STORE_NAME
@@ -135,16 +158,35 @@ export default function ClientRoster() {
 				</Button>
 			</div>
 
+			{ showFilters && (
+				<ListFilters
+					search={ filters.search }
+					onSearchChange={ ( value ) => setFilter( 'search', value ) }
+					searchPlaceholder={ __(
+						'Search name or email…',
+						'nutrio'
+					) }
+					status={ filters.status }
+					onStatusChange={ ( value ) => setFilter( 'status', value ) }
+					statusOptions={ CLIENT_STATUS_OPTIONS }
+				/>
+			) }
+
 			<Panel>
 				<PanelBody className="nutrio-table-wrap">
 					{ isLoading && <p>{ __( 'Loading…', 'nutrio' ) }</p> }
 
 					{ ! isLoading && clients.length === 0 && (
 						<p>
-							{ __(
-								'No clients yet. Add your first client to get started.',
-								'nutrio'
-							) }
+							{ isFiltering
+								? __(
+										'No clients match your search.',
+										'nutrio'
+								  )
+								: __(
+										'No clients yet. Add your first client to get started.',
+										'nutrio'
+								  ) }
 						</p>
 					) }
 
@@ -203,6 +245,7 @@ export default function ClientRoster() {
 										<th>{ __( 'Email', 'nutrio' ) }</th>
 										<th>{ __( 'Allergies', 'nutrio' ) }</th>
 										<th>{ __( 'Status', 'nutrio' ) }</th>
+										<th>{ __( 'Added', 'nutrio' ) }</th>
 										<th></th>
 									</tr>
 								</thead>
@@ -280,6 +323,11 @@ export default function ClientRoster() {
 												</Chip>
 											</td>
 											<td>
+												{ formatDateTime(
+													client.created_at
+												) }
+											</td>
+											<td>
 												<div className="nutrio-row-actions">
 													<IconButton
 														label={ __(
@@ -322,6 +370,9 @@ export default function ClientRoster() {
 				page={ page }
 				totalPages={ totalPages }
 				onPageChange={ setPage }
+				total={ total }
+				perPage={ perPage }
+				onPerPageChange={ setPerPage }
 			/>
 
 			<Drawer

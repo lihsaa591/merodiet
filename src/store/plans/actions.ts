@@ -3,6 +3,8 @@ import type { Plan, PlanInput } from '../../types';
 
 export function receivePlansPage(
 	page: number,
+	perPage: number,
+	filters: Record< string, string >,
 	plans: Plan[],
 	total: number,
 	totalPages: number
@@ -10,6 +12,8 @@ export function receivePlansPage(
 	return {
 		type: 'RECEIVE_PLANS_PAGE' as const,
 		page,
+		perPage,
+		filters,
 		plans,
 		total,
 		totalPages,
@@ -28,12 +32,13 @@ interface ThunkArgs {
 	dispatch: {
 		receivePlan: ( plan: Plan ) => void;
 		removePlan: ( id: number ) => void;
-		// Auto-provided by @wordpress/data for any store with resolvers —
-		// forces the next call to that selector+args to actually re-fetch.
-		invalidateResolution: (
-			selectorName: string,
-			args?: unknown[]
-		) => void;
+		// Invalidates every cached resolution of a selector, regardless of
+		// the args each was resolved with — the right tool here since
+		// getPlansPage() is called with a (page, perPage) pair, and we
+		// don't know which perPage the practitioner currently has active.
+		// invalidateResolution(name, [exactArgs]) would only invalidate one
+		// specific args tuple and silently miss the rest.
+		invalidateResolutionForStoreSelector: ( selectorName: string ) => void;
 	};
 }
 
@@ -48,9 +53,10 @@ export function createPlan( data: PlanInput ) {
 
 		dispatch.receivePlan( plan );
 		// A newly created plan won't be in any cached page's id list yet —
-		// invalidate page 1 (plans sort most-recent-first, so that's where
-		// it'll land) so the list reflects it if the user returns there.
-		dispatch.invalidateResolution( 'getPlansPage', [ 1 ] );
+		// invalidate every cached page so the list reflects it if the user
+		// returns there (plans sort most-recent-first, so it'll land on
+		// whichever page is currently "page 1").
+		dispatch.invalidateResolutionForStoreSelector( 'getPlansPage' );
 
 		return plan;
 	};

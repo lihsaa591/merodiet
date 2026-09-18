@@ -16,6 +16,8 @@ export function receiveCustomFoods(
 
 export function receiveCustomFoodsPage(
 	page: number,
+	perPage: number,
+	filters: Record< string, string >,
 	foods: CustomFood[],
 	total: number,
 	totalPages: number
@@ -23,6 +25,8 @@ export function receiveCustomFoodsPage(
 	return {
 		type: 'RECEIVE_CUSTOM_FOODS_PAGE' as const,
 		page,
+		perPage,
+		filters,
 		foods,
 		total,
 		totalPages,
@@ -41,10 +45,13 @@ interface ThunkArgs {
 	dispatch: {
 		receiveCustomFood: ( food: CustomFood ) => void;
 		removeCustomFood: ( id: number ) => void;
-		invalidateResolution: (
-			selectorName: string,
-			args?: unknown[]
-		) => void;
+		// Invalidates every cached resolution of a selector, regardless of
+		// the args each was resolved with — the right tool here since
+		// getCustomFoodsPage() is called with a (page, perPage) pair, and
+		// we don't know which perPage the practitioner currently has
+		// active. invalidateResolution(name, [exactArgs]) would only
+		// invalidate one specific args tuple and silently miss the rest.
+		invalidateResolutionForStoreSelector: ( selectorName: string ) => void;
 	};
 }
 
@@ -58,8 +65,8 @@ export function createCustomFood( data: CustomFoodInput ) {
 		} );
 
 		dispatch.receiveCustomFood( food );
-		dispatch.invalidateResolution( 'getCustomFoodsPage', [ 1 ] );
-		dispatch.invalidateResolution( 'getCustomFoods', [] );
+		dispatch.invalidateResolutionForStoreSelector( 'getCustomFoodsPage' );
+		dispatch.invalidateResolutionForStoreSelector( 'getCustomFoods' );
 
 		return food;
 	};

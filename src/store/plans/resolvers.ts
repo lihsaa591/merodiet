@@ -5,6 +5,8 @@ interface ThunkArgs {
 	dispatch: {
 		receivePlansPage: (
 			page: number,
+			perPage: number,
+			filters: Record< string, string >,
 			plans: Plan[],
 			total: number,
 			totalPages: number
@@ -13,14 +15,25 @@ interface ThunkArgs {
 	};
 }
 
-export function getPlansPage( page: number ) {
+export function getPlansPage(
+	page: number,
+	perPage: number = 10,
+	filters: Record< string, string > = {}
+) {
 	return async ( { dispatch }: ThunkArgs ) => {
+		const params = new URLSearchParams( {
+			page: String( page ),
+			per_page: String( perPage ),
+			...filters,
+		} );
 		const response: PaginatedResponse< Plan > = await apiFetch( {
-			path: `/nutrio/v1/plans?page=${ page }&per_page=20`,
+			path: `/nutrio/v1/plans?${ params.toString() }`,
 		} );
 
 		dispatch.receivePlansPage(
 			page,
+			perPage,
+			filters,
 			response.items,
 			response.total,
 			response.total_pages
