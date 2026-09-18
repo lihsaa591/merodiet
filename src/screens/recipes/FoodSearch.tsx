@@ -2,10 +2,17 @@ import { useRef, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
+import { alertDialog } from '../../utils/confirmDialog';
+import Button from '../../components/ui/Button';
 import Chip from '../../components/ui/Chip';
 import { STORE_NAME as CUSTOM_FOODS_STORE } from '../../store/customFoods';
 import styles from './FoodSearch.module.css';
-import type { CustomFood, FoodSearchResult, ResolvedFood } from '../../types';
+import type {
+	CustomFood,
+	FoodSearchResponse,
+	FoodSearchResult,
+	ResolvedFood,
+} from '../../types';
 
 interface FoodSearchProps {
 	onResolve: ( food: ResolvedFood ) => void;
@@ -54,28 +61,79 @@ export default function FoodSearch( { onResolve }: FoodSearchProps ) {
 
 function UsdaSearch( { onResolve }: FoodSearchProps ) {
 	const [ query, setQuery ] = useState( '' );
+	const [ includeBranded, setIncludeBranded ] = useState( false );
 	const [ results, setResults ] = useState< FoodSearchResult[] >( [] );
+	const [ page, setPage ] = useState( 1 );
+	const [ hasMore, setHasMore ] = useState( false );
 	const [ isSearching, setIsSearching ] = useState( false );
+	const [ isLoadingMore, setIsLoadingMore ] = useState( false );
 	const [ resolvingId, setResolvingId ] = useState< number | null >( null );
 	const debounceRef = useRef< ReturnType< typeof setTimeout > >();
+	// A query typed character-by-character fires several debounced
+	// searches; their responses can come back out of order (a shorter,
+	// earlier query's request can resolve after a later, longer one's).
+	// Aborting the previous request before starting a new one — rather
+	// than just overwriting whichever response lands last — is what
+	// actually prevents a stale response from clobbering the current one.
+	const abortRef = useRef< AbortController | null >();
 
-	const runSearch = async ( value: string ) => {
+	const runSearch = async (
+		value: string,
+		withBranded: boolean,
+		targetPage: number,
+		append: boolean
+	) => {
+		abortRef.current?.abort();
+
 		if ( ! value.trim() ) {
 			setResults( [] );
+			setHasMore( false );
 			return;
 		}
 
-		setIsSearching( true );
+		const controller = new AbortController();
+		abortRef.current = controller;
+
+		if ( append ) {
+			setIsLoadingMore( true );
+		} else {
+			setIsSearching( true );
+		}
 
 		try {
-			const found: FoodSearchResult[] = await apiFetch( {
+			const response: FoodSearchResponse = await apiFetch( {
 				path: `/nutrio/v1/foods/search?query=${ encodeURIComponent(
 					value
-				) }`,
+				) }&page=${ targetPage }${
+					withBranded ? '&include_branded=1' : ''
+				}`,
+				signal: controller.signal,
 			} );
-			setResults( found );
+
+			setResults( ( prev ) =>
+				append ? [ ...prev, ...response.items ] : response.items
+			);
+			setHasMore( response.has_more );
+			setPage( targetPage );
+		} catch ( error ) {
+			if ( ( error as { name?: string } )?.name === 'AbortError' ) {
+				return; // Superseded by a newer search — not a real failure.
+			}
+
+			const message =
+				error &&
+				typeof error === 'object' &&
+				'message' in error &&
+				typeof error.message === 'string'
+					? error.message
+					: __( 'Something went wrong searching.', 'nutrio' );
+
+			await alertDialog( { message } );
 		} finally {
-			setIsSearching( false );
+			if ( abortRef.current === controller ) {
+				setIsSearching( false );
+				setIsLoadingMore( false );
+			}
 		}
 	};
 
@@ -85,9 +143,21 @@ function UsdaSearch( { onResolve }: FoodSearchProps ) {
 
 		clearTimeout( debounceRef.current );
 		debounceRef.current = setTimeout(
-			() => runSearch( value ),
+			() => runSearch( value, includeBranded, 1, false ),
 			DEBOUNCE_MS
 		);
+	};
+
+	const handleIncludeBrandedChange = (
+		event: React.ChangeEvent< HTMLInputElement >
+	) => {
+		const checked = event.target.checked;
+		setIncludeBranded( checked );
+		runSearch( query, checked, 1, false );
+	};
+
+	const handleLoadMore = () => {
+		runSearch( query, includeBranded, page + 1, true );
 	};
 
 	const handleSelect = async ( fdcId: number ) => {
@@ -99,6 +169,21 @@ function UsdaSearch( { onResolve }: FoodSearchProps ) {
 				method: 'POST',
 			} );
 			onResolve( food );
+		} catch ( error ) {
+			// apiFetch rejects with the REST API's error envelope
+			// ({code, message, data}), not a native Error — most likely
+			// here: this food can't be reliably converted to a per-100g
+			// profile (a non-gram serving size, or USDA reported no
+			// identifiable nutrient values for it).
+			const message =
+				error &&
+				typeof error === 'object' &&
+				'message' in error &&
+				typeof error.message === 'string'
+					? error.message
+					: __( 'Something went wrong adding this food.', 'nutrio' );
+
+			await alertDialog( { message } );
 		} finally {
 			setResolvingId( null );
 		}
@@ -106,7 +191,7 @@ function UsdaSearch( { onResolve }: FoodSearchProps ) {
 
 	return (
 		<>
-			<div className="nutrio-field" style={ { marginBottom: '12px' } }>
+			<div className="nutrio-field" style={ { marginBottom: '8px' } }>
 				<input
 					type="text"
 					value={ query }
@@ -114,6 +199,26 @@ function UsdaSearch( { onResolve }: FoodSearchProps ) {
 					placeholder={ __( 'Search ingredient…', 'nutrio' ) }
 				/>
 			</div>
+
+			<label
+				htmlFor="nutrio-include-branded"
+				style={ {
+					display: 'flex',
+					alignItems: 'center',
+					gap: '6px',
+					fontSize: '12px',
+					color: 'var(--ink-muted)',
+					marginBottom: '12px',
+				} }
+			>
+				<input
+					id="nutrio-include-branded"
+					type="checkbox"
+					checked={ includeBranded }
+					onChange={ handleIncludeBrandedChange }
+				/>
+				{ __( 'Include branded products', 'nutrio' ) }
+			</label>
 
 			{ isSearching && (
 				<p style={ { fontSize: '12.5px', color: 'var(--ink-muted)' } }>
@@ -148,9 +253,26 @@ function UsdaSearch( { onResolve }: FoodSearchProps ) {
 				</button>
 			) ) }
 
+			{ hasMore && (
+				<Button
+					variant="ghost"
+					onClick={ handleLoadMore }
+					disabled={ isLoadingMore }
+					style={ {
+						width: '100%',
+						justifyContent: 'center',
+						marginBottom: '8px',
+					} }
+				>
+					{ isLoadingMore
+						? __( 'Loading…', 'nutrio' )
+						: __( 'Load more', 'nutrio' ) }
+				</Button>
+			) }
+
 			<p className="nutrio-field-hint" style={ { marginTop: '8px' } }>
 				{ __(
-					'Foundation & SR Legacy report per 100g and are preferred for clinical accuracy over manufacturer-supplied Branded values.',
+					"Branded (manufacturer-supplied) products are hidden by default — some report their serving size in a way that can't be reliably added to a recipe. Foundation & SR Legacy always work.",
 					'nutrio'
 				) }
 			</p>

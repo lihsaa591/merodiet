@@ -45,10 +45,15 @@ final class FoodDataServiceProvider extends AbstractServiceProvider {
 
 		$container->add(
 			FoodDataService::class,
-			static fn () => new FoodDataService(
-				$container->get( FoodDataClient::class ),
-				$container->get( FoodCache::class )
-			)
+			static function () use ( $container ) {
+				$config = $container->get( 'config' );
+
+				return new FoodDataService(
+					$container->get( FoodDataClient::class ),
+					$container->get( FoodCache::class ),
+					(array) ( $config['fooddata']['data_types'] ?? array( 'Foundation', 'SR Legacy', 'Survey (FNDDS)', 'Branded' ) )
+				);
+			}
 		)->setShared( true );
 	}
 }

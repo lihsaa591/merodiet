@@ -33,6 +33,15 @@ final class FoodsController extends AbstractPractitionerController {
 	protected string $rest_base = 'foods';
 
 	/**
+	 * Results per "page" of search — a search-as-you-type UI, not a
+	 * table, so this is a fixed batch size for "load more" rather than
+	 * a client-controlled per_page like the paginated list endpoints.
+	 *
+	 * @var int
+	 */
+	private const SEARCH_PAGE_SIZE = 15;
+
+	/**
 	 * Construct with the service this controller reads/resolves through.
 	 *
 	 * @param FoodDataService $food_data Orchestrates USDA search/resolve against the local cache.
@@ -49,10 +58,18 @@ final class FoodsController extends AbstractPractitionerController {
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( $this, 'search' ),
 				'args'     => array(
-					'query' => array(
+					'query'           => array(
 						'required'          => true,
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
+					),
+					'include_branded' => array(
+						'type'    => 'boolean',
+						'default' => false,
+					),
+					'page'            => array(
+						'type'    => 'integer',
+						'default' => 1,
 					),
 				),
 			),
@@ -70,19 +87,33 @@ final class FoodsController extends AbstractPractitionerController {
 	}
 
 	/**
-	 * GET /foods/search — live USDA search, restricted to the
-	 * configured preferred data types (see config('fooddata.data_types')).
+	 * GET /foods/search — live USDA search. Branded (manufacturer-supplied)
+	 * results are excluded unless ?include_branded=1 — see
+	 * FoodDataService::search()'s docblock for why. ?page=2, 3, ... fetches
+	 * further batches for a "Load more" control, rather than a single
+	 * unbounded fetch of every match.
 	 *
 	 * @param WP_REST_Request $request The current request.
 	 */
 	public function search( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-		$results = $this->food_data->search( (string) $request->get_param( 'query' ) );
+		$page   = max( 1, (int) $request->get_param( 'page' ) );
+		$result = $this->food_data->search(
+			(string) $request->get_param( 'query' ),
+			(bool) $request->get_param( 'include_branded' ),
+			self::SEARCH_PAGE_SIZE,
+			$page
+		);
 
-		if ( is_wp_error( $results ) ) {
-			return $results;
+		if ( is_wp_error( $result ) ) {
+			return $result;
 		}
 
-		return $this->success( $results );
+		return $this->success(
+			array(
+				'items'    => $result['items'],
+				'has_more' => $page * self::SEARCH_PAGE_SIZE < $result['total_hits'],
+			)
+		);
 	}
 
 	/**

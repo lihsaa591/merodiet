@@ -50,7 +50,7 @@ export default function ItemSearch( {
 					}`.trim() }
 					onClick={ () => setTab( 'foods' ) }
 				>
-					{ __( 'USDA Foods', 'nutrio' ) }
+					{ __( 'Foods', 'nutrio' ) }
 				</button>
 			</div>
 

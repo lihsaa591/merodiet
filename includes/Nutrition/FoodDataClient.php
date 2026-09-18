@@ -42,15 +42,17 @@ final class FoodDataClient {
 	 *
 	 * @param string   $query      Search keywords.
 	 * @param string[] $data_types Restrict to these FoodData Central data types (e.g. "Foundation", "SR Legacy").
-	 * @param int      $page_size  Max results, 1-200 per USDA's own limit.
+	 * @param int      $page_size  Max results per page, 1-200 per USDA's own limit.
+	 * @param int      $page       1-indexed page number, for "load more".
 	 *
-	 * @return array<int, array<string, mixed>>|WP_Error Raw search-result food summaries (partial nutrient data only — see FoodDataNormalizer's docblock; call get_details() before normalizing).
+	 * @return array{items: array<int, array<string, mixed>>, total_hits: int}|WP_Error `items` are raw search-result food summaries (partial nutrient data only — see FoodDataNormalizer's docblock; call get_details() before normalizing).
 	 */
-	public function search( string $query, array $data_types = array(), int $page_size = 10 ): array|WP_Error {
+	public function search( string $query, array $data_types = array(), int $page_size = 10, int $page = 1 ): array|WP_Error {
 		$params = array(
-			'api_key'  => $this->api_key,
-			'query'    => $query,
-			'pageSize' => max( 1, min( 200, $page_size ) ),
+			'api_key'    => $this->api_key,
+			'query'      => $query,
+			'pageSize'   => max( 1, min( 200, $page_size ) ),
+			'pageNumber' => max( 1, $page ),
 		);
 
 		if ( array() !== $data_types ) {
@@ -63,7 +65,10 @@ final class FoodDataClient {
 			return $response;
 		}
 
-		return (array) ( $response['foods'] ?? array() );
+		return array(
+			'items'      => (array) ( $response['foods'] ?? array() ),
+			'total_hits' => (int) ( $response['totalHits'] ?? 0 ),
+		);
 	}
 
 	/**

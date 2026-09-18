@@ -3,7 +3,7 @@ import { __ } from '@wordpress/i18n';
 import Button from '../../components/ui/Button';
 import UnsavedBadge from '../../components/ui/UnsavedBadge';
 import { useGlobalDirtyState } from '../../hooks/useGlobalDirtyState';
-import { confirmDialog } from '../../utils/confirmDialog';
+import { alertDialog, confirmDialog } from '../../utils/confirmDialog';
 import type { CustomFood, CustomFoodInput } from '../../types';
 
 interface NutrientFieldDef {
@@ -102,6 +102,18 @@ export default function CustomFoodForm( {
 
 			await onSubmit( data as unknown as CustomFoodInput );
 			markClean();
+		} catch ( error ) {
+			// apiFetch rejects with the REST API's error envelope
+			// ({code, message, data}), not a native Error.
+			const message =
+				error &&
+				typeof error === 'object' &&
+				'message' in error &&
+				typeof error.message === 'string'
+					? error.message
+					: __( 'Something went wrong saving this food.', 'nutrio' );
+
+			await alertDialog( { message } );
 		} finally {
 			setIsSaving( false );
 		}

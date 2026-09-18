@@ -23,12 +23,14 @@ class FoodDataService {
 	/**
 	 * Construct with the client and cache this service orchestrates between.
 	 *
-	 * @param FoodDataClient $client The USDA HTTP client.
-	 * @param FoodCache      $cache  The local food-data cache.
+	 * @param FoodDataClient $client     The USDA HTTP client.
+	 * @param FoodCache      $cache      The local food-data cache.
+	 * @param string[]       $data_types Every data type search may return, most-preferred first — see config('fooddata.data_types').
 	 */
 	public function __construct(
 		private readonly FoodDataClient $client,
-		private readonly FoodCache $cache
+		private readonly FoodCache $cache,
+		private readonly array $data_types = array( 'Foundation', 'SR Legacy', 'Survey (FNDDS)', 'Branded' )
 	) {}
 
 	/**
@@ -37,14 +39,29 @@ class FoodDataService {
 	 * since this is a "help the practitioner pick the right food" UI
 	 * concern, not something plan/log math depends on.
 	 *
-	 * @param string   $query      Search keywords.
-	 * @param string[] $data_types Restrict to these data types, most-preferred first.
-	 * @param int      $page_size  Max results to return.
+	 * Branded results are excluded unless explicitly requested: USDA's
+	 * search response doesn't include servingSize/servingSizeUnit (only
+	 * the /food/{fdcId} detail endpoint does), so there's no way to know
+	 * in advance whether a given Branded result will turn out to have a
+	 * non-gram serving size and fail to resolve (see
+	 * FoodDataNormalizer's docblock, points 2 and 5 — both are
+	 * Branded-specific quirks; Foundation/SR Legacy/Survey always
+	 * resolve). Rather than show results that might silently fail,
+	 * Branded is opt-in via $include_branded.
 	 *
-	 * @return array<int, array<string, mixed>>|WP_Error
+	 * @param string $query           Search keywords.
+	 * @param bool   $include_branded Whether to also search Branded (manufacturer-supplied) foods.
+	 * @param int    $page_size       Max results per page.
+	 * @param int    $page            1-indexed page number, for "load more".
+	 *
+	 * @return array{items: array<int, array<string, mixed>>, total_hits: int}|WP_Error
 	 */
-	public function search( string $query, array $data_types = array(), int $page_size = 10 ): array|WP_Error {
-		return $this->client->search( $query, $data_types, $page_size );
+	public function search( string $query, bool $include_branded = false, int $page_size = 10, int $page = 1 ): array|WP_Error {
+		$data_types = $include_branded
+			? $this->data_types
+			: array_values( array_diff( $this->data_types, array( 'Branded' ) ) );
+
+		return $this->client->search( $query, $data_types, $page_size, $page );
 	}
 
 	/**
