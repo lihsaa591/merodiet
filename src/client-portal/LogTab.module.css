@@ -1,0 +1,27 @@
+.empty {
+	color: var(--text-muted, #666);
+}
+.itemList {
+	list-style: none;
+	margin: 0 0 24px;
+	padding: 0;
+}
+.item {
+	padding: 10px 0;
+	border-bottom: 1px solid var(--border, #eee);
+}
+.actions {
+	display: flex;
+	gap: 6px;
+	margin-top: 6px;
+}
+.adHocForm {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+.adHocForm textarea {
+	min-height: 70px;
+	padding: 8px;
+	font-family: inherit;
+}
