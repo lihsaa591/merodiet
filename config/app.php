@@ -25,6 +25,7 @@ return array(
 		\Nutrio\Providers\PlanServiceProvider::class,
 		\Nutrio\Providers\RestApiServiceProvider::class,
 		\Nutrio\Providers\AdminServiceProvider::class,
+		\Nutrio\Providers\PortalServiceProvider::class,
 	),
 
 	/*
