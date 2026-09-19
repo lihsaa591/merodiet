@@ -48,7 +48,11 @@ final class ClientInviteService {
 			$user = get_user_by( 'id', $client['user_id'] );
 
 			if ( false !== $user ) {
-				retrieve_password( $user->user_login );
+				$result = retrieve_password( $user->user_login );
+
+				if ( $result instanceof WP_Error ) {
+					return $result;
+				}
 
 				return true;
 			}
@@ -82,8 +86,12 @@ final class ClientInviteService {
 
 		$this->clients->set_user_id( $client_id, (int) $user_id );
 
-		$user = get_user_by( 'id', $user_id );
-		retrieve_password( false !== $user ? $user->user_login : $login );
+		$user   = get_user_by( 'id', $user_id );
+		$result = retrieve_password( false !== $user ? $user->user_login : $login );
+
+		if ( $result instanceof WP_Error ) {
+			return $result;
+		}
 
 		// Fires after a client is invited to the portal.
 		do_action( 'nutrio_client_invited', $client_id, $user_id );

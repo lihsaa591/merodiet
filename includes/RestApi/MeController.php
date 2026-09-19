@@ -81,8 +81,14 @@ final class MeController extends AbstractClientController {
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( $this, 'list_logs' ),
 				'args'     => array(
-					'from' => array( 'type' => 'string' ),
-					'to'   => array( 'type' => 'string' ),
+					'from' => array(
+						'type'   => 'string',
+						'format' => 'date',
+					),
+					'to'   => array(
+						'type'   => 'string',
+						'format' => 'date',
+					),
 				),
 			),
 			required_capability: 'view_own_nutrio_plan'
@@ -104,8 +110,14 @@ final class MeController extends AbstractClientController {
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( $this, 'list_measurements' ),
 				'args'     => array(
-					'from' => array( 'type' => 'string' ),
-					'to'   => array( 'type' => 'string' ),
+					'from' => array(
+						'type'   => 'string',
+						'format' => 'date',
+					),
+					'to'   => array(
+						'type'   => 'string',
+						'format' => 'date',
+					),
 				),
 			),
 			required_capability: 'view_own_nutrio_plan'
@@ -204,6 +216,10 @@ final class MeController extends AbstractClientController {
 			)
 		);
 
+		if ( $id instanceof WP_Error ) {
+			return $id;
+		}
+
 		return $this->success( $this->logs->find( $id ), 201 );
 	}
 
@@ -251,6 +267,10 @@ final class MeController extends AbstractClientController {
 				'notes'        => $request->get_param( 'notes' ),
 			)
 		);
+
+		if ( $id instanceof WP_Error ) {
+			return $id;
+		}
 
 		return $this->success( $this->measurements->find( $id ), 201 );
 	}
@@ -304,6 +324,7 @@ final class MeController extends AbstractClientController {
 			'log_date'       => array(
 				'required' => true,
 				'type'     => 'string',
+				'format'   => 'date',
 			),
 			'status'         => array(
 				'required' => true,
@@ -327,6 +348,7 @@ final class MeController extends AbstractClientController {
 			'measured_at'  => array(
 				'required' => true,
 				'type'     => 'string',
+				'format'   => 'date',
 			),
 			'weight_grams' => array( 'type' => 'integer' ),
 			'metrics'      => array( 'type' => 'object' ),

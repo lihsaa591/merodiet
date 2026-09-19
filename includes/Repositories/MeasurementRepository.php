@@ -10,6 +10,7 @@ declare( strict_types=1 );
 namespace Nutrio\Repositories;
 
 use Nutrio\Database\QueryFilters;
+use WP_Error;
 
 /**
  * Same client-scoping posture as LogEntryRepository — every method
@@ -24,12 +25,12 @@ class MeasurementRepository {
 	 * @param int                                                                                        $client_id Owning client's internal ID.
 	 * @param array{measured_at:string, weight_grams?:int, metrics?:array<string, mixed>, notes?:string} $data      Measurement fields.
 	 *
-	 * @return int The new measurement's internal ID.
+	 * @return int|WP_Error The new measurement's internal ID, or a WP_Error if the insert failed.
 	 */
-	public function create_for_client( int $client_id, array $data ): int {
+	public function create_for_client( int $client_id, array $data ): int|WP_Error {
 		global $wpdb;
 
-		$wpdb->insert(
+		$inserted = $wpdb->insert(
 			$wpdb->prefix . 'nutrio_measurements',
 			array(
 				'client_id'    => $client_id,
@@ -40,6 +41,10 @@ class MeasurementRepository {
 				'created_at'   => current_time( 'mysql' ),
 			)
 		);
+
+		if ( false === $inserted ) {
+			return new WP_Error( 'nutrio_db_error', __( 'Could not save the entry.', 'nutrio' ), array( 'status' => 500 ) );
+		}
 
 		$id = (int) $wpdb->insert_id;
 

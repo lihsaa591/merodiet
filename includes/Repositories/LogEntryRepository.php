@@ -10,6 +10,7 @@ declare( strict_types=1 );
 namespace Nutrio\Repositories;
 
 use Nutrio\Database\QueryFilters;
+use WP_Error;
 
 /**
  * Every read/write method here takes the client's own internal ID —
@@ -27,12 +28,12 @@ class LogEntryRepository {
 	 * @param int                                                                                                                                                           $client_id Owning client's internal ID.
 	 * @param array{plan_item_id?:int, food_id?:int, recipe_id?:int, quantity_grams?:float, servings?:float, log_date:string, status:string, source?:string, notes?:string} $data      Entry fields.
 	 *
-	 * @return int The new entry's internal ID.
+	 * @return int|WP_Error The new entry's internal ID, or a WP_Error if the insert failed.
 	 */
-	public function create_for_client( int $client_id, array $data ): int {
+	public function create_for_client( int $client_id, array $data ): int|WP_Error {
 		global $wpdb;
 
-		$wpdb->insert(
+		$inserted = $wpdb->insert(
 			$wpdb->prefix . 'nutrio_log_entries',
 			array(
 				'client_id'      => $client_id,
@@ -48,6 +49,10 @@ class LogEntryRepository {
 				'created_at'     => current_time( 'mysql' ),
 			)
 		);
+
+		if ( false === $inserted ) {
+			return new WP_Error( 'nutrio_db_error', __( 'Could not save the entry.', 'nutrio' ), array( 'status' => 500 ) );
+		}
 
 		$id = (int) $wpdb->insert_id;
 
