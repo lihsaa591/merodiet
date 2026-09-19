@@ -45,7 +45,7 @@ final class RestApiServiceProvider extends AbstractServiceProvider {
 
 		foreach ( (array) ( $config['rest']['controllers'] ?? array() ) as $controller_class => $dependency_classes ) {
 			foreach ( (array) $dependency_classes as $dependency_class ) {
-				if ( ! in_array( $dependency_class, $already_bound, true ) ) {
+				if ( ! in_array( $dependency_class, $already_bound, true ) && ! $container->has( $dependency_class ) ) {
 					$container->add( $dependency_class )->setShared( true );
 					$already_bound[] = $dependency_class;
 				}

@@ -9,6 +9,7 @@ declare( strict_types=1 );
 
 namespace Nutrio\RestApi;
 
+use Nutrio\Clients\ClientInviteService;
 use Nutrio\Repositories\ClientRepository;
 use WP_Error;
 use WP_REST_Request;
@@ -39,11 +40,15 @@ final class ClientsController extends AbstractPractitionerController {
 	private const LIST_FILTERS = array( 'search', 'status' );
 
 	/**
-	 * Construct with the repository this controller reads/writes through.
+	 * Construct with the repository and service this controller uses.
 	 *
-	 * @param ClientRepository $clients The client roster data access layer.
+	 * @param ClientRepository    $clients The client roster data access layer.
+	 * @param ClientInviteService $invites The client invite provisioning service.
 	 */
-	public function __construct( private readonly ClientRepository $clients ) {}
+	public function __construct(
+		private readonly ClientRepository $clients,
+		private readonly ClientInviteService $invites
+	) {}
 
 	/**
 	 * Register the roster's CRUD routes.
@@ -96,6 +101,15 @@ final class ClientsController extends AbstractPractitionerController {
 			array(
 				'methods'  => WP_REST_Server::DELETABLE,
 				'callback' => array( $this, 'delete_client' ),
+			),
+			required_capability: 'manage_nutrio_clients'
+		);
+
+		$this->register_route(
+			'/(?P<id>\d+)/invite',
+			array(
+				'methods'  => WP_REST_Server::CREATABLE,
+				'callback' => array( $this, 'invite_client' ),
 			),
 			required_capability: 'manage_nutrio_clients'
 		);
@@ -217,6 +231,30 @@ final class ClientsController extends AbstractPractitionerController {
 		$this->clients->delete( $id );
 
 		return $this->success( array( 'deleted' => true ) );
+	}
+
+	/**
+	 * POST /clients/{id}/invite — provision (or re-invite) portal access
+	 * for a client owned by the current practitioner.
+	 *
+	 * @param WP_REST_Request $request The current request.
+	 */
+	public function invite_client( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$id     = (int) $request->get_param( 'id' );
+		$client = $this->clients->find_for_practitioner( $id, $this->current_practitioner_id() );
+		$owns   = $this->assert_owns( $client );
+
+		if ( true !== $owns ) {
+			return $owns;
+		}
+
+		$result = $this->invites->invite( $id );
+
+		if ( $result instanceof WP_Error ) {
+			return $result;
+		}
+
+		return $this->success( array( 'invited' => true ) );
 	}
 
 	/**
