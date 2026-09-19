@@ -1,6 +1,10 @@
 .empty {
 	color: var(--text-muted, #666);
 }
+.error {
+	color: var(--critical, #c0392b);
+	font-size: 13px;
+}
 .itemList {
 	list-style: none;
 	margin: 0 0 24px;

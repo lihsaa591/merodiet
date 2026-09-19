@@ -8,6 +8,15 @@ import styles from './LogTab.module.css';
 
 type Status = 'eaten' | 'substituted' | 'skipped';
 
+// The plan's day_offset that corresponds to today, based on its start_date.
+function todaysDayOffset( startDate: string ): number {
+	const start = new Date( startDate + 'T00:00:00' );
+	const today = new Date();
+	today.setHours( 0, 0, 0, 0 );
+	const diffMs = today.getTime() - start.getTime();
+	return Math.floor( diffMs / ( 1000 * 60 * 60 * 24 ) );
+}
+
 export default function LogTab() {
 	const [ plan, setPlan ] = useState< Plan | null | undefined >( undefined );
 	const [ notes, setNotes ] = useState( '' );
@@ -15,6 +24,7 @@ export default function LogTab() {
 	const [ pendingItemId, setPendingItemId ] = useState< number | null >(
 		null
 	);
+	const [ errorMessage, setErrorMessage ] = useState< string | null >( null );
 
 	useEffect( () => {
 		apiFetch< Plan | null >( { path: '/nutrio/v1/me/plan' } ).then(
@@ -45,6 +55,11 @@ export default function LogTab() {
 				data: payload,
 			} );
 			doAction( 'nutrio.clientPortal.logCreated', entry );
+			setErrorMessage( null );
+		} catch {
+			setErrorMessage(
+				__( 'Something went wrong — please try again.', 'nutrio' )
+			);
 		} finally {
 			setPendingItemId( null );
 		}
@@ -66,16 +81,30 @@ export default function LogTab() {
 			} );
 			doAction( 'nutrio.clientPortal.logCreated', entry );
 			setNotes( '' );
+			setErrorMessage( null );
+		} catch {
+			setErrorMessage(
+				__( 'Something went wrong — please try again.', 'nutrio' )
+			);
 		} finally {
 			setIsSubmittingAdHoc( false );
 		}
 	};
 
 	const todaysItems: PlanItem[] =
-		undefined !== plan && null !== plan ? plan.days[ 0 ]?.items ?? [] : [];
+		undefined !== plan && null !== plan
+			? plan.days.find(
+					( day ) =>
+						day.day_offset === todaysDayOffset( plan.start_date )
+			  )?.items ?? []
+			: [];
 
 	return (
 		<div>
+			{ errorMessage && (
+				<p className={ styles.error }>{ errorMessage }</p>
+			) }
+
 			{ undefined === plan && <p>{ __( 'Loading…', 'nutrio' ) }</p> }
 
 			{ null === plan && (

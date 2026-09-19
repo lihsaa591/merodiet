@@ -47,6 +47,12 @@ module.exports = {
 			__dirname,
 			'src/client-portal/index.tsx'
 		),
+		// CSS-only entry for the logged-out login form's page chrome
+		// (rendered outside the React app, so it can't use CSS Modules).
+		'portal-login': path.resolve(
+			__dirname,
+			'src/client-portal/portal-login.css'
+		),
 	},
 	// wp-admin runs on a different origin than the dev server, so both
 	// cross-origin requests and the HMR client's fetch polling need to be allowed.

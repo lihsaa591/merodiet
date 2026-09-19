@@ -44,27 +44,44 @@ final class PortalPage {
 			return;
 		}
 
+		// This page carries personalized content (a REST nonce, the
+		// client's display name) on a front-end URL — never let a page
+		// cache plugin or CDN serve it to a different visitor.
+		nocache_headers();
+		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+			define( 'DONOTCACHEPAGE', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- a WP-core-recognized cache-plugin convention, not our own constant to prefix.
+		}
+
 		if ( ! is_user_logged_in() ) {
 			$this->render_login_form();
 			exit;
 		}
 
-		$current_user = wp_get_current_user();
-
-		if ( ! $current_user->has_cap( 'view_own_nutrio_plan' ) ) {
+		if ( ! $this->current_user_is_a_linked_client( wp_get_current_user() ) ) {
 			wp_safe_redirect( admin_url() );
 			exit;
 		}
 
-		// A capability alone isn't enough — a client row must actually be
-		// linked to this user (mirrors the /me/* REST layer's own check).
-		if ( null === $this->clients->find_for_user( $current_user->ID ) ) {
-			wp_safe_redirect( admin_url() );
-			exit;
-		}
-
-		$this->render_app( $current_user );
+		$this->render_app( wp_get_current_user() );
 		exit;
+	}
+
+	/**
+	 * The identity-resolution guard behind handle_request(): true only
+	 * when the logged-in user (resolved solely from get_current_user_id()
+	 * via wp_get_current_user() — never from request data) both holds the
+	 * capability AND has a client row actually linked to their account
+	 * (mirrors the /me/* REST layer's own check). Deliberately exit()-free
+	 * so it can be unit tested directly.
+	 *
+	 * @param WP_User $current_user The logged-in user, as resolved from the session.
+	 */
+	public function current_user_is_a_linked_client( WP_User $current_user ): bool {
+		if ( ! $current_user->has_cap( 'view_own_nutrio_plan' ) ) {
+			return false;
+		}
+
+		return null !== $this->clients->find_for_user( $current_user->ID );
 	}
 
 	/**
@@ -94,6 +111,7 @@ final class PortalPage {
 	 * auth code here.
 	 */
 	private function render_login_form(): void {
+		Assets::enqueue_style( 'nutrio-portal-login', NUTRIO_PATH . 'build', NUTRIO_URL . 'build', 'portal-login' );
 		?>
 		<!DOCTYPE html>
 		<html <?php language_attributes(); ?>>
@@ -101,6 +119,7 @@ final class PortalPage {
 			<meta charset="<?php bloginfo( 'charset' ); ?>" />
 			<meta name="viewport" content="width=device-width, initial-scale=1" />
 			<title><?php echo esc_html( get_bloginfo( 'name' ) ); ?> — <?php esc_html_e( 'Client Portal', 'nutrio' ); ?></title>
+			<?php wp_head(); ?>
 		</head>
 		<body class="nutrio-portal-login">
 			<main class="nutrio-portal-login-card">
@@ -113,6 +132,7 @@ final class PortalPage {
 				);
 				?>
 			</main>
+			<?php wp_footer(); ?>
 		</body>
 		</html>
 		<?php
@@ -165,6 +185,7 @@ final class PortalPage {
 			self::SCRIPT_ENTRY,
 			NUTRIO_DEVELOPMENT ? array( $runtime_handle ) : array()
 		);
+		wp_set_script_translations( $handle, 'nutrio', NUTRIO_PATH . 'languages' );
 		Assets::enqueue_style( $handle, NUTRIO_PATH . 'build', NUTRIO_URL . 'build', self::SCRIPT_ENTRY );
 
 		$bootstrap_data = array(

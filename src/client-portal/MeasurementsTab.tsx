@@ -45,6 +45,7 @@ export default function MeasurementsTab() {
 	>( undefined );
 	const [ weightInput, setWeightInput ] = useState( '' );
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
+	const [ errorMessage, setErrorMessage ] = useState< string | null >( null );
 
 	const loadMeasurements = () => {
 		apiFetch< Measurement[] >( {
@@ -81,7 +82,12 @@ export default function MeasurementsTab() {
 			} );
 			doAction( 'nutrio.clientPortal.measurementCreated', entry );
 			setWeightInput( '' );
+			setErrorMessage( null );
 			loadMeasurements();
+		} catch {
+			setErrorMessage(
+				__( 'Something went wrong — please try again.', 'nutrio' )
+			);
 		} finally {
 			setIsSubmitting( false );
 		}
@@ -93,6 +99,9 @@ export default function MeasurementsTab() {
 				<label htmlFor="nutrio-weight-input">
 					{ __( 'Weight', 'nutrio' ) }
 				</label>
+				{ errorMessage && (
+					<p className={ styles.error }>{ errorMessage }</p>
+				) }
 				<div className={ styles.weightRow }>
 					<input
 						id="nutrio-weight-input"

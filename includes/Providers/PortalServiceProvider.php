@@ -45,6 +45,22 @@ final class PortalServiceProvider extends AbstractServiceProvider {
 	public function boot( Container $container ): void {
 		add_action( 'init', array( PortalRewrite::class, 'register' ) );
 
+		// A site that already had Nutrio active before this feature shipped
+		// won't otherwise get the rewrite rule onto disk until someone
+		// resaves Settings -> Permalinks. Catch it up once, the same way
+		// DatabaseServiceProvider catches up pending migrations.
+		add_action(
+			'admin_init',
+			static function () {
+				if ( '1' === get_option( 'nutrio_portal_rewrite_flushed' ) ) {
+					return;
+				}
+
+				flush_rewrite_rules();
+				update_option( 'nutrio_portal_rewrite_flushed', '1' );
+			}
+		);
+
 		add_action(
 			'template_redirect',
 			static function () use ( $container ) {
