@@ -10,7 +10,11 @@ interface ProUpsellModalProps {
 
 // The one shared Pro upsell surface — every locked feature opens this same
 // modal rather than rolling its own. See DESIGN.md's Pro-feature pattern.
-export default function ProUpsellModal( { isOpen, featureName, onClose }: ProUpsellModalProps ) {
+export default function ProUpsellModal( {
+	isOpen,
+	featureName,
+	onClose,
+}: ProUpsellModalProps ) {
 	if ( ! isOpen ) {
 		return null;
 	}
@@ -18,11 +22,24 @@ export default function ProUpsellModal( { isOpen, featureName, onClose }: ProUps
 	return (
 		<div
 			className={ styles.modalScrim }
+			role="button"
+			tabIndex={ -1 }
+			aria-label={ __( 'Close', 'nutrio' ) }
 			onClick={ ( e ) => e.target === e.currentTarget && onClose() }
+			onKeyDown={ ( event ) => {
+				if ( 'Escape' === event.key ) {
+					onClose();
+				}
+			} }
 		>
 			<div className={ styles.modal }>
 				<div className={ styles.modalIcon }>
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+					<svg
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="2"
+					>
 						<rect x="5" y="11" width="14" height="9" rx="2" />
 						<path d="M8 11V8a4 4 0 0 1 8 0v3" />
 					</svg>
@@ -31,15 +48,25 @@ export default function ProUpsellModal( { isOpen, featureName, onClose }: ProUps
 				<p>
 					{ sprintf(
 						/* translators: %s: the locked feature's name */
-						__( '%s is part of Nutrio Pro. Upgrade to unlock it for your practice.', 'nutrio' ),
+						__(
+							'%s is part of Nutrio Pro. Upgrade to unlock it for your practice.',
+							'nutrio'
+						),
 						featureName
 					) }
 				</p>
 				<div className={ styles.modalActions }>
-					<Button variant="primary" style={ { justifyContent: 'center' } }>
+					<Button
+						variant="primary"
+						style={ { justifyContent: 'center' } }
+					>
 						{ __( 'Upgrade to Pro', 'nutrio' ) }
 					</Button>
-					<Button variant="ghost" style={ { justifyContent: 'center' } } onClick={ onClose }>
+					<Button
+						variant="ghost"
+						style={ { justifyContent: 'center' } }
+						onClick={ onClose }
+					>
 						{ __( 'Maybe later', 'nutrio' ) }
 					</Button>
 				</div>

@@ -37,7 +37,9 @@ const NAV_ITEMS: NavItem[] = [
 	{
 		id: 'recipes',
 		label: __( 'Recipes', 'nutrio' ),
-		icon: <path d="M5 3v6a3 3 0 0 0 3 3v9M8 3v6M11 3v6M17 3c-2 1-2.5 3-2.5 5.5S17 13 17 13v9" />,
+		icon: (
+			<path d="M5 3v6a3 3 0 0 0 3 3v9M8 3v6M11 3v6M17 3c-2 1-2.5 3-2.5 5.5S17 13 17 13v9" />
+		),
 	},
 	{
 		id: 'plans',
@@ -53,7 +55,9 @@ const NAV_ITEMS: NavItem[] = [
 	{
 		id: 'foods',
 		label: __( 'Food database', 'nutrio' ),
-		icon: <path d="M12 3c-3.5 3-5 6-5 9a5 5 0 0 0 10 0c0-3-1.5-6-5-9ZM12 8v9" />,
+		icon: (
+			<path d="M12 3c-3.5 3-5 6-5 9a5 5 0 0 0 10 0c0-3-1.5-6-5-9ZM12 8v9" />
+		),
 	},
 	{
 		id: 'settings',
@@ -73,14 +77,28 @@ interface SidebarProps {
 	onSelect: ( id: string ) => void;
 }
 
-export default function Sidebar( { isOpen, activeView, onSelect }: SidebarProps ) {
+export default function Sidebar( {
+	isOpen,
+	activeView,
+	onSelect,
+}: SidebarProps ) {
 	const [ isProModalOpen, setProModalOpen ] = useState( false );
 
 	return (
 		<>
-			<aside className={ `nutrio-rail ${ isOpen ? 'is-open' : '' }`.trim() }>
-				<a className="nutrio-wp-back" href={ window.nutrioAdmin?.adminUrl ?? '#' }>
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+			<aside
+				className={ `nutrio-rail ${ isOpen ? 'is-open' : '' }`.trim() }
+			>
+				<a
+					className="nutrio-wp-back"
+					href={ window.nutrioAdmin?.adminUrl ?? '#' }
+				>
+					<svg
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="2"
+					>
 						<path d="M19 12H5M11 18l-6-6 6-6" />
 					</svg>
 					{ __( 'Back to WordPress', 'nutrio' ) }
@@ -95,22 +113,51 @@ export default function Sidebar( { isOpen, activeView, onSelect }: SidebarProps 
 					{ NAV_ITEMS.map( ( item ) => (
 						<button
 							key={ item.id }
-							className={ `nutrio-nav-item ${ activeView === item.id ? 'is-active' : '' }`.trim() }
+							className={ `nutrio-nav-item ${
+								activeView === item.id ? 'is-active' : ''
+							}`.trim() }
 							onClick={ () => onSelect( item.id ) }
 						>
-							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+							<svg
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth="1.8"
+							>
 								{ item.icon }
 							</svg>
 							{ item.label }
 						</button>
 					) ) }
-					<button className="nutrio-nav-item nutrio-nav-item-pro" onClick={ () => setProModalOpen( true ) }>
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+					<button
+						className="nutrio-nav-item nutrio-nav-item-pro"
+						onClick={ () => setProModalOpen( true ) }
+					>
+						<svg
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							strokeWidth="1.8"
+						>
 							<path d="M4 19V9M12 19V4M20 19v-6" />
 						</svg>
 						{ __( 'Analytics', 'nutrio' ) }
-						<svg className="nutrio-pro-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-							<rect x="5" y="11" width="14" height="9" rx="2" fill="currentColor" stroke="none" />
+						<svg
+							className="nutrio-pro-lock"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							strokeWidth="2"
+						>
+							<rect
+								x="5"
+								y="11"
+								width="14"
+								height="9"
+								rx="2"
+								fill="currentColor"
+								stroke="none"
+							/>
 							<path d="M8 11V8a4 4 0 0 1 8 0v3" />
 						</svg>
 					</button>
@@ -138,7 +185,9 @@ function RailFoot() {
 			return explicit;
 		}
 
-		return window.matchMedia?.( '(prefers-color-scheme: dark)' ).matches ? 'dark' : 'light';
+		return window.matchMedia?.( '(prefers-color-scheme: dark)' ).matches
+			? 'dark'
+			: 'light';
 	} );
 
 	const toggleTheme = () => {
@@ -149,10 +198,16 @@ function RailFoot() {
 
 	return (
 		<div className="nutrio-rail-foot">
-			<div className="nutrio-user-avatar">{ window.nutrioAdmin?.currentUserInitials ?? 'U' }</div>
+			<div className="nutrio-user-avatar">
+				{ window.nutrioAdmin?.currentUserInitials ?? 'U' }
+			</div>
 			<div style={ { flex: 1, minWidth: 0 } }>
-				<div className="nutrio-rail-foot-name">{ window.nutrioAdmin?.currentUserName ?? '' }</div>
-				<div className="nutrio-rail-foot-role">{ __( 'Practitioner', 'nutrio' ) }</div>
+				<div className="nutrio-rail-foot-name">
+					{ window.nutrioAdmin?.currentUserName ?? '' }
+				</div>
+				<div className="nutrio-rail-foot-role">
+					{ __( 'Practitioner', 'nutrio' ) }
+				</div>
 			</div>
 			<button
 				className="nutrio-theme-toggle"
@@ -168,7 +223,12 @@ function RailFoot() {
 
 function SunIcon() {
 	return (
-		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+		<svg
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2"
+		>
 			<circle cx="12" cy="12" r="4" />
 			<path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" />
 		</svg>
@@ -177,7 +237,12 @@ function SunIcon() {
 
 function MoonIcon() {
 	return (
-		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+		<svg
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2"
+		>
 			<path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" />
 		</svg>
 	);

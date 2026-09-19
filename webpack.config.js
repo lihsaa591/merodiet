@@ -14,6 +14,7 @@ const path = require( 'path' );
  * *.module.css file gets CSS Modules scoping for free -- no new dependency.
  * The only thing worth customizing is the generated class name pattern, so
  * scoped names still read as ours in devtools instead of an opaque hash.
+ * @param {import('webpack').Configuration} config
  */
 function withNutrioModuleNames( config ) {
 	for ( const rule of config.module.rules ) {
@@ -22,7 +23,11 @@ function withNutrioModuleNames( config ) {
 		}
 
 		for ( const use of rule.use ) {
-			if ( use.loader && use.loader.includes( 'css-loader' ) && use.options?.modules ) {
+			if (
+				use.loader &&
+				use.loader.includes( 'css-loader' ) &&
+				use.options?.modules
+			) {
 				use.options.modules = {
 					...use.options.modules,
 					localIdentName: 'nutrio-[name]__[local]',

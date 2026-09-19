@@ -199,13 +199,18 @@ function Kpi( { label, value, delta, tone }: KpiProps ) {
 	);
 }
 
+function complianceTone( percent: number ): string {
+	if ( percent >= 70 ) {
+		return 'var(--success)';
+	}
+	if ( percent >= 40 ) {
+		return 'var(--warning)';
+	}
+	return 'var(--critical)';
+}
+
 function ComplianceRow( { client }: { client: ComplianceEntry } ) {
-	const barTone =
-		client.percent >= 70
-			? 'var(--success)'
-			: client.percent >= 40
-			? 'var(--warning)'
-			: 'var(--critical)';
+	const barTone = complianceTone( client.percent );
 
 	return (
 		<div

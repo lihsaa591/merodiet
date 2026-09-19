@@ -7,9 +7,18 @@ interface IconButtonProps {
 	children: ReactNode;
 }
 
-export default function IconButton( { label, onClick, children }: IconButtonProps ) {
+export default function IconButton( {
+	label,
+	onClick,
+	children,
+}: IconButtonProps ) {
 	return (
-		<button className={ styles.iconBtn } onClick={ onClick } aria-label={ label } title={ label }>
+		<button
+			className={ styles.iconBtn }
+			onClick={ onClick }
+			aria-label={ label }
+			title={ label }
+		>
 			{ children }
 		</button>
 	);
