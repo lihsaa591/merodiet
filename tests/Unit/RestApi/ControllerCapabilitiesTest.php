@@ -14,10 +14,13 @@ use Nutrio\Nutrition\FoodDataService;
 use Nutrio\Nutrition\PlanNutrientResolver;
 use Nutrio\Nutrition\RecipeNutrientResolver;
 use Nutrio\Repositories\ClientRepository;
+use Nutrio\Repositories\LogEntryRepository;
+use Nutrio\Repositories\MeasurementRepository;
 use Nutrio\Repositories\PlanRepository;
 use Nutrio\Repositories\RecipeRepository;
 use Nutrio\RestApi\ClientsController;
 use Nutrio\RestApi\FoodsController;
+use Nutrio\RestApi\MeController;
 use Nutrio\RestApi\PlansController;
 use Nutrio\RestApi\RecipesController;
 use Nutrio\Tests\TestCase;
@@ -44,6 +47,18 @@ final class ControllerCapabilitiesTest extends TestCase {
 			'RecipesController'  => array( RecipesController::class, array( RecipeRepository::class, RecipeNutrientResolver::class, FoodCache::class ), 'manage_nutrio_recipes' ),
 			'FoodsController'    => array( FoodsController::class, array( FoodDataService::class ), 'manage_nutrio_foods' ),
 			'PlansController'    => array( PlansController::class, array( PlanRepository::class, PlanNutrientResolver::class, ClientRepository::class, FoodCache::class, RecipeRepository::class, RecipeNutrientResolver::class ), 'manage_nutrio_plans' ),
+			'MeController'       => array(
+				MeController::class,
+				array(
+					PlanRepository::class,
+					LogEntryRepository::class,
+					MeasurementRepository::class,
+					ClientRepository::class,
+					FoodCache::class,
+					RecipeRepository::class,
+				),
+				'view_own_nutrio_plan',
+			),
 		);
 	}
 

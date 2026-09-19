@@ -51,6 +51,14 @@ return array(
 				\Nutrio\Nutrition\RecipeNutrientResolver::class,
 			),
 			\Nutrio\RestApi\SettingsController::class    => array(),
+			\Nutrio\RestApi\MeController::class          => array(
+				\Nutrio\Repositories\PlanRepository::class,
+				\Nutrio\Repositories\LogEntryRepository::class,
+				\Nutrio\Repositories\MeasurementRepository::class,
+				\Nutrio\Repositories\ClientRepository::class,
+				\Nutrio\Nutrition\FoodCache::class,
+				\Nutrio\Repositories\RecipeRepository::class,
+			),
 		),
 	),
 
