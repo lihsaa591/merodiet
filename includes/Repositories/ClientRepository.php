@@ -109,6 +109,49 @@ class ClientRepository {
 	}
 
 	/**
+	 * Find the client row linked to a given WordPress user — the lookup
+	 * every client-portal request starts from (see
+	 * AbstractClientController::current_client_id()). Returns null both
+	 * when no client is linked to this user and when the user doesn't
+	 * exist, which is the same "don't leak which case it is" posture
+	 * find_for_practitioner() takes for practitioner-owned rows.
+	 *
+	 * @param int $user_id WordPress user ID of the logged-in client.
+	 *
+	 * @return array<string, mixed>|null
+	 */
+	public function find_for_user( int $user_id ): ?array {
+		global $wpdb;
+
+		$row = $wpdb->get_row(
+			$wpdb->prepare( "SELECT * FROM {$wpdb->prefix}nutrio_clients WHERE user_id = %d", $user_id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
+			ARRAY_A
+		);
+
+		return null === $row ? null : $this->hydrate( $row );
+	}
+
+	/**
+	 * Link a client row to the WordPress user created for its portal
+	 * login — see ClientInviteService, the only caller.
+	 *
+	 * @param int $client_id Internal client ID.
+	 * @param int $user_id   WordPress user ID to link.
+	 */
+	public function set_user_id( int $client_id, int $user_id ): void {
+		global $wpdb;
+
+		$wpdb->update(
+			$wpdb->prefix . 'nutrio_clients',
+			array(
+				'user_id'    => $user_id,
+				'updated_at' => current_time( 'mysql' ),
+			),
+			array( 'id' => $client_id )
+		);
+	}
+
+	/**
 	 * A page of clients belonging to a practitioner, alphabetical by name,
 	 * plus the total count across all pages (for building pagination UI
 	 * without a second round-trip). $filters is deliberately open-ended —
