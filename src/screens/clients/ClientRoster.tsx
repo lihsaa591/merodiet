@@ -1,8 +1,9 @@
 import { useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
+import apiFetch from '@wordpress/api-fetch';
 import { STORE_NAME } from '../../store/clients';
-import { confirmDialog } from '../../utils/confirmDialog';
+import { confirmDialog, alertDialog } from '../../utils/confirmDialog';
 import { useBulkSelection } from '../../hooks/useBulkSelection';
 import { usePagination } from '../../hooks/usePagination';
 import { useShowFilters } from '../../hooks/useShowFilters';
@@ -115,6 +116,37 @@ export default function ClientRoster() {
 		} );
 		if ( confirmed ) {
 			deleteClient( client.id );
+		}
+	};
+
+	const handleInvite = async ( client: Client ) => {
+		try {
+			await apiFetch( {
+				path: `/nutrio/v1/clients/${ client.id }/invite`,
+				method: 'POST',
+			} );
+			await alertDialog( {
+				message: sprintf(
+					/* translators: %s: client's full name */
+					__( '%s has been invited to the client portal.', 'nutrio' ),
+					`${ client.first_name } ${ client.last_name }`
+				),
+			} );
+		} catch ( error ) {
+			// apiFetch rejects with the REST API's error envelope
+			// ({code, message, data}), not a native Error.
+			const message =
+				error &&
+				typeof error === 'object' &&
+				'message' in error &&
+				typeof error.message === 'string'
+					? error.message
+					: __(
+							'Could not send the invite. Please try again.',
+							'nutrio'
+					  );
+
+			await alertDialog( { message } );
 		}
 	};
 
@@ -331,6 +363,19 @@ export default function ClientRoster() {
 												<div className="nutrio-row-actions">
 													<IconButton
 														label={ __(
+															'Invite to client portal',
+															'nutrio'
+														) }
+														onClick={ () =>
+															handleInvite(
+																client
+															)
+														}
+													>
+														<InviteIcon />
+													</IconButton>
+													<IconButton
+														label={ __(
 															'Edit client',
 															'nutrio'
 														) }
@@ -413,6 +458,20 @@ function PlusIcon() {
 			strokeWidth="2"
 		>
 			<path d="M12 5v14M5 12h14" />
+		</svg>
+	);
+}
+
+function InviteIcon() {
+	return (
+		<svg
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2"
+		>
+			<path d="M4 6h16v12H4z" />
+			<path d="m4 7 8 6 8-6" />
 		</svg>
 	);
 }
