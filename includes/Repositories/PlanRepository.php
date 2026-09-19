@@ -101,6 +101,35 @@ class PlanRepository {
 	}
 
 	/**
+	 * The client's currently-active assigned plan for a given date, if
+	 * any — the plan whose date range covers $date. Assumes plan date
+	 * ranges for one client never overlap (a practitioner assigning a
+	 * second overlapping plan is a product-level validation concern,
+	 * not this query's); if that assumption is ever violated, this
+	 * returns the most recently started of the overlapping plans.
+	 *
+	 * @param int    $client_id Client's internal ID.
+	 * @param string $date      Date to check, 'Y-m-d'.
+	 *
+	 * @return array<string, mixed>|null
+	 */
+	public function find_active_for_client( int $client_id, string $date ): ?array {
+		global $wpdb;
+
+		$row = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT * FROM {$wpdb->prefix}nutrio_plans WHERE client_id = %d AND status = 'assigned' AND start_date <= %s AND end_date >= %s ORDER BY start_date DESC LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; values are parameterized.
+				$client_id,
+				$date,
+				$date
+			),
+			ARRAY_A
+		);
+
+		return null === $row ? null : $this->hydrate( $row );
+	}
+
+	/**
 	 * A page of plans belonging to a practitioner, most recently created
 	 * first, plus the total count across all pages. $filters is
 	 * deliberately open-ended — see QueryFilters — today supports
