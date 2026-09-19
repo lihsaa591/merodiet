@@ -36,8 +36,14 @@ final class ClientInviteService {
 	 * that (idempotent re-invite; see class docblock).
 	 *
 	 * @param int $client_id Internal client ID.
+	 *
+	 * @return bool|WP_Error Always `true` on success — declared `bool` rather
+	 *                       than the standalone `true` type because this
+	 *                       codebase's PHP floor (see composer.json) is 8.1,
+	 *                       and standalone `true`/`false`/`null` return
+	 *                       types are a PHP 8.2 addition.
 	 */
-	public function invite( int $client_id ): true|WP_Error {
+	public function invite( int $client_id ): bool|WP_Error {
 		$client = $this->clients->find( $client_id );
 
 		if ( null === $client ) {
