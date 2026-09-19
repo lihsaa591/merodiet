@@ -9,6 +9,7 @@ declare( strict_types=1 );
 
 namespace Nutrio;
 
+use Nutrio\Clients\PortalRewrite;
 use Nutrio\Database\Migrator;
 use Nutrio\Roles\RoleRegistrar;
 
@@ -29,6 +30,7 @@ final class Activation {
 		update_option( 'nutrio_db_version', NUTRIO_VERSION );
 
 		RoleRegistrar::register();
+		PortalRewrite::register();
 
 		flush_rewrite_rules();
 	}
