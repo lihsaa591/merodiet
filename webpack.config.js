@@ -43,6 +43,10 @@ module.exports = {
 	...withNutrioModuleNames( defaultConfig ),
 	entry: {
 		admin: path.resolve( __dirname, 'src/admin/index.tsx' ),
+		'client-portal': path.resolve(
+			__dirname,
+			'src/client-portal/index.tsx'
+		),
 	},
 	// wp-admin runs on a different origin than the dev server, so both
 	// cross-origin requests and the HMR client's fetch polling need to be allowed.

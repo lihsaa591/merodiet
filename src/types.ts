@@ -167,6 +167,48 @@ export interface PlanInput {
 	days: PlanDayInput[];
 }
 
+export interface LogEntry {
+	id: number;
+	client_id: number;
+	plan_item_id: number | null;
+	food_id: number | null;
+	recipe_id: number | null;
+	quantity_grams: number | null;
+	servings: number | null;
+	log_date: string;
+	status: 'eaten' | 'substituted' | 'skipped';
+	source: 'manual' | 'ai_parsed';
+	notes: string | null;
+	created_at: string;
+}
+
+export interface LogEntryInput {
+	plan_item_id?: number;
+	food_id?: number;
+	recipe_id?: number;
+	quantity_grams?: number;
+	servings?: number;
+	log_date: string;
+	status: 'eaten' | 'substituted' | 'skipped';
+	notes?: string;
+}
+
+export interface Measurement {
+	id: number;
+	client_id: number;
+	measured_at: string;
+	weight_grams: number | null;
+	metrics: Record< string, unknown >;
+	notes: string | null;
+	created_at: string;
+}
+
+export interface MeasurementInput {
+	measured_at: string;
+	weight_grams?: number;
+	notes?: string;
+}
+
 /** A resolved food's per-100g nutrient profile — the shape FoodDataService::resolve() returns. */
 export interface ResolvedFood {
 	id: number;
@@ -206,6 +248,13 @@ declare global {
 			dateFormat?: string;
 			/** This site's Settings → General → Time Format, a PHP date() format string (e.g. "g:i a"). */
 			timeFormat?: string;
+		};
+		nutrioClientPortal?: {
+			restUrl?: string;
+			restNonce?: string;
+			mountId?: string;
+			clientName?: string;
+			dateFormat?: string;
 		};
 	}
 }
