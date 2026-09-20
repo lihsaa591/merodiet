@@ -11,8 +11,10 @@ import styles from './PlanBuilder.module.css';
 import {
 	estimateDayNutrients,
 	formatAmount,
+	listExtraNutrients,
 	summarizeNutrients,
 } from '../../utils/nutrients';
+import type { NutrientSummary } from '../../utils/nutrients';
 import type {
 	MealType,
 	Plan,
@@ -443,9 +445,9 @@ export default function PlanBuilder( {
 
 	// An assigned plan's totals are a frozen snapshot keyed by day_offset —
 	// never recomputed from in-memory items, unlike the live draft estimate.
-	function computeLiveSummary() {
+	function computeLiveSummary(): NutrientSummary {
 		if ( ! activeDay ) {
-			return { kcal: null, protein: null, carbs: null, fat: null };
+			return estimateDayNutrients( [] );
 		}
 
 		return estimateDayNutrients(
@@ -469,6 +471,7 @@ export default function PlanBuilder( {
 	const summary = isReadOnly
 		? summarizeNutrients( plan?.nutrient_totals[ activeDayOffset ] ?? {} )
 		: computeLiveSummary();
+	const extraNutrients = listExtraNutrients( summary );
 
 	return (
 		<>
@@ -1027,6 +1030,33 @@ export default function PlanBuilder( {
 									</div>
 								</div>
 							</div>
+							{ extraNutrients.length > 0 && (
+								<div
+									className={ styles.nutrientGrid }
+									style={ { marginTop: '10px' } }
+								>
+									{ extraNutrients.map( ( nutrient ) => (
+										<div
+											className={ styles.nutrientTile }
+											key={ nutrient.key }
+										>
+											<div
+												className={ styles.nutrientVal }
+											>
+												{ formatAmount(
+													nutrient.value,
+													` ${ nutrient.unit }`
+												) }
+											</div>
+											<div
+												className={ styles.nutrientLbl }
+											>
+												{ nutrient.label }
+											</div>
+										</div>
+									) ) }
+								</div>
+							) }
 						</div>
 					</PanelBody>
 				</Panel>
