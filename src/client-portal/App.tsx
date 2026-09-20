@@ -4,6 +4,7 @@ import { applyFilters, doAction } from '@wordpress/hooks';
 import PlanTab from './PlanTab';
 import LogTab from './LogTab';
 import MeasurementsTab from './MeasurementsTab';
+import ThemeToggle from './ThemeToggle';
 import styles from './App.module.css';
 
 export interface Section {
@@ -43,9 +44,12 @@ export default function App() {
 	return (
 		<div className={ styles.shell }>
 			<header className={ styles.header }>
-				<h1 className={ styles.title }>
-					{ __( 'Client Portal', 'nutrio' ) }
-				</h1>
+				<div className={ styles.headerLeft }>
+					<h1 className={ styles.title }>
+						{ __( 'Client Portal', 'nutrio' ) }
+					</h1>
+					<ThemeToggle />
+				</div>
 				{ clientName && (
 					<span className={ styles.greeting }>{ clientName }</span>
 				) }

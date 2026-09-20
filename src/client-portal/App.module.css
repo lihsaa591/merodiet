@@ -6,9 +6,14 @@
 }
 .header {
 	display: flex;
-	align-items: baseline;
+	align-items: center;
 	justify-content: space-between;
 	margin-bottom: 20px;
+}
+.headerLeft {
+	display: flex;
+	align-items: center;
+	gap: 12px;
 }
 .title {
 	font-size: 22px;

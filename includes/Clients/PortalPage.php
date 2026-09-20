@@ -119,11 +119,25 @@ final class PortalPage {
 			<meta charset="<?php bloginfo( 'charset' ); ?>" />
 			<meta name="viewport" content="width=device-width, initial-scale=1" />
 			<title><?php echo esc_html( get_bloginfo( 'name' ) ); ?> — <?php esc_html_e( 'Client Portal', 'nutrio' ); ?></title>
+			<?php $this->render_theme_init_script(); ?>
 			<?php wp_head(); ?>
 		</head>
 		<body class="nutrio-portal-login">
 			<main class="nutrio-portal-login-card">
-				<h1><?php esc_html_e( 'Client Portal', 'nutrio' ); ?></h1>
+				<?php $this->render_site_logo(); ?>
+				<div class="nutrio-portal-login-heading">
+					<h1><?php esc_html_e( 'Client Portal', 'nutrio' ); ?></h1>
+					<button
+						type="button"
+						class="nutrio-portal-theme-toggle"
+						onclick="window.nutrioTogglePortalTheme()"
+						aria-label="<?php esc_attr_e( 'Toggle dark mode', 'nutrio' ); ?>"
+						title="<?php esc_attr_e( 'Toggle dark mode', 'nutrio' ); ?>"
+					>
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nutrio-portal-theme-icon-sun"><circle cx="12" cy="12" r="4" /><path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" /></svg>
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nutrio-portal-theme-icon-moon"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" /></svg>
+					</button>
+				</div>
 				<?php
 				wp_login_form(
 					array(
@@ -136,6 +150,78 @@ final class PortalPage {
 		</body>
 		</html>
 		<?php
+	}
+
+	/**
+	 * A tiny inline script, run before the stylesheet paints, that
+	 * applies any previously saved theme choice as a data-theme
+	 * attribute on <html> — same mechanism (and localStorage key) the
+	 * practitioner admin app's own dark-mode toggle would use, so a
+	 * choice made here or there is consistent. Falls back to the
+	 * system preference (tokens.css's own prefers-color-scheme rules)
+	 * when nothing has been saved yet. Also defines the toggle button's
+	 * click handler, since this page has no React runtime to attach one.
+	 */
+	private function render_theme_init_script(): void {
+		?>
+		<script>
+			( function () {
+				try {
+					var saved = window.localStorage.getItem( 'nutrio-theme' );
+					if ( 'dark' === saved || 'light' === saved ) {
+						document.documentElement.setAttribute( 'data-theme', saved );
+					}
+				} catch ( error ) {
+					// Storage unavailable (private browsing, blocked) — falls
+					// back to the system preference tokens.css already handles.
+				}
+
+				window.nutrioTogglePortalTheme = function () {
+					var current = document.documentElement.getAttribute( 'data-theme' );
+					var isDark = 'dark' === current ||
+						( ! current && window.matchMedia && window.matchMedia( '(prefers-color-scheme: dark)' ).matches );
+					var next = isDark ? 'light' : 'dark';
+					document.documentElement.setAttribute( 'data-theme', next );
+					try {
+						window.localStorage.setItem( 'nutrio-theme', next );
+					} catch ( error ) {
+						// Storage unavailable — the choice just won't persist.
+					}
+				};
+			} )();
+		</script>
+		<?php
+	}
+
+	/**
+	 * Outputs the site's custom logo (Appearance -> Customize -> Site
+	 * Identity), or the site icon as a fallback — read directly via the
+	 * theme mod / site-icon APIs rather than get_custom_logo(), since
+	 * this page never loads a theme and get_custom_logo() only works
+	 * for themes that declare 'custom-logo' support. Outputs nothing if
+	 * neither is set.
+	 */
+	private function render_site_logo(): void {
+		$logo_id = get_theme_mod( 'custom_logo' );
+
+		if ( $logo_id ) {
+			echo wp_get_attachment_image(
+				(int) $logo_id,
+				'medium',
+				false,
+				array( 'class' => 'nutrio-portal-login-logo' )
+			);
+			return;
+		}
+
+		$icon_url = get_site_icon_url( 64 );
+
+		if ( $icon_url ) {
+			printf(
+				'<img src="%s" alt="" class="nutrio-portal-login-logo" />',
+				esc_url( $icon_url )
+			);
+		}
 	}
 
 	/**

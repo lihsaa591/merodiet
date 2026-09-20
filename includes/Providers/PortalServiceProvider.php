@@ -61,6 +61,20 @@ final class PortalServiceProvider extends AbstractServiceProvider {
 			}
 		);
 
+		// WordPress core's own admin-bar setup (_wp_admin_bar_init()) is
+		// hooked to 'template_redirect' at priority 0 — earlier than any
+		// default-priority hook we add there. Suppressing the bar must
+		// happen on 'wp' instead, which fires before 'template_redirect',
+		// so the filter is already in place by the time core reads it.
+		add_action(
+			'wp',
+			static function () {
+				if ( get_query_var( PortalRewrite::QUERY_VAR ) ) {
+					add_filter( 'show_admin_bar', '__return_false' );
+				}
+			}
+		);
+
 		add_action(
 			'template_redirect',
 			static function () use ( $container ) {
