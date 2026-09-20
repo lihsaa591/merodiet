@@ -2,6 +2,8 @@ export interface Client {
 	id: number;
 	practitioner_user_id: number;
 	user_id: number | null;
+	avatar_id: number | null;
+	avatar_url: string | null;
 	first_name: string;
 	last_name: string;
 	email: string;
