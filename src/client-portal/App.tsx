@@ -5,6 +5,7 @@ import PlanTab from './PlanTab';
 import LogTab from './LogTab';
 import MeasurementsTab from './MeasurementsTab';
 import PortalSidebar from './PortalSidebar';
+import ProfileDrawer from './ProfileDrawer';
 
 export interface Section {
 	id: string;
@@ -49,6 +50,7 @@ export default function App() {
 		sectionFromLocation( sections )
 	);
 	const [ isSidebarOpen, setSidebarOpen ] = useState( false );
+	const [ isProfileOpen, setProfileOpen ] = useState( false );
 	const active = sections.find( ( section ) => section.id === activeId );
 
 	doAction( 'nutrio.clientPortal.mounted' );
@@ -108,6 +110,7 @@ export default function App() {
 					sections={ sections }
 					activeId={ activeId }
 					onSelect={ selectSection }
+					onOpenProfile={ () => setProfileOpen( true ) }
 				/>
 
 				<div className="nutrio-main">
@@ -116,6 +119,11 @@ export default function App() {
 					</div>
 				</div>
 			</div>
+
+			<ProfileDrawer
+				isOpen={ isProfileOpen }
+				onClose={ () => setProfileOpen( false ) }
+			/>
 		</div>
 	);
 }

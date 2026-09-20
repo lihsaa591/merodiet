@@ -7,6 +7,7 @@ interface PortalSidebarProps {
 	sections: Section[];
 	activeId: string;
 	onSelect: ( id: string ) => void;
+	onOpenProfile: () => void;
 }
 
 // Deliberately mirrors src/admin/Sidebar.tsx's structure/classes exactly
@@ -18,6 +19,7 @@ export default function PortalSidebar( {
 	sections,
 	activeId,
 	onSelect,
+	onOpenProfile,
 }: PortalSidebarProps ) {
 	const clientName = window.nutrioClientPortal?.clientName ?? '';
 	const logoutUrl = window.nutrioClientPortal?.logoutUrl ?? '#';
@@ -66,15 +68,24 @@ export default function PortalSidebar( {
 			</nav>
 
 			<div className="nutrio-rail-foot">
-				<div className="nutrio-user-avatar">
-					{ initialsFor( clientName ) }
-				</div>
-				<div style={ { flex: 1, minWidth: 0 } }>
-					<div className="nutrio-rail-foot-name">{ clientName }</div>
-					<div className="nutrio-rail-foot-role">
-						{ __( 'Client', 'nutrio' ) }
+				<button
+					type="button"
+					className="nutrio-rail-foot-profile-btn"
+					onClick={ onOpenProfile }
+					aria-label={ __( 'Open profile', 'nutrio' ) }
+				>
+					<div className="nutrio-user-avatar">
+						{ initialsFor( clientName ) }
 					</div>
-				</div>
+					<div style={ { flex: 1, minWidth: 0 } }>
+						<div className="nutrio-rail-foot-name">
+							{ clientName }
+						</div>
+						<div className="nutrio-rail-foot-role">
+							{ __( 'Client', 'nutrio' ) }
+						</div>
+					</div>
+				</button>
 				<ThemeToggle />
 			</div>
 		</aside>
