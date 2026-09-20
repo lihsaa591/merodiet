@@ -160,6 +160,25 @@ final class MeController extends AbstractClientController {
 			),
 			required_capability: 'view_own_nutrio_plan'
 		);
+
+		$this->register_route(
+			'/password',
+			array(
+				'methods'  => WP_REST_Server::CREATABLE,
+				'callback' => array( $this, 'change_password' ),
+				'args'     => array(
+					'new_password'     => array(
+						'required' => true,
+						'type'     => 'string',
+					),
+					'confirm_password' => array(
+						'required' => true,
+						'type'     => 'string',
+					),
+				),
+			),
+			required_capability: 'view_own_nutrio_plan'
+		);
 	}
 
 	/**
@@ -383,6 +402,53 @@ final class MeController extends AbstractClientController {
 		$this->clients->update( $client_id, array( 'avatar_id' => $attachment_id ) );
 
 		return $this->success( $this->clients->find( $client_id ) );
+	}
+
+	/**
+	 * POST /me/password — change the caller's own password. Never accepts
+	 * a user id — always the currently logged-in user, resolved the same
+	 * way current_client_id() resolves identity.
+	 *
+	 * @param WP_REST_Request $request The current request.
+	 */
+	public function change_password( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$client_id = $this->current_client_id();
+
+		if ( $client_id instanceof WP_Error ) {
+			return $client_id;
+		}
+
+		// Deliberately not sanitize_text_field()'d — a password's exact
+		// bytes matter, matching the same convention already used for
+		// login/reset-password handling in PortalPage.
+		$new_password     = (string) $request->get_param( 'new_password' );
+		$confirm_password = (string) $request->get_param( 'confirm_password' );
+
+		if ( strlen( $new_password ) < 8 ) {
+			return $this->error( 'nutrio_password_too_short', __( 'Your new password must be at least 8 characters.', 'nutrio' ), 400 );
+		}
+
+		if ( $new_password !== $confirm_password ) {
+			return $this->error( 'nutrio_password_mismatch', __( 'The two passwords you entered do not match.', 'nutrio' ), 400 );
+		}
+
+		$current_user = wp_get_current_user();
+
+		wp_set_password( $new_password, $current_user->ID );
+
+		// wp_set_password() clears the current auth cookie when changing
+		// your own password — re-authenticate immediately so the client
+		// isn't unexpectedly logged out by the request that just succeeded.
+		wp_signon(
+			array(
+				'user_login'    => $current_user->user_login,
+				'user_password' => $new_password,
+				'remember'      => true,
+			),
+			is_ssl()
+		);
+
+		return $this->success( array( 'changed' => true ) );
 	}
 
 	/**
