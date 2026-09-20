@@ -167,6 +167,10 @@ final class MeController extends AbstractClientController {
 				'methods'  => WP_REST_Server::CREATABLE,
 				'callback' => array( $this, 'change_password' ),
 				'args'     => array(
+					'current_password' => array(
+						'required' => true,
+						'type'     => 'string',
+					),
 					'new_password'     => array(
 						'required' => true,
 						'type'     => 'string',
@@ -421,8 +425,15 @@ final class MeController extends AbstractClientController {
 		// Deliberately not sanitize_text_field()'d — a password's exact
 		// bytes matter, matching the same convention already used for
 		// login/reset-password handling in PortalPage.
+		$current_password = (string) $request->get_param( 'current_password' );
 		$new_password     = (string) $request->get_param( 'new_password' );
 		$confirm_password = (string) $request->get_param( 'confirm_password' );
+
+		$current_user = wp_get_current_user();
+
+		if ( ! wp_check_password( $current_password, $current_user->user_pass, $current_user->ID ) ) {
+			return $this->error( 'nutrio_password_incorrect', __( 'Your current password is incorrect.', 'nutrio' ), 400 );
+		}
 
 		if ( strlen( $new_password ) < 8 ) {
 			return $this->error( 'nutrio_password_too_short', __( 'Your new password must be at least 8 characters.', 'nutrio' ), 400 );
@@ -432,14 +443,12 @@ final class MeController extends AbstractClientController {
 			return $this->error( 'nutrio_password_mismatch', __( 'The two passwords you entered do not match.', 'nutrio' ), 400 );
 		}
 
-		$current_user = wp_get_current_user();
-
 		wp_set_password( $new_password, $current_user->ID );
 
 		// wp_set_password() clears the current auth cookie when changing
 		// your own password — re-authenticate immediately so the client
 		// isn't unexpectedly logged out by the request that just succeeded.
-		wp_signon(
+		$signon = wp_signon(
 			array(
 				'user_login'    => $current_user->user_login,
 				'user_password' => $new_password,
@@ -448,7 +457,19 @@ final class MeController extends AbstractClientController {
 			is_ssl()
 		);
 
-		return $this->success( array( 'changed' => true ) );
+		if ( is_wp_error( $signon ) ) {
+			return $signon;
+		}
+
+		// The re-signon rotates the session token, which invalidates any
+		// REST nonce issued for the old session — hand back a fresh one
+		// so the portal's next apiFetch() call doesn't 403.
+		return $this->success(
+			array(
+				'changed' => true,
+				'nonce'   => wp_create_nonce( 'wp_rest' ),
+			)
+		);
 	}
 
 	/**

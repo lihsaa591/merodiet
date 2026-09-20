@@ -3,6 +3,7 @@ import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import Button from '../components/ui/Button';
 import styles from './PasswordChangeModal.module.css';
+import { nonceMiddleware } from './nonceMiddleware';
 
 interface PasswordChangeModalProps {
 	isOpen: boolean;
@@ -13,6 +14,7 @@ export default function PasswordChangeModal( {
 	isOpen,
 	onClose,
 }: PasswordChangeModalProps ) {
+	const [ currentPassword, setCurrentPassword ] = useState( '' );
 	const [ newPassword, setNewPassword ] = useState( '' );
 	const [ confirmPassword, setConfirmPassword ] = useState( '' );
 	const [ isSaving, setIsSaving ] = useState( false );
@@ -24,6 +26,7 @@ export default function PasswordChangeModal( {
 	}
 
 	const handleClose = () => {
+		setCurrentPassword( '' );
 		setNewPassword( '' );
 		setConfirmPassword( '' );
 		setErrorMessage( null );
@@ -37,14 +40,21 @@ export default function PasswordChangeModal( {
 		setErrorMessage( null );
 
 		try {
-			await apiFetch( {
+			const response = await apiFetch< {
+				changed: boolean;
+				nonce: string;
+			} >( {
 				path: '/nutrio/v1/me/password',
 				method: 'POST',
 				data: {
+					current_password: currentPassword,
 					new_password: newPassword,
 					confirm_password: confirmPassword,
 				},
 			} );
+			// The password change re-authenticates the session, which
+			// rotates the token the old REST nonce was bound to.
+			nonceMiddleware.nonce = response.nonce;
 			setIsDone( true );
 		} catch ( error ) {
 			const message =
@@ -95,6 +105,20 @@ export default function PasswordChangeModal( {
 						{ errorMessage && (
 							<p className={ styles.error }>{ errorMessage }</p>
 						) }
+						<div className="nutrio-field">
+							<label htmlFor="nutrio-current-password">
+								{ __( 'Current Password', 'nutrio' ) }
+							</label>
+							<input
+								id="nutrio-current-password"
+								type="password"
+								value={ currentPassword }
+								onChange={ ( event ) =>
+									setCurrentPassword( event.target.value )
+								}
+								required
+							/>
+						</div>
 						<div className="nutrio-field">
 							<label htmlFor="nutrio-new-password">
 								{ __( 'New Password', 'nutrio' ) }

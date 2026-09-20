@@ -1,11 +1,13 @@
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { applyFilters, doAction } from '@wordpress/hooks';
+import apiFetch from '@wordpress/api-fetch';
 import PlanTab from './PlanTab';
 import LogTab from './LogTab';
 import MeasurementsTab from './MeasurementsTab';
 import PortalSidebar from './PortalSidebar';
 import ProfileDrawer from './ProfileDrawer';
+import type { Client } from '../types';
 
 export interface Section {
 	id: string;
@@ -51,9 +53,19 @@ export default function App() {
 	);
 	const [ isSidebarOpen, setSidebarOpen ] = useState( false );
 	const [ isProfileOpen, setProfileOpen ] = useState( false );
+	const [ client, setClient ] = useState< Client | null >( null );
 	const active = sections.find( ( section ) => section.id === activeId );
 
 	doAction( 'nutrio.clientPortal.mounted' );
+
+	// Fetched once here (rather than inside ProfileDrawer) so the
+	// sidebar's avatar can reflect the same client record without a
+	// second, duplicate request.
+	useEffect( () => {
+		apiFetch< Client >( { path: '/nutrio/v1/me/profile' } )
+			.then( setClient )
+			.catch( () => {} );
+	}, [] );
 
 	// Keep the browser's back/forward buttons working.
 	useEffect( () => {
@@ -111,6 +123,7 @@ export default function App() {
 					activeId={ activeId }
 					onSelect={ selectSection }
 					onOpenProfile={ () => setProfileOpen( true ) }
+					avatarUrl={ client?.avatar_url ?? null }
 				/>
 
 				<div className="nutrio-main">
@@ -123,6 +136,8 @@ export default function App() {
 			<ProfileDrawer
 				isOpen={ isProfileOpen }
 				onClose={ () => setProfileOpen( false ) }
+				client={ client }
+				onClientUpdate={ setClient }
 			/>
 		</div>
 	);

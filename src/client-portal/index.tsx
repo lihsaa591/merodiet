@@ -3,6 +3,7 @@ import apiFetch from '@wordpress/api-fetch';
 import '../styles/tokens.css';
 import '../styles/base.css';
 import App from './App';
+import { nonceMiddleware } from './nonceMiddleware';
 
 const settings = window.nutrioClientPortal ?? {};
 
@@ -11,7 +12,8 @@ if ( settings.restUrl ) {
 	apiFetch.use( apiFetch.createRootURLMiddleware( settings.restUrl ) );
 }
 if ( settings.restNonce ) {
-	apiFetch.use( apiFetch.createNonceMiddleware( settings.restNonce ) );
+	nonceMiddleware.nonce = settings.restNonce;
+	apiFetch.use( nonceMiddleware );
 }
 
 domReady( () => {

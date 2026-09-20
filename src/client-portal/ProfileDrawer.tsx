@@ -10,6 +10,8 @@ import styles from './ProfileDrawer.module.css';
 interface ProfileDrawerProps {
 	isOpen: boolean;
 	onClose: () => void;
+	client: Client | null;
+	onClientUpdate: ( client: Client ) => void;
 }
 
 interface FormValues {
@@ -33,33 +35,89 @@ const EMPTY: FormValues = {
 export default function ProfileDrawer( {
 	isOpen,
 	onClose,
+	client,
+	onClientUpdate,
 }: ProfileDrawerProps ) {
-	const [ client, setClient ] = useState< Client | null >( null );
 	const [ values, setValues ] = useState< FormValues >( EMPTY );
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ isUploadingAvatar, setIsUploadingAvatar ] = useState( false );
 	const [ errorMessage, setErrorMessage ] = useState< string | null >( null );
+	const [ successMessage, setSuccessMessage ] = useState< string | null >(
+		null
+	);
+	const [ loadError, setLoadError ] = useState< string | null >( null );
 	const [ isPasswordModalOpen, setPasswordModalOpen ] = useState( false );
+	const [ avatarPreviewUrl, setAvatarPreviewUrl ] = useState< string | null >(
+		null
+	);
+	const [ isViewingAvatar, setIsViewingAvatar ] = useState( false );
+
+	// Revoke the local object URL whenever it's replaced or the drawer unmounts.
+	useEffect( () => {
+		return () => {
+			if ( avatarPreviewUrl ) {
+				URL.revokeObjectURL( avatarPreviewUrl );
+			}
+		};
+	}, [ avatarPreviewUrl ] );
+
+	const applyClient = ( data: Client ) => {
+		onClientUpdate( data );
+		setValues( {
+			first_name: data.first_name,
+			last_name: data.last_name,
+			email: data.email,
+			goals: data.goals ?? '',
+			dietary_restrictions: data.dietary_restrictions ?? '',
+			allergies: data.allergies.join( ', ' ),
+		} );
+	};
 
 	useEffect( () => {
 		if ( ! isOpen ) {
 			return;
 		}
 
-		apiFetch< Client >( { path: '/nutrio/v1/me/profile' } ).then(
-			( data ) => {
-				setClient( data );
-				setValues( {
-					first_name: data.first_name,
-					last_name: data.last_name,
-					email: data.email,
-					goals: data.goals ?? '',
-					dietary_restrictions: data.dietary_restrictions ?? '',
-					allergies: data.allergies.join( ', ' ),
-				} );
-			}
-		);
+		if ( client ) {
+			applyClient( client );
+			return;
+		}
+
+		let cancelled = false;
+		setLoadError( null );
+
+		apiFetch< Client >( { path: '/nutrio/v1/me/profile' } )
+			.then( ( data ) => {
+				if ( ! cancelled ) {
+					applyClient( data );
+				}
+			} )
+			.catch( () => {
+				if ( ! cancelled ) {
+					setLoadError(
+						__(
+							'Could not load your profile — please try again.',
+							'nutrio'
+						)
+					);
+				}
+			} );
+
+		return () => {
+			cancelled = true;
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- only re-run when the drawer opens, not on every client/applyClient identity change.
 	}, [ isOpen ] );
+
+	// Self-dismissing success toast, cleared whenever a new one is shown.
+	useEffect( () => {
+		if ( ! successMessage ) {
+			return;
+		}
+
+		const timer = setTimeout( () => setSuccessMessage( null ), 2500 );
+		return () => clearTimeout( timer );
+	}, [ successMessage ] );
 
 	const setField =
 		( field: keyof FormValues ) =>
@@ -92,7 +150,8 @@ export default function ProfileDrawer( {
 						.filter( Boolean ),
 				},
 			} );
-			setClient( updated );
+			applyClient( updated );
+			setSuccessMessage( __( 'Saved.', 'nutrio' ) );
 		} catch {
 			setErrorMessage(
 				__( 'Something went wrong — please try again.', 'nutrio' )
@@ -111,6 +170,9 @@ export default function ProfileDrawer( {
 			return;
 		}
 
+		// Show the picked file immediately, before the upload round-trip
+		// finishes, so "Change photo" feels instant.
+		setAvatarPreviewUrl( URL.createObjectURL( file ) );
 		setIsUploadingAvatar( true );
 		setErrorMessage( null );
 
@@ -123,8 +185,10 @@ export default function ProfileDrawer( {
 				method: 'POST',
 				body: formData,
 			} );
-			setClient( updated );
+			applyClient( updated );
+			setSuccessMessage( __( 'Photo updated.', 'nutrio' ) );
 		} catch {
+			setAvatarPreviewUrl( null );
 			setErrorMessage(
 				__(
 					'Could not upload that image — please try a JPEG, PNG, or WebP file.',
@@ -144,21 +208,50 @@ export default function ProfileDrawer( {
 				title={ __( 'My Profile', 'nutrio' ) }
 				onClose={ onClose }
 			>
-				{ ! client ? (
+				{ successMessage && (
+					<div className={ styles.toast } role="status">
+						<svg
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							strokeWidth="2.5"
+						>
+							<path d="M5 13l4 4L19 7" />
+						</svg>
+						{ successMessage }
+					</div>
+				) }
+				{ loadError && <p className={ styles.error }>{ loadError }</p> }
+				{ ! loadError && ! client && (
 					<p>{ __( 'Loading…', 'nutrio' ) }</p>
-				) : (
+				) }
+				{ ! loadError && client && (
 					<form onSubmit={ handleSubmit } className={ styles.form }>
 						{ errorMessage && (
 							<p className={ styles.error }>{ errorMessage }</p>
 						) }
 
 						<div className={ styles.avatarRow }>
-							{ client.avatar_url ? (
-								<img
-									src={ client.avatar_url }
-									alt=""
-									className={ styles.avatarImage }
-								/>
+							{ avatarPreviewUrl || client.avatar_url ? (
+								<button
+									type="button"
+									className={ styles.avatarViewBtn }
+									onClick={ () => setIsViewingAvatar( true ) }
+									aria-label={ __(
+										'View profile photo',
+										'nutrio'
+									) }
+								>
+									<img
+										src={
+											avatarPreviewUrl ??
+											client.avatar_url ??
+											''
+										}
+										alt=""
+										className={ styles.avatarImage }
+									/>
+								</button>
 							) : (
 								<div className={ styles.avatarPlaceholder }>
 									{ ( client.first_name[ 0 ] ?? '' ) +
@@ -265,7 +358,7 @@ export default function ProfileDrawer( {
 							variant="primary"
 							disabled={ isSaving }
 						>
-							{ __( 'Save changes', 'nutrio' ) }
+							{ __( 'Save', 'nutrio' ) }
 						</Button>
 
 						<button
@@ -283,6 +376,27 @@ export default function ProfileDrawer( {
 				isOpen={ isPasswordModalOpen }
 				onClose={ () => setPasswordModalOpen( false ) }
 			/>
+
+			{ isViewingAvatar && ( avatarPreviewUrl || client?.avatar_url ) && (
+				<div
+					className={ styles.lightboxScrim }
+					role="button"
+					tabIndex={ -1 }
+					aria-label={ __( 'Close', 'nutrio' ) }
+					onClick={ () => setIsViewingAvatar( false ) }
+					onKeyDown={ ( event ) => {
+						if ( 'Escape' === event.key ) {
+							setIsViewingAvatar( false );
+						}
+					} }
+				>
+					<img
+						src={ avatarPreviewUrl ?? client?.avatar_url ?? '' }
+						alt=""
+						className={ styles.lightboxImage }
+					/>
+				</div>
+			) }
 		</>
 	);
 }
