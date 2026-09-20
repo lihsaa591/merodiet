@@ -132,6 +132,25 @@ final class MeController extends AbstractClientController {
 			),
 			required_capability: 'view_own_nutrio_plan'
 		);
+
+		$this->register_route(
+			'/profile',
+			array(
+				'methods'  => WP_REST_Server::READABLE,
+				'callback' => array( $this, 'get_profile' ),
+			),
+			required_capability: 'view_own_nutrio_plan'
+		);
+
+		$this->register_route(
+			'/profile',
+			array(
+				'methods'  => WP_REST_Server::EDITABLE,
+				'callback' => array( $this, 'update_profile' ),
+				'args'     => self::profile_write_args(),
+			),
+			required_capability: 'view_own_nutrio_plan'
+		);
 	}
 
 	/**
@@ -276,6 +295,46 @@ final class MeController extends AbstractClientController {
 	}
 
 	/**
+	 * GET /me/profile — the caller's own client record.
+	 *
+	 * @param WP_REST_Request $request The current request.
+	 */
+	public function get_profile( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$client_id = $this->current_client_id();
+
+		if ( $client_id instanceof WP_Error ) {
+			return $client_id;
+		}
+
+		return $this->success( $this->clients->find( $client_id ) );
+	}
+
+	/**
+	 * PATCH /me/profile — update the caller's own client record.
+	 *
+	 * @param WP_REST_Request $request The current request.
+	 */
+	public function update_profile( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$client_id = $this->current_client_id();
+
+		if ( $client_id instanceof WP_Error ) {
+			return $client_id;
+		}
+
+		$data = array();
+
+		foreach ( array( 'first_name', 'last_name', 'email', 'goals', 'dietary_restrictions', 'allergies' ) as $field ) {
+			if ( null !== $request->get_param( $field ) ) {
+				$data[ $field ] = $request->get_param( $field );
+			}
+		}
+
+		$this->clients->update( $client_id, $data );
+
+		return $this->success( $this->clients->find( $client_id ) );
+	}
+
+	/**
 	 * Attach a resolved food/recipe label to one plan item — same shape
 	 * PlansController::with_item_details() attaches for the practitioner
 	 * side, but scoped by the plan's OWN practitioner_user_id rather
@@ -355,6 +414,41 @@ final class MeController extends AbstractClientController {
 			'notes'        => array(
 				'type'              => 'string',
 				'sanitize_callback' => 'sanitize_textarea_field',
+			),
+		);
+	}
+
+	/**
+	 * REST arg schema for PATCH /me/profile.
+	 *
+	 * @return array<string, array<string, mixed>>
+	 */
+	private static function profile_write_args(): array {
+		return array(
+			'first_name'           => array(
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			),
+			'last_name'            => array(
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			),
+			'email'                => array(
+				'type'              => 'string',
+				'format'            => 'email',
+				'sanitize_callback' => 'sanitize_email',
+			),
+			'goals'                => array(
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_textarea_field',
+			),
+			'dietary_restrictions' => array(
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_textarea_field',
+			),
+			'allergies'            => array(
+				'type'  => 'array',
+				'items' => array( 'type' => 'string' ),
 			),
 		);
 	}
