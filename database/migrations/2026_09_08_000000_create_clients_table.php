@@ -8,7 +8,9 @@
  *
  * `user_id` is nullable: a practitioner can create a client record
  * (to start building plans) before the client has portal login access
- * (Phase 3). Allergies are stored as a JSON array of free-text strings
+ * (Phase 3). `avatar_id` is nullable the same way, pointing at a
+ * WordPress media attachment the client uploaded via the portal.
+ * Allergies are stored as a JSON array of free-text strings
  * for v1 — good enough for a human practitioner to read, and Phase 5's
  * allergy validator can do case-insensitive substring matching against
  * it without needing a normalized allergen table yet.
@@ -34,6 +36,7 @@ return new class() extends Migration {
 				id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 				practitioner_user_id BIGINT UNSIGNED NOT NULL,
 				user_id BIGINT UNSIGNED NULL,
+				avatar_id BIGINT UNSIGNED NULL,
 				first_name VARCHAR(100) NOT NULL,
 				last_name VARCHAR(100) NOT NULL,
 				email VARCHAR(191) NOT NULL,
@@ -45,7 +48,8 @@ return new class() extends Migration {
 				updated_at DATETIME NOT NULL,
 				PRIMARY KEY  (id),
 				KEY practitioner_user_id (practitioner_user_id),
-				KEY user_id (user_id)
+				KEY user_id (user_id),
+				KEY avatar_id (avatar_id)
 			) {$charset_collate};"
 		);
 	}

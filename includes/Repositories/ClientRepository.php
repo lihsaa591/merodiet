@@ -216,7 +216,7 @@ class ClientRepository {
 
 		$fields = array();
 
-		foreach ( array( 'first_name', 'last_name', 'email', 'goals', 'dietary_restrictions', 'status' ) as $field ) {
+		foreach ( array( 'first_name', 'last_name', 'email', 'goals', 'dietary_restrictions', 'status', 'avatar_id' ) as $field ) {
 			if ( array_key_exists( $field, $data ) ) {
 				$fields[ $field ] = $data[ $field ];
 			}
@@ -273,6 +273,8 @@ class ClientRepository {
 		$row['id']                   = (int) $row['id'];
 		$row['practitioner_user_id'] = (int) $row['practitioner_user_id'];
 		$row['user_id']              = null === $row['user_id'] ? null : (int) $row['user_id'];
+		$row['avatar_id']            = null === $row['avatar_id'] ? null : (int) $row['avatar_id'];
+		$row['avatar_url']           = null === $row['avatar_id'] ? null : wp_get_attachment_url( (int) $row['avatar_id'] );
 		$row['allergies']            = (array) json_decode( (string) $row['allergies'], true );
 
 		return $row;
