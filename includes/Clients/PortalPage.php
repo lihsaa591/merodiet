@@ -679,6 +679,7 @@ final class PortalPage {
 			'mountId'    => self::MOUNT_ELEMENT_ID,
 			'clientName' => $current_user->display_name,
 			'dateFormat' => get_option( 'date_format', 'F j, Y' ),
+			'logoutUrl'  => wp_logout_url( PortalRewrite::url() ),
 		);
 
 		/**

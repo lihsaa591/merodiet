@@ -255,6 +255,7 @@ declare global {
 			mountId?: string;
 			clientName?: string;
 			dateFormat?: string;
+			logoutUrl?: string;
 		};
 	}
 }

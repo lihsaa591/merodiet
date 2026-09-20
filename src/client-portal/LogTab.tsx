@@ -3,6 +3,7 @@ import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { doAction } from '@wordpress/hooks';
 import Button from '../components/ui/Button';
+import Panel, { PanelBody } from '../components/ui/Panel';
 import type { LogEntry, LogEntryInput, Plan, PlanItem } from '../types';
 import styles from './LogTab.module.css';
 
@@ -100,84 +101,109 @@ export default function LogTab() {
 			: [];
 
 	return (
-		<div>
-			{ errorMessage && (
-				<p className={ styles.error }>{ errorMessage }</p>
-			) }
-
-			{ undefined === plan && <p>{ __( 'Loading…', 'nutrio' ) }</p> }
-
-			{ null === plan && (
-				<p className={ styles.empty }>
-					{ __(
-						'No plan assigned yet — check back once your practitioner assigns one.',
-						'nutrio'
+		<>
+			<div className="nutrio-topbar">
+				<h1>{ __( 'Log', 'nutrio' ) }</h1>
+			</div>
+			<Panel>
+				<PanelBody>
+					{ errorMessage && (
+						<p className={ styles.error }>{ errorMessage }</p>
 					) }
-				</p>
-			) }
 
-			{ plan && todaysItems.length > 0 && (
-				<ul className={ styles.itemList }>
-					{ todaysItems.map( ( item ) => (
-						<li key={ item.id } className={ styles.item }>
-							<span>
-								{ item.food_description ??
-									item.recipe_name ??
-									__( 'Item', 'nutrio' ) }
-							</span>
-							<div className={ styles.actions }>
-								<Button
-									variant="ghost"
-									disabled={ pendingItemId === item.id }
-									onClick={ () =>
-										logPlanItem( item, 'eaten' )
-									}
-								>
-									{ __( 'Mark eaten', 'nutrio' ) }
-								</Button>
-								<Button
-									variant="ghost"
-									disabled={ pendingItemId === item.id }
-									onClick={ () =>
-										logPlanItem( item, 'substituted' )
-									}
-								>
-									{ __( 'Substituted', 'nutrio' ) }
-								</Button>
-								<Button
-									variant="ghost"
-									disabled={ pendingItemId === item.id }
-									onClick={ () =>
-										logPlanItem( item, 'skipped' )
-									}
-								>
-									{ __( 'Skip', 'nutrio' ) }
-								</Button>
-							</div>
-						</li>
-					) ) }
-				</ul>
-			) }
+					{ undefined === plan && (
+						<p>{ __( 'Loading…', 'nutrio' ) }</p>
+					) }
 
-			<form onSubmit={ logAdHoc } className={ styles.adHocForm }>
-				<label htmlFor="nutrio-log-notes">
-					{ __( 'Log something else', 'nutrio' ) }
-				</label>
-				<textarea
-					id="nutrio-log-notes"
-					value={ notes }
-					onChange={ ( event ) => setNotes( event.target.value ) }
-					placeholder={ __( 'What did you eat?', 'nutrio' ) }
-					required
-				/>
-				<Button
-					type="submit"
-					variant="primary"
-					disabled={ isSubmittingAdHoc }
-				>
-					{ __( 'Log it', 'nutrio' ) }
-				</Button>
-			</form>
-		</div>
+					{ null === plan && (
+						<p className={ styles.empty }>
+							{ __(
+								'No plan assigned yet — check back once your practitioner assigns one.',
+								'nutrio'
+							) }
+						</p>
+					) }
+
+					{ plan && todaysItems.length > 0 && (
+						<ul className={ styles.itemList }>
+							{ todaysItems.map( ( item ) => (
+								<li key={ item.id } className={ styles.item }>
+									<span>
+										{ item.food_description ??
+											item.recipe_name ??
+											__( 'Item', 'nutrio' ) }
+									</span>
+									<div className={ styles.actions }>
+										<Button
+											variant="ghost"
+											disabled={
+												pendingItemId === item.id
+											}
+											onClick={ () =>
+												logPlanItem( item, 'eaten' )
+											}
+										>
+											{ __( 'Mark eaten', 'nutrio' ) }
+										</Button>
+										<Button
+											variant="ghost"
+											disabled={
+												pendingItemId === item.id
+											}
+											onClick={ () =>
+												logPlanItem(
+													item,
+													'substituted'
+												)
+											}
+										>
+											{ __( 'Substituted', 'nutrio' ) }
+										</Button>
+										<Button
+											variant="ghost"
+											disabled={
+												pendingItemId === item.id
+											}
+											onClick={ () =>
+												logPlanItem( item, 'skipped' )
+											}
+										>
+											{ __( 'Skip', 'nutrio' ) }
+										</Button>
+									</div>
+								</li>
+							) ) }
+						</ul>
+					) }
+
+					<form onSubmit={ logAdHoc } className={ styles.adHocForm }>
+						<div className={ `nutrio-field ${ styles.field }` }>
+							<label htmlFor="nutrio-log-notes">
+								{ __( 'Log something else', 'nutrio' ) }
+							</label>
+							<textarea
+								id="nutrio-log-notes"
+								value={ notes }
+								onChange={ ( event ) =>
+									setNotes( event.target.value )
+								}
+								placeholder={ __(
+									'What did you eat?',
+									'nutrio'
+								) }
+								required
+							/>
+						</div>
+						<Button
+							type="submit"
+							variant="primary"
+							disabled={ isSubmittingAdHoc }
+						>
+							{ __( 'Log it', 'nutrio' ) }
+						</Button>
+					</form>
+				</PanelBody>
+			</Panel>
+		</>
 	);
 }

@@ -3,6 +3,7 @@ import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { doAction } from '@wordpress/hooks';
 import Button from '../components/ui/Button';
+import Panel, { PanelBody } from '../components/ui/Panel';
 import type { Measurement, MeasurementInput } from '../types';
 import styles from './MeasurementsTab.module.css';
 
@@ -94,76 +95,89 @@ export default function MeasurementsTab() {
 	};
 
 	return (
-		<div>
-			<form onSubmit={ submit } className={ styles.form }>
-				<label htmlFor="nutrio-weight-input">
-					{ __( 'Weight', 'nutrio' ) }
-				</label>
-				{ errorMessage && (
-					<p className={ styles.error }>{ errorMessage }</p>
-				) }
-				<div className={ styles.weightRow }>
-					<input
-						id="nutrio-weight-input"
-						type="number"
-						step="0.1"
-						min="0"
-						value={ weightInput }
-						onChange={ ( event ) =>
-							setWeightInput( event.target.value )
-						}
-						required
-					/>
-					<select
-						value={ unit }
-						onChange={ ( event ) =>
-							changeUnit( event.target.value as Unit )
-						}
-					>
-						<option value="kg">{ __( 'kg', 'nutrio' ) }</option>
-						<option value="lb">{ __( 'lb', 'nutrio' ) }</option>
-					</select>
-				</div>
-				<Button
-					type="submit"
-					variant="primary"
-					disabled={ isSubmitting }
-				>
-					{ __( 'Log weight', 'nutrio' ) }
-				</Button>
-			</form>
-
-			<h3 className={ styles.historyTitle }>
-				{ __( 'History', 'nutrio' ) }
-			</h3>
-			{ undefined === measurements && (
-				<p>{ __( 'Loading…', 'nutrio' ) }</p>
-			) }
-			{ measurements && 0 === measurements.length && (
-				<p className={ styles.empty }>
-					{ __( 'No measurements logged yet.', 'nutrio' ) }
-				</p>
-			) }
-			{ measurements && measurements.length > 0 && (
-				<ul className={ styles.historyList }>
-					{ measurements.map( ( measurement ) => (
-						<li
-							key={ measurement.id }
-							className={ styles.historyItem }
+		<>
+			<div className="nutrio-topbar">
+				<h1>{ __( 'Measurements', 'nutrio' ) }</h1>
+			</div>
+			<Panel>
+				<PanelBody>
+					<form onSubmit={ submit } className={ styles.form }>
+						{ errorMessage && (
+							<p className={ styles.error }>{ errorMessage }</p>
+						) }
+						<div className="nutrio-field">
+							<label htmlFor="nutrio-weight-input">
+								{ __( 'Weight', 'nutrio' ) }
+							</label>
+							<div className={ styles.weightRow }>
+								<input
+									id="nutrio-weight-input"
+									type="number"
+									step="0.1"
+									min="0"
+									value={ weightInput }
+									onChange={ ( event ) =>
+										setWeightInput( event.target.value )
+									}
+									required
+								/>
+								<select
+									value={ unit }
+									onChange={ ( event ) =>
+										changeUnit( event.target.value as Unit )
+									}
+								>
+									<option value="kg">
+										{ __( 'kg', 'nutrio' ) }
+									</option>
+									<option value="lb">
+										{ __( 'lb', 'nutrio' ) }
+									</option>
+								</select>
+							</div>
+						</div>
+						<Button
+							type="submit"
+							variant="primary"
+							disabled={ isSubmitting }
 						>
-							<span>{ measurement.measured_at }</span>
-							<span>
-								{ null !== measurement.weight_grams
-									? `${ gramsToDisplay(
-											measurement.weight_grams,
-											unit
-									  ) } ${ unit }`
-									: '—' }
-							</span>
-						</li>
-					) ) }
-				</ul>
-			) }
-		</div>
+							{ __( 'Log weight', 'nutrio' ) }
+						</Button>
+					</form>
+
+					<h3 className={ styles.historyTitle }>
+						{ __( 'History', 'nutrio' ) }
+					</h3>
+					{ undefined === measurements && (
+						<p>{ __( 'Loading…', 'nutrio' ) }</p>
+					) }
+					{ measurements && 0 === measurements.length && (
+						<p className={ styles.empty }>
+							{ __( 'No measurements logged yet.', 'nutrio' ) }
+						</p>
+					) }
+					{ measurements && measurements.length > 0 && (
+						<ul className={ styles.historyList }>
+							{ measurements.map( ( measurement ) => (
+								<li
+									key={ measurement.id }
+									className={ styles.historyItem }
+								>
+									<span>{ measurement.measured_at }</span>
+									<span>
+										{ null !== measurement.weight_grams
+											? `${ gramsToDisplay(
+													measurement.weight_grams,
+													unit
+											  ) } ${ unit }`
+											: '—' }
+									</span>
+								</li>
+							) ) }
+						</ul>
+					) }
+				</PanelBody>
+			</Panel>
+		</>
 	);
 }

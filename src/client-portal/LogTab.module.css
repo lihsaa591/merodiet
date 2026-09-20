@@ -1,5 +1,5 @@
 .empty {
-	color: var(--text-muted, #666);
+	color: var(--ink-muted);
 }
 .error {
 	color: var(--critical, #c0392b);
@@ -12,7 +12,7 @@
 }
 .item {
 	padding: 10px 0;
-	border-bottom: 1px solid var(--border, #eee);
+	border-bottom: 1px solid var(--line);
 }
 .actions {
 	display: flex;
@@ -22,10 +22,13 @@
 .adHocForm {
 	display: flex;
 	flex-direction: column;
+	align-items: flex-start;
 	gap: 8px;
+}
+.adHocForm .field {
+	width: 100%;
 }
 .adHocForm textarea {
 	min-height: 70px;
-	padding: 8px;
-	font-family: inherit;
+	width: 100%;
 }
