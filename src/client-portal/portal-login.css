@@ -101,6 +101,38 @@ body.nutrio-portal-login {
 	color: var(--ink);
 }
 
+.nutrio-portal-login-error {
+	background: var(--critical-wash);
+	border-left: 3px solid var(--critical);
+	border-radius: 4px;
+	padding: 10px 14px;
+	margin: 0 0 16px;
+}
+
+.nutrio-portal-login-error p {
+	margin: 0;
+	font-size: 13px;
+	color: var(--ink);
+}
+
+.nutrio-portal-login-error p + p {
+	margin-top: 4px;
+}
+
+.nutrio-portal-login-success {
+	background: var(--success-wash);
+	border-left: 3px solid var(--success);
+	border-radius: 4px;
+	padding: 10px 14px;
+	margin: 0 0 16px;
+}
+
+.nutrio-portal-login-success p {
+	margin: 0;
+	font-size: 13px;
+	color: var(--ink);
+}
+
 #loginform {
 	display: flex;
 	flex-direction: column;
@@ -171,4 +203,19 @@ body.nutrio-portal-login {
 
 #wp-submit:hover {
 	background: var(--sage-deep);
+}
+
+.nutrio-portal-login-lostpassword {
+	margin: 16px 0 0;
+	text-align: center;
+	font-size: 13px;
+}
+
+.nutrio-portal-login-lostpassword a {
+	color: var(--sage);
+	text-decoration: none;
+}
+
+.nutrio-portal-login-lostpassword a:hover {
+	text-decoration: underline;
 }

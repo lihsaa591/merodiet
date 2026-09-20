@@ -102,5 +102,20 @@ final class PortalServiceProvider extends AbstractServiceProvider {
 			10,
 			3
 		);
+
+		add_filter(
+			'retrieve_password_message',
+			static function ( $message, $key, $user_login, $user_data ) use ( $container ) {
+				/**
+				 * The shared PortalPage instance.
+				 *
+				 * @var PortalPage $page
+				 */
+				$page = $container->get( PortalPage::class );
+				return $page->customize_reset_password_email( $message, $key, $user_login, $user_data );
+			},
+			10,
+			4
+		);
 	}
 }
