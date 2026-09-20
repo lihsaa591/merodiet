@@ -151,6 +151,15 @@ final class MeController extends AbstractClientController {
 			),
 			required_capability: 'view_own_nutrio_plan'
 		);
+
+		$this->register_route(
+			'/profile/avatar',
+			array(
+				'methods'  => WP_REST_Server::CREATABLE,
+				'callback' => array( $this, 'upload_avatar' ),
+			),
+			required_capability: 'view_own_nutrio_plan'
+		);
 	}
 
 	/**
@@ -330,6 +339,48 @@ final class MeController extends AbstractClientController {
 		}
 
 		$this->clients->update( $client_id, $data );
+
+		return $this->success( $this->clients->find( $client_id ) );
+	}
+
+	/**
+	 * POST /me/profile/avatar — upload a new avatar image for the caller.
+	 * Requires the 'avatar' field in a multipart/form-data request.
+	 *
+	 * @param WP_REST_Request $request The current request.
+	 */
+	public function upload_avatar( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$client_id = $this->current_client_id();
+
+		if ( $client_id instanceof WP_Error ) {
+			return $client_id;
+		}
+
+		$files = $request->get_file_params();
+
+		if ( empty( $files['avatar'] ) ) {
+			return $this->error( 'nutrio_missing_file', __( 'No image file was uploaded.', 'nutrio' ), 400 );
+		}
+
+		if ( ! function_exists( 'media_handle_upload' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/image.php';
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+			require_once ABSPATH . 'wp-admin/includes/media.php';
+		}
+
+		$allowed_types = array( 'image/jpeg', 'image/png', 'image/webp' );
+
+		if ( ! in_array( $files['avatar']['type'], $allowed_types, true ) ) {
+			return $this->error( 'nutrio_invalid_file_type', __( 'Please upload a JPEG, PNG, or WebP image.', 'nutrio' ), 400 );
+		}
+
+		$attachment_id = media_handle_upload( 'avatar', 0 );
+
+		if ( is_wp_error( $attachment_id ) ) {
+			return $attachment_id;
+		}
+
+		$this->clients->update( $client_id, array( 'avatar_id' => $attachment_id ) );
 
 		return $this->success( $this->clients->find( $client_id ) );
 	}
