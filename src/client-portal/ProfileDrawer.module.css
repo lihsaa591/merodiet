@@ -1,0 +1,52 @@
+.form {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+.error {
+	color: var(--critical);
+	font-size: 13px;
+	margin: 0;
+}
+.avatarRow {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	margin-bottom: 4px;
+}
+.avatarImage {
+	width: 56px;
+	height: 56px;
+	border-radius: 50%;
+	object-fit: cover;
+}
+.avatarPlaceholder {
+	width: 56px;
+	height: 56px;
+	border-radius: 50%;
+	background: var(--sage);
+	color: #fff;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: 700;
+	font-size: 18px;
+}
+.avatarUpload {
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--sage);
+	cursor: pointer;
+}
+.passwordLink {
+	background: none;
+	border: none;
+	border-top: 1px solid var(--line);
+	padding-top: 16px;
+	margin-top: 4px;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--sage);
+	text-align: left;
+	cursor: pointer;
+}
