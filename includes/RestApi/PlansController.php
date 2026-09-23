@@ -309,6 +309,21 @@ final class PlansController extends AbstractPractitionerController {
 			return $this->error( 'nutrio_not_found', __( 'Client not found.', 'nutrio' ), 404 );
 		}
 
+		$overlapping = $this->plans->find_overlapping_assigned_plan( $client_id, $plan['start_date'], $plan['end_date'] );
+
+		if ( null !== $overlapping ) {
+			return $this->error(
+				'nutrio_plan_overlap',
+				sprintf(
+					/* translators: 1: the already-assigned plan's title, 2: its end date */
+					__( 'This client already has an active plan ("%1$s", through %2$s). Unassign it before assigning another for an overlapping date range.', 'nutrio' ),
+					$overlapping['title'],
+					$overlapping['end_date']
+				),
+				409
+			);
+		}
+
 		$snapshot = $this->resolver->calculate_plan_totals( $id );
 
 		$this->plans->assign( $id, $client_id, $snapshot );

@@ -42,6 +42,7 @@ export default function AssignModal( {
 		null
 	);
 	const [ isAssigning, setIsAssigning ] = useState( false );
+	const [ errorMessage, setErrorMessage ] = useState< string | null >( null );
 
 	if ( ! isOpen ) {
 		return null;
@@ -58,8 +59,18 @@ export default function AssignModal( {
 			return;
 		}
 		setIsAssigning( true );
+		setErrorMessage( null );
 		try {
 			await onAssign( selectedClientId );
+		} catch ( error ) {
+			setErrorMessage(
+				error &&
+					typeof error === 'object' &&
+					'message' in error &&
+					typeof error.message === 'string'
+					? error.message
+					: __( 'Something went wrong — please try again.', 'nutrio' )
+			);
 		} finally {
 			setIsAssigning( false );
 		}
@@ -84,11 +95,12 @@ export default function AssignModal( {
 					<select
 						id="nutrio-assign-client"
 						value={ selectedClientId ?? '' }
-						onChange={ ( e ) =>
+						onChange={ ( e ) => {
 							setSelectedClientId(
 								e.target.value ? Number( e.target.value ) : null
-							)
-						}
+							);
+							setErrorMessage( null );
+						} }
 					>
 						<option value="">
 							{ __( 'Select a client…', 'nutrio' ) }
@@ -123,6 +135,10 @@ export default function AssignModal( {
 							) ) }
 						</div>
 					</div>
+				) }
+
+				{ errorMessage && (
+					<p className={ styles.conflictWarning }>{ errorMessage }</p>
 				) }
 
 				{ conflicts.length > 0 && (
