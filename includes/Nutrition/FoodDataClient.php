@@ -93,43 +93,71 @@ final class FoodDataClient {
 	private function request( string $path, array $params ): array|WP_Error {
 		$url = add_query_arg( $params, $this->base_url . $path );
 
-		$response = wp_remote_get(
-			$url,
-			array( 'timeout' => $this->timeout )
-		);
+		// USDA's endpoint intermittently returns a spurious error status
+		// (observed: 400) on an otherwise-valid, identical request — most
+		// often the very first call after a period of inactivity, which
+		// then succeeds on retry with no change to the request. A couple
+		// of quick retries absorb that instead of surfacing a false
+		// failure to the practitioner. 429 (rate limit) and 404 (genuine
+		// not-found) are real outcomes, never retried.
+		$max_attempts = 5;
 
-		if ( is_wp_error( $response ) ) {
-			return $response;
-		}
-
-		$status = wp_remote_retrieve_response_code( $response );
-		$body   = wp_remote_retrieve_body( $response );
-
-		if ( 429 === $status ) {
-			return new WP_Error( 'nutrio_fooddata_rate_limited', __( 'USDA FoodData Central rate limit exceeded.', 'nutrio' ) );
-		}
-
-		if ( 404 === $status ) {
-			return new WP_Error( 'nutrio_fooddata_not_found', __( 'Food not found.', 'nutrio' ) );
-		}
-
-		if ( $status < 200 || $status >= 300 ) {
-			return new WP_Error(
-				'nutrio_fooddata_http_error',
-				sprintf(
-					/* translators: %d: HTTP status code */
-					__( 'USDA FoodData Central returned an unexpected status: %d', 'nutrio' ),
-					$status
+		for ( $attempt = 1; $attempt <= $max_attempts; $attempt++ ) {
+			$response = wp_remote_get(
+				$url,
+				array(
+					'timeout' => $this->timeout,
+					// Some environments intermittently fail the first use
+					// of a reused keep-alive connection to this host; a
+					// fresh connection per attempt avoids that.
+					'headers' => array( 'Connection' => 'close' ),
 				)
 			);
+
+			if ( is_wp_error( $response ) ) {
+				if ( $attempt < $max_attempts ) {
+					continue;
+				}
+
+				return $response;
+			}
+
+			$status = wp_remote_retrieve_response_code( $response );
+
+			if ( 429 === $status ) {
+				return new WP_Error( 'nutrio_fooddata_rate_limited', __( 'USDA FoodData Central rate limit exceeded.', 'nutrio' ) );
+			}
+
+			if ( 404 === $status ) {
+				return new WP_Error( 'nutrio_fooddata_not_found', __( 'Food not found.', 'nutrio' ) );
+			}
+
+			if ( $status < 200 || $status >= 300 ) {
+				if ( $attempt < $max_attempts ) {
+					usleep( 200000 );
+					continue;
+				}
+
+				return new WP_Error(
+					'nutrio_fooddata_http_error',
+					sprintf(
+						/* translators: %d: HTTP status code */
+						__( 'USDA FoodData Central returned an unexpected status: %d', 'nutrio' ),
+						$status
+					)
+				);
+			}
+
+			$decoded = json_decode( wp_remote_retrieve_body( $response ), true );
+
+			if ( ! is_array( $decoded ) ) {
+				return new WP_Error( 'nutrio_fooddata_invalid_response', __( 'USDA FoodData Central returned an unreadable response.', 'nutrio' ) );
+			}
+
+			return $decoded;
 		}
 
-		$decoded = json_decode( $body, true );
-
-		if ( ! is_array( $decoded ) ) {
-			return new WP_Error( 'nutrio_fooddata_invalid_response', __( 'USDA FoodData Central returned an unreadable response.', 'nutrio' ) );
-		}
-
-		return $decoded;
+		// Unreachable — the loop above always returns by its final iteration.
+		return new WP_Error( 'nutrio_fooddata_http_error', __( 'USDA FoodData Central returned an unexpected status.', 'nutrio' ) );
 	}
 }
