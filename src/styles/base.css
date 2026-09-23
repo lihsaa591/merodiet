@@ -100,6 +100,15 @@ body.toplevel_page_nutrio #wpbody-content {
 	display: flex;
 	flex-direction: column;
 	gap: 22px;
+	/* Stays put while .nutrio-view's content scrolls — sticks within the
+	   nearest scrolling ancestor (.nutrio-admin-app's own scroll on the
+	   admin side, the document on the client-portal side). overflow-y
+	   lets the rail scroll its own nav internally on the rare screen
+	   where it's taller than the viewport, instead of getting clipped. */
+	position: sticky;
+	top: 0;
+	height: 100vh;
+	overflow-y: auto;
 }
 
 .nutrio-wp-back {
