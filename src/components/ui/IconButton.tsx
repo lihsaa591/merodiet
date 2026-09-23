@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import Tooltip from './Tooltip';
 import styles from './IconButton.module.css';
 
 interface IconButtonProps {
@@ -13,13 +14,14 @@ export default function IconButton( {
 	children,
 }: IconButtonProps ) {
 	return (
-		<button
-			className={ styles.iconBtn }
-			onClick={ onClick }
-			aria-label={ label }
-			title={ label }
-		>
-			{ children }
-		</button>
+		<Tooltip content={ label }>
+			<button
+				className={ styles.iconBtn }
+				onClick={ onClick }
+				aria-label={ label }
+			>
+				{ children }
+			</button>
+		</Tooltip>
 	);
 }
