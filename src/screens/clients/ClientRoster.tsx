@@ -313,6 +313,9 @@ export default function ClientRoster() {
 														lastName={
 															client.last_name
 														}
+														avatarUrl={
+															client.avatar_url
+														}
 													/>
 													{ client.first_name }{ ' ' }
 													{ client.last_name }

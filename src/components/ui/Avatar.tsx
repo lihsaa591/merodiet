@@ -25,6 +25,8 @@ interface AvatarProps {
 	firstName?: string;
 	lastName?: string;
 	size?: 'sm' | 'md' | 'lg';
+	/** A client-uploaded photo (Client['avatar_url']) — shown in place of the initials circle when present. */
+	avatarUrl?: string | null;
 }
 
 export default function Avatar( {
@@ -32,6 +34,7 @@ export default function Avatar( {
 	firstName,
 	lastName,
 	size = 'md',
+	avatarUrl,
 }: AvatarProps ) {
 	const SIZE_CLASSES: Record<
 		NonNullable< AvatarProps[ 'size' ] >,
@@ -42,6 +45,16 @@ export default function Avatar( {
 		lg: styles.lg,
 	};
 	const sizeClass = SIZE_CLASSES[ size ];
+
+	if ( avatarUrl ) {
+		return (
+			<img
+				src={ avatarUrl }
+				alt=""
+				className={ `${ styles.avatar } ${ styles.photo } ${ sizeClass }`.trim() }
+			/>
+		);
+	}
 
 	return (
 		<div

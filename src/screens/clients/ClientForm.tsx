@@ -1,5 +1,6 @@
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import Avatar from '../../components/ui/Avatar';
 import Button from '../../components/ui/Button';
 import UnsavedBadge from '../../components/ui/UnsavedBadge';
 import { useGlobalDirtyState } from '../../hooks/useGlobalDirtyState';
@@ -110,6 +111,39 @@ export default function ClientForm( {
 			onSubmit={ handleSubmit }
 			style={ { display: 'flex', flexDirection: 'column', gap: '16px' } }
 		>
+			{ client && (
+				<div
+					style={ {
+						display: 'flex',
+						alignItems: 'center',
+						gap: '12px',
+					} }
+				>
+					<Avatar
+						id={ client.id }
+						firstName={ client.first_name }
+						lastName={ client.last_name }
+						avatarUrl={ client.avatar_url }
+						size="lg"
+					/>
+					<span
+						style={ {
+							fontSize: '12px',
+							color: 'var(--ink-muted)',
+						} }
+					>
+						{ client.avatar_url
+							? __(
+									'Uploaded by the client from their portal.',
+									'nutrio'
+							  )
+							: __(
+									'No photo yet — set by the client from their portal.',
+									'nutrio'
+							  ) }
+					</span>
+				</div>
+			) }
 			<div className="nutrio-field">
 				<label htmlFor="nutrio-first-name">
 					{ __( 'First name', 'nutrio' ) }
