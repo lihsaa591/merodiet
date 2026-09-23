@@ -102,11 +102,10 @@ class PlanRepository {
 
 	/**
 	 * The client's currently-active assigned plan for a given date, if
-	 * any — the plan whose date range covers $date. Assumes plan date
-	 * ranges for one client never overlap (a practitioner assigning a
-	 * second overlapping plan is a product-level validation concern,
-	 * not this query's); if that assumption is ever violated, this
-	 * returns the most recently started of the overlapping plans.
+	 * any — the plan whose date range covers $date. Plan date ranges for
+	 * one client are kept non-overlapping by find_overlapping_assigned_plan()
+	 * at assignment time; if that's ever bypassed, this returns the most
+	 * recently started of the overlapping plans rather than erroring.
 	 *
 	 * @param int    $client_id Client's internal ID.
 	 * @param string $date      Date to check, 'Y-m-d'.
@@ -125,6 +124,68 @@ class PlanRepository {
 			),
 			ARRAY_A
 		);
+
+		return null === $row ? null : $this->hydrate( $row );
+	}
+
+	/**
+	 * The client's next-to-start assigned plan after a given date, if any —
+	 * lets the portal preview "your next plan starts on X" ahead of time.
+	 *
+	 * @param int    $client_id Client's internal ID.
+	 * @param string $after_date Only plans starting after this date, 'Y-m-d'.
+	 *
+	 * @return array<string, mixed>|null
+	 */
+	public function find_next_assigned_for_client( int $client_id, string $after_date ): ?array {
+		global $wpdb;
+
+		$row = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT * FROM {$wpdb->prefix}nutrio_plans WHERE client_id = %d AND status = 'assigned' AND start_date > %s ORDER BY start_date ASC LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; values are parameterized.
+				$client_id,
+				$after_date
+			),
+			ARRAY_A
+		);
+
+		return null === $row ? null : $this->hydrate( $row );
+	}
+
+	/**
+	 * Whether the client already has an assigned plan whose date range
+	 * overlaps the given range — the validation find_active_for_client()'s
+	 * docblock defers to "product-level validation", now enforced at
+	 * assignment time so a client is never left with two competing active
+	 * plans. Two ranges overlap when each starts on or before the other's
+	 * end date.
+	 *
+	 * @param int      $client_id        Client's internal ID.
+	 * @param string   $start_date       Range start to check, 'Y-m-d'.
+	 * @param string   $end_date         Range end to check, 'Y-m-d'.
+	 * @param int|null $exclude_plan_id A plan ID to exclude from the check (re-assigning the same plan after editing its dates).
+	 *
+	 * @return array<string, mixed>|null The first overlapping assigned plan found, or null if none.
+	 */
+	public function find_overlapping_assigned_plan( int $client_id, string $start_date, string $end_date, ?int $exclude_plan_id = null ): ?array {
+		global $wpdb;
+
+		$exclude_clause = null !== $exclude_plan_id ? ' AND id != %d' : '';
+		$params         = array( $client_id, $end_date, $start_date );
+
+		if ( null !== $exclude_plan_id ) {
+			$params[] = $exclude_plan_id;
+		}
+
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders -- table name is derived from $wpdb->prefix, not user input; $exclude_clause is one of two fixed literal strings, not user input; every value is bound via prepare()'s own placeholders. phpcs's static count of "%s"/"%d" tokens can't see through the conditional exclude clause.
+		$row = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT * FROM {$wpdb->prefix}nutrio_plans WHERE client_id = %d AND status = 'assigned' AND start_date <= %s AND end_date >= %s{$exclude_clause} ORDER BY start_date ASC LIMIT 1",
+				...$params
+			),
+			ARRAY_A
+		);
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders
 
 		return null === $row ? null : $this->hydrate( $row );
 	}

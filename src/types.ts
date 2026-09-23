@@ -149,6 +149,14 @@ export interface Plan {
 	updated_at: string;
 }
 
+/** GET /me/plan/next's lightweight preview — a title + date range only, no days/items. */
+export interface NextPlanSummary {
+	id: number;
+	title: string;
+	start_date: string;
+	end_date: string;
+}
+
 export interface PlanItemInput {
 	meal_type: MealType;
 	food_id?: number;

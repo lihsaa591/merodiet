@@ -76,6 +76,15 @@ final class MeController extends AbstractClientController {
 		);
 
 		$this->register_route(
+			'/plan/next',
+			array(
+				'methods'  => WP_REST_Server::READABLE,
+				'callback' => array( $this, 'get_next_plan' ),
+			),
+			required_capability: 'view_own_nutrio_plan'
+		);
+
+		$this->register_route(
 			'/logs',
 			array(
 				'methods'  => WP_REST_Server::READABLE,
@@ -215,6 +224,37 @@ final class MeController extends AbstractClientController {
 		);
 
 		return $this->success( $plan );
+	}
+
+	/**
+	 * GET /me/plan/next — a lightweight preview of the caller's
+	 * next-to-start assigned plan, if any (title + date range only — no
+	 * days/items, since this is a "coming up" teaser, not something to
+	 * act on yet).
+	 *
+	 * @param WP_REST_Request $request The current request.
+	 */
+	public function get_next_plan( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$client_id = $this->current_client_id();
+
+		if ( $client_id instanceof WP_Error ) {
+			return $client_id;
+		}
+
+		$plan = $this->plans->find_next_assigned_for_client( $client_id, current_time( 'Y-m-d' ) );
+
+		if ( null === $plan ) {
+			return $this->success( null );
+		}
+
+		return $this->success(
+			array(
+				'id'         => $plan['id'],
+				'title'      => $plan['title'],
+				'start_date' => $plan['start_date'],
+				'end_date'   => $plan['end_date'],
+			)
+		);
 	}
 
 	/**
