@@ -2,6 +2,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import Panel, { PanelBody } from '../components/ui/Panel';
+import Skeleton from '../components/ui/Skeleton';
 import {
 	estimateDayNutrients,
 	formatAmount,
@@ -14,6 +15,7 @@ import {
 	MEAL_ICONS,
 	itemsByMeal,
 	itemQuantityLabel,
+	toEstimateInput,
 } from './mealMeta';
 import type { NextPlanSummary, Plan, PlanDay, PlanItem } from '../types';
 import styles from './PlanTab.module.css';
@@ -37,23 +39,46 @@ function addDays( dateStr: string, days: number ): string {
 	return date.toISOString().slice( 0, 10 );
 }
 
-function toEstimateInput( item: PlanItem ) {
-	return item.food_id
-		? {
-				kind: 'food' as const,
-				quantity_grams: item.quantity_grams ?? 0,
-				nutrients: item.nutrients ?? {},
-		  }
-		: {
-				kind: 'recipe' as const,
-				servings: item.servings ?? 0,
-				nutrient_totals_per_serving:
-					item.recipe_nutrient_totals_per_serving ?? {},
-		  };
-}
-
 function itemKcal( item: PlanItem ): number | null {
 	return estimateDayNutrients( [ toEstimateInput( item ) ] ).kcal;
+}
+
+// Mirrors the loaded layout's rough shape (title, day tabs, a couple of
+// meal groups, totals) so the page doesn't jump around once real data
+// arrives — a plain "Loading…" line collapses to a fraction of the
+// eventual height.
+function PlanTabSkeleton() {
+	return (
+		<div>
+			<Skeleton width="140px" height="22px" />
+			<div style={ { marginTop: '8px', marginBottom: '18px' } }>
+				<Skeleton width="180px" height="13px" />
+			</div>
+			<div className={ styles.dayTabs }>
+				{ [ 0, 1, 2, 3, 4 ].map( ( index ) => (
+					<Skeleton
+						key={ index }
+						shape="block"
+						width="64px"
+						height="52px"
+					/>
+				) ) }
+			</div>
+			{ [ 0, 1 ].map( ( meal ) => (
+				<div key={ meal } className={ styles.meal }>
+					<div style={ { marginBottom: '8px' } }>
+						<Skeleton width="90px" height="15px" />
+					</div>
+					<div className={ styles.item }>
+						<Skeleton width="55%" height="14px" />
+					</div>
+					<div className={ styles.item }>
+						<Skeleton width="40%" height="14px" />
+					</div>
+				</div>
+			) ) }
+		</div>
+	);
 }
 
 export default function PlanTab() {
@@ -121,9 +146,7 @@ export default function PlanTab() {
 			</div>
 			<Panel>
 				<PanelBody>
-					{ undefined === plan && (
-						<p>{ __( 'Loading…', 'nutrio' ) }</p>
-					) }
+					{ undefined === plan && <PlanTabSkeleton /> }
 
 					{ null === plan && (
 						<p className={ styles.empty }>

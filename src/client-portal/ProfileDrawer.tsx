@@ -3,9 +3,30 @@ import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import Drawer from '../components/ui/Drawer';
 import Button from '../components/ui/Button';
+import Skeleton from '../components/ui/Skeleton';
 import PasswordChangeModal from './PasswordChangeModal';
 import type { Client } from '../types';
 import styles from './ProfileDrawer.module.css';
+
+// Mirrors the avatar row + a handful of field rows below it.
+function ProfileDrawerSkeleton() {
+	return (
+		<div className={ styles.form }>
+			<div className={ styles.avatarRow }>
+				<Skeleton shape="circle" width="56px" height="56px" />
+				<Skeleton width="90px" height="13px" />
+			</div>
+			{ [ 0, 1, 2, 3 ].map( ( row ) => (
+				<div key={ row } className="nutrio-field">
+					<Skeleton width="70px" height="11px" />
+					<div style={ { marginTop: '6px' } }>
+						<Skeleton width="100%" height="36px" shape="block" />
+					</div>
+				</div>
+			) ) }
+		</div>
+	);
+}
 
 interface ProfileDrawerProps {
 	isOpen: boolean;
@@ -222,9 +243,7 @@ export default function ProfileDrawer( {
 					</div>
 				) }
 				{ loadError && <p className={ styles.error }>{ loadError }</p> }
-				{ ! loadError && ! client && (
-					<p>{ __( 'Loading…', 'nutrio' ) }</p>
-				) }
+				{ ! loadError && ! client && <ProfileDrawerSkeleton /> }
 				{ ! loadError && client && (
 					<form onSubmit={ handleSubmit } className={ styles.form }>
 						{ errorMessage && (

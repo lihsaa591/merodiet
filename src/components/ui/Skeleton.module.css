@@ -1,0 +1,36 @@
+.skeleton {
+	display: block;
+	background: linear-gradient(
+		90deg,
+		var(--paper-dim) 25%,
+		var(--line) 50%,
+		var(--paper-dim) 75%
+	);
+	background-size: 200% 100%;
+	animation: nutrio-skeleton-shimmer 1.4s ease-in-out infinite;
+}
+.text {
+	border-radius: 4px;
+}
+.block {
+	border-radius: 8px;
+}
+.circle {
+	border-radius: 50%;
+}
+
+@keyframes nutrio-skeleton-shimmer {
+	0% {
+		background-position: 200% 0;
+	}
+	100% {
+		background-position: -200% 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.skeleton {
+		animation: none;
+		background: var(--paper-dim);
+	}
+}
