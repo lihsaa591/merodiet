@@ -7,6 +7,8 @@ import { execSync } from 'node:child_process';
  * than swallow it, since a failed seed step must not silently
  * continue into a suite that then fails confusingly at the assertion
  * layer instead.
+ *
+ * @param command The WP-CLI subcommand and arguments, e.g. `'user list'`.
  */
 export function runWpCli( command: string ): string {
 	return execSync( `npx wp-env run cli -- wp ${ command }`, {

@@ -37,9 +37,13 @@ async function globalSetup(): Promise< void > {
 	} );
 
 	// base64 + `wp eval` sidesteps shell/SQL quoting issues with the raw JSON (see task-2-report.md).
-	const insertSql =
-		`INSERT INTO wp_nutrio_foods (source, source_id, description, data_type, nutrients, source_synced_at, created_at, updated_at) VALUES ('usda', ${ SEED_FOOD_SOURCE_ID }, 'E2E Seed Oatmeal', 'Foundation', '${ nutrientsJson.replace( /'/g, "\\'" ) }', '${ nowSql }', '${ nowSql }', '${ nowSql }')`;
-	const insertSqlBase64 = Buffer.from( insertSql, 'utf8' ).toString( 'base64' );
+	const insertSql = `INSERT INTO wp_nutrio_foods (source, source_id, description, data_type, nutrients, source_synced_at, created_at, updated_at) VALUES ('usda', ${ SEED_FOOD_SOURCE_ID }, 'E2E Seed Oatmeal', 'Foundation', '${ nutrientsJson.replace(
+		/'/g,
+		"\\'"
+	) }', '${ nowSql }', '${ nowSql }', '${ nowSql }')`;
+	const insertSqlBase64 = Buffer.from( insertSql, 'utf8' ).toString(
+		'base64'
+	);
 
 	runWpCli(
 		`eval 'global $wpdb; $wpdb->query( base64_decode( "${ insertSqlBase64 }" ) );'`
@@ -142,8 +146,12 @@ async function globalSetup(): Promise< void > {
 	await page.waitForSelector( '.nutrio-rail' );
 
 	const restNonce = await page.evaluate(
-		() => ( window as unknown as { nutrioClientPortal: { restNonce: string } } )
-			.nutrioClientPortal.restNonce
+		() =>
+			(
+				window as unknown as {
+					nutrioClientPortal: { restNonce: string };
+				}
+			 ).nutrioClientPortal.restNonce
 	);
 
 	const clientRequest = await playwrightRequest.newContext( {
@@ -179,6 +187,7 @@ async function globalSetup(): Promise< void > {
 // Playwright run.
 if ( process.argv[ 1 ] === fileURLToPath( import.meta.url ) ) {
 	globalSetup().catch( ( error ) => {
+		// eslint-disable-next-line no-console -- the only way this standalone CLI run (outside Playwright's own reporter) surfaces its failure.
 		console.error( error );
 		process.exitCode = 1;
 	} );
