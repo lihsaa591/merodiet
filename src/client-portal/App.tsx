@@ -83,6 +83,12 @@ export default function App() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- sections only ever changes via a filter evaluated once at mount, not per render.
 	}, [] );
 
+	useEffect( () => {
+		if ( active ) {
+			document.title = `${ active.label } — Nutrio`;
+		}
+	}, [ active ] );
+
 	const selectSection = ( id: string ) => {
 		setActiveId( id );
 		setSidebarOpen( false );

@@ -53,6 +53,9 @@ export default function PortalSidebar( {
 							activeId === section.id ? 'is-active' : ''
 						}`.trim() }
 						onClick={ () => onSelect( section.id ) }
+						aria-current={
+							activeId === section.id ? 'page' : undefined
+						}
 					>
 						<svg
 							viewBox="0 0 24 24"
