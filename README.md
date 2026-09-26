@@ -27,6 +27,16 @@ npm install
 npm run build      # or: npm start, for watch mode
 ```
 
+To use `npm start`'s hot reload, add this to the WordPress install's
+`wp-config.php` (before `NUTRIO_DEVELOPMENT` is otherwise defined —
+i.e. before the line that loads plugins) — it defaults to `false`,
+regardless of `WP_DEBUG`, so the plugin never tries to load its JS
+from a dev server that isn't running:
+
+```php
+define( 'NUTRIO_DEVELOPMENT', true );
+```
+
 Then point `wp-env` (or a local WordPress install) at this directory as a plugin:
 
 ```bash
