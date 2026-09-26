@@ -656,19 +656,13 @@ final class PortalPage {
 	 * @param WP_User $current_user The logged-in client's WP user.
 	 */
 	private function enqueue_assets( WP_User $current_user ): void {
-		$handle         = 'nutrio-' . self::SCRIPT_ENTRY;
-		$runtime_handle = $handle . '-runtime';
-
-		if ( NUTRIO_DEVELOPMENT ) {
-			Assets::enqueue_script( $runtime_handle, NUTRIO_PATH . 'build', NUTRIO_URL . 'build', 'runtime' );
-		}
+		$handle = 'nutrio-' . self::SCRIPT_ENTRY;
 
 		Assets::enqueue_script(
 			$handle,
 			NUTRIO_PATH . 'build',
 			NUTRIO_URL . 'build',
-			self::SCRIPT_ENTRY,
-			NUTRIO_DEVELOPMENT ? array( $runtime_handle ) : array()
+			self::SCRIPT_ENTRY
 		);
 		wp_set_script_translations( $handle, 'nutrio', NUTRIO_PATH . 'languages' );
 		Assets::enqueue_style( $handle, NUTRIO_PATH . 'build', NUTRIO_URL . 'build', self::SCRIPT_ENTRY );
