@@ -1,4 +1,3 @@
-import { fileURLToPath } from 'node:url';
 import { chromium, request as playwrightRequest } from '@playwright/test';
 import { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import { runWpCli } from './helpers/wp-cli';
@@ -185,7 +184,15 @@ async function globalSetup(): Promise< void > {
 // tests/e2e/global-setup.ts`), which is how the manual verification
 // steps and the CI job in Task 6 exercise it outside of a full
 // Playwright run.
-if ( process.argv[ 1 ] === fileURLToPath( import.meta.url ) ) {
+//
+// `require.main === module` (rather than `import.meta.url`) is used here
+// deliberately: any use of `import.meta` forces Playwright's TS loader to
+// evaluate this file as native ESM, which breaks its interop with the
+// CommonJS `@wordpress/e2e-test-utils-playwright` build
+// ("ReferenceError: exports is not defined in ES module scope") —
+// reproduced while verifying Task 3. `require.main` works identically for
+// both the standalone `tsx` run and Playwright's own CJS-mode import.
+if ( require.main === module ) {
 	globalSetup().catch( ( error ) => {
 		// eslint-disable-next-line no-console -- the only way this standalone CLI run (outside Playwright's own reporter) surfaces its failure.
 		console.error( error );

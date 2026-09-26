@@ -8,3 +8,5 @@
 .phpunit.result.cache
 .phpcs-cache
 /wp-env-homedir/
+/playwright-report/
+/test-results/
