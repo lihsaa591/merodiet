@@ -1,53 +1,40 @@
+import { useEffect, useState } from '@wordpress/element';
+import apiFetch from '@wordpress/api-fetch';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { STORE_NAME } from '../../store/clients';
 import { STORE_NAME as RECIPES_STORE } from '../../store/recipes';
 import Panel, { PanelBody, PanelHead } from '../../components/ui/Panel';
 import Avatar from '../../components/ui/Avatar';
+import Skeleton from '../../components/ui/Skeleton';
 import { greeting, greetingEmoji } from '../../utils/greeting';
 import type { Client, Recipe } from '../../types';
+import type { ReactNode } from 'react';
 
-// Compliance and activity are placeholder content — Nutrio has no log-entry
-// or plan-status endpoints yet (that's Phase 3+). Active clients and Recipe
-// library are the two KPIs already backed by real data.
 interface ComplianceEntry {
-	id: number;
-	firstName: string;
-	lastName: string;
-	goal: string;
+	client_id: number;
+	name: string;
 	percent: number;
 }
 
-const PLACEHOLDER_COMPLIANCE: ComplianceEntry[] = [
-	{
-		id: 1,
-		firstName: 'Sam',
-		lastName: 'Rivera',
-		goal: 'Weight management',
-		percent: 92,
-	},
-	{
-		id: 2,
-		firstName: 'Jordan',
-		lastName: 'Mackey',
-		goal: 'Type 2 diabetes',
-		percent: 78,
-	},
-	{
-		id: 3,
-		firstName: 'Elena',
-		lastName: 'Cho',
-		goal: 'Prenatal',
-		percent: 54,
-	},
-	{
-		id: 4,
-		firstName: 'Theo',
-		lastName: 'Novak',
-		goal: 'Sports performance',
-		percent: 21,
-	},
-];
+interface DashboardOverview {
+	active_client_count: number;
+	clients_without_plan_count: number;
+	logged_today_count: number;
+	draft_plan_count: number;
+	compliance: ComplianceEntry[];
+}
+
+/**
+ * Builds a link to a client's detail screen, preserving other URL params.
+ * @param clientId
+ */
+function clientDetailUrl( clientId: number ): string {
+	const url = new URL( window.location.href );
+	url.searchParams.set( 'view', 'clients' );
+	url.searchParams.set( 'id', String( clientId ) );
+	return url.toString();
+}
 
 interface ClientsStoreSelectors {
 	getClients: () => Client[];
@@ -76,6 +63,24 @@ export default function Dashboard() {
 		return store.getRecipesTotal();
 	}, [] );
 
+	const [ overview, setOverview ] = useState< DashboardOverview | undefined >(
+		undefined
+	);
+
+	useEffect( () => {
+		apiFetch< DashboardOverview >( {
+			path: '/nutrio/v1/dashboard/overview',
+		} ).then( setOverview, () =>
+			setOverview( {
+				active_client_count: 0,
+				clients_without_plan_count: 0,
+				logged_today_count: 0,
+				draft_plan_count: 0,
+				compliance: [],
+			} )
+		);
+	}, [] );
+
 	return (
 		<>
 			<div className="nutrio-topbar">
@@ -102,13 +107,28 @@ export default function Dashboard() {
 				/>
 				<Kpi
 					label={ __( 'Logged today', 'nutrio' ) }
-					value="8/12"
+					value={
+						overview ? (
+							`${ overview.logged_today_count }/${
+								overview.active_client_count -
+								overview.clients_without_plan_count
+							}`
+						) : (
+							<Skeleton width="50px" height="26px" />
+						)
+					}
 					delta="67% compliance"
 					tone="up"
 				/>
 				<Kpi
 					label={ __( 'Plans awaiting review', 'nutrio' ) }
-					value="3"
+					value={
+						overview ? (
+							overview.draft_plan_count
+						) : (
+							<Skeleton width="30px" height="26px" />
+						)
+					}
 					delta="needs approval"
 					tone="warn"
 				/>
@@ -125,9 +145,18 @@ export default function Dashboard() {
 					</h3>
 				</PanelHead>
 				<PanelBody>
-					{ PLACEHOLDER_COMPLIANCE.map( ( client ) => (
-						<ComplianceRow key={ client.id } client={ client } />
+					{ ( overview?.compliance ?? [] ).map( ( client ) => (
+						<ComplianceRow
+							key={ client.client_id }
+							client={ client }
+						/>
 					) ) }
+					{ overview && overview.clients_without_plan_count > 0 && (
+						<p>
+							{ overview.clients_without_plan_count }{ ' ' }
+							{ __( 'client(s) have no active plan.', 'nutrio' ) }
+						</p>
+					) }
 				</PanelBody>
 			</Panel>
 		</>
@@ -136,7 +165,7 @@ export default function Dashboard() {
 
 interface KpiProps {
 	label: string;
-	value: string | number;
+	value: string | number | ReactNode;
 	delta?: string;
 	tone?: 'up' | 'warn';
 }
@@ -171,21 +200,26 @@ function complianceTone( percent: number ): string {
 
 function ComplianceRow( { client }: { client: ComplianceEntry } ) {
 	const barTone = complianceTone( client.percent );
+	const [ firstName, ...rest ] = client.name.split( ' ' );
+	const lastName = rest.join( ' ' );
 
 	return (
-		<div
+		<a
+			href={ clientDetailUrl( client.client_id ) }
 			style={ {
 				display: 'flex',
 				alignItems: 'center',
 				gap: '12px',
 				padding: '10px 0',
 				borderBottom: '1px solid var(--line)',
+				color: 'inherit',
+				textDecoration: 'none',
 			} }
 		>
 			<Avatar
-				id={ client.id }
-				firstName={ client.firstName }
-				lastName={ client.lastName }
+				id={ client.client_id }
+				firstName={ firstName }
+				lastName={ lastName }
 				size="lg"
 			/>
 			<div style={ { width: '110px', minWidth: 0 } }>
@@ -197,12 +231,9 @@ function ComplianceRow( { client }: { client: ComplianceEntry } ) {
 						overflow: 'hidden',
 						textOverflow: 'ellipsis',
 					} }
-					title={ `${ client.firstName } ${ client.lastName }` }
+					title={ client.name }
 				>
-					{ client.firstName } { client.lastName }
-				</div>
-				<div style={ { fontSize: '12px', color: 'var(--ink-muted)' } }>
-					{ client.goal }
+					{ client.name }
 				</div>
 			</div>
 			<div
@@ -234,6 +265,6 @@ function ComplianceRow( { client }: { client: ComplianceEntry } ) {
 			>
 				{ client.percent }%
 			</div>
-		</div>
+		</a>
 	);
 }
