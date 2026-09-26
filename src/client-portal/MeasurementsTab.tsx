@@ -6,12 +6,15 @@ import Button from '../components/ui/Button';
 import Panel, { PanelBody } from '../components/ui/Panel';
 import Skeleton from '../components/ui/Skeleton';
 import { formatDate } from '../utils/date';
+import {
+	readStoredWeightUnit,
+	storeWeightUnit,
+	gramsToDisplay,
+	displayToGrams,
+	type WeightUnit,
+} from '../utils/weight';
 import type { Measurement, MeasurementInput } from '../types';
 import styles from './MeasurementsTab.module.css';
-
-type Unit = 'kg' | 'lb';
-
-const UNIT_STORAGE_KEY = 'nutrio-client-portal-weight-unit';
 
 // How many days back the history fetches, including today — starts at
 // one page, "Load more" widens the window up to the cap. Weigh-ins are
@@ -25,34 +28,6 @@ function daysAgo( days: number ): string {
 	const date = new Date();
 	date.setDate( date.getDate() - days );
 	return date.toISOString().slice( 0, 10 );
-}
-
-function readStoredUnit(): Unit {
-	try {
-		const stored = window.localStorage.getItem( UNIT_STORAGE_KEY );
-		return 'lb' === stored ? 'lb' : 'kg';
-	} catch {
-		return 'kg';
-	}
-}
-
-function storeUnit( unit: Unit ): void {
-	try {
-		window.localStorage.setItem( UNIT_STORAGE_KEY, unit );
-	} catch {
-		// Private browsing / blocked storage — the preference just won't persist.
-	}
-}
-
-function gramsToDisplay( grams: number, unit: Unit ): number {
-	return (
-		Math.round( ( 'lb' === unit ? grams / 453.592 : grams / 1000 ) * 10 ) /
-		10
-	);
-}
-
-function displayToGrams( value: number, unit: Unit ): number {
-	return Math.round( 'lb' === unit ? value * 453.592 : value * 1000 );
 }
 
 // Mirrors a handful of history rows while the real list loads.
@@ -72,7 +47,7 @@ function HistorySkeleton() {
 }
 
 export default function MeasurementsTab() {
-	const [ unit, setUnit ] = useState< Unit >( readStoredUnit );
+	const [ unit, setUnit ] = useState< WeightUnit >( readStoredWeightUnit );
 	const [ measurements, setMeasurements ] = useState<
 		Measurement[] | undefined
 	>( undefined );
@@ -117,9 +92,9 @@ export default function MeasurementsTab() {
 	// eslint-disable-next-line react-hooks/exhaustive-deps -- mount-only fetch; loadMore() (not this effect) is what advances historyRangeDays.
 	useEffect( loadMeasurements, [] );
 
-	const changeUnit = ( next: Unit ) => {
+	const changeUnit = ( next: WeightUnit ) => {
 		setUnit( next );
-		storeUnit( next );
+		storeWeightUnit( next );
 	};
 
 	const submit = async ( event: React.FormEvent ) => {
@@ -205,7 +180,9 @@ export default function MeasurementsTab() {
 								<select
 									value={ unit }
 									onChange={ ( event ) =>
-										changeUnit( event.target.value as Unit )
+										changeUnit(
+											event.target.value as WeightUnit
+										)
 									}
 								>
 									<option value="kg">

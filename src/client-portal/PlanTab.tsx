@@ -16,22 +16,15 @@ import {
 	itemsByMeal,
 	itemQuantityLabel,
 	toEstimateInput,
+	todaysDayOffset,
 } from './mealMeta';
-import type { NextPlanSummary, Plan, PlanDay, PlanItem } from '../types';
+import NextPlanBanner from './NextPlanBanner';
+import type { Plan, PlanDay, PlanItem } from '../types';
 import styles from './PlanTab.module.css';
 
 // Mirrors the practitioner Plan builder's own pagination: past a week,
 // showing every day in one row gets unwieldy for a multi-month plan.
 const DAYS_PER_WEEK = 7;
-
-// The plan's day_offset that corresponds to today, based on its start_date.
-function todaysDayOffset( startDate: string ): number {
-	const start = new Date( startDate + 'T00:00:00' );
-	const today = new Date();
-	today.setHours( 0, 0, 0, 0 );
-	const diffMs = today.getTime() - start.getTime();
-	return Math.floor( diffMs / ( 1000 * 60 * 60 * 24 ) );
-}
 
 function addDays( dateStr: string, days: number ): string {
 	const date = new Date( dateStr + 'T00:00:00' );
@@ -87,9 +80,6 @@ export default function PlanTab() {
 		null
 	);
 	const [ isNutritionExpanded, setIsNutritionExpanded ] = useState( false );
-	const [ nextPlan, setNextPlan ] = useState< NextPlanSummary | null >(
-		null
-	);
 
 	useEffect( () => {
 		apiFetch< Plan | null >( { path: '/nutrio/v1/me/plan' } ).then(
@@ -107,12 +97,6 @@ export default function PlanTab() {
 			},
 			() => setPlan( null )
 		);
-
-		apiFetch< NextPlanSummary | null >( {
-			path: '/nutrio/v1/me/plan/next',
-		} )
-			.then( setNextPlan )
-			.catch( () => {} );
 	}, [] );
 
 	const activeDay: PlanDay | undefined = plan?.days.find(
@@ -473,25 +457,7 @@ export default function PlanTab() {
 				</PanelBody>
 			</Panel>
 
-			{ nextPlan && (
-				<div className={ styles.nextPlanBanner }>
-					<svg
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						strokeWidth="1.8"
-					>
-						<rect x="3.5" y="4" width="17" height="16" rx="2" />
-						<path d="M3.5 9h17M8 3v3M16 3v3" />
-					</svg>
-					<span>
-						{ __( 'Next up:', 'nutrio' ) }{ ' ' }
-						<strong>{ nextPlan.title }</strong>{ ' ' }
-						{ __( 'starts', 'nutrio' ) }{ ' ' }
-						{ formatShortDate( nextPlan.start_date ) }
-					</span>
-				</div>
-			) }
+			<NextPlanBanner />
 		</>
 	);
 }

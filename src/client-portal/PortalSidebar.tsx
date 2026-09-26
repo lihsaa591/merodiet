@@ -106,6 +106,14 @@ export default function PortalSidebar( {
 // section (via the nutrio.clientPortal.sections filter) falls back to
 // the generic circle above rather than rendering nothing.
 const SECTION_ICONS: Record< string, JSX.Element > = {
+	dashboard: (
+		<>
+			<rect x="3" y="3" width="8" height="8" rx="1.5" />
+			<rect x="13" y="3" width="8" height="5" rx="1.5" />
+			<rect x="13" y="10" width="8" height="11" rx="1.5" />
+			<rect x="3" y="13" width="8" height="8" rx="1.5" />
+		</>
+	),
 	plan: (
 		<>
 			<rect x="3.5" y="4" width="17" height="16" rx="2" />

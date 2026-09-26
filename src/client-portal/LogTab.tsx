@@ -12,6 +12,7 @@ import {
 	itemsByMeal,
 	itemQuantityLabel,
 	toEstimateInput,
+	todaysDayOffset,
 } from './mealMeta';
 import { estimateDayNutrients, formatAmount } from '../utils/nutrients';
 import { formatDate } from '../utils/date';
@@ -30,15 +31,6 @@ const STATUS_LABELS: Record< Status, string > = {
 // today — starts at one page, "Load more" widens the window up to the cap.
 const HISTORY_PAGE_DAYS = 7;
 const HISTORY_MAX_DAYS = 90;
-
-// The plan's day_offset that corresponds to today, based on its start_date.
-function todaysDayOffset( startDate: string ): number {
-	const start = new Date( startDate + 'T00:00:00' );
-	const today = new Date();
-	today.setHours( 0, 0, 0, 0 );
-	const diffMs = today.getTime() - start.getTime();
-	return Math.floor( diffMs / ( 1000 * 60 * 60 * 24 ) );
-}
 
 function daysAgo( days: number ): string {
 	const date = new Date();

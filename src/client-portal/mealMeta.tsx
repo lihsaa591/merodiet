@@ -85,3 +85,14 @@ export function toEstimateInput( item: PlanItem ): DayFoodItem | DayRecipeItem {
 					item.recipe_nutrient_totals_per_serving ?? {},
 		  };
 }
+
+// The plan's day_offset that corresponds to today, based on its
+// start_date — shared by every screen that needs to find "today" within
+// a plan's day list (Plan, Log, Dashboard).
+export function todaysDayOffset( startDate: string ): number {
+	const start = new Date( startDate + 'T00:00:00' );
+	const today = new Date();
+	today.setHours( 0, 0, 0, 0 );
+	const diffMs = today.getTime() - start.getTime();
+	return Math.floor( diffMs / ( 1000 * 60 * 60 * 24 ) );
+}

@@ -2,6 +2,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { applyFilters, doAction } from '@wordpress/hooks';
 import apiFetch from '@wordpress/api-fetch';
+import DashboardTab from './DashboardTab';
 import PlanTab from './PlanTab';
 import LogTab from './LogTab';
 import MeasurementsTab from './MeasurementsTab';
@@ -15,12 +16,18 @@ export interface Section {
 	component: () => JSX.Element;
 }
 
-// The built-in sections. A future add-on's own bundle (enqueued via the
-// PHP `nutrio_client_portal_render` action) can append, remove, or
-// reorder entries here via the `nutrio.clientPortal.sections` filter
-// below — the JS-side counterpart to the PHP
-// `nutrio_client_portal_bootstrap_data` filter.
+// The built-in sections — 'dashboard' first makes it the default landing
+// tab (sectionFromLocation() below falls back to sections[0]). A future
+// add-on's own bundle (enqueued via the PHP `nutrio_client_portal_render`
+// action) can append, remove, or reorder entries here via the
+// `nutrio.clientPortal.sections` filter below — the JS-side counterpart
+// to the PHP `nutrio_client_portal_bootstrap_data` filter.
 const DEFAULT_SECTIONS: Section[] = [
+	{
+		id: 'dashboard',
+		label: __( 'Dashboard', 'nutrio' ),
+		component: DashboardTab,
+	},
 	{ id: 'plan', label: __( 'My Plan', 'nutrio' ), component: PlanTab },
 	{ id: 'log', label: __( 'Log', 'nutrio' ), component: LogTab },
 	{
