@@ -29,7 +29,6 @@ export const test = base.extend< { clientPage: Page } >( {
 			);
 		}
 
-		// eslint-disable-next-line react-hooks/rules-of-hooks -- this is Playwright's fixture `use()` callback, not a React hook.
 		await use( page );
 		await context.close();
 	},

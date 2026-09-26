@@ -17,10 +17,16 @@ export const test = base.extend< { adminPage: Page } >( {
 		// Wait for the wp-admin page to load — a CI runner's first cold
 		// page load can comfortably exceed 10s (see client-portal.ts's
 		// identical widening for the same reason).
-		await page.waitForURL( /wp-admin/, { timeout: 30000 } );
+		try {
+			await page.waitForURL( /wp-admin/, { timeout: 30000 } );
+		} catch {
+			throw new Error(
+				'Admin login fixture failed: never reached wp-admin after submitting the login form. ' +
+					`Check that wp-env is running and the admin user exists with the expected credentials (login: "${ ADMIN_LOGIN }").`
+			);
+		}
 		await page.waitForLoadState( 'networkidle' );
 
-		// eslint-disable-next-line react-hooks/rules-of-hooks -- this is Playwright's fixture `use()` callback, not a React hook.
 		await use( page );
 		await context.close();
 	},

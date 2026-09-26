@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 const fs = require( 'node:fs' );
 
 /**
@@ -13,6 +12,7 @@ const fs = require( 'node:fs' );
  * @return {string} Markdown summary table.
  */
 function summarize( reportJson ) {
+	const errors = reportJson.errors ?? [];
 	const rows = [];
 
 	for ( const suite of reportJson.suites ?? [] ) {
@@ -57,8 +57,28 @@ function summarize( reportJson ) {
 		}
 	}
 
+	let warning = '';
+
+	// A non-empty top-level `errors` array means the run itself blew up
+	// (e.g. globalSetup threw) before some or all specs ever executed —
+	// distinct from a run that completed and simply found nothing to
+	// report. Without this check, both cases produce the same "no rows"
+	// output below, so a crashed run reads as a clean pass.
+	if ( errors.length > 0 ) {
+		const errorList = errors
+			.map( ( e ) => `- ${ e.message ?? String( e ) }` )
+			.join( '\n' );
+
+		warning =
+			`⚠️ The test run did not complete — only ${ rows.length } ` +
+			`screen(s) were scanned before it stopped. See the errors ` +
+			`below.\n\n${ errorList }\n\n`;
+	}
+
 	if ( 0 === rows.length ) {
-		return '## Accessibility scan\n\nNo scan attachments found in this report.\n';
+		return warning
+			? `## Accessibility scan\n\n${ warning }`
+			: '## Accessibility scan\n\nNo scan attachments found in this report.\n';
 	}
 
 	const header =
@@ -67,7 +87,10 @@ function summarize( reportJson ) {
 		.map( ( r ) => `| ${ r.screen } | ${ r.count } | ${ r.topRules } |` )
 		.join( '\n' );
 
-	return `${ header }${ body }\n`;
+	return `${ header.replace(
+		'## Accessibility scan\n\n',
+		`## Accessibility scan\n\n${ warning }`
+	) }${ body }\n`;
 }
 
 if ( require.main === module ) {

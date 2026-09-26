@@ -40,7 +40,11 @@ fixture, and runs axe-core against 8 core admin and client-portal
 screens (see `tests/e2e/`). Results are non-blocking in CI today — see
 `docs/superpowers/specs/2026-09-26-accessibility-testing-design.md`
 for the full design and what's deliberately out of scope for this
-first pass. Open `playwright-report/index.html` after a local run for
+first pass. This wp-env instance is dedicated to automated testing;
+NUTRIO_DEVELOPMENT is forced off here so the plugin loads from the
+built files rather than a phantom dev server. Day-to-day interactive
+development with hot reload happens against a separate WordPress
+install. Open `playwright-report/index.html` after a local run for
 full per-violation detail.
 
 ## Requirements

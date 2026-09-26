@@ -163,25 +163,29 @@ async function globalSetup(): Promise< void > {
 		storageState: await page.context().storageState(),
 	} );
 
-	const measurementResponse = await clientRequest.post(
-		'/wp-json/nutrio/v1/me/measurements',
-		{
-			headers: { 'X-WP-Nonce': restNonce },
-			data: { measured_at: today, weight_grams: 75000 },
-		}
-	);
-
-	// Unlike requestUtils.rest(), this raw APIRequestContext call doesn't
-	// throw on a non-2xx response — check explicitly so a failure here
-	// isn't silently swallowed.
-	if ( ! measurementResponse.ok() ) {
-		throw new Error(
-			`Failed to seed measurement: ${ measurementResponse.status() } ${ await measurementResponse.text() }`
+	// try/finally so a failed seed still releases the request context and
+	// closes the browser, instead of leaking them if the throw below fires.
+	try {
+		const measurementResponse = await clientRequest.post(
+			'/wp-json/nutrio/v1/me/measurements',
+			{
+				headers: { 'X-WP-Nonce': restNonce },
+				data: { measured_at: today, weight_grams: 75000 },
+			}
 		);
-	}
 
-	await clientRequest.dispose();
-	await browser.close();
+		// Unlike requestUtils.rest(), this raw APIRequestContext call doesn't
+		// throw on a non-2xx response — check explicitly so a failure here
+		// isn't silently swallowed.
+		if ( ! measurementResponse.ok() ) {
+			throw new Error(
+				`Failed to seed measurement: ${ measurementResponse.status() } ${ await measurementResponse.text() }`
+			);
+		}
+	} finally {
+		await clientRequest.dispose();
+		await browser.close();
+	}
 }
 
 // Playwright imports this module and invokes the default export itself.
