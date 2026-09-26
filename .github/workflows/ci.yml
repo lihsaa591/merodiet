@@ -97,6 +97,7 @@ jobs:
           cache: npm
       - run: composer install --no-progress --prefer-dist
       - run: npm ci
+      - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: npx wp-env start
       - name: Run accessibility scans
