@@ -11,6 +11,7 @@ namespace Nutrio\RestApi;
 
 use Nutrio\Clients\ComplianceCalculator;
 use Nutrio\Repositories\ClientRepository;
+use Nutrio\Repositories\LogEntryRepository;
 use Nutrio\Repositories\PlanRepository;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -43,11 +44,16 @@ final class DashboardController extends AbstractPractitionerController {
 	 * @param ClientRepository     $clients    The practitioner's client roster.
 	 * @param PlanRepository       $plans      Used for the draft-plan count and each client's active plan.
 	 * @param ComplianceCalculator $compliance Computes each client's plan-compliance percentage.
+	 * @param LogEntryRepository   $logs       Used only for "logged today" — a raw
+	 *                                         activity check (any log entry, including
+	 *                                         ad-hoc ones ComplianceCalculator deliberately
+	 *                                         excludes), not a compliance calculation.
 	 */
 	public function __construct(
 		private readonly ClientRepository $clients,
 		private readonly PlanRepository $plans,
-		private readonly ComplianceCalculator $compliance
+		private readonly ComplianceCalculator $compliance,
+		private readonly LogEntryRepository $logs
 	) {}
 
 	/**
@@ -88,7 +94,20 @@ final class DashboardController extends AbstractPractitionerController {
 				continue;
 			}
 
-			if ( $result['logged_count'] > 0 ) {
+			// "Logged today" means any activity today — including an
+			// ad-hoc entry not tied to a scheduled plan item, which
+			// ComplianceCalculator deliberately excludes (it measures
+			// plan adherence, not general activity) — so this is a raw
+			// LogEntryRepository check, not a second calculate() call.
+			$todays_logs = $this->logs->all_for_client(
+				(int) $client['id'],
+				array(
+					'from' => $today,
+					'to'   => $today,
+				)
+			);
+
+			if ( count( $todays_logs ) > 0 ) {
 				++$logged_today_count;
 			}
 

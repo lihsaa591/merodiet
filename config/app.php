@@ -70,6 +70,7 @@ return array(
 				\Nutrio\Repositories\ClientRepository::class,
 				\Nutrio\Repositories\PlanRepository::class,
 				\Nutrio\Clients\ComplianceCalculator::class,
+				\Nutrio\Repositories\LogEntryRepository::class,
 			),
 		),
 	),

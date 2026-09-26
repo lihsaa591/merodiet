@@ -36,7 +36,10 @@ final class DashboardControllerTest extends TestCase {
 		$calc_plans->expects( self::never() )->method( 'find_active_for_client' );
 		$compliance = new ComplianceCalculator( $calc_plans, $this->createMock( LogEntryRepository::class ) );
 
-		$controller = new DashboardController( $clients, $plans, $compliance );
+		$logs = $this->createMock( LogEntryRepository::class );
+		$logs->expects( self::never() )->method( 'all_for_client' );
+
+		$controller = new DashboardController( $clients, $plans, $compliance, $logs );
 
 		$response = $controller->get_overview( new WP_REST_Request() );
 		$data     = $response->get_data();
@@ -136,12 +139,29 @@ final class DashboardControllerTest extends TestCase {
 
 		$compliance = new ComplianceCalculator( $calc_plans, $logs );
 
-		$controller = new DashboardController( $clients, $plans, $compliance );
+		// A separate LogEntryRepository instance for the controller's own
+		// "logged today" check (raw activity, independent of
+		// ComplianceCalculator) — client 1 logged something specifically
+		// today (an ad-hoc entry, proving this isn't scoped to scheduled
+		// plan items), client 2 did not.
+		$today_logs = $this->createMock( LogEntryRepository::class );
+		$today_logs->method( 'all_for_client' )->willReturnMap(
+			array(
+				array( 1, array( 'from' => '2026-09-26', 'to' => '2026-09-26' ), array( array( 'plan_item_id' => null ) ) ),
+				array( 2, array( 'from' => '2026-09-26', 'to' => '2026-09-26' ), array() ),
+			)
+		);
+
+		$controller = new DashboardController( $clients, $plans, $compliance, $today_logs );
 
 		$response = $controller->get_overview( new WP_REST_Request() );
 		$data     = $response->get_data();
 
 		self::assertSame( 1, $data['clients_without_plan_count'] );
+		// Only client 1 logged something specifically today (not just
+		// within the wider 7-day compliance window) — proves
+		// logged_today_count is scoped to today, not the whole window.
+		self::assertSame( 1, $data['logged_today_count'] );
 		self::assertCount( 2, $data['compliance'] );
 		self::assertSame( 2, $data['compliance'][0]['client_id'] ); // 20% first (worst).
 		self::assertSame( 20, $data['compliance'][0]['percent'] );
