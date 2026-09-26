@@ -14,8 +14,10 @@ export const test = base.extend< { adminPage: Page } >( {
 		await page.fill( '#user_pass', ADMIN_PASSWORD );
 		await page.click( '#wp-submit' );
 
-		// Wait for the wp-admin page to load
-		await page.waitForURL( /wp-admin/, { timeout: 10000 } );
+		// Wait for the wp-admin page to load — a CI runner's first cold
+		// page load can comfortably exceed 10s (see client-portal.ts's
+		// identical widening for the same reason).
+		await page.waitForURL( /wp-admin/, { timeout: 30000 } );
 		await page.waitForLoadState( 'networkidle' );
 
 		// eslint-disable-next-line react-hooks/rules-of-hooks -- this is Playwright's fixture `use()` callback, not a React hook.

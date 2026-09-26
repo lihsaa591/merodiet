@@ -17,7 +17,11 @@ export const test = base.extend< { clientPage: Page } >( {
 		const rail = page.locator( '.nutrio-rail' );
 
 		try {
-			await rail.waitFor( { timeout: 10000 } );
+			// A CI runner's first cold page load (full SPA bundle fetch +
+			// hydration) can comfortably exceed 10s — CI's own wp-env start
+			// alone has been observed taking well over a minute, versus
+			// seconds locally.
+			await rail.waitFor( { timeout: 30000 } );
 		} catch {
 			throw new Error(
 				'Client-portal login fixture failed: the sidebar (.nutrio-rail) never appeared after submitting the login form. ' +

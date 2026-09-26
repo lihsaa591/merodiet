@@ -142,7 +142,12 @@ async function globalSetup(): Promise< void > {
 	await page.fill( '#user_login', CLIENT_LOGIN );
 	await page.fill( '#user_pass', CLIENT_PASSWORD );
 	await page.click( '#wp-submit' );
-	await page.waitForSelector( '.nutrio-rail' );
+	// A CI runner's first cold page load (full SPA bundle fetch +
+	// hydration) can comfortably exceed the 30s default — reproduced
+	// directly: this exact line timed out in CI on the very first live
+	// run, aborting the whole suite silently (see tests/e2e/fixtures/
+	// client-portal.ts's identical widening).
+	await page.waitForSelector( '.nutrio-rail', { timeout: 60000 } );
 
 	const restNonce = await page.evaluate(
 		() =>
