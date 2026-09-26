@@ -13,6 +13,20 @@ type Unit = 'kg' | 'lb';
 
 const UNIT_STORAGE_KEY = 'nutrio-client-portal-weight-unit';
 
+// How many days back the history fetches, including today — starts at
+// one page, "Load more" widens the window up to the cap. Weigh-ins are
+// naturally low-frequency (daily at most), so a day-range window is a
+// reasonable stand-in for true offset pagination, which the endpoint
+// doesn't support.
+const HISTORY_PAGE_DAYS = 30;
+const HISTORY_MAX_DAYS = 365;
+
+function daysAgo( days: number ): string {
+	const date = new Date();
+	date.setDate( date.getDate() - days );
+	return date.toISOString().slice( 0, 10 );
+}
+
 function readStoredUnit(): Unit {
 	try {
 		const stored = window.localStorage.getItem( UNIT_STORAGE_KEY );
@@ -66,13 +80,41 @@ export default function MeasurementsTab() {
 	const [ notesInput, setNotesInput ] = useState( '' );
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
 	const [ errorMessage, setErrorMessage ] = useState< string | null >( null );
+	const [ historyRangeDays, setHistoryRangeDays ] =
+		useState( HISTORY_PAGE_DAYS );
+	const [ isLoadingMore, setIsLoadingMore ] = useState( false );
+
+	const today = new Date().toISOString().slice( 0, 10 );
 
 	const loadMeasurements = () => {
 		apiFetch< Measurement[] >( {
-			path: '/nutrio/v1/me/measurements',
+			path: `/nutrio/v1/me/measurements?from=${ daysAgo(
+				historyRangeDays - 1
+			) }&to=${ today }`,
 		} ).then( setMeasurements, () => setMeasurements( [] ) );
 	};
 
+	const loadMore = () => {
+		const nextRange = Math.min(
+			historyRangeDays + HISTORY_PAGE_DAYS,
+			HISTORY_MAX_DAYS
+		);
+		setIsLoadingMore( true );
+
+		apiFetch< Measurement[] >( {
+			path: `/nutrio/v1/me/measurements?from=${ daysAgo(
+				nextRange - 1
+			) }&to=${ today }`,
+		} )
+			.then( ( entries ) => {
+				setMeasurements( entries );
+				setHistoryRangeDays( nextRange );
+			} )
+			.catch( () => {} )
+			.finally( () => setIsLoadingMore( false ) );
+	};
+
+	// eslint-disable-next-line react-hooks/exhaustive-deps -- mount-only fetch; loadMore() (not this effect) is what advances historyRangeDays.
 	useEffect( loadMeasurements, [] );
 
 	const changeUnit = ( next: Unit ) => {
@@ -312,6 +354,19 @@ export default function MeasurementsTab() {
 								);
 							} ) }
 						</ul>
+					) }
+
+					{ measurements && historyRangeDays < HISTORY_MAX_DAYS && (
+						<button
+							type="button"
+							className={ styles.loadMore }
+							onClick={ loadMore }
+							disabled={ isLoadingMore }
+						>
+							{ isLoadingMore
+								? __( 'Loading…', 'nutrio' )
+								: __( 'Load more', 'nutrio' ) }
+						</button>
 					) }
 				</PanelBody>
 			</Panel>

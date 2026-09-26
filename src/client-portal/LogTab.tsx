@@ -26,8 +26,10 @@ const STATUS_LABELS: Record< Status, string > = {
 	skipped: __( 'Skipped', 'nutrio' ),
 };
 
-// How many days back the "Recent history" section looks, including today.
-const HISTORY_DAYS = 7;
+// How many days back the "Recent history" section looks, including
+// today — starts at one page, "Load more" widens the window up to the cap.
+const HISTORY_PAGE_DAYS = 7;
+const HISTORY_MAX_DAYS = 90;
 
 // The plan's day_offset that corresponds to today, based on its start_date.
 function todaysDayOffset( startDate: string ): number {
@@ -145,6 +147,9 @@ export default function LogTab() {
 	const [ history, setHistory ] = useState< LogEntry[] | undefined >(
 		undefined
 	);
+	const [ historyRangeDays, setHistoryRangeDays ] =
+		useState( HISTORY_PAGE_DAYS );
+	const [ isLoadingMoreHistory, setIsLoadingMoreHistory ] = useState( false );
 	const [ substitutingItemId, setSubstitutingItemId ] = useState<
 		number | null
 	>( null );
@@ -155,9 +160,29 @@ export default function LogTab() {
 	const loadHistory = () => {
 		apiFetch< LogEntry[] >( {
 			path: `/nutrio/v1/me/logs?from=${ daysAgo(
-				HISTORY_DAYS - 1
+				historyRangeDays - 1
 			) }&to=${ today }`,
 		} ).then( setHistory, () => setHistory( [] ) );
+	};
+
+	const loadMoreHistory = () => {
+		const nextRange = Math.min(
+			historyRangeDays + HISTORY_PAGE_DAYS,
+			HISTORY_MAX_DAYS
+		);
+		setIsLoadingMoreHistory( true );
+
+		apiFetch< LogEntry[] >( {
+			path: `/nutrio/v1/me/logs?from=${ daysAgo(
+				nextRange - 1
+			) }&to=${ today }`,
+		} )
+			.then( ( entries ) => {
+				setHistory( entries );
+				setHistoryRangeDays( nextRange );
+			} )
+			.catch( () => {} )
+			.finally( () => setIsLoadingMoreHistory( false ) );
 	};
 
 	useEffect( () => {
@@ -752,6 +777,19 @@ export default function LogTab() {
 							</ul>
 						</div>
 					) ) }
+
+					{ history && historyRangeDays < HISTORY_MAX_DAYS && (
+						<button
+							type="button"
+							className={ styles.loadMore }
+							onClick={ loadMoreHistory }
+							disabled={ isLoadingMoreHistory }
+						>
+							{ isLoadingMoreHistory
+								? __( 'Loading…', 'nutrio' )
+								: __( 'Load more', 'nutrio' ) }
+						</button>
+					) }
 				</PanelBody>
 			</Panel>
 		</>

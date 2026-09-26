@@ -70,3 +70,22 @@
 	color: var(--ink-muted);
 	margin: 0 0 12px;
 }
+.loadMore {
+	display: block;
+	margin: 12px auto 0;
+	background: none;
+	border: none;
+	padding: 4px 8px;
+	font-family: inherit;
+	font-size: 12.5px;
+	font-weight: 600;
+	color: var(--sage);
+	cursor: pointer;
+}
+.loadMore:hover {
+	color: var(--sage-deep);
+}
+.loadMore:disabled {
+	color: var(--ink-faint);
+	cursor: default;
+}
