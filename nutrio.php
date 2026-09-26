@@ -62,11 +62,15 @@ require_once $nutrio_autoloader;
 /**
  * Boot the plugin.
  *
- * Deferred to plugins_loaded so every other plugin's autoloader
- * and text-domain setup has already run.
+ * Deferred to init (not plugins_loaded): config/app.php calls __() while
+ * building its config array, and WordPress 6.7+ triggers a
+ * _doing_it_wrong() notice for any translation call made before init for
+ * a domain not yet loaded — which, under WP_DEBUG_DISPLAY, gets echoed
+ * into the response body and corrupts every later header() call on the
+ * same request (REST discovery, login redirects, nonce cookies).
  */
 add_action(
-	'plugins_loaded',
+	'init',
 	static function () {
 		require_once NUTRIO_PATH . 'bootstrap/app.php';
 	},
