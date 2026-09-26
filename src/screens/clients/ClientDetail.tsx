@@ -165,14 +165,28 @@ export default function ClientDetail( {
 									<div className="nutrio-kpi-label">
 										{ compliance.plan.title }
 									</div>
-									<div className="nutrio-kpi-value">
-										{ compliance.percent }%
-									</div>
-									<div className="nutrio-kpi-delta">
-										{ compliance.logged_count } /{ ' ' }
-										{ compliance.total_count }{ ' ' }
-										{ __( 'items logged', 'nutrio' ) }
-									</div>
+									{ null === compliance.percent ? (
+										<div className="nutrio-kpi-value">
+											{ __(
+												'No items scheduled this week',
+												'nutrio'
+											) }
+										</div>
+									) : (
+										<>
+											<div className="nutrio-kpi-value">
+												{ compliance.percent }%
+											</div>
+											<div className="nutrio-kpi-delta">
+												{ compliance.logged_count } /{ ' ' }
+												{ compliance.total_count }{ ' ' }
+												{ __(
+													'items logged',
+													'nutrio'
+												) }
+											</div>
+										</>
+									) }
 								</div>
 							) }
 						</PanelBody>

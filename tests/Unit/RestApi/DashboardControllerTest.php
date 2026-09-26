@@ -168,4 +168,53 @@ final class DashboardControllerTest extends TestCase {
 		self::assertSame( 1, $data['compliance'][1]['client_id'] ); // 80% second.
 		self::assertSame( 80, $data['compliance'][1]['percent'] );
 	}
+
+	public function test_client_with_active_plan_but_no_items_in_window_is_excluded_from_compliance(): void {
+		\Brain\Monkey\Functions\when( 'get_current_user_id' )->justReturn( 42 );
+		\Brain\Monkey\Functions\when( 'current_time' )->alias( static fn () => '2026-09-26' );
+
+		$clients = $this->createMock( ClientRepository::class );
+		$clients->method( 'all_for_practitioner' )->willReturn(
+			array(
+				'items' => array(
+					array( 'id' => 1, 'first_name' => 'A', 'last_name' => 'One' ),
+				),
+				'total' => 1,
+			)
+		);
+
+		$plans = $this->createMock( PlanRepository::class );
+		$plans->method( 'all_for_practitioner' )->willReturn( array( 'items' => array(), 'total' => 0 ) );
+
+		// Client 1 has an active plan, but its only scheduled day falls
+		// outside the 7-day window — zero items in-window, so
+		// ComplianceCalculator returns percent: null. This client must be
+		// excluded from the compliance list (not treated as 0%/worst),
+		// and must NOT be counted toward clients_without_plan_count since
+		// they do have an active plan.
+		$calc_plans = $this->createMock( PlanRepository::class );
+		$calc_plans->method( 'find_active_for_client' )->willReturn(
+			array( 'id' => 10, 'title' => 'Sparse plan', 'start_date' => '2026-09-01', 'end_date' => '2026-09-30' )
+		);
+		$calc_plans->method( 'days_for_plan' )->willReturn(
+			array( array( 'id' => 1, 'plan_id' => 10, 'day_offset' => 0 ) ) // Sep 1 — outside the Sep 20-26 window.
+		);
+		$calc_plans->method( 'items_for_day' )->willReturn( array( array( 'id' => 100 ) ) );
+
+		$logs = $this->createMock( LogEntryRepository::class );
+		$logs->method( 'all_for_client' )->willReturn( array() );
+
+		$compliance = new ComplianceCalculator( $calc_plans, $logs );
+
+		$today_logs = $this->createMock( LogEntryRepository::class );
+		$today_logs->method( 'all_for_client' )->willReturn( array() );
+
+		$controller = new DashboardController( $clients, $plans, $compliance, $today_logs );
+
+		$response = $controller->get_overview( new WP_REST_Request() );
+		$data     = $response->get_data();
+
+		self::assertSame( 0, $data['clients_without_plan_count'] );
+		self::assertSame( array(), $data['compliance'] );
+	}
 }

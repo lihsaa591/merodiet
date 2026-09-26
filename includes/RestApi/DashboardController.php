@@ -111,10 +111,18 @@ final class DashboardController extends AbstractPractitionerController {
 				++$logged_today_count;
 			}
 
+			// A plan with nothing scheduled in the window has no follow-up
+			// candidate — it isn't a compliance problem, so it's excluded
+			// from the list rather than counted as 0%.
+			if ( null === $result['percent'] ) {
+				continue;
+			}
+
 			$compliance_rows[] = array(
-				'client_id' => (int) $client['id'],
-				'name'      => trim( ( $client['first_name'] ?? '' ) . ' ' . ( $client['last_name'] ?? '' ) ),
-				'percent'   => (int) $result['percent'],
+				'client_id'  => (int) $client['id'],
+				'first_name' => (string) ( $client['first_name'] ?? '' ),
+				'last_name'  => (string) ( $client['last_name'] ?? '' ),
+				'percent'    => (int) $result['percent'],
 			);
 		}
 

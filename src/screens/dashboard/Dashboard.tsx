@@ -13,7 +13,8 @@ import type { ReactNode } from 'react';
 
 interface ComplianceEntry {
 	client_id: number;
-	name: string;
+	first_name: string;
+	last_name: string;
 	percent: number;
 }
 
@@ -117,7 +118,6 @@ export default function Dashboard() {
 							<Skeleton width="50px" height="26px" />
 						)
 					}
-					delta="67% compliance"
 					tone="up"
 				/>
 				<Kpi
@@ -200,8 +200,7 @@ function complianceTone( percent: number ): string {
 
 function ComplianceRow( { client }: { client: ComplianceEntry } ) {
 	const barTone = complianceTone( client.percent );
-	const [ firstName, ...rest ] = client.name.split( ' ' );
-	const lastName = rest.join( ' ' );
+	const displayName = `${ client.first_name } ${ client.last_name }`.trim();
 
 	return (
 		<a
@@ -218,8 +217,8 @@ function ComplianceRow( { client }: { client: ComplianceEntry } ) {
 		>
 			<Avatar
 				id={ client.client_id }
-				firstName={ firstName }
-				lastName={ lastName }
+				firstName={ client.first_name }
+				lastName={ client.last_name }
 				size="lg"
 			/>
 			<div style={ { width: '110px', minWidth: 0 } }>
@@ -231,9 +230,9 @@ function ComplianceRow( { client }: { client: ComplianceEntry } ) {
 						overflow: 'hidden',
 						textOverflow: 'ellipsis',
 					} }
-					title={ client.name }
+					title={ displayName }
 				>
-					{ client.name }
+					{ displayName }
 				</div>
 			</div>
 			<div

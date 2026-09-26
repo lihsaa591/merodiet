@@ -187,4 +187,51 @@ final class ComplianceCalculatorTest extends TestCase {
 		self::assertSame( 2, $result['logged_count'] );
 		self::assertSame( 100, $result['percent'] );
 	}
+
+	public function test_active_plan_with_no_items_in_window_returns_null_percent(): void {
+		// Plan is active (Sep 1-7), but its only day falls outside the
+		// requested window — zero scheduled items in-window, so percent
+		// must be null, not 0.
+		$plan = array( 'id' => 3, 'title' => 'Week 1', 'start_date' => '2026-09-01', 'end_date' => '2026-09-07' );
+
+		$plans = $this->createMock( PlanRepository::class );
+		$plans->method( 'find_active_for_client' )->willReturn( $plan );
+		$plans->method( 'days_for_plan' )->willReturn(
+			array( array( 'id' => 10, 'plan_id' => 3, 'day_offset' => 6 ) )
+		);
+		$plans->method( 'items_for_day' )->willReturn( array( array( 'id' => 100 ) ) );
+
+		$logs = $this->createMock( LogEntryRepository::class );
+		$logs->method( 'all_for_client' )->willReturn( array() );
+
+		$result = $this->make_calculator( $plans, $logs )->calculate( 7, '2026-09-01', '2026-09-02' );
+
+		self::assertNotNull( $result['plan'] );
+		self::assertSame( 0, $result['total_count'] );
+		self::assertSame( 0, $result['logged_count'] );
+		self::assertNull( $result['percent'] );
+	}
+
+	public function test_active_plan_with_days_but_no_items_returns_null_percent(): void {
+		// Plan is active and its day is within the window, but that day
+		// has no scheduled items at all — still zero total, so percent
+		// must be null, not 0.
+		$plan = array( 'id' => 3, 'title' => 'Week 1', 'start_date' => '2026-09-01', 'end_date' => '2026-09-07' );
+
+		$plans = $this->createMock( PlanRepository::class );
+		$plans->method( 'find_active_for_client' )->willReturn( $plan );
+		$plans->method( 'days_for_plan' )->willReturn(
+			array( array( 'id' => 10, 'plan_id' => 3, 'day_offset' => 0 ) )
+		);
+		$plans->method( 'items_for_day' )->willReturn( array() );
+
+		$logs = $this->createMock( LogEntryRepository::class );
+		$logs->method( 'all_for_client' )->willReturn( array() );
+
+		$result = $this->make_calculator( $plans, $logs )->calculate( 7, '2026-09-01', '2026-09-07' );
+
+		self::assertNotNull( $result['plan'] );
+		self::assertSame( 0, $result['total_count'] );
+		self::assertNull( $result['percent'] );
+	}
 }
