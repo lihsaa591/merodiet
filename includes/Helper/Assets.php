@@ -86,5 +86,10 @@ final class Assets {
 		$version = NUTRIO_DEVELOPMENT ? (string) filemtime( $style_path ) : NUTRIO_VERSION;
 
 		wp_enqueue_style( $handle, rtrim( $build_url, '/' ) . "/{$entry}.css", array(), $version );
+
+		// wp-scripts emits an {$entry}-rtl.css alongside every entry; this
+		// tells core to swap it in on an RTL locale instead of leaving the
+		// generated file unused.
+		wp_style_add_data( $handle, 'rtl', 'replace' );
 	}
 }
