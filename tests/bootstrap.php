@@ -94,6 +94,10 @@ if ( ! class_exists( 'WP_REST_Request' ) ) {
 if ( ! class_exists( 'WP_REST_Response' ) ) {
 	class WP_REST_Response {
 		public function __construct( public mixed $data = null, public int $status = 200 ) {}
+
+		public function get_data(): mixed {
+			return $this->data;
+		}
 	}
 }
 
