@@ -280,7 +280,7 @@ final class PortalPage {
 	 *
 	 * @param true|WP_Error|null $result The outcome of a just-submitted request, if any (null when just viewing the form).
 	 */
-	private function render_lost_password_form( true|WP_Error|null $result ): void {
+	private function render_lost_password_form( bool|WP_Error|null $result ): void {
 		Assets::enqueue_style( 'nutrio-portal-login', NUTRIO_PATH . 'build', NUTRIO_URL . 'build', 'portal-login' );
 		?>
 		<!DOCTYPE html>
