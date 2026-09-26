@@ -1,0 +1,17 @@
+.backLink {
+	background: none;
+	border: none;
+	padding: 4px 0;
+	font-size: 13px;
+	color: var(--sage);
+	cursor: pointer;
+}
+
+.sectionTitle {
+	font-size: 15px;
+	margin: 0 0 14px;
+}
+
+.empty {
+	color: var(--ink-muted);
+}

@@ -481,6 +481,9 @@ body.toplevel_page_nutrio #wpbody-content {
 .nutrio-table tbody tr:hover {
 	background: var(--paper-dim);
 }
+.nutrio-table tbody tr.nutrio-row-clickable {
+	cursor: pointer;
+}
 .nutrio-cell-name {
 	display: flex;
 	align-items: center;
