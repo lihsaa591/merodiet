@@ -5,7 +5,9 @@ import { doAction } from '@wordpress/hooks';
 import Button from '../components/ui/Button';
 import Panel, { PanelBody } from '../components/ui/Panel';
 import Skeleton from '../components/ui/Skeleton';
-import LogHistoryList from '../components/clients/LogHistoryList';
+import LogHistoryList, {
+	STATUS_LABELS,
+} from '../components/clients/LogHistoryList';
 import {
 	MEAL_ORDER,
 	MEAL_LABELS,
@@ -20,12 +22,6 @@ import type { LogEntry, LogEntryInput, Plan, PlanItem } from '../types';
 import styles from './LogTab.module.css';
 
 type Status = 'eaten' | 'substituted' | 'skipped';
-
-const STATUS_LABELS: Record< Status, string > = {
-	eaten: __( 'Eaten', 'nutrio' ),
-	substituted: __( 'Substituted', 'nutrio' ),
-	skipped: __( 'Skipped', 'nutrio' ),
-};
 
 // How many days back the "Recent history" section looks, including
 // today — starts at one page, "Load more" widens the window up to the cap.

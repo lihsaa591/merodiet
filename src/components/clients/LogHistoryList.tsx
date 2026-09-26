@@ -9,7 +9,7 @@ interface LogHistoryListProps {
 	itemLabels?: Record< number, string >;
 }
 
-const STATUS_LABELS: Record< LogEntry[ 'status' ], string > = {
+export const STATUS_LABELS: Record< LogEntry[ 'status' ], string > = {
 	eaten: __( 'Eaten', 'nutrio' ),
 	substituted: __( 'Substituted', 'nutrio' ),
 	skipped: __( 'Skipped', 'nutrio' ),
