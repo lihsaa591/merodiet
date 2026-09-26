@@ -10,7 +10,10 @@ export function hasUnsavedChanges(): boolean {
 	return globalDirty;
 }
 
-/** Drop-in replacement for useDirtyState that also reports into the global flag. */
+/**
+ * Drop-in replacement for useDirtyState that also reports into the global flag.
+ * @param current
+ */
 export function useGlobalDirtyState< T >( current: T ): {
 	isDirty: boolean;
 	markClean: () => void;

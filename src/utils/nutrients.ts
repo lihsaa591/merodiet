@@ -157,13 +157,13 @@ export function estimateNutrientsPerServing(
 	};
 }
 
-interface DayFoodItem {
+export interface DayFoodItem {
 	kind: 'food';
 	quantity_grams: number;
 	nutrients: Record< string, { amount_per_100g: number } >;
 }
 
-interface DayRecipeItem {
+export interface DayRecipeItem {
 	kind: 'recipe';
 	servings: number;
 	nutrient_totals_per_serving: NutrientTotals;

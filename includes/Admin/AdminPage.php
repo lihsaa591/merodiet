@@ -99,20 +99,11 @@ final class AdminPage {
 
 		$handle = 'nutrio-' . $this->script_entry;
 
-		// Dev builds split a shared "runtime" chunk that must load before the
-		// entry itself, or the entry silently fails to register.
-		$runtime_handle = $handle . '-runtime';
-
-		if ( NUTRIO_DEVELOPMENT ) {
-			Assets::enqueue_script( $runtime_handle, NUTRIO_PATH . 'build', NUTRIO_URL . 'build', 'runtime' );
-		}
-
 		Assets::enqueue_script(
 			$handle,
 			NUTRIO_PATH . 'build',
 			NUTRIO_URL . 'build',
-			$this->script_entry,
-			NUTRIO_DEVELOPMENT ? array( $runtime_handle ) : array()
+			$this->script_entry
 		);
 		Assets::enqueue_style( $handle, NUTRIO_PATH . 'build', NUTRIO_URL . 'build', $this->script_entry );
 

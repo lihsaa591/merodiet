@@ -150,7 +150,15 @@ export default function App() {
 				className={ `nutrio-rail-scrim ${
 					isSidebarOpen ? 'is-open' : ''
 				}`.trim() }
+				role="button"
+				tabIndex={ -1 }
+				aria-label={ __( 'Close menu', 'nutrio' ) }
 				onClick={ () => setSidebarOpen( false ) }
+				onKeyDown={ ( event ) => {
+					if ( 'Escape' === event.key || 'Enter' === event.key ) {
+						setSidebarOpen( false );
+					}
+				} }
 			/>
 
 			<div className="nutrio-shell">

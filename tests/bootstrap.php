@@ -66,6 +66,17 @@ if ( ! class_exists( 'WP_Error' ) ) {
 	}
 }
 
+if ( ! class_exists( 'WP_User' ) ) {
+	class WP_User {
+		public int $ID = 0;
+		public string $display_name = '';
+
+		public function has_cap( string $capability ): bool {
+			return false;
+		}
+	}
+}
+
 if ( ! class_exists( 'WP_REST_Request' ) ) {
 	class WP_REST_Request {
 		private array $params = array();

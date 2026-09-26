@@ -10,6 +10,8 @@ declare( strict_types=1 );
 namespace Nutrio\Providers;
 
 use League\Container\Container;
+use Nutrio\Clients\ClientInviteService;
+use Nutrio\Repositories\ClientRepository;
 
 /**
  * Home for bindings that don't belong to a more specific provider.
@@ -19,10 +21,11 @@ use League\Container\Container;
 final class AppServiceProvider extends AbstractServiceProvider {
 
 	/**
-	 * No bindings in the boilerplate — add your own plugin's
-	 * cross-cutting services here (a settings repository, a mailer, etc.).
+	 * Register ClientInviteService with its dependency on ClientRepository.
 	 *
 	 * @param Container $container The DI container.
 	 */
-	public function register( Container $container ): void {}
+	public function register( Container $container ): void {
+		$container->add( ClientInviteService::class )->addArgument( ClientRepository::class )->setShared( true );
+	}
 }

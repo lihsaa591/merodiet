@@ -5,7 +5,10 @@ import { __ } from '@wordpress/i18n';
 import { alertDialog } from '../../utils/confirmDialog';
 import Button from '../../components/ui/Button';
 import Chip from '../../components/ui/Chip';
+import Tooltip from '../../components/ui/Tooltip';
+import InfoIcon from '../../components/ui/InfoIcon';
 import { STORE_NAME as CUSTOM_FOODS_STORE } from '../../store/customFoods';
+import { BRANDED_FOODS_HELP_TEXT } from '../../utils/helpText';
 import styles from './FoodSearch.module.css';
 import type {
 	CustomFood,
@@ -200,8 +203,7 @@ function UsdaSearch( { onResolve }: FoodSearchProps ) {
 				/>
 			</div>
 
-			<label
-				htmlFor="nutrio-include-branded"
+			<div
 				style={ {
 					display: 'flex',
 					alignItems: 'center',
@@ -211,14 +213,31 @@ function UsdaSearch( { onResolve }: FoodSearchProps ) {
 					marginBottom: '12px',
 				} }
 			>
-				<input
-					id="nutrio-include-branded"
-					type="checkbox"
-					checked={ includeBranded }
-					onChange={ handleIncludeBrandedChange }
-				/>
-				{ __( 'Include branded products', 'nutrio' ) }
-			</label>
+				<label
+					htmlFor="nutrio-include-branded"
+					style={ {
+						display: 'flex',
+						alignItems: 'center',
+						gap: '6px',
+					} }
+				>
+					<input
+						id="nutrio-include-branded"
+						type="checkbox"
+						checked={ includeBranded }
+						onChange={ handleIncludeBrandedChange }
+					/>
+					{ __( 'Include branded products', 'nutrio' ) }
+				</label>
+				<Tooltip content={ BRANDED_FOODS_HELP_TEXT }>
+					<InfoIcon
+						label={ __(
+							'Why are branded products hidden?',
+							'nutrio'
+						) }
+					/>
+				</Tooltip>
+			</div>
 
 			{ isSearching && (
 				<p style={ { fontSize: '12.5px', color: 'var(--ink-muted)' } }>
@@ -269,13 +288,6 @@ function UsdaSearch( { onResolve }: FoodSearchProps ) {
 						: __( 'Load more', 'nutrio' ) }
 				</Button>
 			) }
-
-			<p className="nutrio-field-hint" style={ { marginTop: '8px' } }>
-				{ __(
-					"Branded (manufacturer-supplied) products are hidden by default — some report their serving size in a way that can't be reliably added to a recipe. Foundation & SR Legacy always work.",
-					'nutrio'
-				) }
-			</p>
 		</>
 	);
 }

@@ -10,18 +10,27 @@
 		"lint:js": "wp-scripts lint-js",
 		"check-types": "tsc --noEmit",
 		"format": "wp-scripts format",
+		"test:e2e:a11y": "wp-env start && playwright test tests/e2e",
 		"test:unit": "wp-scripts test-unit-js"
 	},
 	"devDependencies": {
+		"@axe-core/playwright": "^4.10.0",
+		"@playwright/test": "^1.48.0",
 		"@types/react": "^18.3.31",
 		"@types/react-dom": "^18.3.7",
+		"@wordpress/e2e-test-utils-playwright": "^1.20.0",
+		"@wordpress/env": "^11.16.0",
 		"@wordpress/scripts": "^34.2.0",
+		"tsx": "^4.23.15",
 		"typescript": "^6.0.3"
 	},
 	"dependencies": {
 		"@wordpress/api-fetch": "^7.0.0",
 		"@wordpress/data": "^10.54.0",
 		"@wordpress/element": "^8.6.0",
-		"@wordpress/i18n": "^6.27.0"
+		"@wordpress/hooks": "^4.54.0",
+		"@wordpress/i18n": "^6.27.0",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1"
 	}
 }

@@ -8,15 +8,19 @@ declare( strict_types=1 );
 namespace Nutrio\Tests\Unit\RestApi;
 
 use Brain\Monkey\Functions;
+use Nutrio\Clients\ClientInviteService;
 use Nutrio\Nutrition\FoodCache;
 use Nutrio\Nutrition\FoodDataService;
 use Nutrio\Nutrition\PlanNutrientResolver;
 use Nutrio\Nutrition\RecipeNutrientResolver;
 use Nutrio\Repositories\ClientRepository;
+use Nutrio\Repositories\LogEntryRepository;
+use Nutrio\Repositories\MeasurementRepository;
 use Nutrio\Repositories\PlanRepository;
 use Nutrio\Repositories\RecipeRepository;
 use Nutrio\RestApi\ClientsController;
 use Nutrio\RestApi\FoodsController;
+use Nutrio\RestApi\MeController;
 use Nutrio\RestApi\PlansController;
 use Nutrio\RestApi\RecipesController;
 use Nutrio\Tests\TestCase;
@@ -39,10 +43,22 @@ final class ControllerCapabilitiesTest extends TestCase {
 	 */
 	public static function controller_provider(): array {
 		return array(
-			'ClientsController' => array( ClientsController::class, array( ClientRepository::class ), 'manage_nutrio_clients' ),
+			'ClientsController' => array( ClientsController::class, array( ClientRepository::class, \Nutrio\Clients\ClientInviteService::class ), 'manage_nutrio_clients' ),
 			'RecipesController'  => array( RecipesController::class, array( RecipeRepository::class, RecipeNutrientResolver::class, FoodCache::class ), 'manage_nutrio_recipes' ),
 			'FoodsController'    => array( FoodsController::class, array( FoodDataService::class ), 'manage_nutrio_foods' ),
 			'PlansController'    => array( PlansController::class, array( PlanRepository::class, PlanNutrientResolver::class, ClientRepository::class, FoodCache::class, RecipeRepository::class, RecipeNutrientResolver::class ), 'manage_nutrio_plans' ),
+			'MeController'       => array(
+				MeController::class,
+				array(
+					PlanRepository::class,
+					LogEntryRepository::class,
+					MeasurementRepository::class,
+					ClientRepository::class,
+					FoodCache::class,
+					RecipeRepository::class,
+				),
+				'view_own_nutrio_plan',
+			),
 		);
 	}
 
@@ -99,8 +115,25 @@ final class ControllerCapabilitiesTest extends TestCase {
 	 * @param array<int, class-string> $dependency_classes
 	 */
 	private function build_controller_via_mocked_dependencies( string $controller_class, array $dependency_classes ) {
-		$mocks = array_map( fn ( string $class ) => $this->createMock( $class ), $dependency_classes );
+		$mocks = array_map(
+			fn ( string $class ) => $this->build_dependency_mock( $class ),
+			$dependency_classes
+		);
 
 		return new $controller_class( ...$mocks );
+	}
+
+	/**
+	 * Build a mock for a dependency, handling final classes specially.
+	 *
+	 * @param class-string $class The class to mock or instantiate.
+	 */
+	private function build_dependency_mock( string $class ) {
+		// For final classes, construct with mocked dependencies instead of mocking the class itself.
+		if ( ClientInviteService::class === $class ) {
+			return new ClientInviteService( $this->createMock( ClientRepository::class ) );
+		}
+
+		return $this->createMock( $class );
 	}
 }

@@ -50,7 +50,7 @@ abstract class AbstractPractitionerController extends AbstractController {
 	 * @param array<string, mixed>|null $fetched_row  The fetched row, or null if it didn't exist at all.
 	 * @param string                    $owner_column Column holding the owning practitioner's user ID.
 	 */
-	protected function assert_owns( ?array $fetched_row, string $owner_column = 'practitioner_user_id' ): true|WP_Error {
+	protected function assert_owns( ?array $fetched_row, string $owner_column = 'practitioner_user_id' ): bool|WP_Error {
 		if ( null === $fetched_row ) {
 			return $this->error( 'nutrio_not_found', __( 'Resource not found.', 'nutrio' ), 404 );
 		}

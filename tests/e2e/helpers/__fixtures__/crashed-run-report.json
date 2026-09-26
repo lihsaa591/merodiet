@@ -1,0 +1,1 @@
+{ "suites": [], "errors": [ { "message": "Error: Failed to seed measurement: 500 Internal Server Error", "stack": "Error: boom\n    at globalSetup (tests/e2e/global-setup.ts:178:9)" } ] }

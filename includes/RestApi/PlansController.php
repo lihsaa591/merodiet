@@ -56,9 +56,12 @@ final class PlansController extends AbstractPractitionerController {
 	/**
 	 * Construct with the repositories and resolver this controller reads/writes through.
 	 *
-	 * @param PlanRepository       $plans    The plan data access layer.
-	 * @param PlanNutrientResolver $resolver Computes a draft plan's live nutrient totals.
-	 * @param ClientRepository     $clients  Used to verify a plan is being assigned to the practitioner's own client.
+	 * @param PlanRepository         $plans           The plan data access layer.
+	 * @param PlanNutrientResolver   $resolver        Computes a draft plan's live nutrient totals.
+	 * @param ClientRepository       $clients         Used to verify a plan is being assigned to the practitioner's own client.
+	 * @param FoodCache              $food_cache      Used to attach food detail to plan items.
+	 * @param RecipeRepository       $recipes         Used to attach recipe detail to plan items.
+	 * @param RecipeNutrientResolver $recipe_resolver Computes a recipe item's live per-serving nutrient totals.
 	 */
 	public function __construct(
 		private readonly PlanRepository $plans,
@@ -306,6 +309,21 @@ final class PlansController extends AbstractPractitionerController {
 			return $this->error( 'nutrio_not_found', __( 'Client not found.', 'nutrio' ), 404 );
 		}
 
+		$overlapping = $this->plans->find_overlapping_assigned_plan( $client_id, $plan['start_date'], $plan['end_date'] );
+
+		if ( null !== $overlapping ) {
+			return $this->error(
+				'nutrio_plan_overlap',
+				sprintf(
+					/* translators: 1: the already-assigned plan's title, 2: its end date */
+					__( 'This client already has an active plan ("%1$s", through %2$s). Unassign it before assigning another for an overlapping date range.', 'nutrio' ),
+					$overlapping['title'],
+					$overlapping['end_date']
+				),
+				409
+			);
+		}
+
 		$snapshot = $this->resolver->calculate_plan_totals( $id );
 
 		$this->plans->assign( $id, $client_id, $snapshot );
@@ -404,22 +422,22 @@ final class PlansController extends AbstractPractitionerController {
 	 */
 	private function with_item_details( array $item ): array {
 		if ( null !== $item['food_id'] ) {
-			$food                     = $this->food_cache->find( $item['food_id'] );
-			$item['food_description'] = $food['description'] ?? null;
-			$item['nutrients']        = $food['nutrients'] ?? array();
-			$item['recipe_name']      = null;
+			$food                                       = $this->food_cache->find( $item['food_id'] );
+			$item['food_description']                   = $food['description'] ?? null;
+			$item['nutrients']                          = $food['nutrients'] ?? array();
+			$item['recipe_name']                        = null;
 			$item['recipe_nutrient_totals_per_serving'] = null;
 
 			return $item;
 		}
 
-		$recipe                      = $this->recipes->find_for_practitioner( (int) $item['recipe_id'], $this->current_practitioner_id() );
-		$item['recipe_name']        = $recipe['name'] ?? null;
+		$recipe                                     = $this->recipes->find_for_practitioner( (int) $item['recipe_id'], $this->current_practitioner_id() );
+		$item['recipe_name']                        = $recipe['name'] ?? null;
 		$item['recipe_nutrient_totals_per_serving'] = null === $recipe
 			? null
 			: $this->recipe_resolver->calculate_per_serving_totals( (int) $item['recipe_id'] );
-		$item['food_description']   = null;
-		$item['nutrients']          = null;
+		$item['food_description']                   = null;
+		$item['nutrients']                          = null;
 
 		return $item;
 	}

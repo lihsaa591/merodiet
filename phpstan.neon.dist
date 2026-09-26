@@ -12,6 +12,18 @@ parameters:
         - includes/Examples/* # Demo code, replaced per-project.
     scanFiles:
         - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
+    ignoreErrors:
+        -
+            # NUTRIO_DEVELOPMENT's literal `false` default (nutrio.php) is
+            # intentionally overridable from a site's own wp-config.php,
+            # which PHPStan cannot see into — every "always false"/"always
+            # true" PHPStan reports against it is only true for this
+            # codebase's own static default, not for a site that has opted
+            # in via wp-config.php.
+            message: '#(Left side of && is always false|Ternary operator condition is always false)#'
+            paths:
+                - nutrio.php
+                - includes/Helper/Assets.php
 
 includes:
     - vendor/szepeviktor/phpstan-wordpress/extension.neon

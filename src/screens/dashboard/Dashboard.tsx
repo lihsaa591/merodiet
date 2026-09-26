@@ -4,6 +4,7 @@ import { STORE_NAME } from '../../store/clients';
 import { STORE_NAME as RECIPES_STORE } from '../../store/recipes';
 import Panel, { PanelBody, PanelHead } from '../../components/ui/Panel';
 import Avatar from '../../components/ui/Avatar';
+import { greeting, greetingEmoji } from '../../utils/greeting';
 import type { Client, Recipe } from '../../types';
 
 // Compliance and activity are placeholder content — Nutrio has no log-entry
@@ -56,47 +57,6 @@ interface ClientsStoreSelectors {
 interface RecipesStoreSelectors {
 	getRecipes: () => Recipe[];
 	getRecipesTotal: () => number;
-}
-
-// Based on the viewer's own local clock, not the site's timezone — this is
-// a greeting for whoever's looking at the screen right now, same idea as a
-// phone's lock-screen greeting. Emoji is kept out of the translatable
-// string itself (translators shouldn't have to carry it) and appended
-// separately in the same order.
-function greeting(): string {
-	const hour = new Date().getHours();
-
-	if ( hour < 5 ) {
-		return __( 'Good night', 'nutrio' );
-	}
-	if ( hour < 12 ) {
-		return __( 'Good morning', 'nutrio' );
-	}
-	if ( hour < 17 ) {
-		return __( 'Good afternoon', 'nutrio' );
-	}
-	if ( hour < 21 ) {
-		return __( 'Good evening', 'nutrio' );
-	}
-	return __( 'Good night', 'nutrio' );
-}
-
-function greetingEmoji(): string {
-	const hour = new Date().getHours();
-
-	if ( hour < 5 ) {
-		return '🌙';
-	}
-	if ( hour < 12 ) {
-		return '☀️';
-	}
-	if ( hour < 17 ) {
-		return '🌤️';
-	}
-	if ( hour < 21 ) {
-		return '🌇';
-	}
-	return '🌙';
 }
 
 export default function Dashboard() {
@@ -199,13 +159,18 @@ function Kpi( { label, value, delta, tone }: KpiProps ) {
 	);
 }
 
+function complianceTone( percent: number ): string {
+	if ( percent >= 70 ) {
+		return 'var(--success)';
+	}
+	if ( percent >= 40 ) {
+		return 'var(--warning)';
+	}
+	return 'var(--critical)';
+}
+
 function ComplianceRow( { client }: { client: ComplianceEntry } ) {
-	const barTone =
-		client.percent >= 70
-			? 'var(--success)'
-			: client.percent >= 40
-			? 'var(--warning)'
-			: 'var(--critical)';
+	const barTone = complianceTone( client.percent );
 
 	return (
 		<div

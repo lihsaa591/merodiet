@@ -28,11 +28,16 @@ define( 'NUTRIO_PATH', plugin_dir_path( __FILE__ ) );
 define( 'NUTRIO_URL', plugin_dir_url( __FILE__ ) );
 define( 'NUTRIO_BASENAME', plugin_basename( __FILE__ ) );
 
-// Defaults to WP_DEBUG, but a site's wp-config.php can define this before
-// the plugin loads to override it independently (e.g. WP_DEBUG on for
-// error logging, without also switching Nutrio's own dev-only behavior).
+// Defaults to false (production-safe) regardless of WP_DEBUG — WP_DEBUG is
+// commonly on for error logging alone on staging/dev sites that never run
+// `npm start`, and this constant used to piggyback on it, which made the
+// plugin try to load its JS from a webpack-dev-server that isn't running on
+// any such site, breaking the whole admin/portal UI. A site's wp-config.php
+// must explicitly `define( 'NUTRIO_DEVELOPMENT', true )` before the plugin
+// loads to opt into dev-server script loading — see README's Development
+// section.
 if ( ! defined( 'NUTRIO_DEVELOPMENT' ) ) {
-	define( 'NUTRIO_DEVELOPMENT', defined( 'WP_DEBUG' ) && WP_DEBUG );
+	define( 'NUTRIO_DEVELOPMENT', false );
 }
 
 // Where `npm start` (webpack-dev-server) serves the build from — overridable
@@ -62,11 +67,15 @@ require_once $nutrio_autoloader;
 /**
  * Boot the plugin.
  *
- * Deferred to plugins_loaded so every other plugin's autoloader
- * and text-domain setup has already run.
+ * Deferred to init (not plugins_loaded): config/app.php calls __() while
+ * building its config array, and WordPress 6.7+ triggers a
+ * _doing_it_wrong() notice for any translation call made before init for
+ * a domain not yet loaded — which, under WP_DEBUG_DISPLAY, gets echoed
+ * into the response body and corrupts every later header() call on the
+ * same request (REST discovery, login redirects, nonce cookies).
  */
 add_action(
-	'plugins_loaded',
+	'init',
 	static function () {
 		require_once NUTRIO_PATH . 'bootstrap/app.php';
 	},

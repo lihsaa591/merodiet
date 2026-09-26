@@ -2,6 +2,8 @@ export interface Client {
 	id: number;
 	practitioner_user_id: number;
 	user_id: number | null;
+	avatar_id: number | null;
+	avatar_url: string | null;
 	first_name: string;
 	last_name: string;
 	email: string;
@@ -147,6 +149,14 @@ export interface Plan {
 	updated_at: string;
 }
 
+/** GET /me/plan/next's lightweight preview — a title + date range only, no days/items. */
+export interface NextPlanSummary {
+	id: number;
+	title: string;
+	start_date: string;
+	end_date: string;
+}
+
 export interface PlanItemInput {
 	meal_type: MealType;
 	food_id?: number;
@@ -165,6 +175,48 @@ export interface PlanInput {
 	start_date: string;
 	end_date: string;
 	days: PlanDayInput[];
+}
+
+export interface LogEntry {
+	id: number;
+	client_id: number;
+	plan_item_id: number | null;
+	food_id: number | null;
+	recipe_id: number | null;
+	quantity_grams: number | null;
+	servings: number | null;
+	log_date: string;
+	status: 'eaten' | 'substituted' | 'skipped';
+	source: 'manual' | 'ai_parsed';
+	notes: string | null;
+	created_at: string;
+}
+
+export interface LogEntryInput {
+	plan_item_id?: number;
+	food_id?: number;
+	recipe_id?: number;
+	quantity_grams?: number;
+	servings?: number;
+	log_date: string;
+	status: 'eaten' | 'substituted' | 'skipped';
+	notes?: string;
+}
+
+export interface Measurement {
+	id: number;
+	client_id: number;
+	measured_at: string;
+	weight_grams: number | null;
+	metrics: Record< string, unknown >;
+	notes: string | null;
+	created_at: string;
+}
+
+export interface MeasurementInput {
+	measured_at: string;
+	weight_grams?: number;
+	notes?: string;
 }
 
 /** A resolved food's per-100g nutrient profile — the shape FoodDataService::resolve() returns. */
@@ -206,6 +258,14 @@ declare global {
 			dateFormat?: string;
 			/** This site's Settings → General → Time Format, a PHP date() format string (e.g. "g:i a"). */
 			timeFormat?: string;
+		};
+		nutrioClientPortal?: {
+			restUrl?: string;
+			restNonce?: string;
+			mountId?: string;
+			clientName?: string;
+			dateFormat?: string;
+			logoutUrl?: string;
 		};
 	}
 }

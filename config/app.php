@@ -25,6 +25,7 @@ return array(
 		\Nutrio\Providers\PlanServiceProvider::class,
 		\Nutrio\Providers\RestApiServiceProvider::class,
 		\Nutrio\Providers\AdminServiceProvider::class,
+		\Nutrio\Providers\PortalServiceProvider::class,
 	),
 
 	/*
@@ -34,7 +35,7 @@ return array(
 	 */
 	'rest'      => array(
 		'controllers' => array(
-			\Nutrio\RestApi\ClientsController::class     => array( \Nutrio\Repositories\ClientRepository::class ),
+			\Nutrio\RestApi\ClientsController::class     => array( \Nutrio\Repositories\ClientRepository::class, \Nutrio\Clients\ClientInviteService::class ),
 			\Nutrio\RestApi\FoodsController::class       => array( \Nutrio\Nutrition\FoodDataService::class ),
 			\Nutrio\RestApi\CustomFoodsController::class => array( \Nutrio\Repositories\CustomFoodRepository::class ),
 			\Nutrio\RestApi\RecipesController::class     => array(
@@ -51,6 +52,14 @@ return array(
 				\Nutrio\Nutrition\RecipeNutrientResolver::class,
 			),
 			\Nutrio\RestApi\SettingsController::class    => array(),
+			\Nutrio\RestApi\MeController::class          => array(
+				\Nutrio\Repositories\PlanRepository::class,
+				\Nutrio\Repositories\LogEntryRepository::class,
+				\Nutrio\Repositories\MeasurementRepository::class,
+				\Nutrio\Repositories\ClientRepository::class,
+				\Nutrio\Nutrition\FoodCache::class,
+				\Nutrio\Repositories\RecipeRepository::class,
+			),
 		),
 	),
 

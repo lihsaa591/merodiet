@@ -32,7 +32,15 @@ export default function Drawer( {
 				className={ `${ styles.scrim } ${
 					isOpen ? styles.isOpen : ''
 				}`.trim() }
+				role="button"
+				tabIndex={ -1 }
+				aria-label={ __( 'Close', 'nutrio' ) }
 				onClick={ handleClose }
+				onKeyDown={ ( event ) => {
+					if ( 'Escape' === event.key || 'Enter' === event.key ) {
+						handleClose();
+					}
+				} }
 			/>
 			<aside
 				className={ `${ styles.drawer } ${

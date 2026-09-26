@@ -77,6 +77,42 @@ final class QueryFilters {
 	}
 
 	/**
+	 * An inclusive date-range filter against one column — used by any
+	 * list that supports a "from"/"to" window (log entries,
+	 * measurements). Either bound may be supplied alone for an
+	 * open-ended range. Returns null (and leaves $params untouched) if
+	 * neither bound was supplied.
+	 *
+	 * @param array<string, mixed> $filters Filter values, keyed by filter name.
+	 * @param string               $from_key Which key in $filters holds the inclusive lower bound.
+	 * @param string               $to_key   Which key in $filters holds the inclusive upper bound.
+	 * @param string               $column   Column to range against.
+	 * @param array<int, mixed>    $params   Bound params array to append to, by reference.
+	 */
+	public static function date_range_clause( array $filters, string $from_key, string $to_key, string $column, array &$params ): ?string {
+		$from = trim( (string) ( $filters[ $from_key ] ?? '' ) );
+		$to   = trim( (string) ( $filters[ $to_key ] ?? '' ) );
+
+		$conditions = array();
+
+		if ( '' !== $from ) {
+			$conditions[] = "{$column} >= %s"; // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders -- column name is a caller-supplied literal, not user input; the %s placeholder itself is filled via $wpdb->prepare() by the caller.
+			$params[]     = $from;
+		}
+
+		if ( '' !== $to ) {
+			$conditions[] = "{$column} <= %s"; // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders -- column name is a caller-supplied literal, not user input; the %s placeholder itself is filled via $wpdb->prepare() by the caller.
+			$params[]     = $to;
+		}
+
+		if ( array() === $conditions ) {
+			return null;
+		}
+
+		return implode( ' AND ', $conditions );
+	}
+
+	/**
 	 * Combine a base condition (e.g. "practitioner_user_id = %d", already
 	 * in $params) with every non-null filter clause, ANDed together.
 	 *

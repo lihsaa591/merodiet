@@ -1,0 +1,221 @@
+@import '../styles/tokens.css';
+
+/*
+ * wp_login_form() outputs plain, unstyled markup — WordPress's own
+ * login styling only loads on wp-login.php itself, never here. Every
+ * selector below targets that form's actual, fixed output (element
+ * ids/classes WordPress core has used unchanged for years:
+ * #loginform, .login-username, #user_login, etc.), styled with the
+ * same tokens and .nutrio-field look the practitioner admin app uses,
+ * so the two apps read as one product.
+ */
+
+body.nutrio-portal-login {
+	margin: 0;
+	min-height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--paper);
+	color: var(--ink);
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.nutrio-portal-login-card {
+	background: var(--surface);
+	border: 1px solid var(--line);
+	border-radius: var(--radius);
+	padding: 32px;
+	max-width: 360px;
+	width: 100%;
+	box-shadow: 0 1px 4px rgba( 0, 0, 0, 0.08 );
+}
+
+.nutrio-portal-login-heading {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin: 0 0 24px;
+}
+.nutrio-portal-login-heading h1 {
+	margin: 0;
+}
+
+.nutrio-portal-theme-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 30px;
+	height: 30px;
+	flex-shrink: 0;
+	border-radius: 8px;
+	border: 1px solid var(--line);
+	background: var(--surface);
+	color: var(--ink-muted);
+	cursor: pointer;
+}
+
+.nutrio-portal-theme-toggle:hover {
+	color: var(--ink);
+	border-color: var(--line-strong);
+}
+
+.nutrio-portal-theme-toggle svg {
+	width: 15px;
+	height: 15px;
+}
+
+.nutrio-portal-theme-icon-moon {
+	display: none;
+}
+
+/* Matches tokens.css's own convention: an explicit data-theme wins,
+   otherwise the system preference decides which icon shows. */
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme='light']) .nutrio-portal-theme-icon-sun {
+		display: none;
+	}
+	:root:not([data-theme='light']) .nutrio-portal-theme-icon-moon {
+		display: block;
+	}
+}
+:root[data-theme='dark'] .nutrio-portal-theme-icon-sun {
+	display: none;
+}
+:root[data-theme='dark'] .nutrio-portal-theme-icon-moon {
+	display: block;
+}
+
+.nutrio-portal-login-logo {
+	display: block;
+	max-width: 160px;
+	max-height: 64px;
+	width: auto;
+	height: auto;
+	margin: 0 auto 20px;
+}
+
+.nutrio-portal-login-card h1 {
+	font-size: 20px;
+	color: var(--ink);
+}
+
+.nutrio-portal-login-error {
+	background: var(--critical-wash);
+	border-left: 3px solid var(--critical);
+	border-radius: 4px;
+	padding: 10px 14px;
+	margin: 0 0 16px;
+}
+
+.nutrio-portal-login-error p {
+	margin: 0;
+	font-size: 13px;
+	color: var(--ink);
+}
+
+.nutrio-portal-login-error p + p {
+	margin-top: 4px;
+}
+
+.nutrio-portal-login-success {
+	background: var(--success-wash);
+	border-left: 3px solid var(--success);
+	border-radius: 4px;
+	padding: 10px 14px;
+	margin: 0 0 16px;
+}
+
+.nutrio-portal-login-success p {
+	margin: 0;
+	font-size: 13px;
+	color: var(--ink);
+}
+
+#loginform {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+#loginform p {
+	margin: 0;
+}
+
+#loginform label {
+	display: block;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--ink-muted);
+	margin-bottom: 6px;
+}
+
+#loginform input[type='text'],
+#loginform input[type='password'] {
+	width: 100%;
+	box-sizing: border-box;
+	font-family: inherit;
+	font-size: 13.5px;
+	padding: 9px 11px;
+	border: 1px solid var(--line-strong);
+	border-radius: 8px;
+	background: var(--surface);
+	color: var(--ink);
+}
+
+#loginform input[type='text']:focus,
+#loginform input[type='password']:focus {
+	outline: 2px solid var(--sage);
+	outline-offset: 1px;
+	border-color: var(--sage);
+}
+
+.forgetmenot {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.forgetmenot label {
+	margin: 0;
+	font-size: 13px;
+	font-weight: 400;
+	color: var(--ink);
+}
+
+.login-submit {
+	margin-top: 4px;
+}
+
+#wp-submit {
+	width: 100%;
+	font-family: inherit;
+	font-size: 13.5px;
+	font-weight: 600;
+	padding: 10px 16px;
+	border: none;
+	border-radius: 8px;
+	background: var(--sage);
+	color: #fff;
+	cursor: pointer;
+}
+
+#wp-submit:hover {
+	background: var(--sage-deep);
+}
+
+.nutrio-portal-login-lostpassword {
+	margin: 16px 0 0;
+	text-align: center;
+	font-size: 13px;
+}
+
+.nutrio-portal-login-lostpassword a {
+	color: var(--sage);
+	text-decoration: none;
+}
+
+.nutrio-portal-login-lostpassword a:hover {
+	text-decoration: underline;
+}
