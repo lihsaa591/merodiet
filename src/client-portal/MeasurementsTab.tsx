@@ -1,9 +1,11 @@
 import { useEffect, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { doAction } from '@wordpress/hooks';
 import Button from '../components/ui/Button';
 import Panel, { PanelBody } from '../components/ui/Panel';
+import Skeleton from '../components/ui/Skeleton';
+import { formatDate } from '../utils/date';
 import type { Measurement, MeasurementInput } from '../types';
 import styles from './MeasurementsTab.module.css';
 
@@ -39,12 +41,29 @@ function displayToGrams( value: number, unit: Unit ): number {
 	return Math.round( 'lb' === unit ? value * 453.592 : value * 1000 );
 }
 
+// Mirrors a handful of history rows while the real list loads.
+function HistorySkeleton() {
+	return (
+		<div>
+			{ [ 0, 1, 2 ].map( ( row ) => (
+				<div key={ row } className={ styles.historyItem }>
+					<div className={ styles.historyRow }>
+						<Skeleton width="35%" height="13px" />
+						<Skeleton width="60px" height="13px" />
+					</div>
+				</div>
+			) ) }
+		</div>
+	);
+}
+
 export default function MeasurementsTab() {
 	const [ unit, setUnit ] = useState< Unit >( readStoredUnit );
 	const [ measurements, setMeasurements ] = useState<
 		Measurement[] | undefined
 	>( undefined );
 	const [ weightInput, setWeightInput ] = useState( '' );
+	const [ notesInput, setNotesInput ] = useState( '' );
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
 	const [ errorMessage, setErrorMessage ] = useState< string | null >( null );
 
@@ -75,6 +94,7 @@ export default function MeasurementsTab() {
 			const payload: MeasurementInput = {
 				measured_at: new Date().toISOString().slice( 0, 10 ),
 				weight_grams: displayToGrams( value, unit ),
+				notes: notesInput.trim() || undefined,
 			};
 			const entry = await apiFetch< Measurement >( {
 				path: '/nutrio/v1/me/measurements',
@@ -83,6 +103,7 @@ export default function MeasurementsTab() {
 			} );
 			doAction( 'nutrio.clientPortal.measurementCreated', entry );
 			setWeightInput( '' );
+			setNotesInput( '' );
 			setErrorMessage( null );
 			loadMeasurements();
 		} catch {
@@ -93,6 +114,24 @@ export default function MeasurementsTab() {
 			setIsSubmitting( false );
 		}
 	};
+
+	// Weighed entries only, in the same most-recent-first order the API
+	// returns — used to compute the per-row and overall trend deltas.
+	const weighed = ( measurements ?? [] ).filter(
+		( m ): m is Measurement & { weight_grams: number } =>
+			null !== m.weight_grams
+	);
+	const netChange =
+		weighed.length > 1
+			? Math.round(
+					( gramsToDisplay( weighed[ 0 ].weight_grams, unit ) -
+						gramsToDisplay(
+							weighed[ weighed.length - 1 ].weight_grams,
+							unit
+						) ) *
+						10
+			  ) / 10
+			: null;
 
 	return (
 		<>
@@ -136,6 +175,22 @@ export default function MeasurementsTab() {
 								</select>
 							</div>
 						</div>
+						<div className="nutrio-field">
+							<label htmlFor="nutrio-weight-notes">
+								{ __( 'Notes (optional)', 'nutrio' ) }
+							</label>
+							<textarea
+								id="nutrio-weight-notes"
+								value={ notesInput }
+								onChange={ ( event ) =>
+									setNotesInput( event.target.value )
+								}
+								placeholder={ __(
+									'e.g. measured after workout',
+									'nutrio'
+								) }
+							/>
+						</div>
 						<Button
 							type="submit"
 							variant="primary"
@@ -148,32 +203,114 @@ export default function MeasurementsTab() {
 					<h3 className={ styles.historyTitle }>
 						{ __( 'History', 'nutrio' ) }
 					</h3>
-					{ undefined === measurements && (
-						<p>{ __( 'Loading…', 'nutrio' ) }</p>
-					) }
+					{ undefined === measurements && <HistorySkeleton /> }
 					{ measurements && 0 === measurements.length && (
 						<p className={ styles.empty }>
 							{ __( 'No measurements logged yet.', 'nutrio' ) }
 						</p>
 					) }
+					{ null !== netChange && (
+						<p className={ styles.trendSummary }>
+							{ netChange === 0
+								? sprintf(
+										/* translators: %d: number of weigh-ins the summary covers */
+										__(
+											'No change over your last %d entries.',
+											'nutrio'
+										),
+										weighed.length
+								  )
+								: sprintf(
+										/* translators: 1: "Up"/"Down", 2: the amount changed, 3: unit (kg/lb), 4: number of weigh-ins the summary covers */
+										__(
+											'%1$s %2$s %3$s over your last %4$d entries.',
+											'nutrio'
+										),
+										netChange > 0
+											? __( 'Up', 'nutrio' )
+											: __( 'Down', 'nutrio' ),
+										String( Math.abs( netChange ) ),
+										unit,
+										weighed.length
+								  ) }
+						</p>
+					) }
 					{ measurements && measurements.length > 0 && (
 						<ul className={ styles.historyList }>
-							{ measurements.map( ( measurement ) => (
-								<li
-									key={ measurement.id }
-									className={ styles.historyItem }
-								>
-									<span>{ measurement.measured_at }</span>
-									<span>
-										{ null !== measurement.weight_grams
-											? `${ gramsToDisplay(
+							{ measurements.map( ( measurement, index ) => {
+								const prevWeighed = measurements
+									.slice( index + 1 )
+									.find( ( m ) => null !== m.weight_grams );
+								const delta =
+									null !== measurement.weight_grams &&
+									prevWeighed &&
+									null !== prevWeighed.weight_grams
+										? Math.round(
+												( gramsToDisplay(
 													measurement.weight_grams,
 													unit
-											  ) } ${ unit }`
-											: '—' }
-									</span>
-								</li>
-							) ) }
+												) -
+													gramsToDisplay(
+														prevWeighed.weight_grams,
+														unit
+													) ) *
+													10
+										  ) / 10
+										: null;
+
+								return (
+									<li
+										key={ measurement.id }
+										className={ styles.historyItem }
+									>
+										<div className={ styles.historyRow }>
+											<span>
+												{ formatDate(
+													measurement.measured_at
+												) }
+											</span>
+											<div
+												className={
+													styles.historyWeight
+												}
+											>
+												<span>
+													{ null !==
+													measurement.weight_grams
+														? `${ gramsToDisplay(
+																measurement.weight_grams,
+																unit
+														  ) } ${ unit }`
+														: '—' }
+												</span>
+												{ null !== delta &&
+													0 !== delta && (
+														<span
+															className={
+																styles.historyDelta
+															}
+														>
+															{ delta > 0
+																? '↑'
+																: '↓' }{ ' ' }
+															{ Math.abs(
+																delta
+															) }{ ' ' }
+															{ unit }
+														</span>
+													) }
+											</div>
+										</div>
+										{ measurement.notes && (
+											<div
+												className={ styles.historyNote }
+											>
+												{ measurement.notes }
+											</div>
+										) }
+									</li>
+								);
+							} ) }
 						</ul>
 					) }
 				</PanelBody>

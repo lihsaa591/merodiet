@@ -1,4 +1,5 @@
 import { __ } from '@wordpress/i18n';
+import type { DayFoodItem, DayRecipeItem } from '../utils/nutrients';
 import type { MealType, PlanItem } from '../types';
 
 // Shared between PlanTab and LogTab so both group/label/icon meals
@@ -66,4 +67,21 @@ export function itemQuantityLabel( item: PlanItem ): string | null {
 	return null === item.servings
 		? null
 		: `${ item.servings } ${ __( 'srv', 'nutrio' ) }`;
+}
+
+// Converts a PlanItem into estimateDayNutrients()'s expected input shape —
+// shared so PlanTab and LogTab compute kcal/nutrients identically.
+export function toEstimateInput( item: PlanItem ): DayFoodItem | DayRecipeItem {
+	return item.food_id
+		? {
+				kind: 'food',
+				quantity_grams: item.quantity_grams ?? 0,
+				nutrients: item.nutrients ?? {},
+		  }
+		: {
+				kind: 'recipe',
+				servings: item.servings ?? 0,
+				nutrient_totals_per_serving:
+					item.recipe_nutrient_totals_per_serving ?? {},
+		  };
 }

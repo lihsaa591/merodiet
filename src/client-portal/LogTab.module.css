@@ -11,6 +11,24 @@
 	color: var(--ink-muted);
 	margin: 0 0 16px;
 }
+.kcalSummary {
+	background: var(--paper-dim);
+	border-radius: 8px;
+	padding: 10px 12px;
+	margin: 0 0 18px;
+}
+.kcalValue {
+	display: block;
+	font-family: 'IBM Plex Mono', monospace;
+	font-size: 14px;
+	font-weight: 600;
+}
+.kcalFootnote {
+	display: block;
+	font-size: 11.5px;
+	color: var(--ink-faint);
+	margin-top: 3px;
+}
 .meal {
 	margin-bottom: 18px;
 }
@@ -123,14 +141,22 @@
 	}
 }
 
+.adHocToday {
+	margin-top: 20px;
+	padding-top: 16px;
+	border-top: 1px solid var(--line-strong);
+}
 .adHocForm {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
 	gap: 8px;
 	margin-top: 20px;
-	padding-top: 16px;
-	border-top: 1px solid var(--line-strong);
+}
+.adHocToday + .adHocForm {
+	margin-top: 4px;
+	padding-top: 0;
+	border-top: none;
 }
 .adHocForm .field {
 	width: 100%;

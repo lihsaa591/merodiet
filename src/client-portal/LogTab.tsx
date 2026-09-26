@@ -1,16 +1,19 @@
 import { useEffect, useState } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { doAction } from '@wordpress/hooks';
 import Button from '../components/ui/Button';
 import Panel, { PanelBody } from '../components/ui/Panel';
+import Skeleton from '../components/ui/Skeleton';
 import {
 	MEAL_ORDER,
 	MEAL_LABELS,
 	MEAL_ICONS,
 	itemsByMeal,
 	itemQuantityLabel,
+	toEstimateInput,
 } from './mealMeta';
+import { estimateDayNutrients, formatAmount } from '../utils/nutrients';
 import { formatDate } from '../utils/date';
 import type { LogEntry, LogEntryInput, Plan, PlanItem } from '../types';
 import styles from './LogTab.module.css';
@@ -81,6 +84,48 @@ function entryLabel(
 interface LoggedItem {
 	status: Status;
 	notes: string | null;
+}
+
+// Mirrors today's items list — progress line, a couple of meal groups
+// with an item + action-buttons row each.
+function LogTabSkeleton() {
+	return (
+		<div>
+			<div style={ { marginBottom: '16px' } }>
+				<Skeleton width="120px" height="13px" />
+			</div>
+			{ [ 0, 1 ].map( ( meal ) => (
+				<div key={ meal } className={ styles.meal }>
+					<div style={ { marginBottom: '8px' } }>
+						<Skeleton width="90px" height="15px" />
+					</div>
+					<div className={ styles.itemRow }>
+						<Skeleton width="45%" height="14px" />
+						<Skeleton width="90px" height="26px" shape="block" />
+					</div>
+				</div>
+			) ) }
+		</div>
+	);
+}
+
+// Mirrors one day's worth of "Recent history" rows.
+function HistorySkeleton() {
+	return (
+		<div>
+			<div style={ { marginBottom: '6px' } }>
+				<Skeleton width="100px" height="11px" />
+			</div>
+			{ [ 0, 1, 2 ].map( ( row ) => (
+				<div key={ row } className={ styles.historyItem }>
+					<div className={ styles.historyRow }>
+						<Skeleton width="40%" height="13px" />
+						<Skeleton width="70px" height="13px" />
+					</div>
+				</div>
+			) ) }
+		</div>
+	);
 }
 
 export default function LogTab() {
@@ -240,11 +285,37 @@ export default function LogTab() {
 	).length;
 	const grouped = itemsByMeal( todaysItems );
 
+	// Only "eaten" items count toward the kcal total — a substitution's
+	// actual content is an unstructured note, not resolvable nutrient
+	// data, and a skip means nothing was eaten. Counting the substitute
+	// against the *planned* item's kcal would misrepresent what was
+	// actually consumed, so it's excluded rather than guessed at.
+	const eatenItems = todaysItems.filter(
+		( item ) => 'eaten' === loggedByItem[ item.id ]?.status
+	);
+	const notCountedCount = todaysItems.filter( ( item ) => {
+		const status = loggedByItem[ item.id ]?.status;
+		return 'substituted' === status || 'skipped' === status;
+	} ).length;
+	const eatenKcal = estimateDayNutrients(
+		eatenItems.map( toEstimateInput )
+	).kcal;
+	const plannedKcal = estimateDayNutrients(
+		todaysItems.map( toEstimateInput )
+	).kcal;
+
 	const itemLabels = itemLabelsById( plan );
 	const historyByDate: Record< string, LogEntry[] > = {};
+	// Today's "Log something else" entries — not tied to a plan item, so
+	// they never appear in the meal groups above; shown in their own list
+	// instead of only via the toast (which fades) or tomorrow's history.
+	const adHocToday: LogEntry[] = [];
 	for ( const entry of history ?? [] ) {
 		if ( entry.log_date === today ) {
-			continue; // Today's own detail is already shown above.
+			if ( null === entry.plan_item_id ) {
+				adHocToday.push( entry );
+			}
+			continue; // Today's plan-item detail is already shown above.
 		}
 		( historyByDate[ entry.log_date ] ??= [] ).push( entry );
 	}
@@ -276,9 +347,7 @@ export default function LogTab() {
 						<p className={ styles.error }>{ errorMessage }</p>
 					) }
 
-					{ undefined === plan && (
-						<p>{ __( 'Loading…', 'nutrio' ) }</p>
-					) }
+					{ undefined === plan && <LogTabSkeleton /> }
 
 					{ null === plan && (
 						<p className={ styles.empty }>
@@ -299,6 +368,36 @@ export default function LogTab() {
 									todaysItems.length
 								) }
 							</p>
+
+							{ null !== eatenKcal && (
+								<div className={ styles.kcalSummary }>
+									<span className={ styles.kcalValue }>
+										{ sprintf(
+											/* translators: 1: kcal eaten so far today, 2: kcal planned for today */
+											__(
+												'%1$s of %2$s kcal eaten today',
+												'nutrio'
+											),
+											formatAmount( eatenKcal, '' ),
+											formatAmount( plannedKcal, '' )
+										) }
+									</span>
+									{ notCountedCount > 0 && (
+										<span className={ styles.kcalFootnote }>
+											{ sprintf(
+												/* translators: %d: number of items substituted or skipped today, excluded from the kcal count */
+												_n(
+													'%d item substituted or skipped, not counted toward this total.',
+													'%d items substituted or skipped, not counted toward this total.',
+													notCountedCount,
+													'nutrio'
+												),
+												notCountedCount
+											) }
+										</span>
+									) }
+								</div>
+							) }
 
 							{ MEAL_ORDER.filter(
 								( meal ) => ( grouped[ meal ] ?? [] ).length > 0
@@ -531,6 +630,33 @@ export default function LogTab() {
 						</>
 					) }
 
+					{ adHocToday.length > 0 && (
+						<div className={ styles.adHocToday }>
+							<h3 className={ styles.mealTitle }>
+								{ __( 'Also logged today', 'nutrio' ) }
+							</h3>
+							<ul className={ styles.itemList }>
+								{ adHocToday.map( ( entry ) => (
+									<li
+										key={ entry.id }
+										className={ styles.historyItem }
+									>
+										<span className={ styles.itemName }>
+											{ entry.notes }
+										</span>
+										<span
+											className={ `${
+												styles.statusPill
+											} ${ styles[ entry.status ] }` }
+										>
+											{ STATUS_LABELS[ entry.status ] }
+										</span>
+									</li>
+								) ) }
+							</ul>
+						</div>
+					) }
+
 					<form onSubmit={ logAdHoc } className={ styles.adHocForm }>
 						<div className={ `nutrio-field ${ styles.field }` }>
 							<label htmlFor="nutrio-log-notes">
@@ -566,9 +692,7 @@ export default function LogTab() {
 						{ __( 'Recent history', 'nutrio' ) }
 					</h3>
 
-					{ undefined === history && (
-						<p>{ __( 'Loading…', 'nutrio' ) }</p>
-					) }
+					{ undefined === history && <HistorySkeleton /> }
 
 					{ history && pastDates.length === 0 && (
 						<p className={ styles.empty }>
