@@ -5,6 +5,7 @@ import { doAction } from '@wordpress/hooks';
 import Button from '../components/ui/Button';
 import Panel, { PanelBody } from '../components/ui/Panel';
 import Skeleton from '../components/ui/Skeleton';
+import LogHistoryList from '../components/clients/LogHistoryList';
 import {
 	MEAL_ORDER,
 	MEAL_LABELS,
@@ -15,7 +16,6 @@ import {
 	todaysDayOffset,
 } from './mealMeta';
 import { estimateDayNutrients, formatAmount } from '../utils/nutrients';
-import { formatDate } from '../utils/date';
 import type { LogEntry, LogEntryInput, Plan, PlanItem } from '../types';
 import styles from './LogTab.module.css';
 
@@ -59,20 +59,6 @@ function itemLabelsById(
 	}
 
 	return labels;
-}
-
-// A history entry's display label — the plan item it was logged against,
-// or (for an ad-hoc "log something else" entry, which has no plan_item_id)
-// its own free-text notes, since that free text IS the food description.
-function entryLabel(
-	entry: LogEntry,
-	itemLabels: Record< number, string >
-): string {
-	if ( null !== entry.plan_item_id && itemLabels[ entry.plan_item_id ] ) {
-		return itemLabels[ entry.plan_item_id ];
-	}
-
-	return entry.notes ?? __( 'Logged item', 'nutrio' );
 }
 
 interface LoggedItem {
@@ -336,10 +322,6 @@ export default function LogTab() {
 		}
 		( historyByDate[ entry.log_date ] ??= [] ).push( entry );
 	}
-	const pastDates = Object.keys( historyByDate ).sort( ( a, b ) =>
-		b.localeCompare( a )
-	);
-
 	return (
 		<>
 			<div className="nutrio-topbar">
@@ -711,64 +693,12 @@ export default function LogTab() {
 
 					{ undefined === history && <HistorySkeleton /> }
 
-					{ history && pastDates.length === 0 && (
-						<p className={ styles.empty }>
-							{ __( 'Nothing logged yet.', 'nutrio' ) }
-						</p>
+					{ history && (
+						<LogHistoryList
+							entriesByDate={ historyByDate }
+							itemLabels={ itemLabels }
+						/>
 					) }
-
-					{ pastDates.map( ( date ) => (
-						<div key={ date } className={ styles.historyDay }>
-							<div className={ styles.historyDate }>
-								{ formatDate( date ) }
-							</div>
-							<ul className={ styles.historyList }>
-								{ ( historyByDate[ date ] ?? [] ).map(
-									( entry ) => (
-										<li
-											key={ entry.id }
-											className={ styles.historyItem }
-										>
-											<div>
-												<div
-													className={
-														styles.historyLabel
-													}
-												>
-													{ entryLabel(
-														entry,
-														itemLabels
-													) }
-												</div>
-												{ entry.notes &&
-													null !==
-														entry.plan_item_id && (
-														<div
-															className={
-																styles.historyNote
-															}
-														>
-															{ entry.notes }
-														</div>
-													) }
-											</div>
-											<span
-												className={ `${
-													styles.statusPill
-												} ${ styles[ entry.status ] }` }
-											>
-												{
-													STATUS_LABELS[
-														entry.status
-													]
-												}
-											</span>
-										</li>
-									)
-								) }
-							</ul>
-						</div>
-					) ) }
 
 					{ history && historyRangeDays < HISTORY_MAX_DAYS && (
 						<button
