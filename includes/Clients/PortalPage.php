@@ -256,7 +256,7 @@ final class PortalPage {
 	 *
 	 * @return true|WP_Error|null True on a sent email, a WP_Error on failure, or null if this request wasn't a submission (just viewing the form).
 	 */
-	private function maybe_process_lost_password(): true|WP_Error|null {
+	private function maybe_process_lost_password(): bool|WP_Error|null {
 		if ( ! isset( $_POST['nutrio_lostpassword_nonce'] ) ) {
 			return null;
 		}
