@@ -36,12 +36,7 @@ async function globalSetup(): Promise< void > {
 		'1004': { name: 'Total lipid (fat)', unit: 'g', amount_per_100g: 5 },
 	} );
 
-	// The nutrients JSON's own quotes can't survive being embedded in a
-	// double-quoted `wp db query` argument that itself goes through a
-	// shell (runWpCli's execSync runs the whole command through `sh -c`,
-	// so nested quoting breaks the argument apart). Base64-encoding the
-	// SQL and decoding it inside a `wp eval` sidesteps quoting entirely,
-	// since base64 never contains a shell- or SQL-meaningful character.
+	// base64 + `wp eval` sidesteps shell/SQL quoting issues with the raw JSON (see task-2-report.md).
 	const insertSql =
 		`INSERT INTO wp_nutrio_foods (source, source_id, description, data_type, nutrients, source_synced_at, created_at, updated_at) VALUES ('usda', ${ SEED_FOOD_SOURCE_ID }, 'E2E Seed Oatmeal', 'Foundation', '${ nutrientsJson.replace( /'/g, "\\'" ) }', '${ nowSql }', '${ nowSql }', '${ nowSql }')`;
 	const insertSqlBase64 = Buffer.from( insertSql, 'utf8' ).toString( 'base64' );
@@ -93,12 +88,7 @@ async function globalSetup(): Promise< void > {
 		params: { search: CLIENT_EMAIL, context: 'edit' },
 	} );
 
-	// `user_login` is intentionally immutable through WP core's own APIs
-	// (REST and wp_update_user() both reject it — "Username is not
-	// editable"), so the only way to land the exact deterministic login
-	// Task 3's fixture hard-codes is a direct DB update; `password` (a
-	// virtual field, not a real column) *is* REST-editable and goes
-	// through the normal REST call.
+	// user_login isn't REST-editable after creation, so set it directly (see task-2-report.md).
 	runWpCli(
 		`db query "UPDATE wp_users SET user_login='${ CLIENT_LOGIN }' WHERE ID=${ createdUser.id }"`
 	);
@@ -161,10 +151,22 @@ async function globalSetup(): Promise< void > {
 		storageState: await page.context().storageState(),
 	} );
 
-	await clientRequest.post( '/wp-json/nutrio/v1/me/measurements', {
-		headers: { 'X-WP-Nonce': restNonce },
-		data: { measured_at: today, weight_grams: 75000 },
-	} );
+	const measurementResponse = await clientRequest.post(
+		'/wp-json/nutrio/v1/me/measurements',
+		{
+			headers: { 'X-WP-Nonce': restNonce },
+			data: { measured_at: today, weight_grams: 75000 },
+		}
+	);
+
+	// Unlike requestUtils.rest(), this raw APIRequestContext call doesn't
+	// throw on a non-2xx response — check explicitly so a failure here
+	// isn't silently swallowed.
+	if ( ! measurementResponse.ok() ) {
+		throw new Error(
+			`Failed to seed measurement: ${ measurementResponse.status() } ${ await measurementResponse.text() }`
+		);
+	}
 
 	await clientRequest.dispose();
 	await browser.close();
