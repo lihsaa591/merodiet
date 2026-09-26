@@ -10,7 +10,10 @@ declare( strict_types=1 );
 namespace Nutrio\RestApi;
 
 use Nutrio\Clients\ClientInviteService;
+use Nutrio\Clients\ComplianceCalculator;
 use Nutrio\Repositories\ClientRepository;
+use Nutrio\Repositories\LogEntryRepository;
+use Nutrio\Repositories\MeasurementRepository;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -40,14 +43,20 @@ final class ClientsController extends AbstractPractitionerController {
 	private const LIST_FILTERS = array( 'search', 'status' );
 
 	/**
-	 * Construct with the repository and service this controller uses.
+	 * Construct with the repository/service/calculator this controller uses.
 	 *
-	 * @param ClientRepository    $clients The client roster data access layer.
-	 * @param ClientInviteService $invites The client invite provisioning service.
+	 * @param ClientRepository      $clients      The client roster data access layer.
+	 * @param ClientInviteService   $invites      The client invite provisioning service.
+	 * @param LogEntryRepository    $logs         A client's compliance log entries.
+	 * @param MeasurementRepository $measurements A client's weight/measurement entries.
+	 * @param ComplianceCalculator  $compliance   Computes a client's plan-compliance percentage.
 	 */
 	public function __construct(
 		private readonly ClientRepository $clients,
-		private readonly ClientInviteService $invites
+		private readonly ClientInviteService $invites,
+		private readonly LogEntryRepository $logs,
+		private readonly MeasurementRepository $measurements,
+		private readonly ComplianceCalculator $compliance
 	) {}
 
 	/**
@@ -110,6 +119,63 @@ final class ClientsController extends AbstractPractitionerController {
 			array(
 				'methods'  => WP_REST_Server::CREATABLE,
 				'callback' => array( $this, 'invite_client' ),
+			),
+			required_capability: 'manage_nutrio_clients'
+		);
+
+		$this->register_route(
+			'/(?P<id>\d+)/logs',
+			array(
+				'methods'  => WP_REST_Server::READABLE,
+				'callback' => array( $this, 'get_client_logs' ),
+				'args'     => array(
+					'from' => array(
+						'type'   => 'string',
+						'format' => 'date',
+					),
+					'to'   => array(
+						'type'   => 'string',
+						'format' => 'date',
+					),
+				),
+			),
+			required_capability: 'manage_nutrio_clients'
+		);
+
+		$this->register_route(
+			'/(?P<id>\d+)/measurements',
+			array(
+				'methods'  => WP_REST_Server::READABLE,
+				'callback' => array( $this, 'get_client_measurements' ),
+				'args'     => array(
+					'from' => array(
+						'type'   => 'string',
+						'format' => 'date',
+					),
+					'to'   => array(
+						'type'   => 'string',
+						'format' => 'date',
+					),
+				),
+			),
+			required_capability: 'manage_nutrio_clients'
+		);
+
+		$this->register_route(
+			'/(?P<id>\d+)/compliance',
+			array(
+				'methods'  => WP_REST_Server::READABLE,
+				'callback' => array( $this, 'get_client_compliance' ),
+				'args'     => array(
+					'from' => array(
+						'type'   => 'string',
+						'format' => 'date',
+					),
+					'to'   => array(
+						'type'   => 'string',
+						'format' => 'date',
+					),
+				),
 			),
 			required_capability: 'manage_nutrio_clients'
 		);
@@ -255,6 +321,81 @@ final class ClientsController extends AbstractPractitionerController {
 		}
 
 		return $this->success( array( 'invited' => true ) );
+	}
+
+	/**
+	 * GET /clients/{id}/logs — a client's own compliance log, from the
+	 * practitioner's side.
+	 *
+	 * @param WP_REST_Request $request The current request.
+	 */
+	public function get_client_logs( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$client = $this->clients->find_for_practitioner( (int) $request->get_param( 'id' ), $this->current_practitioner_id() );
+		$owns   = $this->assert_owns( $client );
+
+		if ( true !== $owns ) {
+			return $owns;
+		}
+
+		$entries = $this->logs->all_for_client(
+			(int) $client['id'],
+			array(
+				'from' => (string) ( $request->get_param( 'from' ) ?? '' ),
+				'to'   => (string) ( $request->get_param( 'to' ) ?? '' ),
+			)
+		);
+
+		return $this->success( $entries );
+	}
+
+	/**
+	 * GET /clients/{id}/measurements — a client's own measurements, from
+	 * the practitioner's side.
+	 *
+	 * @param WP_REST_Request $request The current request.
+	 */
+	public function get_client_measurements( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$client = $this->clients->find_for_practitioner( (int) $request->get_param( 'id' ), $this->current_practitioner_id() );
+		$owns   = $this->assert_owns( $client );
+
+		if ( true !== $owns ) {
+			return $owns;
+		}
+
+		$entries = $this->measurements->all_for_client(
+			(int) $client['id'],
+			array(
+				'from' => (string) ( $request->get_param( 'from' ) ?? '' ),
+				'to'   => (string) ( $request->get_param( 'to' ) ?? '' ),
+			)
+		);
+
+		return $this->success( $entries );
+	}
+
+	/**
+	 * GET /clients/{id}/compliance — the client's plan-compliance
+	 * percentage over the requested window (defaults handled by
+	 * ComplianceCalculator's caller — see get_client_compliance's own
+	 * args schema for the 'from'/'to' date format).
+	 *
+	 * @param WP_REST_Request $request The current request.
+	 */
+	public function get_client_compliance( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$client = $this->clients->find_for_practitioner( (int) $request->get_param( 'id' ), $this->current_practitioner_id() );
+		$owns   = $this->assert_owns( $client );
+
+		if ( true !== $owns ) {
+			return $owns;
+		}
+
+		$result = $this->compliance->calculate(
+			(int) $client['id'],
+			(string) ( $request->get_param( 'from' ) ?? '' ),
+			(string) ( $request->get_param( 'to' ) ?? '' )
+		);
+
+		return $this->success( $result );
 	}
 
 	/**
