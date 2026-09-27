@@ -1,0 +1,26 @@
+.form {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.tagRow {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+.tagButton {
+	font-family: var(--font-mono, monospace);
+	font-size: 11px;
+	padding: 4px 8px;
+	border-radius: 6px;
+	border: 1px solid var(--line);
+	background: var(--paper-dim);
+	color: var(--ink-muted);
+	cursor: pointer;
+}
+.tagButton:hover {
+	border-color: var(--line-strong);
+	color: var(--ink);
+}
