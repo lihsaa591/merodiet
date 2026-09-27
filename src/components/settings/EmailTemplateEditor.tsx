@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { __ } from '@wordpress/i18n';
 import Panel, { PanelBody, PanelHead } from '../ui/Panel';
 import Button from '../ui/Button';
+import Switch from '../ui/Switch';
 import type { EmailTemplate } from '../../types';
 import styles from './EmailTemplateEditor.module.css';
 
@@ -71,20 +72,20 @@ export default function EmailTemplateEditor( {
 		}
 	};
 
-	const handleToggle = async ( event: React.ChangeEvent< HTMLInputElement > ) => {
+	const handleToggle = async ( checked: boolean ) => {
 		if ( ! onToggleEnabled ) {
 			return;
 		}
 		setIsToggling( true );
 		try {
-			await onToggleEnabled( event.target.checked );
+			await onToggleEnabled( checked );
 		} finally {
 			setIsToggling( false );
 		}
 	};
 
 	return (
-		<Panel>
+		<Panel className={ styles.accordionItem }>
 			<PanelHead>
 				<button
 					type="button"
@@ -107,18 +108,17 @@ export default function EmailTemplateEditor( {
 					<h3>{ label }</h3>
 				</button>
 				{ onToggleEnabled && (
-					<label
+					<div
 						className={ styles.enableToggle }
 						onClick={ ( event ) => event.stopPropagation() }
 					>
-						<input
-							type="checkbox"
+						<Switch
 							checked={ template.enabled }
 							disabled={ isToggling }
 							onChange={ handleToggle }
+							label={ __( 'Enabled', 'nutrio' ) }
 						/>
-						{ __( 'Enabled', 'nutrio' ) }
-					</label>
+					</div>
 				) }
 			</PanelHead>
 			{ isExpanded && (

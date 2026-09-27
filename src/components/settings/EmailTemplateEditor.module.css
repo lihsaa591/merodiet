@@ -1,3 +1,7 @@
+.accordionItem {
+	margin-bottom: 10px;
+}
+
 .headerRow {
 	display: flex;
 	align-items: center;
