@@ -78,18 +78,30 @@ final class EmailTemplateService {
 	 * @return array{subject: string, body: string}
 	 */
 	public function render( string $type, array $context ): array {
-		$template     = $this->get( $type );
-		$replacements = array();
+		$template              = $this->get( $type );
+		$body_replacements     = array();
+		$subject_replacements = array();
 
 		foreach ( $context as $tag => $value ) {
-			$replacements[ '{{' . $tag . '}}' ] = $value instanceof RawHtml
+			$placeholder = '{{' . $tag . '}}';
+
+			$body_replacements[ $placeholder ] = $value instanceof RawHtml
 				? (string) $value
 				: esc_html( (string) $value );
+
+			// The subject is a plain-text mail header, not HTML — it must
+			// not be esc_html()'d like the body. Newlines are stripped as
+			// a defensive measure against header injection; sanitize_text_field()
+			// already strips them where these values are first saved, so
+			// this is belt-and-braces, not the primary defense.
+			$subject_replacements[ $placeholder ] = $value instanceof RawHtml
+				? (string) $value
+				: str_replace( array( "\r", "\n" ), '', (string) $value );
 		}
 
 		return array(
-			'subject' => strtr( $template['subject'], $replacements ),
-			'body'    => strtr( $template['body'], $replacements ),
+			'subject' => strtr( $template['subject'], $subject_replacements ),
+			'body'    => strtr( $template['body'], $body_replacements ),
 		);
 	}
 

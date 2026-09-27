@@ -77,6 +77,36 @@ final class EmailTemplateServiceTest extends TestCase {
 		self::assertStringNotContainsString( '<b>Al</b>', $result['body'] );
 	}
 
+	public function test_render_does_not_escape_the_subject_but_still_escapes_the_body(): void {
+		// The default client_invite subject has no {{client_first_name}}
+		// tag, so a saved override is used here to put it in the subject too.
+		Functions\when( 'get_option' )->justReturn(
+			array(
+				'subject' => 'New client added: {{client_first_name}}',
+				'body'    => 'Hi {{client_first_name}},',
+			)
+		);
+		Functions\when( 'esc_html' )->alias( static fn ( string $text ) => htmlspecialchars( $text, ENT_QUOTES ) );
+
+		$service = new EmailTemplateService();
+		$result  = $service->render(
+			'client_invite',
+			array(
+				'client_first_name' => "O'Brien",
+				'practitioner_name' => 'Dr. Lee',
+				'portal_url'        => 'https://example.test/portal',
+				'site_name'         => 'Test Site',
+				'client_last_name'  => '',
+			)
+		);
+
+		self::assertStringContainsString( "O'Brien", $result['subject'] );
+		self::assertStringNotContainsString( '&#039;', $result['subject'] );
+
+		self::assertStringContainsString( '&#039;', $result['body'] );
+		self::assertStringNotContainsString( "O'Brien", $result['body'] );
+	}
+
 	public function test_render_leaves_a_rawhtml_context_value_unescaped(): void {
 		Functions\when( 'get_option' )->justReturn( array() );
 		Functions\when( 'esc_html' )->alias( static fn ( string $text ) => htmlspecialchars( $text, ENT_QUOTES ) );
