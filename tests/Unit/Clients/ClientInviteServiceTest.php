@@ -76,4 +76,24 @@ final class ClientInviteServiceTest extends TestCase {
 
 		self::assertInstanceOf( WP_Error::class, $service->invite( 7 ) );
 	}
+
+	public function test_the_sending_invite_flag_is_true_during_invite_and_resets_afterward_even_on_failure(): void {
+		Functions\when( 'get_current_user_id' )->justReturn( 1 );
+
+		$clients = $this->createMock( ClientRepository::class );
+		$clients->method( 'find' )->willReturn(
+			array( 'id' => 1, 'user_id' => null, 'email' => 'client@example.test' )
+		);
+		// A WP user already exists with this email — invite() returns a
+		// WP_Error without ever reaching retrieve_password().
+		Functions\when( 'get_user_by' )->justReturn( (object) array( 'ID' => 55 ) );
+
+		self::assertFalse( ClientInviteService::is_sending_invite() );
+
+		$service = new ClientInviteService( $clients );
+		$result  = $service->invite( 1 );
+
+		self::assertTrue( is_wp_error( $result ) );
+		self::assertFalse( ClientInviteService::is_sending_invite() );
+	}
 }
