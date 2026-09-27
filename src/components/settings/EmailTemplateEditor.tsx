@@ -163,7 +163,12 @@ export default function EmailTemplateEditor( {
 								</button>
 							) ) }
 						</div>
-						<Button variant="primary" type="submit" disabled={ isSaving }>
+						<Button
+							variant="primary"
+							type="submit"
+							disabled={ isSaving }
+							className={ styles.saveButton }
+						>
 							{ __( 'Save', 'nutrio' ) }
 						</Button>
 					</form>

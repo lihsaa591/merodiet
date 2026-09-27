@@ -86,3 +86,9 @@
 	border-color: var(--line-strong);
 	color: var(--ink);
 }
+
+/* .form is a flex column, whose default align-items:stretch would
+   otherwise stretch the button to the full row width. */
+.saveButton {
+	align-self: flex-start;
+}
