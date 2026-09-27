@@ -81,7 +81,15 @@ final class ClientsController extends AbstractPractitionerController {
 			array(
 				'methods'  => WP_REST_Server::CREATABLE,
 				'callback' => array( $this, 'create_client' ),
-				'args'     => self::client_write_args( require_all: true ),
+				'args'     => array_merge(
+					self::client_write_args( require_all: true ),
+					array(
+						'send_invite' => array(
+							'type'    => 'boolean',
+							'default' => false,
+						),
+					)
+				),
 			),
 			required_capability: 'manage_nutrio_clients'
 		);
@@ -220,12 +228,28 @@ final class ClientsController extends AbstractPractitionerController {
 			)
 		);
 
+		// Provisioning the account and sending the invite is best-effort —
+		// a failure here (e.g. the email is already tied to another WP
+		// user) must not undo the client record that was just created;
+		// it's surfaced to the caller instead, so the UI can tell the
+		// practitioner to invite manually from the roster.
+		$invite_error = null;
+
+		if ( $request->get_param( 'send_invite' ) ) {
+			$result = $this->invites->invite( $id );
+
+			if ( is_wp_error( $result ) ) {
+				$invite_error = $result->get_error_message();
+			}
+		}
+
 		/**
 		 * The just-created client.
 		 *
 		 * @var array<string, mixed> $client
 		 */
-		$client = $this->clients->find( $id );
+		$client                 = $this->clients->find( $id );
+		$client['invite_error'] = $invite_error;
 
 		return $this->success( $client, 201 );
 	}

@@ -24,6 +24,8 @@ export type ClientInput = Pick<
 	dietary_restrictions?: string;
 	/** Not set by the create/edit form — only used for the bulk "Mark active"/"Mark paused" action. */
 	status?: 'active' | 'paused';
+	/** Create-only — provision the client's WP account and send the portal invite immediately. */
+	send_invite?: boolean;
 };
 
 /** Nutrient amounts keyed by USDA nutrient ID, e.g. { "1008": 165 } for kcal. */

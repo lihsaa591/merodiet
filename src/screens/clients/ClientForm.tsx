@@ -3,8 +3,11 @@ import { __ } from '@wordpress/i18n';
 import Avatar from '../../components/ui/Avatar';
 import Button from '../../components/ui/Button';
 import UnsavedBadge from '../../components/ui/UnsavedBadge';
+import Tooltip from '../../components/ui/Tooltip';
+import InfoIcon from '../../components/ui/InfoIcon';
 import { useGlobalDirtyState } from '../../hooks/useGlobalDirtyState';
 import { confirmDialog } from '../../utils/confirmDialog';
+import { SEND_INVITE_HELP_TEXT } from '../../utils/helpText';
 import type { Client, ClientInput } from '../../types';
 
 interface FormValues {
@@ -24,6 +27,11 @@ const EMPTY: FormValues = {
 	goals: '',
 	dietary_restrictions: '',
 };
+
+// Checked by default: the common case is wanting the client to get
+// portal access right away, without a separate "Invite" step to
+// remember afterward.
+const DEFAULT_SEND_INVITE = true;
 
 interface ClientFormProps {
 	client?: Client | null;
@@ -54,6 +62,7 @@ export default function ClientForm( {
 			  }
 			: EMPTY
 	);
+	const [ sendInvite, setSendInvite ] = useState( DEFAULT_SEND_INVITE );
 	const [ isSaving, setIsSaving ] = useState( false );
 	const { isDirty, markClean } = useGlobalDirtyState( values );
 
@@ -86,6 +95,7 @@ export default function ClientForm( {
 					.filter( Boolean ),
 				goals: values.goals,
 				dietary_restrictions: values.dietary_restrictions,
+				...( client ? {} : { send_invite: sendInvite } ),
 			} );
 			markClean();
 		} finally {
@@ -228,6 +238,35 @@ export default function ClientForm( {
 					) }
 				/>
 			</div>
+
+			{ ! client && (
+				<label
+					htmlFor="nutrio-send-invite"
+					style={ {
+						display: 'flex',
+						alignItems: 'center',
+						gap: '6px',
+					} }
+				>
+					<input
+						id="nutrio-send-invite"
+						type="checkbox"
+						checked={ sendInvite }
+						onChange={ ( event ) =>
+							setSendInvite( event.target.checked )
+						}
+					/>
+					{ __( 'Send portal invite now', 'nutrio' ) }
+					<Tooltip content={ SEND_INVITE_HELP_TEXT }>
+						<InfoIcon
+							label={ __(
+								'What does sending the invite now do?',
+								'nutrio'
+							) }
+						/>
+					</Tooltip>
+				</label>
+			) }
 
 			{ isDirty && <UnsavedBadge /> }
 
