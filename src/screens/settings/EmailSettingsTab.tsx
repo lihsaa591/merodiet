@@ -3,7 +3,6 @@ import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import EmailTemplateEditor from '../../components/settings/EmailTemplateEditor';
 import ProUpsellModal from '../../components/ui/ProUpsellModal';
-import { alertDialog } from '../../utils/confirmDialog';
 import type { EmailDigestSettings, EmailTemplate } from '../../types';
 import styles from './EmailSettingsTab.module.css';
 
@@ -32,6 +31,17 @@ export default function EmailSettingsTab( { audience }: EmailSettingsTabProps ) 
 	const [ templates, setTemplates ] = useState< EmailTemplate[] | null >( null );
 	const [ digest, setDigest ] = useState< EmailDigestSettings | null >( null );
 	const [ isProModalOpen, setProModalOpen ] = useState( false );
+	const [ toastMessage, setToastMessage ] = useState< string | null >( null );
+
+	// Self-dismissing success toast, same pattern as ProfileDrawer/LogTab.
+	useEffect( () => {
+		if ( ! toastMessage ) {
+			return;
+		}
+
+		const timer = setTimeout( () => setToastMessage( null ), 2500 );
+		return () => clearTimeout( timer );
+	}, [ toastMessage ] );
 
 	useEffect( () => {
 		apiFetch< EmailTemplate[] >( { path: '/nutrio/v1/settings/email-templates' } ).then(
@@ -60,7 +70,7 @@ export default function EmailSettingsTab( { audience }: EmailSettingsTabProps ) 
 			)
 		);
 
-		await alertDialog( { message: __( 'Email template saved.', 'nutrio' ) } );
+		setToastMessage( __( 'Email template saved.', 'nutrio' ) );
 	};
 
 	const handleToggleTemplate = async ( type: string, enabled: boolean ) => {
@@ -94,6 +104,15 @@ export default function EmailSettingsTab( { audience }: EmailSettingsTabProps ) 
 
 	return (
 		<>
+			{ toastMessage && (
+				<div className={ styles.toast } role="status">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+						<path d="M5 13l4 4L19 7" />
+					</svg>
+					{ toastMessage }
+				</div>
+			) }
+
 			{ visibleTemplates.map( ( template ) => {
 				const isDigest = 'practitioner_daily_digest' === template.type;
 
