@@ -1,0 +1,70 @@
+/* Edit is a secondary action here (unlike e.g. the roster's "Add
+   client", the actual primary CTA of that screen) — override the
+   generic .nutrio-topbar mobile rule that stretches a topbar's last
+   child to full width, so Edit stays a small, compact button instead
+   of an oversized bar disproportionate to its importance. */
+@media (max-width: 900px) {
+	:global(.nutrio-topbar) > *:last-child {
+		width: auto !important;
+	}
+}
+
+.backLink {
+	background: none;
+	border: none;
+	padding: 4px 0;
+	font-size: 13px;
+	color: var(--sage);
+	cursor: pointer;
+}
+
+.sectionTitle {
+	font-size: 15px;
+	margin: 0 0 14px;
+}
+
+.empty {
+	color: var(--ink-muted);
+}
+
+.tabs {
+	display: flex;
+	gap: 6px;
+	margin: 20px 0 14px;
+}
+.tab {
+	font-family: inherit;
+	font-size: 13px;
+	font-weight: 600;
+	padding: 8px 16px;
+	border-radius: 999px;
+	border: 1px solid var(--line);
+	background: var(--paper-dim);
+	color: var(--ink-faint);
+	cursor: pointer;
+}
+.tab.isActive {
+	background: var(--ink);
+	border-color: var(--ink);
+	color: var(--surface);
+}
+
+.loadMore {
+	display: block;
+	margin: 12px auto 0;
+	background: none;
+	border: none;
+	padding: 4px 8px;
+	font-family: inherit;
+	font-size: 12.5px;
+	font-weight: 600;
+	color: var(--sage);
+	cursor: pointer;
+}
+.loadMore:hover {
+	color: var(--sage-deep);
+}
+.loadMore:disabled {
+	color: var(--ink-faint);
+	cursor: default;
+}

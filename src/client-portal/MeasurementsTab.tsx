@@ -5,7 +5,7 @@ import { doAction } from '@wordpress/hooks';
 import Button from '../components/ui/Button';
 import Panel, { PanelBody } from '../components/ui/Panel';
 import Skeleton from '../components/ui/Skeleton';
-import { formatDate } from '../utils/date';
+import MeasurementHistoryList from '../components/clients/MeasurementHistoryList';
 import {
 	readStoredWeightUnit,
 	storeWeightUnit,
@@ -255,82 +255,10 @@ export default function MeasurementsTab() {
 						</p>
 					) }
 					{ measurements && measurements.length > 0 && (
-						<ul className={ styles.historyList }>
-							{ measurements.map( ( measurement, index ) => {
-								const prevWeighed = measurements
-									.slice( index + 1 )
-									.find( ( m ) => null !== m.weight_grams );
-								const delta =
-									null !== measurement.weight_grams &&
-									prevWeighed &&
-									null !== prevWeighed.weight_grams
-										? Math.round(
-												( gramsToDisplay(
-													measurement.weight_grams,
-													unit
-												) -
-													gramsToDisplay(
-														prevWeighed.weight_grams,
-														unit
-													) ) *
-													10
-										  ) / 10
-										: null;
-
-								return (
-									<li
-										key={ measurement.id }
-										className={ styles.historyItem }
-									>
-										<div className={ styles.historyRow }>
-											<span>
-												{ formatDate(
-													measurement.measured_at
-												) }
-											</span>
-											<div
-												className={
-													styles.historyWeight
-												}
-											>
-												<span>
-													{ null !==
-													measurement.weight_grams
-														? `${ gramsToDisplay(
-																measurement.weight_grams,
-																unit
-														  ) } ${ unit }`
-														: '—' }
-												</span>
-												{ null !== delta &&
-													0 !== delta && (
-														<span
-															className={
-																styles.historyDelta
-															}
-														>
-															{ delta > 0
-																? '↑'
-																: '↓' }{ ' ' }
-															{ Math.abs(
-																delta
-															) }{ ' ' }
-															{ unit }
-														</span>
-													) }
-											</div>
-										</div>
-										{ measurement.notes && (
-											<div
-												className={ styles.historyNote }
-											>
-												{ measurement.notes }
-											</div>
-										) }
-									</li>
-								);
-							} ) }
-						</ul>
+						<MeasurementHistoryList
+							measurements={ measurements }
+							unit={ unit }
+						/>
 					) }
 
 					{ measurements && historyRangeDays < HISTORY_MAX_DAYS && (

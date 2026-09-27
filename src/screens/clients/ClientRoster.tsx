@@ -7,6 +7,7 @@ import { confirmDialog, alertDialog } from '../../utils/confirmDialog';
 import { useBulkSelection } from '../../hooks/useBulkSelection';
 import { usePagination } from '../../hooks/usePagination';
 import { useShowFilters } from '../../hooks/useShowFilters';
+import { useQueryParam } from '../../hooks/useQueryParam';
 import Panel, { PanelBody } from '../../components/ui/Panel';
 import Button from '../../components/ui/Button';
 import BulkActionBar from '../../components/ui/BulkActionBar';
@@ -17,6 +18,7 @@ import Drawer from '../../components/ui/Drawer';
 import Pagination from '../../components/ui/Pagination';
 import ListFilters from '../../components/ui/ListFilters';
 import ClientForm from './ClientForm';
+import ClientDetail from './ClientDetail';
 import { formatDateTime } from '../../utils/date';
 import type { Client, ClientInput } from '../../types';
 
@@ -39,8 +41,8 @@ const CLIENT_STATUS_OPTIONS = [
 ];
 
 export default function ClientRoster() {
+	const [ idParam, setIdParam ] = useQueryParam( 'id' );
 	const [ isDrawerOpen, setDrawerOpen ] = useState( false );
-	const [ editingId, setEditingId ] = useState< number | null >( null );
 	const [ isFormDirty, setFormDirty ] = useState( false );
 	const { page, perPage, filters, setPage, setPerPage, setFilter } =
 		usePagination( 'clients', { filterDefaults: CLIENT_FILTER_DEFAULTS } );
@@ -79,29 +81,19 @@ export default function ClientRoster() {
 		deleteClient: ( id: number ) => Promise< void >;
 	};
 
-	const editingClient =
-		clients.find( ( client ) => client.id === editingId ) ?? null;
-
 	const bulk = useBulkSelection( clients );
 
 	const openAdd = () => {
-		setEditingId( null );
 		setDrawerOpen( true );
 	};
 
-	const openEdit = ( id: number ) => {
-		setEditingId( id );
-		setDrawerOpen( true );
-	};
+	const openDetail = ( id: number ) => setIdParam( String( id ) );
+	const backToRoster = () => setIdParam( null );
 
 	const closeDrawer = () => setDrawerOpen( false );
 
 	const handleSubmit = async ( data: ClientInput ) => {
-		if ( editingClient ) {
-			await updateClient( editingClient.id, data );
-		} else {
-			await createClient( data );
-		}
+		await createClient( data );
 		closeDrawer();
 	};
 
@@ -177,6 +169,15 @@ export default function ClientRoster() {
 		);
 		bulk.clear();
 	};
+
+	if ( idParam !== null ) {
+		return (
+			<ClientDetail
+				clientId={ Number( idParam ) }
+				onBack={ backToRoster }
+			/>
+		);
+	}
 
 	return (
 		<>
@@ -283,8 +284,18 @@ export default function ClientRoster() {
 								</thead>
 								<tbody>
 									{ clients.map( ( client ) => (
-										<tr key={ client.id }>
-											<td>
+										<tr
+											key={ client.id }
+											className="nutrio-row-clickable"
+											onClick={ () =>
+												openDetail( client.id )
+											}
+										>
+											<td
+												onClick={ ( event ) =>
+													event.stopPropagation()
+												}
+											>
 												<input
 													type="checkbox"
 													checked={ bulk.isSelected(
@@ -362,7 +373,11 @@ export default function ClientRoster() {
 													client.created_at
 												) }
 											</td>
-											<td>
+											<td
+												onClick={ ( event ) =>
+													event.stopPropagation()
+												}
+											>
 												<div className="nutrio-row-actions">
 													<IconButton
 														label={ __(
@@ -376,19 +391,6 @@ export default function ClientRoster() {
 														}
 													>
 														<InviteIcon />
-													</IconButton>
-													<IconButton
-														label={ __(
-															'Edit client',
-															'nutrio'
-														) }
-														onClick={ () =>
-															openEdit(
-																client.id
-															)
-														}
-													>
-														<EditIcon />
 													</IconButton>
 													<IconButton
 														label={ __(
@@ -425,11 +427,7 @@ export default function ClientRoster() {
 
 			<Drawer
 				isOpen={ isDrawerOpen }
-				title={
-					editingClient
-						? __( 'Edit client', 'nutrio' )
-						: __( 'Add client', 'nutrio' )
-				}
+				title={ __( 'Add client', 'nutrio' ) }
 				onClose={ closeDrawer }
 				confirmClose={ async () =>
 					! isFormDirty ||
@@ -441,8 +439,8 @@ export default function ClientRoster() {
 				}
 			>
 				<ClientForm
-					key={ editingClient?.id ?? 'new' }
-					client={ editingClient }
+					key="new"
+					client={ null }
 					onSubmit={ handleSubmit }
 					onCancel={ closeDrawer }
 					onDirtyChange={ setFormDirty }
@@ -475,20 +473,6 @@ function InviteIcon() {
 		>
 			<path d="M4 6h16v12H4z" />
 			<path d="m4 7 8 6 8-6" />
-		</svg>
-	);
-}
-
-function EditIcon() {
-	return (
-		<svg
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			strokeWidth="2"
-		>
-			<path d="M12 20h9" />
-			<path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
 		</svg>
 	);
 }

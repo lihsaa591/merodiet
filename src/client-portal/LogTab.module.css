@@ -192,25 +192,6 @@
 	font-size: 15px;
 	margin: 0 0 14px;
 }
-.historyDay {
-	margin-bottom: 16px;
-}
-.historyDay:last-child {
-	margin-bottom: 0;
-}
-.historyDate {
-	font-size: 11.5px;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.04em;
-	color: var(--ink-faint);
-	margin-bottom: 6px;
-}
-.historyList {
-	list-style: none;
-	margin: 0;
-	padding: 0;
-}
 .historyItem {
 	display: flex;
 	align-items: center;
@@ -221,13 +202,4 @@
 }
 .historyItem:last-child {
 	border-bottom: none;
-}
-.historyLabel {
-	font-size: 13px;
-}
-.historyNote {
-	font-size: 12px;
-	color: var(--ink-muted);
-	font-style: italic;
-	margin-top: 2px;
 }
