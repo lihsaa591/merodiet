@@ -11,6 +11,7 @@ namespace Nutrio;
 
 use Nutrio\Clients\PortalRewrite;
 use Nutrio\Database\Migrator;
+use Nutrio\Email\DigestScheduler;
 use Nutrio\Roles\RoleRegistrar;
 
 /**
@@ -33,5 +34,7 @@ final class Activation {
 		PortalRewrite::register();
 
 		flush_rewrite_rules();
+
+		DigestScheduler::reschedule();
 	}
 }
