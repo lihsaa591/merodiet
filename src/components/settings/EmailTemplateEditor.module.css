@@ -1,5 +1,10 @@
 .accordionItem {
 	margin-bottom: 10px;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.accordionItem:hover {
+	border-color: var(--line-strong);
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
 .headerRow {
@@ -8,12 +13,17 @@
 	gap: 8px;
 	background: none;
 	border: none;
-	padding: 0;
+	padding: 2px 0 4px;
 	font-family: inherit;
 	cursor: pointer;
 	text-align: left;
 	flex: 1;
 	min-width: 0;
+}
+/* Collapsed rows have no PanelBody below to give them breathing room —
+   add it here instead so a collapsed row doesn't look cramped. */
+.headerRowCollapsed {
+	padding-bottom: 14px;
 }
 .headerRow h3 {
 	margin: 0;

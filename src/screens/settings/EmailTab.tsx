@@ -5,8 +5,10 @@ import styles from './Settings.module.css';
 
 type EmailAudienceTab = 'practitioner' | 'client';
 
-// Nested sub-tabs inside Settings' top-level "Email" tab — one
-// EmailSettingsTab per audience, same pill-tab pattern as the parent.
+// Nested sub-tabs inside Settings' top-level "Email" tab — a
+// segmented-control style (not the parent's pill-tab style) so the
+// hierarchy is visually obvious: this is a filter within Email, not a
+// sibling of General/Email.
 export default function EmailTab() {
 	const [ activeAudience, setActiveAudience ] = useState< EmailAudienceTab >(
 		'practitioner'
@@ -14,9 +16,9 @@ export default function EmailTab() {
 
 	return (
 		<>
-			<div className={ styles.subTabs }>
+			<div className={ styles.subTabsWrap }>
 				<button
-					className={ `${ styles.tab } ${
+					className={ `${ styles.subTab } ${
 						'practitioner' === activeAudience ? styles.isActive : ''
 					}` }
 					onClick={ () => setActiveAudience( 'practitioner' ) }
@@ -24,7 +26,7 @@ export default function EmailTab() {
 					{ __( 'Practitioner', 'nutrio' ) }
 				</button>
 				<button
-					className={ `${ styles.tab } ${
+					className={ `${ styles.subTab } ${
 						'client' === activeAudience ? styles.isActive : ''
 					}` }
 					onClick={ () => setActiveAudience( 'client' ) }
