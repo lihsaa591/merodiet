@@ -88,6 +88,7 @@ if ( ! class_exists( 'WP_User' ) ) {
 	class WP_User {
 		public int $ID = 0;
 		public string $display_name = '';
+		public string $user_email = '';
 
 		public function has_cap( string $capability ): bool {
 			return false;

@@ -9,6 +9,7 @@ namespace Nutrio\Tests\Unit\RestApi;
 
 use Nutrio\Clients\ClientInviteService;
 use Nutrio\Clients\ComplianceCalculator;
+use Nutrio\Email\Mailer;
 use Nutrio\Repositories\ClientRepository;
 use Nutrio\Repositories\LogEntryRepository;
 use Nutrio\Repositories\MeasurementRepository;
@@ -45,7 +46,8 @@ final class ClientsControllerComplianceTest extends TestCase {
 			$compliance ?? new ComplianceCalculator(
 				$this->createMock( PlanRepository::class ),
 				$this->createMock( LogEntryRepository::class )
-			)
+			),
+			new Mailer( new \Nutrio\Email\EmailTemplateService() )
 		);
 	}
 

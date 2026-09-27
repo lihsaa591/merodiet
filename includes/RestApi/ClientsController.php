@@ -11,6 +11,7 @@ namespace Nutrio\RestApi;
 
 use Nutrio\Clients\ClientInviteService;
 use Nutrio\Clients\ComplianceCalculator;
+use Nutrio\Email\Mailer;
 use Nutrio\Repositories\ClientRepository;
 use Nutrio\Repositories\LogEntryRepository;
 use Nutrio\Repositories\MeasurementRepository;
@@ -50,13 +51,15 @@ final class ClientsController extends AbstractPractitionerController {
 	 * @param LogEntryRepository    $logs         A client's compliance log entries.
 	 * @param MeasurementRepository $measurements A client's weight/measurement entries.
 	 * @param ComplianceCalculator  $compliance   Computes a client's plan-compliance percentage.
+	 * @param Mailer                $mailer       Sends transactional/notification emails.
 	 */
 	public function __construct(
 		private readonly ClientRepository $clients,
 		private readonly ClientInviteService $invites,
 		private readonly LogEntryRepository $logs,
 		private readonly MeasurementRepository $measurements,
-		private readonly ComplianceCalculator $compliance
+		private readonly ComplianceCalculator $compliance,
+		private readonly Mailer $mailer
 	) {}
 
 	/**
@@ -250,6 +253,17 @@ final class ClientsController extends AbstractPractitionerController {
 		 */
 		$client                 = $this->clients->find( $id );
 		$client['invite_error'] = $invite_error;
+
+		$this->mailer->send(
+			'practitioner_client_added',
+			wp_get_current_user()->user_email,
+			array(
+				'practitioner_name' => wp_get_current_user()->display_name,
+				'client_first_name' => (string) $client['first_name'],
+				'client_last_name'  => (string) $client['last_name'],
+				'invite_status'     => self::invite_status_copy( (bool) $request->get_param( 'send_invite' ), $invite_error ),
+			)
+		);
 
 		return $this->success( $client, 201 );
 	}
@@ -464,5 +478,27 @@ final class ClientsController extends AbstractPractitionerController {
 				'enum' => array( 'active', 'inactive' ),
 			),
 		);
+	}
+
+	/**
+	 * Build the human-readable invite-status copy for the notification email.
+	 *
+	 * @param bool        $send_invite_requested Whether the create request asked for an invite.
+	 * @param string|null $invite_error           A failure message, if the invite attempt failed.
+	 */
+	private static function invite_status_copy( bool $send_invite_requested, ?string $invite_error ): string {
+		if ( ! $send_invite_requested ) {
+			return __( 'not invited (added without sending an invite)', 'nutrio' );
+		}
+
+		if ( null !== $invite_error ) {
+			return sprintf(
+				/* translators: %s: the reason the invite failed */
+				__( 'invite failed: %s', 'nutrio' ),
+				$invite_error
+			);
+		}
+
+		return __( 'invited', 'nutrio' );
 	}
 }
