@@ -9,6 +9,8 @@ declare( strict_types=1 );
 
 namespace Nutrio\Clients;
 
+use Nutrio\Clients\ClientInviteService;
+use Nutrio\Email\Mailer;
 use Nutrio\Helper\Assets;
 use Nutrio\Repositories\ClientRepository;
 use WP_Error;
@@ -32,8 +34,12 @@ final class PortalPage {
 	 * Constructor.
 	 *
 	 * @param ClientRepository $clients Used to resolve the logged-in user's own client row.
+	 * @param Mailer            $mailer Used to render the branded invite/reset email.
 	 */
-	public function __construct( private readonly ClientRepository $clients ) {}
+	public function __construct(
+		private readonly ClientRepository $clients,
+		private readonly Mailer $mailer
+	) {}
 
 	/**
 	 * Hooked to template_redirect. Short-circuits WordPress's normal
@@ -137,20 +143,100 @@ final class PortalPage {
 			return $message;
 		}
 
-		$reset_url = add_query_arg(
-			array(
-				'nutrio_action' => 'resetpass',
-				'key'           => $key,
-				'login'         => rawurlencode( $user_login ),
-			),
-			PortalRewrite::url()
-		);
+		$client = $this->clients->find_for_user( $user_data->ID );
 
-		return sprintf(
-			/* translators: %1$s: site URL, %2$s: password reset link */
-			__( "Someone has requested a password reset for the following account:\n\n%1\$s\n\nIf this was not you, you can safely ignore this email.\n\nTo reset your password, visit the following link:\n\n%2\$s", 'nutrio' ),
-			home_url( '/' ),
-			$reset_url
+		if ( null === $client ) {
+			return $message;
+		}
+
+		add_filter( 'wp_mail_content_type', array( self::class, 'force_html_content_type' ) );
+
+		return $this->mailer->render_html(
+			self::current_email_type(),
+			self::email_context( $client, $key, $user_login )
+		)['body'];
+	}
+
+	/**
+	 * Hooked to retrieve_password_title, alongside
+	 * customize_reset_password_email()'s retrieve_password_message
+	 * hook — same guard, same context, just the subject half of the
+	 * same email.
+	 *
+	 * @param string  $title      The default subject core built.
+	 * @param string  $user_login The user's login.
+	 * @param WP_User $user_data  The user the reset is for.
+	 */
+	public function customize_reset_password_subject( string $title, string $user_login, WP_User $user_data ): string {
+		if ( ! $user_data->has_cap( 'view_own_nutrio_plan' ) ) {
+			return $title;
+		}
+
+		$client = $this->clients->find_for_user( $user_data->ID );
+
+		if ( null === $client ) {
+			return $title;
+		}
+
+		return $this->mailer->render_html(
+			self::current_email_type(),
+			self::email_context( $client, '', $user_login )
+		)['subject'];
+	}
+
+	/**
+	 * Self-removing wp_mail_content_type filter — fires exactly once,
+	 * for the single wp_mail() call retrieve_password() makes right
+	 * after this filter runs, then unhooks itself so it never affects
+	 * an unrelated later email in the same request.
+	 */
+	public static function force_html_content_type(): string {
+		remove_filter( 'wp_mail_content_type', array( self::class, 'force_html_content_type' ) );
+		return 'text/html';
+	}
+
+	/**
+	 * Which of the two client-facing email types this retrieve_password()
+	 * call is — see ClientInviteService::is_sending_invite()'s docblock.
+	 */
+	private static function current_email_type(): string {
+		return ClientInviteService::is_sending_invite() ? 'client_invite' : 'client_password_reset';
+	}
+
+	/**
+	 * The merge-tag context both the subject and body renders need.
+	 * $key is '' when called from customize_reset_password_subject()
+	 * (the subject template has no {{reset_url}} tag to fill, so the
+	 * unused value is harmless).
+	 *
+	 * @param array<string, mixed> $client     The client row (from find_for_user()).
+	 * @param string               $key        The reset key core generated, or '' when building subject-only context.
+	 * @param string               $user_login The user's login.
+	 *
+	 * @return array<string, string>
+	 */
+	private static function email_context( array $client, string $key, string $user_login ): array {
+		$practitioner_id = (int) ( $client['practitioner_user_id'] ?? 0 );
+		$practitioner     = 0 !== $practitioner_id ? get_userdata( $practitioner_id ) : false;
+
+		$reset_url = '' !== $key
+			? add_query_arg(
+				array(
+					'nutrio_action' => 'resetpass',
+					'key'           => $key,
+					'login'         => rawurlencode( $user_login ),
+				),
+				PortalRewrite::url()
+			)
+			: '';
+
+		return array(
+			'client_first_name' => (string) ( $client['first_name'] ?? '' ),
+			'client_last_name'  => (string) ( $client['last_name'] ?? '' ),
+			'practitioner_name' => false !== $practitioner ? $practitioner->display_name : '',
+			'portal_url'        => PortalRewrite::url(),
+			'reset_url'         => $reset_url,
+			'site_name'         => get_bloginfo( 'name' ),
 		);
 	}
 

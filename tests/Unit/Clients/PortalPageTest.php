@@ -8,7 +8,10 @@ declare( strict_types=1 );
 namespace Nutrio\Tests\Unit\Clients;
 
 use Brain\Monkey\Functions;
+use Nutrio\Clients\ClientInviteService;
 use Nutrio\Clients\PortalPage;
+use Nutrio\Email\EmailTemplateService;
+use Nutrio\Email\Mailer;
 use Nutrio\Repositories\ClientRepository;
 use Nutrio\Tests\TestCase;
 use WP_User;
@@ -20,7 +23,7 @@ final class PortalPageTest extends TestCase {
 		Functions\when( 'home_url' )->alias( static fn( string $path ) => 'https://example.test' . $path );
 
 		$clients = $this->createMock( ClientRepository::class );
-		$page    = new PortalPage( $clients );
+		$page    = new PortalPage( $clients, new Mailer( new EmailTemplateService() ) );
 
 		$user = $this->createMock( WP_User::class );
 		$user->method( 'has_cap' )->with( 'view_own_nutrio_plan' )->willReturn( true );
@@ -32,7 +35,7 @@ final class PortalPageTest extends TestCase {
 
 	public function test_filter_login_redirect_leaves_a_practitioner_untouched(): void {
 		$clients = $this->createMock( ClientRepository::class );
-		$page    = new PortalPage( $clients );
+		$page    = new PortalPage( $clients, new Mailer( new EmailTemplateService() ) );
 
 		$user = $this->createMock( WP_User::class );
 		$user->method( 'has_cap' )->with( 'view_own_nutrio_plan' )->willReturn( false );
@@ -68,7 +71,7 @@ final class PortalPageTest extends TestCase {
 		// wp_get_current_user()/get_current_user_id()).
 		$_GET['client_id'] = '999';
 
-		$page = new PortalPage( $clients );
+		$page = new PortalPage( $clients, new Mailer( new EmailTemplateService() ) );
 
 		self::assertTrue( $page->current_user_is_a_linked_client( $user ) );
 
@@ -83,7 +86,7 @@ final class PortalPageTest extends TestCase {
 		$clients = $this->createMock( ClientRepository::class );
 		$clients->method( 'find_for_user' )->with( 42 )->willReturn( null );
 
-		$page = new PortalPage( $clients );
+		$page = new PortalPage( $clients, new Mailer( new EmailTemplateService() ) );
 
 		self::assertFalse( $page->current_user_is_a_linked_client( $user ) );
 	}
@@ -105,7 +108,7 @@ final class PortalPageTest extends TestCase {
 		$clients = $this->createMock( ClientRepository::class );
 		$clients->method( 'find_for_user' )->with( 42 )->willReturn( array( 'id' => 7 ) );
 
-		$page   = new PortalPage( $clients );
+		$page   = new PortalPage( $clients, new Mailer( new EmailTemplateService() ) );
 		$output = $page->render_shortcode();
 
 		self::assertStringContainsString( 'https://example.test/?nutrio_portal=1', $output );
@@ -123,7 +126,7 @@ final class PortalPageTest extends TestCase {
 		Functions\when( 'remove_query_arg' )->justReturn( 'https://example.test/clients/' );
 
 		$clients = $this->createMock( ClientRepository::class );
-		$page    = new PortalPage( $clients );
+		$page    = new PortalPage( $clients, new Mailer( new EmailTemplateService() ) );
 
 		$output = $page->render_shortcode();
 
@@ -151,7 +154,7 @@ final class PortalPageTest extends TestCase {
 		Functions\when( 'remove_query_arg' )->justReturn( 'https://example.test/clients/' );
 
 		$clients = $this->createMock( ClientRepository::class );
-		$page    = new PortalPage( $clients );
+		$page    = new PortalPage( $clients, new Mailer( new EmailTemplateService() ) );
 
 		$output = $page->render_shortcode( array( 'theme' => 'dark' ) );
 
@@ -171,13 +174,44 @@ final class PortalPageTest extends TestCase {
 		$_GET['nutrio_login_error'] = 'invalid_nonce';
 
 		$clients = $this->createMock( ClientRepository::class );
-		$page    = new PortalPage( $clients );
+		$page    = new PortalPage( $clients, new Mailer( new EmailTemplateService() ) );
 
 		$output = $page->render_shortcode();
 
 		unset( $_GET['nutrio_login_error'] );
 
 		self::assertStringContainsString( 'Your session expired', $output );
+	}
+
+	public function test_customize_reset_password_email_uses_the_invite_template_while_a_client_is_being_invited(): void {
+		Functions\when( 'get_option' )->justReturn( '' );
+		Functions\when( 'home_url' )->alias( static fn ( string $path = '' ) => 'https://example.test' . $path );
+		Functions\when( 'add_query_arg' )->alias(
+			static fn ( $key, $value = '', $url = '' ) => is_array( $key ) ? ( $url ?: 'https://example.test/' ) : ( $url ?: 'https://example.test/' )
+		);
+		Functions\when( 'get_bloginfo' )->justReturn( 'Test Practice' );
+		Functions\when( 'get_theme_mod' )->justReturn( false );
+		Functions\when( 'get_userdata' )->justReturn( false );
+		Functions\when( 'esc_html' )->returnArg( 1 );
+
+		$user = $this->createMock( WP_User::class );
+		$user->method( 'has_cap' )->with( 'view_own_nutrio_plan' )->willReturn( true );
+		$user->ID = 42;
+
+		$clients = $this->createMock( ClientRepository::class );
+		$clients->method( 'find_for_user' )->with( 42 )->willReturn(
+			array( 'first_name' => 'Ana', 'last_name' => 'Lee', 'practitioner_user_id' => 7 )
+		);
+
+		$templates = new EmailTemplateService();
+		$mailer    = new Mailer( $templates );
+		$page      = new PortalPage( $clients, $mailer );
+
+		ClientInviteServiceTestHelper::force_sending_invite( true );
+		$result = $page->customize_reset_password_email( 'original core message', 'key123', 'ana', $user );
+		ClientInviteServiceTestHelper::force_sending_invite( false );
+
+		self::assertStringContainsString( 'invited', $result );
 	}
 
 	/**
