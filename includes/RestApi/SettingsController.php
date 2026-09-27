@@ -9,6 +9,7 @@ declare( strict_types=1 );
 
 namespace Nutrio\RestApi;
 
+use Nutrio\Email\DigestScheduler;
 use Nutrio\Email\EmailTemplateRegistry;
 use Nutrio\Email\EmailTemplateService;
 use WP_Error;
@@ -96,6 +97,34 @@ final class SettingsController extends AbstractController {
 			),
 			required_capability: 'manage_nutrio_settings'
 		);
+
+		$this->register_route(
+			'/email-digest',
+			array(
+				'methods'  => WP_REST_Server::READABLE,
+				'callback' => array( $this, 'get_email_digest' ),
+			),
+			required_capability: 'manage_nutrio_settings'
+		);
+
+		$this->register_route(
+			'/email-digest',
+			array(
+				'methods'  => WP_REST_Server::EDITABLE,
+				'callback' => array( $this, 'update_email_digest' ),
+				'args'     => array(
+					'enabled'   => array(
+						'required' => true,
+						'type'     => 'boolean',
+					),
+					'send_time' => array(
+						'required' => true,
+						'type'     => 'string',
+					),
+				),
+			),
+			required_capability: 'manage_nutrio_settings'
+		);
 	}
 
 	/**
@@ -169,6 +198,57 @@ final class SettingsController extends AbstractController {
 				'body'    => $saved['body'],
 			)
 		);
+	}
+
+	/**
+	 * GET /settings/email-digest — whether the daily digest is enabled
+	 * and what time it's sent.
+	 */
+	public function get_email_digest(): WP_REST_Response {
+		return $this->success(
+			array(
+				'enabled'   => (bool) get_option( 'nutrio_digest_enabled', false ),
+				'send_time' => (string) get_option( 'nutrio_digest_time', '20:00' ),
+			)
+		);
+	}
+
+	/**
+	 * PUT /settings/email-digest — save enabled/send_time and reschedule the cron event.
+	 *
+	 * @param WP_REST_Request $request The current request.
+	 */
+	public function update_email_digest( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$send_time = (string) $request->get_param( 'send_time' );
+
+		if ( 1 !== preg_match( '/^([01]\d|2[0-3]):[0-5]\d$/', $send_time ) ) {
+			return $this->error( 'nutrio_invalid_time', __( 'Send time must be in HH:MM (24-hour) format.', 'nutrio' ), 400 );
+		}
+
+		self::save_option_no_autoload( 'nutrio_digest_enabled', (bool) $request->get_param( 'enabled' ) );
+		self::save_option_no_autoload( 'nutrio_digest_time', $send_time );
+
+		DigestScheduler::reschedule();
+
+		return $this->success(
+			array(
+				'enabled'   => (bool) get_option( 'nutrio_digest_enabled', false ),
+				'send_time' => (string) get_option( 'nutrio_digest_time', '20:00' ),
+			)
+		);
+	}
+
+	/**
+	 * See EmailTemplateService::save()'s identical add_option()-then-
+	 * update_option() idiom for why — guarantees autoload=false
+	 * regardless of which WordPress version's update_option() is in play.
+	 *
+	 * @param string      $name  Option name.
+	 * @param bool|string $value Option value.
+	 */
+	private static function save_option_no_autoload( string $name, bool|string $value ): void {
+		add_option( $name, $value, '', false );
+		update_option( $name, $value );
 	}
 
 	/**
