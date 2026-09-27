@@ -3,7 +3,6 @@ import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import EmailTemplateEditor from '../../components/settings/EmailTemplateEditor';
 import ProUpsellModal from '../../components/ui/ProUpsellModal';
-import Panel, { PanelBody, PanelHead } from '../../components/ui/Panel';
 import { alertDialog } from '../../utils/confirmDialog';
 import type { EmailDigestSettings, EmailTemplate } from '../../types';
 import styles from './EmailSettingsTab.module.css';
@@ -22,6 +21,12 @@ const TYPE_LABELS: Record< string, string > = {
 	practitioner_client_added: __( 'New client added', 'nutrio' ),
 	practitioner_daily_digest: __( 'Daily client activity digest', 'nutrio' ),
 };
+
+// client_invite/client_password_reset are triggered by WordPress core
+// itself and always send — no toggle for those. The daily digest has
+// its own separate enabled/send_time mechanism (see the digest-specific
+// wiring below), not the generic per-type toggle.
+const TOGGLEABLE_TYPES = new Set( [ 'client_plan_assigned', 'practitioner_client_added' ] );
 
 export default function EmailSettingsTab( { audience }: EmailSettingsTabProps ) {
 	const [ templates, setTemplates ] = useState< EmailTemplate[] | null >( null );
@@ -58,6 +63,20 @@ export default function EmailSettingsTab( { audience }: EmailSettingsTabProps ) 
 		await alertDialog( { message: __( 'Email template saved.', 'nutrio' ) } );
 	};
 
+	const handleToggleTemplate = async ( type: string, enabled: boolean ) => {
+		const result = await apiFetch< { type: string; enabled: boolean } >( {
+			path: `/nutrio/v1/settings/email-templates/${ type }/enabled`,
+			method: 'PUT',
+			data: { enabled },
+		} );
+
+		setTemplates( ( previous ) =>
+			( previous ?? [] ).map( ( template ) =>
+				template.type === type ? { ...template, enabled: result.enabled } : template
+			)
+		);
+	};
+
 	const handleSaveDigest = async ( next: EmailDigestSettings ) => {
 		const result = await apiFetch< EmailDigestSettings >( {
 			path: '/nutrio/v1/settings/email-digest',
@@ -75,44 +94,44 @@ export default function EmailSettingsTab( { audience }: EmailSettingsTabProps ) 
 
 	return (
 		<>
-			{ 'practitioner' === audience && null !== digest && (
-				<Panel>
-					<PanelHead>
-						<h3>{ __( 'Daily client activity digest', 'nutrio' ) }</h3>
-					</PanelHead>
-					<PanelBody>
-						<label className={ styles.digestRow }>
-							<input
-								type="checkbox"
-								checked={ digest.enabled }
-								onChange={ ( event ) =>
-									handleSaveDigest( { ...digest, enabled: event.target.checked } )
-								}
-							/>
-							{ __( 'Send me a daily summary of client activity', 'nutrio' ) }
-						</label>
-						<label className={ styles.digestRow }>
-							{ __( 'Send at', 'nutrio' ) }
-							<input
-								type="time"
-								value={ digest.send_time }
-								onChange={ ( event ) =>
-									handleSaveDigest( { ...digest, send_time: event.target.value } )
-								}
-							/>
-						</label>
-					</PanelBody>
-				</Panel>
-			) }
+			{ visibleTemplates.map( ( template ) => {
+				const isDigest = 'practitioner_daily_digest' === template.type;
 
-			{ visibleTemplates.map( ( template ) => (
-				<EmailTemplateEditor
-					key={ template.type }
-					template={ template }
-					label={ TYPE_LABELS[ template.type ] ?? template.type }
-					onSave={ handleSaveTemplate }
-				/>
-			) ) }
+				return (
+					<EmailTemplateEditor
+						key={ template.type }
+						template={ template }
+						label={ TYPE_LABELS[ template.type ] ?? template.type }
+						onSave={ handleSaveTemplate }
+						onToggleEnabled={
+							isDigest
+								? null !== digest
+									? ( enabled ) => handleSaveDigest( { ...digest, enabled } )
+									: undefined
+								: TOGGLEABLE_TYPES.has( template.type )
+								? ( enabled ) => handleToggleTemplate( template.type, enabled )
+								: undefined
+						}
+						extraFields={
+							isDigest && null !== digest ? (
+								<label className={ styles.digestTimeRow }>
+									{ __( 'Send at', 'nutrio' ) }
+									<input
+										type="time"
+										value={ digest.send_time }
+										onChange={ ( event ) =>
+											handleSaveDigest( {
+												...digest,
+												send_time: event.target.value,
+											} )
+										}
+									/>
+								</label>
+							) : undefined
+						}
+					/>
+				);
+			} ) }
 
 			<button
 				type="button"

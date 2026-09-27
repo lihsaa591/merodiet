@@ -53,6 +53,14 @@ final class Mailer {
 	 * @param array<string, string|RawHtml> $context Merge-tag context.
 	 */
 	public function send( string $type, string $to, array $context ): bool {
+		// Checked here, once, rather than in every self-triggered call
+		// site — client_invite/client_password_reset never reach send()
+		// at all (see class docblock), so this never blocks those two;
+		// every type this method actually sends defaults to enabled.
+		if ( ! $this->templates->get( $type )['enabled'] ) {
+			return false;
+		}
+
 		$rendered = $this->render_html( $type, $context );
 
 		return wp_mail(

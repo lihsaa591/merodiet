@@ -99,6 +99,21 @@ final class SettingsController extends AbstractController {
 		);
 
 		$this->register_route(
+			'/email-templates/(?P<type>[a-z_]+)/enabled',
+			array(
+				'methods'  => WP_REST_Server::EDITABLE,
+				'callback' => array( $this, 'update_email_template_enabled' ),
+				'args'     => array(
+					'enabled' => array(
+						'required' => true,
+						'type'     => 'boolean',
+					),
+				),
+			),
+			required_capability: 'manage_nutrio_settings'
+		);
+
+		$this->register_route(
 			'/email-digest',
 			array(
 				'methods'  => WP_REST_Server::READABLE,
@@ -164,6 +179,7 @@ final class SettingsController extends AbstractController {
 				'audience' => EmailTemplateRegistry::get_audience( $type ),
 				'subject'  => $template['subject'],
 				'body'     => $template['body'],
+				'enabled'  => $template['enabled'],
 				'tags'     => EmailTemplateRegistry::get_tags( $type ),
 			);
 		}
@@ -196,6 +212,34 @@ final class SettingsController extends AbstractController {
 				'type'    => $type,
 				'subject' => $saved['subject'],
 				'body'    => $saved['body'],
+				'enabled' => $saved['enabled'],
+			)
+		);
+	}
+
+	/**
+	 * PUT /settings/email-templates/{type}/enabled — toggle one type
+	 * without resending its subject/body.
+	 *
+	 * @param WP_REST_Request $request The current request.
+	 */
+	public function update_email_template_enabled( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$type = (string) $request->get_param( 'type' );
+
+		if ( ! EmailTemplateRegistry::is_known_type( $type ) ) {
+			return $this->error( 'nutrio_unknown_email_type', __( 'Unknown email template.', 'nutrio' ), 404 );
+		}
+
+		$this->templates->set_enabled( $type, (bool) $request->get_param( 'enabled' ) );
+
+		$saved = $this->templates->get( $type );
+
+		return $this->success(
+			array(
+				'type'    => $type,
+				'subject' => $saved['subject'],
+				'body'    => $saved['body'],
+				'enabled' => $saved['enabled'],
 			)
 		);
 	}

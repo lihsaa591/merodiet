@@ -277,6 +277,7 @@ export interface EmailTemplate {
 	audience: 'practitioner' | 'client';
 	subject: string;
 	body: string;
+	enabled: boolean;
 	tags: Record< string, string >;
 }
 

@@ -46,4 +46,22 @@ final class MailerTest extends TestCase {
 		self::assertSame( 'client@example.test', $captured[0] );
 		self::assertContains( 'Content-Type: text/html; charset=UTF-8', $captured[3] );
 	}
+
+	public function test_send_skips_a_disabled_type_without_calling_wp_mail(): void {
+		Functions\when( 'get_option' )->justReturn( array( 'enabled' => false ) );
+
+		$called = false;
+		Functions\when( 'wp_mail' )->alias(
+			static function () use ( &$called ) {
+				$called = true;
+				return true;
+			}
+		);
+
+		$mailer = new Mailer( new EmailTemplateService() );
+		$result = $mailer->send( 'client_plan_assigned', 'client@example.test', array() );
+
+		self::assertFalse( $result );
+		self::assertFalse( $called );
+	}
 }

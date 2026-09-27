@@ -57,6 +57,78 @@ final class EmailTemplateServiceTest extends TestCase {
 		( new EmailTemplateService() )->save( 'not_a_real_type', 'x', 'y' );
 	}
 
+	public function test_get_defaults_enabled_to_true_when_nothing_is_saved(): void {
+		Functions\when( 'get_option' )->justReturn( array() );
+
+		$result = ( new EmailTemplateService() )->get( 'client_plan_assigned' );
+
+		self::assertTrue( $result['enabled'] );
+	}
+
+	public function test_set_enabled_persists_and_never_touches_subject_or_body(): void {
+		$stored = array(
+			'subject' => 'Existing subject',
+			'body'    => 'Existing body',
+			'enabled' => true,
+		);
+
+		Functions\when( 'add_option' )->justReturn( true );
+		Functions\when( 'update_option' )->alias(
+			static function ( string $name, $value ) use ( &$stored ) {
+				$stored = $value;
+				return true;
+			}
+		);
+		Functions\when( 'get_option' )->alias(
+			static function ( string $name, $default = false ) use ( &$stored ) {
+				return $stored ?? $default;
+			}
+		);
+
+		$service = new EmailTemplateService();
+		$service->set_enabled( 'client_plan_assigned', false );
+
+		$result = $service->get( 'client_plan_assigned' );
+
+		self::assertFalse( $result['enabled'] );
+		self::assertSame( 'Existing subject', $result['subject'] );
+		self::assertSame( 'Existing body', $result['body'] );
+	}
+
+	public function test_save_preserves_the_current_enabled_state(): void {
+		$stored = array(
+			'subject' => 'x',
+			'body'    => 'y',
+			'enabled' => false,
+		);
+
+		Functions\when( 'add_option' )->justReturn( true );
+		Functions\when( 'sanitize_text_field' )->returnArg( 1 );
+		Functions\when( 'wp_kses_post' )->returnArg( 1 );
+		Functions\when( 'update_option' )->alias(
+			static function ( string $name, $value ) use ( &$stored ) {
+				$stored = $value;
+				return true;
+			}
+		);
+		Functions\when( 'get_option' )->alias(
+			static function ( string $name, $default = false ) use ( &$stored ) {
+				return $stored ?? $default;
+			}
+		);
+
+		$service = new EmailTemplateService();
+		$service->save( 'client_plan_assigned', 'New subject', 'New body' );
+
+		self::assertFalse( $service->get( 'client_plan_assigned' )['enabled'] );
+	}
+
+	public function test_set_enabled_rejects_an_unknown_type(): void {
+		$this->expectException( InvalidArgumentException::class );
+
+		( new EmailTemplateService() )->set_enabled( 'not_a_real_type', false );
+	}
+
 	public function test_render_substitutes_tags_and_escapes_plain_string_context_values(): void {
 		Functions\when( 'get_option' )->justReturn( array() );
 		Functions\when( 'esc_html' )->alias( static fn ( string $text ) => htmlspecialchars( $text, ENT_QUOTES ) );

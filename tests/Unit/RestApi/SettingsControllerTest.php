@@ -20,8 +20,53 @@ final class SettingsControllerTest extends TestCase {
 
 		$controller = new SettingsController( new EmailTemplateService() );
 		$response   = $controller->get_email_templates();
+		$data       = $response->get_data();
 
-		self::assertCount( 5, $response->get_data() );
+		self::assertCount( 5, $data );
+		self::assertTrue( $data[0]['enabled'] );
+	}
+
+	public function test_update_email_template_enabled_toggles_without_touching_subject_or_body(): void {
+		$stored = array(
+			'subject' => 'Existing subject',
+			'body'    => 'Existing body',
+			'enabled' => true,
+		);
+
+		Functions\when( 'add_option' )->justReturn( true );
+		Functions\when( 'update_option' )->alias(
+			static function ( string $name, $value ) use ( &$stored ) {
+				$stored = $value;
+				return true;
+			}
+		);
+		Functions\when( 'get_option' )->alias(
+			static function ( string $name, $default = false ) use ( &$stored ) {
+				return $stored ?? $default;
+			}
+		);
+
+		$request = new WP_REST_Request();
+		$request->set_param( 'type', 'client_plan_assigned' );
+		$request->set_param( 'enabled', false );
+
+		$controller = new SettingsController( new EmailTemplateService() );
+		$response   = $controller->update_email_template_enabled( $request );
+		$data       = $response->get_data();
+
+		self::assertFalse( $data['enabled'] );
+		self::assertSame( 'Existing subject', $data['subject'] );
+	}
+
+	public function test_update_email_template_enabled_404s_for_an_unknown_type(): void {
+		$request = new WP_REST_Request();
+		$request->set_param( 'type', 'not_a_real_type' );
+		$request->set_param( 'enabled', false );
+
+		$controller = new SettingsController( new EmailTemplateService() );
+		$response   = $controller->update_email_template_enabled( $request );
+
+		self::assertSame( 404, $response->get_error_data()['status'] );
 	}
 
 	public function test_update_email_template_saves_and_returns_the_new_values(): void {

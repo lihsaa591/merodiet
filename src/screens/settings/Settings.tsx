@@ -3,7 +3,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import Panel, { PanelBody, PanelHead } from '../../components/ui/Panel';
 import Button from '../../components/ui/Button';
-import EmailSettingsTab from './EmailSettingsTab';
+import EmailTab from './EmailTab';
 import { alertDialog } from '../../utils/confirmDialog';
 import styles from './Settings.module.css';
 
@@ -12,7 +12,7 @@ interface UsdaKeyState {
 	masked: string | null;
 }
 
-type SettingsTab = 'general' | 'practitioner' | 'client';
+type SettingsTab = 'general' | 'email';
 
 export default function Settings() {
 	const [ activeTab, setActiveTab ] = useState< SettingsTab >( 'general' );
@@ -66,19 +66,11 @@ export default function Settings() {
 				</button>
 				<button
 					className={ `${ styles.tab } ${
-						'practitioner' === activeTab ? styles.isActive : ''
+						'email' === activeTab ? styles.isActive : ''
 					}` }
-					onClick={ () => setActiveTab( 'practitioner' ) }
+					onClick={ () => setActiveTab( 'email' ) }
 				>
-					{ __( 'Practitioner emails', 'nutrio' ) }
-				</button>
-				<button
-					className={ `${ styles.tab } ${
-						'client' === activeTab ? styles.isActive : ''
-					}` }
-					onClick={ () => setActiveTab( 'client' ) }
-				>
-					{ __( 'Client emails', 'nutrio' ) }
+					{ __( 'Email', 'nutrio' ) }
 				</button>
 			</div>
 
@@ -177,10 +169,7 @@ export default function Settings() {
 				</Panel>
 			) }
 
-			{ 'practitioner' === activeTab && (
-				<EmailSettingsTab audience="practitioner" />
-			) }
-			{ 'client' === activeTab && <EmailSettingsTab audience="client" /> }
+			{ 'email' === activeTab && <EmailTab /> }
 		</>
 	);
 }

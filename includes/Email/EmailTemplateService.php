@@ -20,11 +20,18 @@ use InvalidArgumentException;
 final class EmailTemplateService {
 
 	/**
-	 * The effective (saved-override-or-default) subject/body for a type.
+	 * The effective (saved-override-or-default) subject/body for a type,
+	 * plus whether it's currently enabled. `enabled` defaults to true —
+	 * only client_plan_assigned and practitioner_client_added actually
+	 * check it before sending (client_invite/client_password_reset are
+	 * triggered by WordPress core itself and always send; the daily
+	 * digest's on/off state lives in its own nutrio_digest_enabled
+	 * option instead, since it gates whether the cron event is even
+	 * scheduled, not just whether an email goes out when it fires).
 	 *
 	 * @param string $type A known type (see EmailTemplateRegistry::is_known_type()).
 	 *
-	 * @return array{subject: string, body: string}
+	 * @return array{subject: string, body: string, enabled: bool}
 	 */
 	public function get( string $type ): array {
 		$default = EmailTemplateRegistry::get_default( $type );
@@ -33,6 +40,7 @@ final class EmailTemplateService {
 		return array(
 			'subject' => (string) ( $saved['subject'] ?? $default['subject'] ),
 			'body'    => (string) ( $saved['body'] ?? $default['body'] ),
+			'enabled' => (bool) ( $saved['enabled'] ?? true ),
 		);
 	}
 
@@ -46,15 +54,66 @@ final class EmailTemplateService {
 	 * @throws InvalidArgumentException When $type isn't one EmailTemplateRegistry knows.
 	 */
 	public function save( string $type, string $subject, string $body ): void {
-		if ( ! EmailTemplateRegistry::is_known_type( $type ) ) {
-			throw new InvalidArgumentException( "Unknown email template type: {$type}" );
-		}
+		self::assert_known_type( $type );
 
+		// Saving subject/body never touches enabled — read the current
+		// value first so a template edit can't accidentally re-enable a
+		// type the practitioner just turned off.
 		$value = array(
 			'subject' => sanitize_text_field( $subject ),
 			'body'    => wp_kses_post( $body ),
+			'enabled' => $this->get( $type )['enabled'],
 		);
 
+		self::write( $type, $value );
+	}
+
+	/**
+	 * Enable or disable a type — a separate method from save() so the
+	 * frontend's accordion-header toggle never has to resend the whole
+	 * subject/body just to flip this one field.
+	 *
+	 * @param string $type    A known type (see EmailTemplateRegistry::is_known_type()).
+	 * @param bool   $enabled The new enabled state.
+	 *
+	 * @throws InvalidArgumentException When $type isn't one EmailTemplateRegistry knows.
+	 */
+	public function set_enabled( string $type, bool $enabled ): void {
+		self::assert_known_type( $type );
+
+		$current = $this->get( $type );
+
+		self::write(
+			$type,
+			array(
+				'subject' => $current['subject'],
+				'body'    => $current['body'],
+				'enabled' => $enabled,
+			)
+		);
+	}
+
+	/**
+	 * Shared guard for save()/set_enabled() — both write paths must
+	 * reject an unregistered type before touching storage.
+	 *
+	 * @param string $type The type to check.
+	 *
+	 * @throws InvalidArgumentException When $type isn't one EmailTemplateRegistry knows.
+	 */
+	private static function assert_known_type( string $type ): void {
+		if ( ! EmailTemplateRegistry::is_known_type( $type ) ) {
+			throw new InvalidArgumentException( esc_html( "Unknown email template type: {$type}" ) );
+		}
+	}
+
+	/**
+	 * Writes the full stored shape for a type.
+	 *
+	 * @param string               $type  A known type.
+	 * @param array<string, mixed> $value The full stored shape (subject/body/enabled).
+	 */
+	private static function write( string $type, array $value ): void {
 		$option = self::option_name( $type );
 
 		// add_option() no-ops if the option already exists (leaving its
@@ -78,8 +137,8 @@ final class EmailTemplateService {
 	 * @return array{subject: string, body: string}
 	 */
 	public function render( string $type, array $context ): array {
-		$template              = $this->get( $type );
-		$body_replacements     = array();
+		$template             = $this->get( $type );
+		$body_replacements    = array();
 		$subject_replacements = array();
 
 		foreach ( $context as $tag => $value ) {
