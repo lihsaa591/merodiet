@@ -1,0 +1,21 @@
+.tabs {
+	display: flex;
+	gap: 6px;
+	margin: 20px 0 14px;
+}
+.tab {
+	font-family: inherit;
+	font-size: 13px;
+	font-weight: 600;
+	padding: 8px 16px;
+	border-radius: 999px;
+	border: 1px solid var(--line);
+	background: var(--paper-dim);
+	color: var(--ink-faint);
+	cursor: pointer;
+}
+.tab.isActive {
+	background: var(--ink);
+	border-color: var(--ink);
+	color: var(--surface);
+}
