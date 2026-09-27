@@ -89,9 +89,7 @@ export default function EmailTemplateEditor( {
 			<PanelHead>
 				<button
 					type="button"
-					className={ `${ styles.headerRow } ${
-						isExpanded ? '' : styles.headerRowCollapsed
-					}` }
+					className={ styles.headerRow }
 					onClick={ () => setIsExpanded( ( previous ) => ! previous ) }
 					aria-expanded={ isExpanded }
 				>

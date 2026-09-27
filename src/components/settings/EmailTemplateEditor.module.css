@@ -13,17 +13,12 @@
 	gap: 8px;
 	background: none;
 	border: none;
-	padding: 2px 0 4px;
+	padding: 8px 0;
 	font-family: inherit;
 	cursor: pointer;
 	text-align: left;
 	flex: 1;
 	min-width: 0;
-}
-/* Collapsed rows have no PanelBody below to give them breathing room —
-   add it here instead so a collapsed row doesn't look cramped. */
-.headerRowCollapsed {
-	padding-bottom: 14px;
 }
 .headerRow h3 {
 	margin: 0;
@@ -44,6 +39,7 @@
 	display: flex;
 	align-items: center;
 	gap: 6px;
+	padding: 8px 0;
 	font-size: 12.5px;
 	font-weight: 600;
 	color: var(--ink-muted);
