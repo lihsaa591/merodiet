@@ -45,6 +45,19 @@ final class PortalServiceProvider extends AbstractServiceProvider {
 	public function boot( Container $container ): void {
 		add_action( 'init', array( PortalRewrite::class, 'register' ) );
 
+		add_action(
+			'init',
+			static function () use ( $container ) {
+				/**
+				 * The shared PortalPage instance.
+				 *
+				 * @var PortalPage $page
+				 */
+				$page = $container->get( PortalPage::class );
+				add_shortcode( 'nutrio_client_portal', array( $page, 'render_shortcode' ) );
+			}
+		);
+
 		// A site that already had Nutrio active before this feature shipped
 		// won't otherwise get the rewrite rule onto disk until someone
 		// resaves Settings -> Permalinks. Catch it up once, the same way

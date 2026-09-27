@@ -169,8 +169,15 @@ final class PortalPage {
 			return null;
 		}
 
+		// Present only when this submission came from the [nutrio_client_portal]
+		// shortcode embedded on a themed page (see render_login_card_markup()) —
+		// a failed attempt bounces back there instead of rendering inline on
+		// this dedicated page. wp_validate_redirect() collapses anything
+		// off-site (or absent) to '', which fail_login() treats as "not embedded".
+		$redirect_to = isset( $_POST['redirect_to'] ) ? wp_validate_redirect( (string) wp_unslash( $_POST['redirect_to'] ), '' ) : '';
+
 		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nutrio_login_nonce'] ) ), 'nutrio_portal_login' ) ) {
-			return new WP_Error( 'invalid_nonce', __( 'Your session expired — please try again.', 'nutrio' ) );
+			return $this->fail_login( new WP_Error( 'invalid_nonce', __( 'Your session expired — please try again.', 'nutrio' ) ), $redirect_to );
 		}
 
 		$username = isset( $_POST['log'] ) ? sanitize_text_field( wp_unslash( $_POST['log'] ) ) : '';
@@ -189,7 +196,7 @@ final class PortalPage {
 		}
 
 		if ( $errors->has_errors() ) {
-			return $errors;
+			return $this->fail_login( $errors, $redirect_to );
 		}
 
 		$user = wp_signon(
@@ -202,10 +209,31 @@ final class PortalPage {
 		);
 
 		if ( is_wp_error( $user ) ) {
-			return $user;
+			return $this->fail_login( $user, $redirect_to );
 		}
 
+		// Success always lands on the dedicated page, embedded or not —
+		// the full app can't render inside an arbitrary theme page.
 		wp_safe_redirect( PortalRewrite::url() );
+		exit;
+	}
+
+	/**
+	 * A failed login attempt's exit point. Embedded (redirect_to set):
+	 * bounces back to the originating themed page with the error code in
+	 * the query string, for render_shortcode() to read back out and
+	 * display inline. Not embedded: returns the error as before, for
+	 * handle_request() to pass straight to render_login_form().
+	 *
+	 * @param WP_Error $error       The failed attempt.
+	 * @param string   $redirect_to A validated local URL to bounce back to, or '' when this request wasn't embedded.
+	 */
+	private function fail_login( WP_Error $error, string $redirect_to ): WP_Error {
+		if ( '' === $redirect_to ) {
+			return $error;
+		}
+
+		wp_safe_redirect( add_query_arg( 'nutrio_login_error', $error->get_error_code(), $redirect_to ) );
 		exit;
 	}
 
@@ -503,10 +531,31 @@ final class PortalPage {
 			<?php wp_head(); ?>
 		</head>
 		<body class="nutrio-portal-login">
-			<main class="nutrio-portal-login-card">
-				<?php $this->render_site_logo(); ?>
-				<div class="nutrio-portal-login-heading">
-					<h1><?php esc_html_e( 'Client Portal', 'nutrio' ); ?></h1>
+			<?php $this->render_login_card_markup( $error ); ?>
+			<?php wp_footer(); ?>
+		</body>
+		</html>
+		<?php
+	}
+
+	/**
+	 * The login card fragment — shared by this page's own full-screen
+	 * render_login_form() and the [nutrio_client_portal] shortcode's
+	 * embedded render_shortcode(). Never rendered standalone: always
+	 * inside either that page's <body class="nutrio-portal-login"> or a
+	 * themed page's content area.
+	 *
+	 * @param WP_Error|null $error            A failed attempt to show inline, if any.
+	 * @param string        $redirect_to      When embedded, the themed page to bounce a failed attempt back to — carried as a hidden field so maybe_process_login()/fail_login() can read it back. Empty on the dedicated page itself, where a failure just re-renders in place.
+	 * @param bool          $show_theme_toggle The toggle button calls window.nutrioTogglePortalTheme(), only defined by render_theme_init_script() in this page's own <head> — dead on a themed page, which also already has its own light/dark story. False when embedded.
+	 */
+	private function render_login_card_markup( ?WP_Error $error, string $redirect_to = '', bool $show_theme_toggle = true ): void {
+		?>
+		<main class="nutrio-portal-login-card">
+			<?php $this->render_site_logo(); ?>
+			<div class="nutrio-portal-login-heading">
+				<h1><?php esc_html_e( 'Client Portal', 'nutrio' ); ?></h1>
+				<?php if ( $show_theme_toggle ) : ?>
 					<button
 						type="button"
 						class="nutrio-portal-theme-toggle"
@@ -517,38 +566,86 @@ final class PortalPage {
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nutrio-portal-theme-icon-sun"><circle cx="12" cy="12" r="4" /><path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" /></svg>
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nutrio-portal-theme-icon-moon"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" /></svg>
 					</button>
-				</div>
-				<?php if ( $error instanceof WP_Error ) : ?>
-					<?php $this->render_login_errors( $error ); ?>
 				<?php endif; ?>
-				<form name="loginform" id="loginform" method="post" action="<?php echo esc_url( PortalRewrite::url() ); ?>">
-					<p class="login-username">
-						<label for="user_login"><?php esc_html_e( 'Username or Email Address', 'nutrio' ); ?></label>
-						<input type="text" name="log" id="user_login" class="input" value="" size="20" autocapitalize="off" autocomplete="username" />
-					</p>
-					<p class="login-password">
-						<label for="user_pass"><?php esc_html_e( 'Password', 'nutrio' ); ?></label>
-						<input type="password" name="pwd" id="user_pass" class="input" value="" size="20" autocomplete="current-password" />
-					</p>
-					<p class="forgetmenot">
-						<input name="rememberme" type="checkbox" id="rememberme" value="forever" />
-						<label for="rememberme"><?php esc_html_e( 'Remember Me', 'nutrio' ); ?></label>
-					</p>
-					<p class="login-submit">
-						<?php wp_nonce_field( 'nutrio_portal_login', 'nutrio_login_nonce' ); ?>
-						<input type="submit" name="wp-submit" id="wp-submit" value="<?php esc_attr_e( 'Log In', 'nutrio' ); ?>" />
-					</p>
-				</form>
-				<p class="nutrio-portal-login-lostpassword">
-					<a href="<?php echo esc_url( add_query_arg( 'nutrio_action', 'lostpassword', PortalRewrite::url() ) ); ?>">
-						<?php esc_html_e( 'Forgot your password?', 'nutrio' ); ?>
-					</a>
+			</div>
+			<?php if ( $error instanceof WP_Error ) : ?>
+				<?php $this->render_login_errors( $error ); ?>
+			<?php endif; ?>
+			<form name="loginform" id="loginform" method="post" action="<?php echo esc_url( PortalRewrite::url() ); ?>">
+				<?php if ( '' !== $redirect_to ) : ?>
+					<input type="hidden" name="redirect_to" value="<?php echo esc_attr( $redirect_to ); ?>" />
+				<?php endif; ?>
+				<p class="login-username">
+					<label for="user_login"><?php esc_html_e( 'Username or Email Address', 'nutrio' ); ?></label>
+					<input type="text" name="log" id="user_login" class="input" value="" size="20" autocapitalize="off" autocomplete="username" />
 				</p>
-			</main>
-			<?php wp_footer(); ?>
-		</body>
-		</html>
+				<p class="login-password">
+					<label for="user_pass"><?php esc_html_e( 'Password', 'nutrio' ); ?></label>
+					<input type="password" name="pwd" id="user_pass" class="input" value="" size="20" autocomplete="current-password" />
+				</p>
+				<p class="forgetmenot">
+					<input name="rememberme" type="checkbox" id="rememberme" value="forever" />
+					<label for="rememberme"><?php esc_html_e( 'Remember Me', 'nutrio' ); ?></label>
+				</p>
+				<p class="login-submit">
+					<?php wp_nonce_field( 'nutrio_portal_login', 'nutrio_login_nonce' ); ?>
+					<input type="submit" name="wp-submit" id="wp-submit" value="<?php esc_attr_e( 'Log In', 'nutrio' ); ?>" />
+				</p>
+			</form>
+			<p class="nutrio-portal-login-lostpassword">
+				<a href="<?php echo esc_url( add_query_arg( 'nutrio_action', 'lostpassword', PortalRewrite::url() ) ); ?>">
+					<?php esc_html_e( 'Forgot your password?', 'nutrio' ); ?>
+				</a>
+			</p>
+		</main>
 		<?php
+	}
+
+	/**
+	 * [nutrio_client_portal] — embeds just the login card inside an
+	 * ordinary themed page (header/footer stay intact around it); the
+	 * full app still needs its own dedicated page (see class docblock —
+	 * .nutrio-shell/.nutrio-rail assume a full 100vh layout an arbitrary
+	 * theme's content area can't provide). The login form itself still
+	 * posts to the dedicated page (see render_login_card_markup()) —
+	 * this shortcode never processes a login attempt directly.
+	 *
+	 * A visitor already logged in as a linked client gets a link to the
+	 * dedicated portal instead of a login form they don't need.
+	 *
+	 * @param array<string, string>|string $atts Shortcode attributes — only `theme` ("light", the default, or "dark") is recognized; anything else is ignored. Unlike the dedicated page, there's no toggle button here (see render_login_card_markup()) and no data-theme on <html> to read, so this is a fixed, author-chosen setting rather than something the visitor can flip.
+	 */
+	public function render_shortcode( $atts = array() ): string {
+		Assets::enqueue_style( 'nutrio-portal-login', NUTRIO_PATH . 'build', NUTRIO_URL . 'build', 'portal-login' );
+
+		$atts  = shortcode_atts( array( 'theme' => 'light' ), $atts, 'nutrio_client_portal' );
+		$theme = 'dark' === $atts['theme'] ? 'dark' : 'light';
+
+		if ( is_user_logged_in() && $this->current_user_is_a_linked_client( wp_get_current_user() ) ) {
+			return sprintf(
+				'<div class="nutrio-portal-embed" data-theme="%s"><p class="nutrio-portal-login-lostpassword"><a href="%s">%s</a></p></div>',
+				esc_attr( $theme ),
+				esc_url( PortalRewrite::url() ),
+				esc_html__( 'You are already logged in — go to your portal →', 'nutrio' )
+			);
+		}
+
+		// Set only when we just bounced back from a failed attempt (see
+		// fail_login()) — the code is our own, never user-supplied free text.
+		$error_code = isset( $_GET['nutrio_login_error'] ) ? sanitize_text_field( wp_unslash( $_GET['nutrio_login_error'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display of a code this same class generated via a redirect, not a state-changing action.
+		$error      = '' !== $error_code ? new WP_Error( $error_code ) : null;
+
+		// Where a failed resubmission should bounce back to — this same
+		// page, with the error code itself stripped so a retry starts clean.
+		$redirect_to = remove_query_arg( 'nutrio_login_error' );
+
+		ob_start();
+		?>
+		<div class="nutrio-portal-embed" data-theme="<?php echo esc_attr( $theme ); ?>">
+			<?php $this->render_login_card_markup( $error, $redirect_to, false ); ?>
+		</div>
+		<?php
+		return (string) ob_get_clean();
 	}
 
 	/**
