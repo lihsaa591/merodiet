@@ -15,8 +15,18 @@ export default function Panel( {
 	);
 }
 
-export function PanelHead( { children }: { children: ReactNode } ) {
-	return <div className={ styles.panelHead }>{ children }</div>;
+export function PanelHead( {
+	children,
+	className = '',
+}: {
+	children: ReactNode;
+	className?: string;
+} ) {
+	return (
+		<div className={ `${ styles.panelHead } ${ className }`.trim() }>
+			{ children }
+		</div>
+	);
 }
 
 export function PanelBody( {

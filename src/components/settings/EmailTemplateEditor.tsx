@@ -86,7 +86,7 @@ export default function EmailTemplateEditor( {
 
 	return (
 		<Panel className={ styles.accordionItem }>
-			<PanelHead>
+			<PanelHead className={ styles.panelHead }>
 				<button
 					type="button"
 					className={ styles.headerRow }
@@ -122,7 +122,7 @@ export default function EmailTemplateEditor( {
 				) }
 			</PanelHead>
 			{ isExpanded && (
-				<PanelBody>
+				<PanelBody className={ styles.panelBody }>
 					<form onSubmit={ handleSave } className={ styles.form }>
 						{ extraFields }
 						<div className="nutrio-field">
