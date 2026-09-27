@@ -9,7 +9,8 @@ import Skeleton from '../../components/ui/Skeleton';
 import Drawer from '../../components/ui/Drawer';
 import LogHistoryList from '../../components/clients/LogHistoryList';
 import MeasurementHistoryList from '../../components/clients/MeasurementHistoryList';
-import { readStoredWeightUnit } from '../../utils/weight';
+import { readStoredWeightUnit, gramsToDisplay } from '../../utils/weight';
+import { formatShortDate } from '../../utils/date';
 import { confirmDialog } from '../../utils/confirmDialog';
 import ClientForm from './ClientForm';
 import type { Client, ClientInput, LogEntry, Measurement } from '../../types';
@@ -32,7 +33,15 @@ interface ClientDetailProps {
 	onBack: () => void;
 }
 
-const HISTORY_DAYS = 30;
+// Matches the client portal's own LogTab.tsx/MeasurementsTab.tsx
+// "load more" convention: start at one page, widen the date range and
+// refetch from scratch (not append) on each click, since the /logs
+// and /measurements endpoints only support from/to filtering, not
+// true offset pagination.
+const HISTORY_PAGE_DAYS = 30;
+const HISTORY_MAX_DAYS = 180;
+
+type DetailTab = 'logs' | 'measurements';
 
 function daysAgo( days: number ): string {
 	const date = new Date();
@@ -58,6 +67,13 @@ export default function ClientDetail( {
 	>( undefined );
 	const [ isDrawerOpen, setDrawerOpen ] = useState( false );
 	const [ isFormDirty, setFormDirty ] = useState( false );
+	const [ activeTab, setActiveTab ] = useState< DetailTab >( 'logs' );
+	const [ logsRangeDays, setLogsRangeDays ] = useState( HISTORY_PAGE_DAYS );
+	const [ isLoadingMoreLogs, setIsLoadingMoreLogs ] = useState( false );
+	const [ measurementsRangeDays, setMeasurementsRangeDays ] =
+		useState( HISTORY_PAGE_DAYS );
+	const [ isLoadingMoreMeasurements, setIsLoadingMoreMeasurements ] =
+		useState( false );
 
 	const { updateClient } = useDispatch( STORE_NAME ) as {
 		updateClient: (
@@ -80,16 +96,56 @@ export default function ClientDetail( {
 		} ).then( setCompliance, () => setCompliance( undefined ) );
 		apiFetch< LogEntry[] >( {
 			path: `/nutrio/v1/clients/${ clientId }/logs?from=${ daysAgo(
-				HISTORY_DAYS - 1
+				HISTORY_PAGE_DAYS - 1
 			) }&to=${ today }`,
 		} ).then( setLogs, () => setLogs( [] ) );
 		apiFetch< Measurement[] >( {
 			path: `/nutrio/v1/clients/${ clientId }/measurements?from=${ daysAgo(
-				HISTORY_DAYS - 1
+				HISTORY_PAGE_DAYS - 1
 			) }&to=${ today }`,
 		} ).then( setMeasurements, () => setMeasurements( [] ) );
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- clientId/today are stable for the component's lifetime.
 	}, [] );
+
+	const loadMoreLogs = () => {
+		const nextRange = Math.min(
+			logsRangeDays + HISTORY_PAGE_DAYS,
+			HISTORY_MAX_DAYS
+		);
+		setIsLoadingMoreLogs( true );
+
+		apiFetch< LogEntry[] >( {
+			path: `/nutrio/v1/clients/${ clientId }/logs?from=${ daysAgo(
+				nextRange - 1
+			) }&to=${ today }`,
+		} )
+			.then( ( entries ) => {
+				setLogs( entries );
+				setLogsRangeDays( nextRange );
+			} )
+			.catch( () => {} )
+			.finally( () => setIsLoadingMoreLogs( false ) );
+	};
+
+	const loadMoreMeasurements = () => {
+		const nextRange = Math.min(
+			measurementsRangeDays + HISTORY_PAGE_DAYS,
+			HISTORY_MAX_DAYS
+		);
+		setIsLoadingMoreMeasurements( true );
+
+		apiFetch< Measurement[] >( {
+			path: `/nutrio/v1/clients/${ clientId }/measurements?from=${ daysAgo(
+				nextRange - 1
+			) }&to=${ today }`,
+		} )
+			.then( ( entries ) => {
+				setMeasurements( entries );
+				setMeasurementsRangeDays( nextRange );
+			} )
+			.catch( () => {} )
+			.finally( () => setIsLoadingMoreMeasurements( false ) );
+	};
 
 	const isLoading =
 		undefined === client ||
@@ -100,6 +156,22 @@ export default function ClientDetail( {
 	for ( const entry of logs ?? [] ) {
 		( logsByDate[ entry.log_date ] ??= [] ).push( entry );
 	}
+
+	// Same latest-weight/delta-vs-previous calculation as the
+	// client-portal's own DashboardTab.tsx.
+	const weighed = ( measurements ?? [] ).filter(
+		( m ): m is Measurement & { weight_grams: number } =>
+			null !== m.weight_grams
+	);
+	const latestWeight = weighed[ 0 ] ?? null;
+	const weightDelta =
+		weighed.length > 1
+			? Math.round(
+					( gramsToDisplay( weighed[ 0 ].weight_grams, unit ) -
+						gramsToDisplay( weighed[ 1 ].weight_grams, unit ) ) *
+						10
+			  ) / 10
+			: null;
 
 	const closeDrawer = () => setDrawerOpen( false );
 
@@ -120,7 +192,7 @@ export default function ClientDetail( {
 						className={ styles.backLink }
 						onClick={ onBack }
 					>
-						{ __( '← Back to roster', 'nutrio' ) }
+						{ __( '← Back to clients', 'nutrio' ) }
 					</button>
 					<h1>
 						{ client
@@ -147,71 +219,152 @@ export default function ClientDetail( {
 
 			{ ! isLoading && (
 				<>
-					<Panel>
-						<PanelBody>
-							<h3 className={ styles.sectionTitle }>
-								{ __( 'Compliance', 'nutrio' ) }
-							</h3>
-							{ compliance && null === compliance.plan && (
+					{ compliance && null === compliance.plan && (
+						<Panel>
+							<PanelBody>
+								<h3 className={ styles.sectionTitle }>
+									{ __( 'Compliance', 'nutrio' ) }
+								</h3>
 								<p className={ styles.empty }>
 									{ __(
 										'No active plan assigned.',
 										'nutrio'
 									) }
 								</p>
-							) }
-							{ compliance && compliance.plan && (
-								<div className="nutrio-kpi">
-									<div className="nutrio-kpi-label">
-										{ compliance.plan.title }
+							</PanelBody>
+						</Panel>
+					) }
+
+					{ compliance && compliance.plan && (
+						<div className="nutrio-kpi-row">
+							<div className="nutrio-kpi">
+								<div className="nutrio-kpi-label">
+									{ __( 'Compliance', 'nutrio' ) }
+								</div>
+								{ null === compliance.percent ? (
+									<div className="nutrio-kpi-value">
+										{ __( 'No items scheduled', 'nutrio' ) }
 									</div>
-									{ null === compliance.percent ? (
+								) : (
+									<>
 										<div className="nutrio-kpi-value">
-											{ __(
-												'No items scheduled this week',
-												'nutrio'
-											) }
+											{ compliance.percent }%
 										</div>
-									) : (
-										<>
-											<div className="nutrio-kpi-value">
-												{ compliance.percent }%
-											</div>
-											<div className="nutrio-kpi-delta">
-												{ compliance.logged_count } /{ ' ' }
-												{ compliance.total_count }{ ' ' }
-												{ __(
-													'items logged',
-													'nutrio'
-												) }
-											</div>
-										</>
+										<div className="nutrio-kpi-delta">
+											{ compliance.logged_count } /{ ' ' }
+											{ compliance.total_count }{ ' ' }
+											{ __( 'items logged', 'nutrio' ) }
+										</div>
+									</>
+								) }
+							</div>
+
+							<div className="nutrio-kpi">
+								<div className="nutrio-kpi-label">
+									{ __( 'Plan', 'nutrio' ) }
+								</div>
+								<div className="nutrio-kpi-value">
+									{ compliance.plan.title }
+								</div>
+								<div className="nutrio-kpi-delta">
+									{ formatShortDate(
+										compliance.plan.start_date
+									) }{ ' ' }
+									–{ ' ' }
+									{ formatShortDate(
+										compliance.plan.end_date
 									) }
 								</div>
-							) }
-						</PanelBody>
-					</Panel>
+							</div>
 
-					<Panel>
-						<PanelBody>
-							<h3 className={ styles.sectionTitle }>
-								{ __( 'Log history', 'nutrio' ) }
-							</h3>
-							<LogHistoryList entriesByDate={ logsByDate } />
-						</PanelBody>
-					</Panel>
+							<div className="nutrio-kpi">
+								<div className="nutrio-kpi-label">
+									{ __( 'Current weight', 'nutrio' ) }
+								</div>
+								<div className="nutrio-kpi-value">
+									{ latestWeight
+										? `${ gramsToDisplay(
+												latestWeight.weight_grams,
+												unit
+										  ) } ${ unit }`
+										: '—' }
+								</div>
+								{ null !== weightDelta && 0 !== weightDelta && (
+									<div className="nutrio-kpi-delta">
+										{ weightDelta > 0 ? '↑' : '↓' }{ ' ' }
+										{ Math.abs( weightDelta ) } { unit }{ ' ' }
+										{ __( 'since last', 'nutrio' ) }
+									</div>
+								) }
+							</div>
+						</div>
+					) }
 
-					<Panel>
-						<PanelBody>
-							<h3 className={ styles.sectionTitle }>
-								{ __( 'Measurements', 'nutrio' ) }
-							</h3>
-							<MeasurementHistoryList
-								measurements={ measurements ?? [] }
-								unit={ unit }
-							/>
-						</PanelBody>
-					</Panel>
+					<div className={ styles.tabs }>
+						<button
+							type="button"
+							className={ `${ styles.tab } ${
+								'logs' === activeTab ? styles.isActive : ''
+							}`.trim() }
+							onClick={ () => setActiveTab( 'logs' ) }
+						>
+							{ __( 'Log history', 'nutrio' ) }
+						</button>
+						<button
+							type="button"
+							className={ `${ styles.tab } ${
+								'measurements' === activeTab
+									? styles.isActive
+									: ''
+							}`.trim() }
+							onClick={ () => setActiveTab( 'measurements' ) }
+						>
+							{ __( 'Measurements', 'nutrio' ) }
+						</button>
+					</div>
+
+					{ 'logs' === activeTab && (
+						<Panel>
+							<PanelBody>
+								<LogHistoryList entriesByDate={ logsByDate } />
+								{ logsRangeDays < HISTORY_MAX_DAYS && (
+									<button
+										type="button"
+										className={ styles.loadMore }
+										onClick={ loadMoreLogs }
+										disabled={ isLoadingMoreLogs }
+									>
+										{ isLoadingMoreLogs
+											? __( 'Loading…', 'nutrio' )
+											: __( 'Load more', 'nutrio' ) }
+									</button>
+								) }
+							</PanelBody>
+						</Panel>
+					) }
+
+					{ 'measurements' === activeTab && (
+						<Panel>
+							<PanelBody>
+								<MeasurementHistoryList
+									measurements={ measurements ?? [] }
+									unit={ unit }
+								/>
+								{ measurementsRangeDays < HISTORY_MAX_DAYS && (
+									<button
+										type="button"
+										className={ styles.loadMore }
+										onClick={ loadMoreMeasurements }
+										disabled={ isLoadingMoreMeasurements }
+									>
+										{ isLoadingMoreMeasurements
+											? __( 'Loading…', 'nutrio' )
+											: __( 'Load more', 'nutrio' ) }
+									</button>
+								) }
+							</PanelBody>
+						</Panel>
+					) }
 				</>
 			) }
 
