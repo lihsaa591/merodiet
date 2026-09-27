@@ -24,6 +24,9 @@ if ( ! defined( 'NUTRIO_PATH' ) ) {
 if ( ! defined( 'NUTRIO_URL' ) ) {
 	define( 'NUTRIO_URL', 'https://example.test/wp-content/plugins/nutrio/' );
 }
+if ( ! defined( 'NUTRIO_DEVELOPMENT' ) ) {
+	define( 'NUTRIO_DEVELOPMENT', false );
+}
 if ( ! defined( 'ABSPATH' ) ) {
 	define( 'ABSPATH', sys_get_temp_dir() . '/' );
 }
@@ -52,6 +55,21 @@ if ( ! class_exists( 'WP_Error' ) ) {
 		public function get_error_code(): string {
 			$codes = array_keys( $this->errors );
 			return $codes[0] ?? '';
+		}
+
+		public function get_error_codes(): array {
+			return array_keys( $this->errors );
+		}
+
+		public function has_errors(): bool {
+			return array() !== $this->errors;
+		}
+
+		public function add( string $code, string $message = '', $data = '' ): void {
+			$this->errors[ $code ][] = $message;
+			if ( '' !== $data ) {
+				$this->error_data[ $code ] = $data;
+			}
 		}
 
 		public function get_error_message(): string {

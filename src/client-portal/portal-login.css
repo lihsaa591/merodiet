@@ -21,6 +21,77 @@ body.nutrio-portal-login {
 	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
+/*
+ * [nutrio_client_portal] embeds the card into an arbitrary themed page,
+ * which never runs render_theme_init_script() — so there's no data-theme
+ * on <html> to opt out of the @media (prefers-color-scheme: dark) block
+ * above, and no toggle button to change it (see render_login_card_markup()
+ * — the toggle is hidden when embedded). This wrapper carries its own
+ * data-theme instead, set from the shortcode's own `theme` attribute
+ * (default "light" — see PortalPage::render_shortcode()), and always
+ * wins over the visitor's OS setting since these custom properties are
+ * defined directly on this element, not inherited from :root.
+ */
+/*
+ * Unlike body.nutrio-portal-login above, this wrapper sits inside a
+ * theme's own content column (any width) rather than a dedicated
+ * full-viewport page — it centers the card within whatever space the
+ * theme gives it instead of assuming the full page.
+ */
+.nutrio-portal-embed {
+	display: flex;
+	justify-content: center;
+	padding: 24px 0;
+}
+
+.nutrio-portal-embed[data-theme='light'] {
+	--paper: #fafafa;
+	--paper-dim: #f1f1f2;
+	--surface: #ffffff;
+	--surface-raised: #ffffff;
+	--ink: #26262a;
+	--ink-muted: #6d6d74;
+	--ink-faint: #9d9da3;
+	--line: #e7e6ea;
+	--line-strong: #d5d3da;
+	--sage: #5b5fa6;
+	--sage-deep: #454880;
+	--sage-wash: #e6e6f5;
+	--clay: #8b8b90;
+	--clay-wash: #f0eff1;
+	--success: #4c9179;
+	--success-wash: #e5f2ed;
+	--warning: #b08a3c;
+	--warning-wash: #f6efdf;
+	--critical: #c1554d;
+	--critical-wash: #fbecea;
+	color-scheme: light;
+}
+
+.nutrio-portal-embed[data-theme='dark'] {
+	--paper: #1c1a20;
+	--paper-dim: #151318;
+	--surface: #242229;
+	--surface-raised: #2b2831;
+	--ink: #e9e6ef;
+	--ink-muted: #a39daf;
+	--ink-faint: #716b7d;
+	--line: #34303b;
+	--line-strong: #423d4a;
+	--sage: #5b5fa6;
+	--sage-deep: #7579c4;
+	--sage-wash: #23233d;
+	--clay: #8d889b;
+	--clay-wash: #2b2833;
+	--success: #7fc1a8;
+	--success-wash: #1f332b;
+	--warning: #d8b268;
+	--warning-wash: #362c18;
+	--critical: #e29089;
+	--critical-wash: #3a2422;
+	color-scheme: dark;
+}
+
 .nutrio-portal-login-card {
 	background: var(--surface);
 	border: 1px solid var(--line);
