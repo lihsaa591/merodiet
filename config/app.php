@@ -57,6 +57,7 @@ return array(
 				\Nutrio\Nutrition\FoodCache::class,
 				\Nutrio\Repositories\RecipeRepository::class,
 				\Nutrio\Nutrition\RecipeNutrientResolver::class,
+				\Nutrio\Email\Mailer::class,
 			),
 			\Nutrio\RestApi\SettingsController::class    => array( \Nutrio\Email\EmailTemplateService::class ),
 			\Nutrio\RestApi\MeController::class          => array(

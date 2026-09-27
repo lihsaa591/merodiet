@@ -9,6 +9,8 @@ declare( strict_types=1 );
 
 namespace Nutrio\RestApi;
 
+use Nutrio\Clients\PortalRewrite;
+use Nutrio\Email\Mailer;
 use Nutrio\Nutrition\FoodCache;
 use Nutrio\Nutrition\PlanNutrientResolver;
 use Nutrio\Nutrition\RecipeNutrientResolver;
@@ -62,6 +64,7 @@ final class PlansController extends AbstractPractitionerController {
 	 * @param FoodCache              $food_cache      Used to attach food detail to plan items.
 	 * @param RecipeRepository       $recipes         Used to attach recipe detail to plan items.
 	 * @param RecipeNutrientResolver $recipe_resolver Computes a recipe item's live per-serving nutrient totals.
+	 * @param Mailer                 $mailer          Sends the client_plan_assigned notification on assign.
 	 */
 	public function __construct(
 		private readonly PlanRepository $plans,
@@ -69,7 +72,8 @@ final class PlansController extends AbstractPractitionerController {
 		private readonly ClientRepository $clients,
 		private readonly FoodCache $food_cache,
 		private readonly RecipeRepository $recipes,
-		private readonly RecipeNutrientResolver $recipe_resolver
+		private readonly RecipeNutrientResolver $recipe_resolver,
+		private readonly Mailer $mailer
 	) {}
 
 	/**
@@ -327,6 +331,19 @@ final class PlansController extends AbstractPractitionerController {
 		$snapshot = $this->resolver->calculate_plan_totals( $id );
 
 		$this->plans->assign( $id, $client_id, $snapshot );
+
+		$this->mailer->send(
+			'client_plan_assigned',
+			(string) $client['email'],
+			array(
+				'client_first_name' => (string) $client['first_name'],
+				'practitioner_name' => wp_get_current_user()->display_name,
+				'plan_title'        => (string) $plan['title'],
+				'start_date'        => (string) $plan['start_date'],
+				'end_date'          => (string) $plan['end_date'],
+				'portal_url'        => PortalRewrite::url(),
+			)
+		);
 
 		/**
 		 * The just-assigned plan.

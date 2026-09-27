@@ -59,7 +59,7 @@ final class ControllerCapabilitiesTest extends TestCase {
 			),
 			'RecipesController'  => array( RecipesController::class, array( RecipeRepository::class, RecipeNutrientResolver::class, FoodCache::class ), 'manage_nutrio_recipes' ),
 			'FoodsController'    => array( FoodsController::class, array( FoodDataService::class ), 'manage_nutrio_foods' ),
-			'PlansController'    => array( PlansController::class, array( PlanRepository::class, PlanNutrientResolver::class, ClientRepository::class, FoodCache::class, RecipeRepository::class, RecipeNutrientResolver::class ), 'manage_nutrio_plans' ),
+			'PlansController'    => array( PlansController::class, array( PlanRepository::class, PlanNutrientResolver::class, ClientRepository::class, FoodCache::class, RecipeRepository::class, RecipeNutrientResolver::class, Mailer::class ), 'manage_nutrio_plans' ),
 			'MeController'       => array(
 				MeController::class,
 				array(
