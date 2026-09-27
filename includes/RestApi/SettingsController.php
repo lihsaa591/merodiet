@@ -9,6 +9,9 @@ declare( strict_types=1 );
 
 namespace Nutrio\RestApi;
 
+use Nutrio\Email\EmailTemplateRegistry;
+use Nutrio\Email\EmailTemplateService;
+use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
@@ -31,6 +34,11 @@ final class SettingsController extends AbstractController {
 	 * @var string
 	 */
 	protected string $rest_base = 'settings';
+
+	/**
+	 * @param EmailTemplateService $templates Per-type email template storage.
+	 */
+	public function __construct( private readonly EmailTemplateService $templates ) {}
 
 	/**
 	 * Register the USDA key routes.
@@ -60,6 +68,34 @@ final class SettingsController extends AbstractController {
 			),
 			required_capability: 'manage_nutrio_foods'
 		);
+
+		$this->register_route(
+			'/email-templates',
+			array(
+				'methods'  => WP_REST_Server::READABLE,
+				'callback' => array( $this, 'get_email_templates' ),
+			),
+			required_capability: 'manage_nutrio_settings'
+		);
+
+		$this->register_route(
+			'/email-templates/(?P<type>[a-z_]+)',
+			array(
+				'methods'  => WP_REST_Server::EDITABLE,
+				'callback' => array( $this, 'update_email_template' ),
+				'args'     => array(
+					'subject' => array(
+						'required' => true,
+						'type'     => 'string',
+					),
+					'body'    => array(
+						'required' => true,
+						'type'     => 'string',
+					),
+				),
+			),
+			required_capability: 'manage_nutrio_settings'
+		);
 	}
 
 	/**
@@ -81,6 +117,58 @@ final class SettingsController extends AbstractController {
 		update_option( 'nutrio_usda_api_key', $api_key );
 
 		return $this->success( self::describe( $api_key ) );
+	}
+
+	/**
+	 * GET /settings/email-templates — every known type's effective
+	 * subject/body, its allowed merge tags, and which Settings tab it
+	 * belongs on.
+	 */
+	public function get_email_templates(): WP_REST_Response {
+		$types = array();
+
+		foreach ( EmailTemplateRegistry::all_types() as $type ) {
+			$template = $this->templates->get( $type );
+
+			$types[] = array(
+				'type'     => $type,
+				'audience' => EmailTemplateRegistry::get_audience( $type ),
+				'subject'  => $template['subject'],
+				'body'     => $template['body'],
+				'tags'     => EmailTemplateRegistry::get_tags( $type ),
+			);
+		}
+
+		return $this->success( $types );
+	}
+
+	/**
+	 * PUT /settings/email-templates/{type} — save one type's subject/body override.
+	 *
+	 * @param WP_REST_Request $request The current request.
+	 */
+	public function update_email_template( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$type = (string) $request->get_param( 'type' );
+
+		if ( ! EmailTemplateRegistry::is_known_type( $type ) ) {
+			return $this->error( 'nutrio_unknown_email_type', __( 'Unknown email template.', 'nutrio' ), 404 );
+		}
+
+		$this->templates->save(
+			$type,
+			(string) $request->get_param( 'subject' ),
+			(string) $request->get_param( 'body' )
+		);
+
+		$saved = $this->templates->get( $type );
+
+		return $this->success(
+			array(
+				'type'    => $type,
+				'subject' => $saved['subject'],
+				'body'    => $saved['body'],
+			)
+		);
 	}
 
 	/**
