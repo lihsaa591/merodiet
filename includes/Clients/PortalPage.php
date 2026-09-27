@@ -9,7 +9,6 @@ declare( strict_types=1 );
 
 namespace Nutrio\Clients;
 
-use Nutrio\Clients\ClientInviteService;
 use Nutrio\Email\Mailer;
 use Nutrio\Helper\Assets;
 use Nutrio\Repositories\ClientRepository;

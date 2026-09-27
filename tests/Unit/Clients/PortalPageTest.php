@@ -208,10 +208,141 @@ final class PortalPageTest extends TestCase {
 		$page      = new PortalPage( $clients, $mailer );
 
 		ClientInviteServiceTestHelper::force_sending_invite( true );
-		$result = $page->customize_reset_password_email( 'original core message', 'key123', 'ana', $user );
-		ClientInviteServiceTestHelper::force_sending_invite( false );
+		try {
+			$result = $page->customize_reset_password_email( 'original core message', 'key123', 'ana', $user );
+		} finally {
+			ClientInviteServiceTestHelper::force_sending_invite( false );
+		}
 
 		self::assertStringContainsString( 'invited', $result );
+	}
+
+	/**
+	 * Same setup as the invite test above, but with the static flag left
+	 * false (a genuine "forgot my password" request, not an invite) —
+	 * confirms the two email types actually render differently, not
+	 * just that customize_reset_password_email() returns *something*.
+	 */
+	public function test_customize_reset_password_email_uses_the_reset_template_when_not_sending_an_invite(): void {
+		Functions\when( 'get_option' )->justReturn( '' );
+		Functions\when( 'home_url' )->alias( static fn ( string $path = '' ) => 'https://example.test' . $path );
+		Functions\when( 'add_query_arg' )->alias(
+			static fn ( $key, $value = '', $url = '' ) => is_array( $key ) ? ( $url ?: 'https://example.test/' ) : ( $url ?: 'https://example.test/' )
+		);
+		Functions\when( 'get_bloginfo' )->justReturn( 'Test Practice' );
+		Functions\when( 'get_theme_mod' )->justReturn( false );
+		Functions\when( 'get_userdata' )->justReturn( false );
+		Functions\when( 'esc_html' )->returnArg( 1 );
+
+		$user = $this->createMock( WP_User::class );
+		$user->method( 'has_cap' )->with( 'view_own_nutrio_plan' )->willReturn( true );
+		$user->ID = 42;
+
+		$clients = $this->createMock( ClientRepository::class );
+		$clients->method( 'find_for_user' )->with( 42 )->willReturn(
+			array( 'first_name' => 'Ana', 'last_name' => 'Lee', 'practitioner_user_id' => 7 )
+		);
+
+		$templates = new EmailTemplateService();
+		$mailer    = new Mailer( $templates );
+		$page      = new PortalPage( $clients, $mailer );
+
+		ClientInviteServiceTestHelper::force_sending_invite( false );
+		$result = $page->customize_reset_password_email( 'original core message', 'key123', 'ana', $user );
+
+		self::assertStringNotContainsString( 'invited', $result );
+		self::assertStringContainsString( 'Reset it here', $result );
+	}
+
+	/**
+	 * The subject half of the same email, exercised directly — until now
+	 * only the body method (customize_reset_password_email()) had a
+	 * direct test.
+	 */
+	public function test_customize_reset_password_subject_uses_the_reset_template_subject(): void {
+		Functions\when( 'get_option' )->justReturn( '' );
+		Functions\when( 'home_url' )->alias( static fn ( string $path = '' ) => 'https://example.test' . $path );
+		Functions\when( 'add_query_arg' )->alias(
+			static fn ( $key, $value = '', $url = '' ) => is_array( $key ) ? ( $url ?: 'https://example.test/' ) : ( $url ?: 'https://example.test/' )
+		);
+		Functions\when( 'get_bloginfo' )->justReturn( 'Test Practice' );
+		Functions\when( 'get_theme_mod' )->justReturn( false );
+		Functions\when( 'get_userdata' )->justReturn( false );
+		Functions\when( 'esc_html' )->returnArg( 1 );
+
+		$user = $this->createMock( WP_User::class );
+		$user->method( 'has_cap' )->with( 'view_own_nutrio_plan' )->willReturn( true );
+		$user->ID = 42;
+
+		$clients = $this->createMock( ClientRepository::class );
+		$clients->method( 'find_for_user' )->with( 42 )->willReturn(
+			array( 'first_name' => 'Ana', 'last_name' => 'Lee', 'practitioner_user_id' => 7 )
+		);
+
+		$templates = new EmailTemplateService();
+		$mailer    = new Mailer( $templates );
+		$page      = new PortalPage( $clients, $mailer );
+
+		ClientInviteServiceTestHelper::force_sending_invite( false );
+		$result = $page->customize_reset_password_subject( 'original core title', 'ana', $user );
+
+		self::assertSame( 'Reset your client portal password', $result );
+	}
+
+	/**
+	 * Both customize_reset_password_email() and
+	 * customize_reset_password_subject() must leave WordPress core's own
+	 * message/title completely untouched whenever the user has the
+	 * capability but no client row is actually linked to their account
+	 * (find_for_user() returns null) — this is the same "capable but
+	 * unlinked" case current_user_is_a_linked_client() already guards
+	 * elsewhere in this class.
+	 */
+	public function test_customize_reset_password_email_and_subject_are_untouched_when_the_user_has_no_linked_client_row(): void {
+		$user = $this->createMock( WP_User::class );
+		$user->method( 'has_cap' )->with( 'view_own_nutrio_plan' )->willReturn( true );
+		$user->ID = 42;
+
+		$clients = $this->createMock( ClientRepository::class );
+		$clients->method( 'find_for_user' )->with( 42 )->willReturn( null );
+
+		$templates = new EmailTemplateService();
+		$mailer    = new Mailer( $templates );
+		$page      = new PortalPage( $clients, $mailer );
+
+		self::assertSame(
+			'original core message',
+			$page->customize_reset_password_email( 'original core message', 'key123', 'ana', $user )
+		);
+		self::assertSame(
+			'original core title',
+			$page->customize_reset_password_subject( 'original core title', 'ana', $user )
+		);
+	}
+
+	/**
+	 * force_html_content_type() is a public static method precisely so it
+	 * can be called directly here, without going through a full
+	 * customize_reset_password_email() render — it must both return
+	 * 'text/html' AND remove the exact same wp_mail_content_type filter
+	 * it was added as, so it never leaks into an unrelated later email
+	 * in the same request.
+	 */
+	public function test_force_html_content_type_removes_its_own_filter_after_firing(): void {
+		add_filter( 'wp_mail_content_type', array( PortalPage::class, 'force_html_content_type' ) );
+
+		self::assertNotFalse(
+			has_filter( 'wp_mail_content_type', array( PortalPage::class, 'force_html_content_type' ) ),
+			'Precondition: the filter must actually be registered before force_html_content_type() runs.'
+		);
+
+		$result = PortalPage::force_html_content_type();
+
+		self::assertSame( 'text/html', $result );
+		self::assertFalse(
+			has_filter( 'wp_mail_content_type', array( PortalPage::class, 'force_html_content_type' ) ),
+			'force_html_content_type() must remove_filter() itself so it never affects an unrelated later email.'
+		);
 	}
 
 	/**
