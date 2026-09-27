@@ -93,8 +93,25 @@ export default function ClientRoster() {
 	const closeDrawer = () => setDrawerOpen( false );
 
 	const handleSubmit = async ( data: ClientInput ) => {
-		await createClient( data );
+		const created = ( await createClient( data ) ) as Client & {
+			invite_error?: string | null;
+		};
 		closeDrawer();
+
+		if ( data.send_invite && created.invite_error ) {
+			await alertDialog( {
+				title: __( 'Client added, but the invite failed', 'nutrio' ),
+				message: sprintf(
+					/* translators: 1: client's name, 2: the reason the invite failed */
+					__(
+						'%1$s did save, but the portal invite could not be sent: %2$s. You can invite them manually from the roster.',
+						'nutrio'
+					),
+					`${ created.first_name } ${ created.last_name }`,
+					created.invite_error
+				),
+			} );
+		}
 	};
 
 	const handleDelete = async ( client: Client ) => {
