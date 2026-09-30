@@ -80,7 +80,12 @@ export default function Settings() {
 						<h3>{ __( 'USDA FoodData Central', 'nutrio' ) }</h3>
 					</PanelHead>
 					<PanelBody>
-						<p style={ { color: 'var(--ink-muted)', marginTop: 0 } }>
+						<p
+							style={ {
+								color: 'var(--ink-muted)',
+								marginTop: 0,
+							} }
+						>
 							{ __(
 								'Required for recipe and plan building — this key lets Nutrio search and pull nutrient data from the USDA FoodData Central database. Get a free key at api.data.gov/signup.',
 								'nutrio'
@@ -104,7 +109,9 @@ export default function Settings() {
 										{ keyState.masked }
 									</span>
 								) : (
-									<span style={ { color: 'var(--ink-muted)' } }>
+									<span
+										style={ { color: 'var(--ink-muted)' } }
+									>
 										{ __( 'No key set', 'nutrio' ) }
 									</span>
 								) }

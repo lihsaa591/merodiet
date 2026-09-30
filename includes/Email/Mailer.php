@@ -11,7 +11,7 @@ declare( strict_types=1 );
 namespace Nutrio\Email;
 
 /**
- * render_html() (rendered content only, no send) exists separately
+ * Render_html() (rendered content only, no send) exists separately
  * from send() because two of the five email types (client_invite,
  * client_password_reset) are triggered by WordPress core itself via
  * retrieve_password() — core calls wp_mail() internally, so PortalPage's
@@ -21,6 +21,11 @@ namespace Nutrio\Email;
  */
 final class Mailer {
 
+	/**
+	 * Constructor.
+	 *
+	 * @param EmailTemplateService $templates Per-type storage and merge-tag rendering.
+	 */
 	public function __construct( private readonly EmailTemplateService $templates ) {}
 
 	/**
@@ -72,6 +77,8 @@ final class Mailer {
 	}
 
 	/**
+	 * Wraps a rendered body in the shared header/footer HTML skeleton.
+	 *
 	 * @param string $body Already-rendered, already-escaped HTML body content.
 	 */
 	private static function wrap_in_skeleton( string $body ): string {

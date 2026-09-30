@@ -21,6 +21,8 @@ namespace Nutrio\Email;
 final class EmailTemplateRegistry {
 
 	/**
+	 * Every email type this plugin knows how to send.
+	 *
 	 * @var array<string, array{audience: string, subject: string, body: string, tags: array<string, string>}>
 	 */
 	private const TYPES = array(

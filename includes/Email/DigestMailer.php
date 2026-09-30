@@ -21,12 +21,22 @@ use Nutrio\Repositories\LogEntryRepository;
  */
 final class DigestMailer {
 
+	/**
+	 * Constructor.
+	 *
+	 * @param Mailer             $mailer  Renders and sends the digest.
+	 * @param ClientRepository   $clients Reads each practitioner's active roster.
+	 * @param LogEntryRepository $logs    Reads today's log entries for the per-client table.
+	 */
 	public function __construct(
 		private readonly Mailer $mailer,
 		private readonly ClientRepository $clients,
 		private readonly LogEntryRepository $logs
 	) {}
 
+	/**
+	 * Build and send today's digest to every practitioner with an active roster.
+	 */
 	public function run(): void {
 		$today = current_time( 'Y-m-d' );
 
@@ -55,6 +65,8 @@ final class DigestMailer {
 	}
 
 	/**
+	 * Builds the per-client "logged today / no activity" HTML table.
+	 *
 	 * @param array<int, array<string, mixed>> $clients The practitioner's active roster.
 	 * @param string                           $today   Y-m-d, today in the site's own timezone.
 	 */

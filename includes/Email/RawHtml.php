@@ -20,10 +20,15 @@ namespace Nutrio\Email;
 final class RawHtml {
 
 	/**
+	 * Constructor.
+	 *
 	 * @param string $html Pre-built, trusted HTML — never end-user input.
 	 */
 	public function __construct( private readonly string $html ) {}
 
+	/**
+	 * The wrapped HTML, unescaped.
+	 */
 	public function __toString(): string {
 		return $this->html;
 	}

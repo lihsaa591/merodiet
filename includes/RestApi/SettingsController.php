@@ -37,6 +37,8 @@ final class SettingsController extends AbstractController {
 	protected string $rest_base = 'settings';
 
 	/**
+	 * Constructor.
+	 *
 	 * @param EmailTemplateService $templates Per-type email template storage.
 	 */
 	public function __construct( private readonly EmailTemplateService $templates ) {}

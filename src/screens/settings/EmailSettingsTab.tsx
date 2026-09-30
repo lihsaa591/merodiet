@@ -25,11 +25,20 @@ const TYPE_LABELS: Record< string, string > = {
 // itself and always send — no toggle for those. The daily digest has
 // its own separate enabled/send_time mechanism (see the digest-specific
 // wiring below), not the generic per-type toggle.
-const TOGGLEABLE_TYPES = new Set( [ 'client_plan_assigned', 'practitioner_client_added' ] );
+const TOGGLEABLE_TYPES = new Set( [
+	'client_plan_assigned',
+	'practitioner_client_added',
+] );
 
-export default function EmailSettingsTab( { audience }: EmailSettingsTabProps ) {
-	const [ templates, setTemplates ] = useState< EmailTemplate[] | null >( null );
-	const [ digest, setDigest ] = useState< EmailDigestSettings | null >( null );
+export default function EmailSettingsTab( {
+	audience,
+}: EmailSettingsTabProps ) {
+	const [ templates, setTemplates ] = useState< EmailTemplate[] | null >(
+		null
+	);
+	const [ digest, setDigest ] = useState< EmailDigestSettings | null >(
+		null
+	);
 	const [ isProModalOpen, setProModalOpen ] = useState( false );
 	const [ toastMessage, setToastMessage ] = useState< string | null >( null );
 
@@ -44,9 +53,9 @@ export default function EmailSettingsTab( { audience }: EmailSettingsTabProps ) 
 	}, [ toastMessage ] );
 
 	useEffect( () => {
-		apiFetch< EmailTemplate[] >( { path: '/nutrio/v1/settings/email-templates' } ).then(
-			setTemplates
-		);
+		apiFetch< EmailTemplate[] >( {
+			path: '/nutrio/v1/settings/email-templates',
+		} ).then( setTemplates );
 
 		if ( 'practitioner' === audience ) {
 			apiFetch< EmailDigestSettings >( {
@@ -55,8 +64,16 @@ export default function EmailSettingsTab( { audience }: EmailSettingsTabProps ) 
 		}
 	}, [ audience ] );
 
-	const handleSaveTemplate = async ( type: string, subject: string, body: string ) => {
-		const result = await apiFetch< { type: string; subject: string; body: string } >( {
+	const handleSaveTemplate = async (
+		type: string,
+		subject: string,
+		body: string
+	) => {
+		const result = await apiFetch< {
+			type: string;
+			subject: string;
+			body: string;
+		} >( {
 			path: `/nutrio/v1/settings/email-templates/${ type }`,
 			method: 'PUT',
 			data: { subject, body },
@@ -65,7 +82,11 @@ export default function EmailSettingsTab( { audience }: EmailSettingsTabProps ) 
 		setTemplates( ( previous ) =>
 			( previous ?? [] ).map( ( template ) =>
 				template.type === type
-					? { ...template, subject: result.subject, body: result.body }
+					? {
+							...template,
+							subject: result.subject,
+							body: result.body,
+					  }
 					: template
 			)
 		);
@@ -82,7 +103,9 @@ export default function EmailSettingsTab( { audience }: EmailSettingsTabProps ) 
 
 		setTemplates( ( previous ) =>
 			( previous ?? [] ).map( ( template ) =>
-				template.type === type ? { ...template, enabled: result.enabled } : template
+				template.type === type
+					? { ...template, enabled: result.enabled }
+					: template
 			)
 		);
 	};
@@ -100,13 +123,20 @@ export default function EmailSettingsTab( { audience }: EmailSettingsTabProps ) 
 		return <p>{ __( 'Loading…', 'nutrio' ) }</p>;
 	}
 
-	const visibleTemplates = templates.filter( ( template ) => template.audience === audience );
+	const visibleTemplates = templates.filter(
+		( template ) => template.audience === audience
+	);
 
 	return (
 		<>
 			{ toastMessage && (
 				<div className={ styles.toast } role="status">
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+					<svg
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="2.5"
+					>
 						<path d="M5 13l4 4L19 7" />
 					</svg>
 					{ toastMessage }
@@ -116,26 +146,36 @@ export default function EmailSettingsTab( { audience }: EmailSettingsTabProps ) 
 			{ visibleTemplates.map( ( template ) => {
 				const isDigest = 'practitioner_daily_digest' === template.type;
 
+				let onToggleEnabled;
+				if ( isDigest ) {
+					onToggleEnabled =
+						null !== digest
+							? ( enabled: boolean ) =>
+									handleSaveDigest( { ...digest, enabled } )
+							: undefined;
+				} else if ( TOGGLEABLE_TYPES.has( template.type ) ) {
+					onToggleEnabled = ( enabled: boolean ) =>
+						handleToggleTemplate( template.type, enabled );
+				}
+
+				const digestTimeInputId = `nutrio-digest-send-time-${ template.type }`;
+
 				return (
 					<EmailTemplateEditor
 						key={ template.type }
 						template={ template }
 						label={ TYPE_LABELS[ template.type ] ?? template.type }
 						onSave={ handleSaveTemplate }
-						onToggleEnabled={
-							isDigest
-								? null !== digest
-									? ( enabled ) => handleSaveDigest( { ...digest, enabled } )
-									: undefined
-								: TOGGLEABLE_TYPES.has( template.type )
-								? ( enabled ) => handleToggleTemplate( template.type, enabled )
-								: undefined
-						}
+						onToggleEnabled={ onToggleEnabled }
 						extraFields={
 							isDigest && null !== digest ? (
-								<label className={ styles.digestTimeRow }>
+								<label
+									className={ styles.digestTimeRow }
+									htmlFor={ digestTimeInputId }
+								>
 									{ __( 'Send at', 'nutrio' ) }
 									<input
+										id={ digestTimeInputId }
 										type="time"
 										value={ digest.send_time }
 										onChange={ ( event ) =>
@@ -157,8 +197,21 @@ export default function EmailSettingsTab( { audience }: EmailSettingsTabProps ) 
 				className={ styles.lockedRow }
 				onClick={ () => setProModalOpen( true ) }
 			>
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-					<rect x="5" y="11" width="14" height="9" rx="2" fill="currentColor" stroke="none" />
+				<svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					strokeWidth="2"
+				>
+					<rect
+						x="5"
+						y="11"
+						width="14"
+						height="9"
+						rx="2"
+						fill="currentColor"
+						stroke="none"
+					/>
 					<path d="M8 11V8a4 4 0 0 1 8 0v3" />
 				</svg>
 				{ __( 'Custom email styling', 'nutrio' ) }

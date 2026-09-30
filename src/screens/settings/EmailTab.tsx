@@ -10,9 +10,8 @@ type EmailAudienceTab = 'practitioner' | 'client';
 // hierarchy is visually obvious: this is a filter within Email, not a
 // sibling of General/Email.
 export default function EmailTab() {
-	const [ activeAudience, setActiveAudience ] = useState< EmailAudienceTab >(
-		'practitioner'
-	);
+	const [ activeAudience, setActiveAudience ] =
+		useState< EmailAudienceTab >( 'practitioner' );
 
 	return (
 		<>

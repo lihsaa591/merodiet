@@ -41,6 +41,8 @@ final class ClientInviteService {
 	 * request in the same PHP process (relevant for a long-running
 	 * wp-cli/cron context more than a normal request, but cheap to get
 	 * right).
+	 *
+	 * @var bool
 	 */
 	private static bool $sending_invite = false;
 

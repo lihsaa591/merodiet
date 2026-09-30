@@ -90,7 +90,9 @@ export default function EmailTemplateEditor( {
 				<button
 					type="button"
 					className={ styles.headerRow }
-					onClick={ () => setIsExpanded( ( previous ) => ! previous ) }
+					onClick={ () =>
+						setIsExpanded( ( previous ) => ! previous )
+					}
 					aria-expanded={ isExpanded }
 				>
 					<svg
@@ -108,9 +110,11 @@ export default function EmailTemplateEditor( {
 					<h3>{ label }</h3>
 				</button>
 				{ onToggleEnabled && (
-					<div
+					<span
+						role="presentation"
 						className={ styles.enableToggle }
 						onClick={ ( event ) => event.stopPropagation() }
+						onKeyDown={ ( event ) => event.stopPropagation() }
 					>
 						<Switch
 							checked={ template.enabled }
@@ -118,7 +122,7 @@ export default function EmailTemplateEditor( {
 							onChange={ handleToggle }
 							label={ __( 'Enabled', 'nutrio' ) }
 						/>
-					</div>
+					</span>
 				) }
 			</PanelHead>
 			{ isExpanded && (
@@ -126,19 +130,25 @@ export default function EmailTemplateEditor( {
 					<form onSubmit={ handleSave } className={ styles.form }>
 						{ extraFields }
 						<div className="nutrio-field">
-							<label htmlFor={ `nutrio-email-subject-${ template.type }` }>
+							<label
+								htmlFor={ `nutrio-email-subject-${ template.type }` }
+							>
 								{ __( 'Subject', 'nutrio' ) }
 							</label>
 							<input
 								id={ `nutrio-email-subject-${ template.type }` }
 								type="text"
 								value={ subject }
-								onChange={ ( event ) => setSubject( event.target.value ) }
+								onChange={ ( event ) =>
+									setSubject( event.target.value )
+								}
 								required
 							/>
 						</div>
 						<div className="nutrio-field">
-							<label htmlFor={ `nutrio-email-body-${ template.type }` }>
+							<label
+								htmlFor={ `nutrio-email-body-${ template.type }` }
+							>
 								{ __( 'Body', 'nutrio' ) }
 							</label>
 							<textarea
@@ -146,22 +156,26 @@ export default function EmailTemplateEditor( {
 								ref={ bodyRef }
 								rows={ 6 }
 								value={ body }
-								onChange={ ( event ) => setBody( event.target.value ) }
+								onChange={ ( event ) =>
+									setBody( event.target.value )
+								}
 								required
 							/>
 						</div>
 						<div className={ styles.tagRow }>
-							{ Object.entries( template.tags ).map( ( [ tag, description ] ) => (
-								<button
-									key={ tag }
-									type="button"
-									className={ styles.tagButton }
-									title={ description }
-									onClick={ () => insertTag( tag ) }
-								>
-									{ `{{${ tag }}}` }
-								</button>
-							) ) }
+							{ Object.entries( template.tags ).map(
+								( [ tag, description ] ) => (
+									<button
+										key={ tag }
+										type="button"
+										className={ styles.tagButton }
+										title={ description }
+										onClick={ () => insertTag( tag ) }
+									>
+										{ `{{${ tag }}}` }
+									</button>
+								)
+							) }
 						</div>
 						<Button
 							variant="primary"

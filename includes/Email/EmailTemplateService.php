@@ -165,6 +165,8 @@ final class EmailTemplateService {
 	}
 
 	/**
+	 * The WordPress option name for a type's stored override.
+	 *
 	 * @param string $type A known type.
 	 */
 	private static function option_name( string $type ): string {
