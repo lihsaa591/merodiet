@@ -49,6 +49,45 @@ final class AdminPage {
 	public function register(): void {
 		add_action( 'admin_menu', array( $this, 'register_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'maybe_enqueue' ) );
+		add_action( 'admin_head', array( $this, 'print_icon_style_override' ) );
+	}
+
+	/**
+	 * Two things WordPress core does to a plain-image menu icon that a
+	 * built-in dashicon-font icon never needs correcting for:
+	 * - Dims it to 60% opacity until its own page is active/hovered
+	 *   (dashicons are colored via `color`, not rendered as an <img>,
+	 *   so they never get this treatment — left unfixed, ours looks
+	 *   faded next to its neighbors).
+	 * - Sizes/positions the <img> via a fixed padding-top calibrated
+	 *   for whatever intrinsic size core expects, which doesn't
+	 *   perfectly vertically center an icon with different proportions.
+	 *   Taking over sizing and centering here, at the exact 20x20 every
+	 *   other menu icon renders at, removes that guesswork.
+	 * No-ops for a dashicon-class icon or a submenu page (this only
+	 * applies to a top-level menu's own icon).
+	 */
+	public function print_icon_style_override(): void {
+		if ( '' !== $this->parent_slug || ! preg_match( '/^(https?:|data:)/', $this->icon ) ) {
+			return;
+		}
+
+		printf(
+			'<style>
+				#toplevel_page_%1$s .wp-menu-image {
+					display: flex;
+					align-items: center;
+					justify-content: center;
+				}
+				#toplevel_page_%1$s .wp-menu-image img {
+					opacity: 1;
+					width: 20px;
+					height: 20px;
+					padding: 0;
+				}
+			</style>',
+			esc_attr( $this->menu_slug )
+		);
 	}
 
 	/**
