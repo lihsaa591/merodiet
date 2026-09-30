@@ -90,7 +90,7 @@ return array(
 				'menu_slug'        => 'nutrio',
 				'mount_element_id' => 'nutrio-admin-app',
 				'script_entry'     => 'admin',
-				'icon'             => 'dashicons-carrot',
+				'icon'             => NUTRIO_URL . 'assets/images/nutrio-leaf.png',
 				'position'         => 30,
 			),
 		),

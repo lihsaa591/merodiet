@@ -134,13 +134,16 @@ body.toplevel_page_nutrio #wpbody-content {
 .nutrio-brand {
 	display: flex;
 	align-items: center;
-	gap: 10px;
+	gap: 4px;
 	padding: 0 6px;
 }
 .nutrio-brand-mark {
-	width: 28px;
-	height: 28px;
-	object-fit: contain;
+	/* The leaf artwork isn't square (~1.26:1) — height + width:auto lets
+	   it size naturally instead of being letterboxed inside a square
+	   box, which was the real cause of the apparent gap next to the
+	   text (empty box padding, not just the flex gap). */
+	height: 36px;
+	width: auto;
 	flex-shrink: 0;
 }
 .nutrio-brand-name {
