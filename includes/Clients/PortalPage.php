@@ -12,6 +12,7 @@ namespace Nutrio\Clients;
 use Nutrio\Email\Mailer;
 use Nutrio\Helper\Assets;
 use Nutrio\Repositories\ClientRepository;
+use PHPMailer\PHPMailer\PHPMailer;
 use WP_Error;
 use WP_User;
 
@@ -33,7 +34,7 @@ final class PortalPage {
 	 * Constructor.
 	 *
 	 * @param ClientRepository $clients Used to resolve the logged-in user's own client row.
-	 * @param Mailer            $mailer Used to render the branded invite/reset email.
+	 * @param Mailer           $mailer Used to render the branded invite/reset email.
 	 */
 	public function __construct(
 		private readonly ClientRepository $clients,
@@ -148,7 +149,7 @@ final class PortalPage {
 			return $message;
 		}
 
-		add_filter( 'wp_mail_content_type', array( self::class, 'force_html_content_type' ) );
+		add_action( 'phpmailer_init', array( self::class, 'force_html_email' ) );
 
 		return $this->mailer->render_html(
 			self::current_email_type(),
@@ -184,14 +185,19 @@ final class PortalPage {
 	}
 
 	/**
-	 * Self-removing wp_mail_content_type filter — fires exactly once,
-	 * for the single wp_mail() call retrieve_password() makes right
-	 * after this filter runs, then unhooks itself so it never affects
-	 * an unrelated later email in the same request.
+	 * Self-removing phpmailer_init hook — sets HTML mode directly on
+	 * the PHPMailer instance right before retrieve_password()'s single
+	 * wp_mail() call sends it, then unhooks itself so it never affects
+	 * an unrelated later email in the same request. Stronger than
+	 * filtering 'wp_mail_content_type' (a content-type string some
+	 * mail-catching setups don't fully honor) — this sets the same
+	 * property PHPMailer itself uses to decide HTML vs. plain text.
+	 *
+	 * @param PHPMailer $phpmailer The PHPMailer instance about to send.
 	 */
-	public static function force_html_content_type(): string {
-		remove_filter( 'wp_mail_content_type', array( self::class, 'force_html_content_type' ) );
-		return 'text/html';
+	public static function force_html_email( PHPMailer $phpmailer ): void {
+		remove_action( 'phpmailer_init', array( self::class, 'force_html_email' ) );
+		$phpmailer->isHTML( true );
 	}
 
 	/**
@@ -216,7 +222,7 @@ final class PortalPage {
 	 */
 	private static function email_context( array $client, string $key, string $user_login ): array {
 		$practitioner_id = (int) ( $client['practitioner_user_id'] ?? 0 );
-		$practitioner     = 0 !== $practitioner_id ? get_userdata( $practitioner_id ) : false;
+		$practitioner    = 0 !== $practitioner_id ? get_userdata( $practitioner_id ) : false;
 
 		$reset_url = '' !== $key
 			? add_query_arg(
@@ -775,34 +781,19 @@ final class PortalPage {
 	}
 
 	/**
-	 * Outputs the site's custom logo (Appearance -> Customize -> Site
-	 * Identity), or the site icon as a fallback — read directly via the
-	 * theme mod / site-icon APIs rather than get_custom_logo(), since
-	 * this page never loads a theme and get_custom_logo() only works
-	 * for themes that declare 'custom-logo' support. Outputs nothing if
-	 * neither is set.
+	 * Our own leaf mark plus the site's title — same branding Mailer's
+	 * email header uses, deliberately not the site's own configured
+	 * custom_logo (Appearance -> Customize), which could be any image a
+	 * practitioner sets (often with its own baked-in white background)
+	 * and isn't guaranteed to look right on this page's own card,
+	 * especially in dark mode.
 	 */
 	private function render_site_logo(): void {
-		$logo_id = get_theme_mod( 'custom_logo' );
-
-		if ( $logo_id ) {
-			echo wp_get_attachment_image(
-				(int) $logo_id,
-				'medium',
-				false,
-				array( 'class' => 'nutrio-portal-login-logo' )
-			);
-			return;
-		}
-
-		$icon_url = get_site_icon_url( 64 );
-
-		if ( $icon_url ) {
-			printf(
-				'<img src="%s" alt="" class="nutrio-portal-login-logo" />',
-				esc_url( $icon_url )
-			);
-		}
+		printf(
+			'<div class="nutrio-portal-login-brand"><img src="%1$s" alt="" class="nutrio-portal-login-logo" /><span class="nutrio-portal-login-brand-name">%2$s</span></div>',
+			esc_url( NUTRIO_URL . 'assets/images/nutrio-leaf-email.png' ),
+			esc_html( get_bloginfo( 'name' ) )
+		);
 	}
 
 	/**

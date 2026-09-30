@@ -251,7 +251,7 @@ final class PortalPageTest extends TestCase {
 		$result = $page->customize_reset_password_email( 'original core message', 'key123', 'ana', $user );
 
 		self::assertStringNotContainsString( 'invited', $result );
-		self::assertStringContainsString( 'Reset it here', $result );
+		self::assertStringContainsString( 'Reset your password', $result );
 	}
 
 	/**
@@ -321,27 +321,28 @@ final class PortalPageTest extends TestCase {
 	}
 
 	/**
-	 * force_html_content_type() is a public static method precisely so it
-	 * can be called directly here, without going through a full
-	 * customize_reset_password_email() render — it must both return
-	 * 'text/html' AND remove the exact same wp_mail_content_type filter
-	 * it was added as, so it never leaks into an unrelated later email
-	 * in the same request.
+	 * force_html_email() is a public static method precisely so it can
+	 * be called directly here, without going through a full
+	 * customize_reset_password_email() render — it must both set HTML
+	 * mode on the PHPMailer instance it's handed AND remove the exact
+	 * same phpmailer_init action it was added as, so it never leaks
+	 * into an unrelated later email in the same request.
 	 */
-	public function test_force_html_content_type_removes_its_own_filter_after_firing(): void {
-		add_filter( 'wp_mail_content_type', array( PortalPage::class, 'force_html_content_type' ) );
+	public function test_force_html_email_sets_html_mode_and_removes_its_own_action_after_firing(): void {
+		add_action( 'phpmailer_init', array( PortalPage::class, 'force_html_email' ) );
 
 		self::assertNotFalse(
-			has_filter( 'wp_mail_content_type', array( PortalPage::class, 'force_html_content_type' ) ),
-			'Precondition: the filter must actually be registered before force_html_content_type() runs.'
+			has_action( 'phpmailer_init', array( PortalPage::class, 'force_html_email' ) ),
+			'Precondition: the action must actually be registered before force_html_email() runs.'
 		);
 
-		$result = PortalPage::force_html_content_type();
+		$phpmailer = new \PHPMailer\PHPMailer\PHPMailer();
+		PortalPage::force_html_email( $phpmailer );
 
-		self::assertSame( 'text/html', $result );
+		self::assertTrue( $phpmailer->is_html );
 		self::assertFalse(
-			has_filter( 'wp_mail_content_type', array( PortalPage::class, 'force_html_content_type' ) ),
-			'force_html_content_type() must remove_filter() itself so it never affects an unrelated later email.'
+			has_action( 'phpmailer_init', array( PortalPage::class, 'force_html_email' ) ),
+			'force_html_email() must remove_action() itself so it never affects an unrelated later email.'
 		);
 	}
 
@@ -356,6 +357,7 @@ final class PortalPageTest extends TestCase {
 		Functions\when( 'home_url' )->alias( static fn( string $path = '' ) => 'https://example.test' . $path );
 		Functions\when( 'get_theme_mod' )->justReturn( false );
 		Functions\when( 'get_site_icon_url' )->justReturn( '' );
+		Functions\when( 'get_bloginfo' )->justReturn( 'Test Practice' );
 		Functions\when( 'esc_html_e' )->alias(
 			static function ( string $text ) {
 				echo $text; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- test stub.

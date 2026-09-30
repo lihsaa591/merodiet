@@ -27,7 +27,7 @@ final class EmailTemplateRegistry {
 		'client_invite'             => array(
 			'audience' => 'client',
 			'subject'  => "You've been invited to your client portal",
-			'body'     => "Hi {{client_first_name}},\n\n{{practitioner_name}} has invited you to your client portal at {{site_name}}. Set your password here: {{portal_url}}",
+			'body'     => "Hi {{client_first_name}},\n\n{{practitioner_name}} has invited you to your client portal at {{site_name}}. Click below to set your password and get started.\n\n<a href=\"{{portal_url}}\" style=\"display:inline-block;margin-top:4px;padding:12px 24px;background:#5b5fa6;color:#ffffff;text-decoration:none;border-radius:6px;font-weight:600;font-size:14px;\">Set your password</a>\n\nOr copy and paste this link into your browser:\n{{portal_url}}",
 			'tags'     => array(
 				'client_first_name' => "The client's first name",
 				'client_last_name'  => "The client's last name",
@@ -39,7 +39,7 @@ final class EmailTemplateRegistry {
 		'client_password_reset'     => array(
 			'audience' => 'client',
 			'subject'  => 'Reset your client portal password',
-			'body'     => "Hi {{client_first_name}},\n\nSomeone requested a password reset for your client portal account at {{site_name}}. Reset it here: {{reset_url}}\n\nIf this wasn't you, you can ignore this email.",
+			'body'     => "Hi {{client_first_name}},\n\nSomeone requested a password reset for your client portal account at {{site_name}}. Click below to choose a new password.\n\n<a href=\"{{reset_url}}\" style=\"display:inline-block;margin-top:4px;padding:12px 24px;background:#5b5fa6;color:#ffffff;text-decoration:none;border-radius:6px;font-weight:600;font-size:14px;\">Reset your password</a>\n\nOr copy and paste this link into your browser:\n{{reset_url}}\n\nIf you didn't request this, you can safely ignore this email.",
 			'tags'     => array(
 				'client_first_name' => "The client's first name",
 				'reset_url'         => 'Link to reset the password',
@@ -49,7 +49,7 @@ final class EmailTemplateRegistry {
 		'client_plan_assigned'      => array(
 			'audience' => 'client',
 			'subject'  => 'Your new meal plan is ready',
-			'body'     => "Hi {{client_first_name}},\n\n{{practitioner_name}} just assigned you a new meal plan, \"{{plan_title}}\", running from {{start_date}} to {{end_date}}. View it in your portal: {{portal_url}}",
+			'body'     => "Hi {{client_first_name}},\n\n{{practitioner_name}} just assigned you a new meal plan, \"{{plan_title}}\", running from {{start_date}} to {{end_date}}.\n\n<a href=\"{{portal_url}}\" style=\"display:inline-block;margin-top:4px;padding:12px 24px;background:#5b5fa6;color:#ffffff;text-decoration:none;border-radius:6px;font-weight:600;font-size:14px;\">View your plan</a>",
 			'tags'     => array(
 				'client_first_name' => "The client's first name",
 				'practitioner_name' => "The practitioner's display name",

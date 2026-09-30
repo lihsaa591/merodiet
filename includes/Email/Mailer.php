@@ -76,33 +76,49 @@ final class Mailer {
 	 */
 	private static function wrap_in_skeleton( string $body ): string {
 		return sprintf(
-			'<div style="font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif;max-width:480px;margin:0 auto;">' .
-			'<div style="background:#5b5fa6;padding:20px;text-align:center;border-radius:8px 8px 0 0;">%1$s</div>' .
-			'<div style="background:#ffffff;padding:24px;border:1px solid #e7e6ea;border-top:none;border-radius:0 0 8px 8px;color:#26262a;white-space:pre-line;">%2$s</div>' .
+			'<div style="font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;max-width:480px;margin:0 auto;">' .
+			'<div style="background:#5b5fa6;padding:28px 20px;text-align:center;border-radius:10px 10px 0 0;">%1$s</div>' .
+			'<div style="background:#ffffff;padding:32px 28px;border:1px solid #e7e6ea;border-top:none;font-size:15px;line-height:1.6;color:#26262a;white-space:pre-line;word-break:break-word;overflow-wrap:break-word;">%2$s</div>' .
+			'<div style="padding:16px 28px;text-align:center;font-size:12px;line-height:1.5;color:#9d9da3;">%3$s</div>' .
 			'</div>',
 			self::site_logo_html(),
-			$body
+			$body,
+			self::footer_html()
 		);
 	}
 
 	/**
-	 * The site's custom logo if set, otherwise its name as plain text —
-	 * an email client can't run this plugin's own CSS/tokens, so
-	 * #5b5fa6 above is --sage's value, inlined literally rather than
-	 * referenced.
+	 * Our own leaf mark plus the site's title — deliberately not the
+	 * site's own configured custom_logo (Appearance -> Customize),
+	 * which could be anything a practitioner sets and isn't guaranteed
+	 * to look right shrunk onto a colored header band the way our own
+	 * asset is designed to. Table layout rather than flex/inline-block,
+	 * since some email clients (notably Outlook desktop) still render
+	 * those unreliably.
 	 */
 	private static function site_logo_html(): string {
-		$logo_id = get_theme_mod( 'custom_logo' );
+		return sprintf(
+			'<table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">' .
+			'<tr>' .
+			'<td style="padding-right:10px;"><img src="%1$s" alt="" height="36" style="display:block;height:36px;width:auto;border:0;" /></td>' .
+			'<td style="color:#ffffff;font-size:20px;font-weight:700;white-space:nowrap;">%2$s</td>' .
+			'</tr>' .
+			'</table>',
+			esc_url( NUTRIO_URL . 'assets/images/nutrio-leaf-email.png' ),
+			esc_html( get_bloginfo( 'name' ) )
+		);
+	}
 
-		if ( $logo_id ) {
-			return (string) wp_get_attachment_image(
-				(int) $logo_id,
-				'medium',
-				false,
-				array( 'style' => 'max-height:40px;' )
-			);
-		}
-
-		return '<span style="color:#ffffff;font-weight:600;">' . esc_html( get_bloginfo( 'name' ) ) . '</span>';
+	/**
+	 * A minimal, professional sign-off line — the site name plus a
+	 * "you're receiving this because" note, the same low-key footer
+	 * convention most transactional emails use.
+	 */
+	private static function footer_html(): string {
+		return sprintf(
+			/* translators: %s: the site's name */
+			esc_html__( 'Sent by %s. If you weren\'t expecting this email, you can safely ignore it.', 'nutrio' ),
+			esc_html( get_bloginfo( 'name' ) )
+		);
 	}
 }

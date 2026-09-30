@@ -158,13 +158,22 @@ body.nutrio-portal-login {
 	display: block;
 }
 
+.nutrio-portal-login-brand {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	margin: 0 0 20px;
+}
 .nutrio-portal-login-logo {
 	display: block;
-	max-width: 160px;
-	max-height: 64px;
+	height: 32px;
 	width: auto;
-	height: auto;
-	margin: 0 auto 20px;
+}
+.nutrio-portal-login-brand-name {
+	font-size: 22px;
+	font-weight: 700;
+	color: var(--ink);
 }
 
 .nutrio-portal-login-card h1 {
