@@ -9,6 +9,10 @@ declare( strict_types=1 );
 
 namespace Nutrio\RestApi;
 
+use Nutrio\Email\DigestScheduler;
+use Nutrio\Email\EmailTemplateRegistry;
+use Nutrio\Email\EmailTemplateService;
+use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
@@ -31,6 +35,13 @@ final class SettingsController extends AbstractController {
 	 * @var string
 	 */
 	protected string $rest_base = 'settings';
+
+	/**
+	 * Constructor.
+	 *
+	 * @param EmailTemplateService $templates Per-type email template storage.
+	 */
+	public function __construct( private readonly EmailTemplateService $templates ) {}
 
 	/**
 	 * Register the USDA key routes.
@@ -60,6 +71,77 @@ final class SettingsController extends AbstractController {
 			),
 			required_capability: 'manage_nutrio_foods'
 		);
+
+		$this->register_route(
+			'/email-templates',
+			array(
+				'methods'  => WP_REST_Server::READABLE,
+				'callback' => array( $this, 'get_email_templates' ),
+			),
+			required_capability: 'manage_nutrio_settings'
+		);
+
+		$this->register_route(
+			'/email-templates/(?P<type>[a-z_]+)',
+			array(
+				'methods'  => WP_REST_Server::EDITABLE,
+				'callback' => array( $this, 'update_email_template' ),
+				'args'     => array(
+					'subject' => array(
+						'required' => true,
+						'type'     => 'string',
+					),
+					'body'    => array(
+						'required' => true,
+						'type'     => 'string',
+					),
+				),
+			),
+			required_capability: 'manage_nutrio_settings'
+		);
+
+		$this->register_route(
+			'/email-templates/(?P<type>[a-z_]+)/enabled',
+			array(
+				'methods'  => WP_REST_Server::EDITABLE,
+				'callback' => array( $this, 'update_email_template_enabled' ),
+				'args'     => array(
+					'enabled' => array(
+						'required' => true,
+						'type'     => 'boolean',
+					),
+				),
+			),
+			required_capability: 'manage_nutrio_settings'
+		);
+
+		$this->register_route(
+			'/email-digest',
+			array(
+				'methods'  => WP_REST_Server::READABLE,
+				'callback' => array( $this, 'get_email_digest' ),
+			),
+			required_capability: 'manage_nutrio_settings'
+		);
+
+		$this->register_route(
+			'/email-digest',
+			array(
+				'methods'  => WP_REST_Server::EDITABLE,
+				'callback' => array( $this, 'update_email_digest' ),
+				'args'     => array(
+					'enabled'   => array(
+						'required' => true,
+						'type'     => 'boolean',
+					),
+					'send_time' => array(
+						'required' => true,
+						'type'     => 'string',
+					),
+				),
+			),
+			required_capability: 'manage_nutrio_settings'
+		);
 	}
 
 	/**
@@ -81,6 +163,138 @@ final class SettingsController extends AbstractController {
 		update_option( 'nutrio_usda_api_key', $api_key );
 
 		return $this->success( self::describe( $api_key ) );
+	}
+
+	/**
+	 * GET /settings/email-templates — every known type's effective
+	 * subject/body, its allowed merge tags, and which Settings tab it
+	 * belongs on.
+	 */
+	public function get_email_templates(): WP_REST_Response {
+		$types = array();
+
+		foreach ( EmailTemplateRegistry::all_types() as $type ) {
+			$template = $this->templates->get( $type );
+
+			$types[] = array(
+				'type'     => $type,
+				'audience' => EmailTemplateRegistry::get_audience( $type ),
+				'subject'  => $template['subject'],
+				'body'     => $template['body'],
+				'enabled'  => $template['enabled'],
+				'tags'     => EmailTemplateRegistry::get_tags( $type ),
+			);
+		}
+
+		return $this->success( $types );
+	}
+
+	/**
+	 * PUT /settings/email-templates/{type} — save one type's subject/body override.
+	 *
+	 * @param WP_REST_Request $request The current request.
+	 */
+	public function update_email_template( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$type = (string) $request->get_param( 'type' );
+
+		if ( ! EmailTemplateRegistry::is_known_type( $type ) ) {
+			return $this->error( 'nutrio_unknown_email_type', __( 'Unknown email template.', 'nutrio' ), 404 );
+		}
+
+		$this->templates->save(
+			$type,
+			(string) $request->get_param( 'subject' ),
+			(string) $request->get_param( 'body' )
+		);
+
+		$saved = $this->templates->get( $type );
+
+		return $this->success(
+			array(
+				'type'    => $type,
+				'subject' => $saved['subject'],
+				'body'    => $saved['body'],
+				'enabled' => $saved['enabled'],
+			)
+		);
+	}
+
+	/**
+	 * PUT /settings/email-templates/{type}/enabled — toggle one type
+	 * without resending its subject/body.
+	 *
+	 * @param WP_REST_Request $request The current request.
+	 */
+	public function update_email_template_enabled( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$type = (string) $request->get_param( 'type' );
+
+		if ( ! EmailTemplateRegistry::is_known_type( $type ) ) {
+			return $this->error( 'nutrio_unknown_email_type', __( 'Unknown email template.', 'nutrio' ), 404 );
+		}
+
+		$this->templates->set_enabled( $type, (bool) $request->get_param( 'enabled' ) );
+
+		$saved = $this->templates->get( $type );
+
+		return $this->success(
+			array(
+				'type'    => $type,
+				'subject' => $saved['subject'],
+				'body'    => $saved['body'],
+				'enabled' => $saved['enabled'],
+			)
+		);
+	}
+
+	/**
+	 * GET /settings/email-digest — whether the daily digest is enabled
+	 * and what time it's sent.
+	 */
+	public function get_email_digest(): WP_REST_Response {
+		return $this->success(
+			array(
+				'enabled'   => (bool) get_option( 'nutrio_digest_enabled', false ),
+				'send_time' => (string) get_option( 'nutrio_digest_time', '20:00' ),
+			)
+		);
+	}
+
+	/**
+	 * PUT /settings/email-digest — save enabled/send_time and reschedule the cron event.
+	 *
+	 * @param WP_REST_Request $request The current request.
+	 */
+	public function update_email_digest( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$send_time = (string) $request->get_param( 'send_time' );
+
+		if ( 1 !== preg_match( '/^([01]\d|2[0-3]):[0-5]\d$/', $send_time ) ) {
+			return $this->error( 'nutrio_invalid_time', __( 'Send time must be in HH:MM (24-hour) format.', 'nutrio' ), 400 );
+		}
+
+		self::save_option_no_autoload( 'nutrio_digest_enabled', (bool) $request->get_param( 'enabled' ) );
+		self::save_option_no_autoload( 'nutrio_digest_time', $send_time );
+
+		DigestScheduler::reschedule();
+
+		return $this->success(
+			array(
+				'enabled'   => (bool) get_option( 'nutrio_digest_enabled', false ),
+				'send_time' => (string) get_option( 'nutrio_digest_time', '20:00' ),
+			)
+		);
+	}
+
+	/**
+	 * See EmailTemplateService::save()'s identical add_option()-then-
+	 * update_option() idiom for why — guarantees autoload=false
+	 * regardless of which WordPress version's update_option() is in play.
+	 *
+	 * @param string      $name  Option name.
+	 * @param bool|string $value Option value.
+	 */
+	private static function save_option_no_autoload( string $name, bool|string $value ): void {
+		add_option( $name, $value, '', false );
+		update_option( $name, $value );
 	}
 
 	/**

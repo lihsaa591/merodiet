@@ -88,11 +88,33 @@ if ( ! class_exists( 'WP_User' ) ) {
 	class WP_User {
 		public int $ID = 0;
 		public string $display_name = '';
+		public string $user_email = '';
 
 		public function has_cap( string $capability ): bool {
 			return false;
 		}
 	}
+}
+
+if ( ! class_exists( 'Nutrio_Tests_PHPMailerStub' ) ) {
+	/**
+	 * Minimal stand-in for WP core's bundled PHPMailer — just enough
+	 * surface (isHTML()) for PortalPage::force_html_email() to be
+	 * unit-tested without pulling in the real library. Aliased below to
+	 * the real class's namespace, since PortalPage type-hints against
+	 * that, not this stub, directly.
+	 */
+	class Nutrio_Tests_PHPMailerStub {
+		public bool $is_html = false;
+
+		public function isHTML( bool $is_html ): void {
+			$this->is_html = $is_html;
+		}
+	}
+}
+
+if ( ! class_exists( 'PHPMailer\PHPMailer\PHPMailer' ) ) {
+	class_alias( 'Nutrio_Tests_PHPMailerStub', 'PHPMailer\PHPMailer\PHPMailer' );
 }
 
 if ( ! class_exists( 'WP_REST_Request' ) ) {

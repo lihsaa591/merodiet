@@ -271,3 +271,17 @@ declare global {
 		};
 	}
 }
+
+export interface EmailTemplate {
+	type: string;
+	audience: 'practitioner' | 'client';
+	subject: string;
+	body: string;
+	enabled: boolean;
+	tags: Record< string, string >;
+}
+
+export interface EmailDigestSettings {
+	enabled: boolean;
+	send_time: string;
+}

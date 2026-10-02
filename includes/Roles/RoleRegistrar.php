@@ -31,6 +31,7 @@ final class RoleRegistrar {
 		'manage_nutrio_recipes',
 		'manage_nutrio_plans',
 		'manage_nutrio_foods',
+		'manage_nutrio_settings',
 	);
 
 	/**

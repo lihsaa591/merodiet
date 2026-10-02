@@ -34,7 +34,8 @@ final class PortalServiceProvider extends AbstractServiceProvider {
 
 		$container->add( PortalPage::class )
 			->setShared( true )
-			->addArgument( ClientRepository::class );
+			->addArgument( ClientRepository::class )
+			->addArgument( \Nutrio\Email\Mailer::class );
 	}
 
 	/**
@@ -129,6 +130,21 @@ final class PortalServiceProvider extends AbstractServiceProvider {
 			},
 			10,
 			4
+		);
+
+		add_filter(
+			'retrieve_password_title',
+			static function ( $title, $user_login, $user_data ) use ( $container ) {
+				/**
+				 * The shared PortalPage instance.
+				 *
+				 * @var PortalPage $page
+				 */
+				$page = $container->get( PortalPage::class );
+				return $page->customize_reset_password_subject( $title, $user_login, $user_data );
+			},
+			10,
+			3
 		);
 	}
 }

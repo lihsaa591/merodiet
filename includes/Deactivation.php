@@ -9,6 +9,8 @@ declare( strict_types=1 );
 
 namespace Nutrio;
 
+use Nutrio\Email\DigestScheduler;
+
 /**
  * Deactivation is reversible housekeeping only (flush rewrite rules,
  * clear scheduled events). Destructive cleanup — dropping tables,
@@ -24,5 +26,6 @@ final class Deactivation {
 	 */
 	public static function deactivate(): void {
 		flush_rewrite_rules();
+		wp_clear_scheduled_hook( DigestScheduler::CRON_HOOK );
 	}
 }

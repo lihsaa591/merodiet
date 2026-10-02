@@ -1,6 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import ThemeToggle from './ThemeToggle';
 import type { Section } from './App';
+import nutrioLeaf from './nutrio-leaf.png';
 
 interface PortalSidebarProps {
 	isOpen: boolean;
@@ -41,7 +42,7 @@ export default function PortalSidebar( {
 			</a>
 
 			<div className="nutrio-brand">
-				<div className="nutrio-brand-mark">N</div>
+				<img className="nutrio-brand-mark" src={ nutrioLeaf } alt="" />
 				<div className="nutrio-brand-name">Nutrio</div>
 			</div>
 

@@ -10,6 +10,7 @@ namespace Nutrio\Tests\Unit\RestApi;
 use Brain\Monkey\Functions;
 use Nutrio\Clients\ClientInviteService;
 use Nutrio\Clients\ComplianceCalculator;
+use Nutrio\Email\Mailer;
 use Nutrio\Nutrition\FoodCache;
 use Nutrio\Nutrition\FoodDataService;
 use Nutrio\Nutrition\PlanNutrientResolver;
@@ -52,12 +53,13 @@ final class ControllerCapabilitiesTest extends TestCase {
 					LogEntryRepository::class,
 					MeasurementRepository::class,
 					ComplianceCalculator::class,
+					Mailer::class,
 				),
 				'manage_nutrio_clients',
 			),
 			'RecipesController'  => array( RecipesController::class, array( RecipeRepository::class, RecipeNutrientResolver::class, FoodCache::class ), 'manage_nutrio_recipes' ),
 			'FoodsController'    => array( FoodsController::class, array( FoodDataService::class ), 'manage_nutrio_foods' ),
-			'PlansController'    => array( PlansController::class, array( PlanRepository::class, PlanNutrientResolver::class, ClientRepository::class, FoodCache::class, RecipeRepository::class, RecipeNutrientResolver::class ), 'manage_nutrio_plans' ),
+			'PlansController'    => array( PlansController::class, array( PlanRepository::class, PlanNutrientResolver::class, ClientRepository::class, FoodCache::class, RecipeRepository::class, RecipeNutrientResolver::class, Mailer::class ), 'manage_nutrio_plans' ),
 			'MeController'       => array(
 				MeController::class,
 				array(
@@ -150,6 +152,10 @@ final class ControllerCapabilitiesTest extends TestCase {
 				$this->createMock( \Nutrio\Repositories\PlanRepository::class ),
 				$this->createMock( LogEntryRepository::class )
 			);
+		}
+
+		if ( Mailer::class === $class ) {
+			return new Mailer( new \Nutrio\Email\EmailTemplateService() );
 		}
 
 		return $this->createMock( $class );

@@ -2,6 +2,7 @@ import { __ } from '@wordpress/i18n';
 import ProUpsellModal from '../components/ui/ProUpsellModal';
 import { useState } from '@wordpress/element';
 import type { ReactNode } from 'react';
+import nutrioLeaf from './nutrio-leaf.png';
 
 interface NavItem {
 	id: string;
@@ -105,7 +106,11 @@ export default function Sidebar( {
 				</a>
 
 				<div className="nutrio-brand">
-					<div className="nutrio-brand-mark">N</div>
+					<img
+						className="nutrio-brand-mark"
+						src={ nutrioLeaf }
+						alt=""
+					/>
 					<div className="nutrio-brand-name">Nutrio</div>
 				</div>
 
