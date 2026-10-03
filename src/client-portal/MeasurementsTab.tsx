@@ -217,11 +217,6 @@ export default function MeasurementsTab() {
 						{ __( 'History', 'nutrio' ) }
 					</h3>
 					{ undefined === measurements && <HistorySkeleton /> }
-					{ measurements && 0 === measurements.length && (
-						<p className={ styles.empty }>
-							{ __( 'No measurements logged yet.', 'nutrio' ) }
-						</p>
-					) }
 					{ null !== netChange && (
 						<p className={ styles.trendSummary }>
 							{ netChange === 0
@@ -248,10 +243,22 @@ export default function MeasurementsTab() {
 								  ) }
 						</p>
 					) }
-					{ visible.length > 0 && (
+					{ measurements && (
 						<MeasurementHistoryList
 							measurements={ visible }
 							unit={ unit }
+							emptyMessage={
+								hasOlder
+									? sprintf(
+											/* translators: %d: number of days the history currently covers */
+											__(
+												'No measurements in the last %d days — use Load more to see older ones.',
+												'nutrio'
+											),
+											historyRangeDays
+									  )
+									: undefined
+							}
 						/>
 					) }
 

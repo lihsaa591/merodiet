@@ -1,3 +1,4 @@
+import { __ } from '@wordpress/i18n';
 import { formatDate } from '../../utils/date';
 import { gramsToDisplay, type WeightUnit } from '../../utils/weight';
 import type { Measurement } from '../../types';
@@ -8,6 +9,8 @@ interface MeasurementHistoryListProps {
 	unit: WeightUnit;
 	/** Show only the newest N entries; deltas still use the full list. */
 	limit?: number;
+	/** Shown when there is nothing to list. */
+	emptyMessage?: string;
 }
 
 // Extracted from client-portal/MeasurementsTab.tsx's history <ul> so the
@@ -17,7 +20,17 @@ export default function MeasurementHistoryList( {
 	measurements,
 	unit,
 	limit,
+	emptyMessage,
 }: MeasurementHistoryListProps ) {
+	if ( 0 === measurements.length ) {
+		return (
+			<p className={ styles.empty }>
+				{ emptyMessage ??
+					__( 'No measurements logged yet.', 'nutrio' ) }
+			</p>
+		);
+	}
+
 	return (
 		<ul className={ styles.historyList }>
 			{ measurements.slice( 0, limit ).map( ( measurement, index ) => {
