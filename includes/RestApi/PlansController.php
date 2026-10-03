@@ -175,6 +175,29 @@ final class PlansController extends AbstractPractitionerController {
 		);
 		$items  = array_map( array( $this, 'with_totals' ), $result['items'] );
 
+		// Resolved server-side so the list never depends on the client
+		// roster having been loaded (or on it fitting in one page).
+		$summaries = array();
+		foreach ( $items as &$item ) {
+			$client_id = $item['client_id'];
+
+			if ( null !== $client_id && ! array_key_exists( $client_id, $summaries ) ) {
+				$client = $this->clients->find_for_practitioner( $client_id, $this->current_practitioner_id() );
+
+				$summaries[ $client_id ] = null === $client
+					? null
+					: array(
+						'id'         => $client['id'],
+						'first_name' => $client['first_name'],
+						'last_name'  => $client['last_name'],
+						'avatar_url' => $client['avatar_url'] ?? null,
+					);
+			}
+
+			$item['client'] = null === $client_id ? null : $summaries[ $client_id ];
+		}
+		unset( $item );
+
 		return $this->success( $this->paginated_response( $items, $result['total'], $page, $per_page ) );
 	}
 

@@ -142,6 +142,11 @@ export interface Plan {
 	id: number;
 	practitioner_user_id: number;
 	client_id: number | null;
+	/** Resolved by the plans list endpoint; null when unassigned (or the client no longer exists). */
+	client?: Pick<
+		Client,
+		'id' | 'first_name' | 'last_name' | 'avatar_url'
+	> | null;
 	title: string;
 	status: 'draft' | 'assigned';
 	start_date: string;
