@@ -6,6 +6,8 @@ import styles from './MeasurementHistoryList.module.css';
 interface MeasurementHistoryListProps {
 	measurements: Measurement[];
 	unit: WeightUnit;
+	/** Show only the newest N entries; deltas still use the full list. */
+	limit?: number;
 }
 
 // Extracted from client-portal/MeasurementsTab.tsx's history <ul> so the
@@ -14,10 +16,11 @@ interface MeasurementHistoryListProps {
 export default function MeasurementHistoryList( {
 	measurements,
 	unit,
+	limit,
 }: MeasurementHistoryListProps ) {
 	return (
 		<ul className={ styles.historyList }>
-			{ measurements.map( ( measurement, index ) => {
+			{ measurements.slice( 0, limit ).map( ( measurement, index ) => {
 				const prevWeighed = measurements
 					.slice( index + 1 )
 					.find( ( m ) => null !== m.weight_grams );

@@ -33,16 +33,13 @@ interface ClientDetailProps {
 	onBack: () => void;
 }
 
-// Matches the client portal's own LogTab.tsx/MeasurementsTab.tsx
-// "load more" convention: start at one page, widen the date range and
-// refetch from scratch (not append) on each click, since the /logs
-// and /measurements endpoints only support from/to filtering, not
-// true offset pagination.
-const HISTORY_PAGE_DAYS = 30;
+// Fetch the whole history window once and reveal it in pages client-side.
+// The /logs and /measurements endpoints only filter by date (no offset
+// pagination), and a client's history over this window is small, so this
+// lets "Load more" show only when there is genuinely more to reveal.
 const HISTORY_MAX_DAYS = 180;
-// Don't offer "Load more" for a short list — a handful of entries almost
-// certainly means there's nothing older to fetch.
-const LOAD_MORE_MIN_ITEMS = 5;
+const LOG_DATES_PAGE_SIZE = 7;
+const MEASUREMENTS_PAGE_SIZE = 10;
 
 type DetailTab = 'logs' | 'measurements';
 
@@ -71,15 +68,11 @@ export default function ClientDetail( {
 	const [ isDrawerOpen, setDrawerOpen ] = useState( false );
 	const [ isFormDirty, setFormDirty ] = useState( false );
 	const [ activeTab, setActiveTab ] = useState< DetailTab >( 'logs' );
-	const [ logsRangeDays, setLogsRangeDays ] = useState( HISTORY_PAGE_DAYS );
-	const [ isLoadingMoreLogs, setIsLoadingMoreLogs ] = useState( false );
-	const [ logsExhausted, setLogsExhausted ] = useState( false );
-	const [ measurementsRangeDays, setMeasurementsRangeDays ] =
-		useState( HISTORY_PAGE_DAYS );
-	const [ isLoadingMoreMeasurements, setIsLoadingMoreMeasurements ] =
-		useState( false );
-	const [ measurementsExhausted, setMeasurementsExhausted ] =
-		useState( false );
+	const [ visibleLogDates, setVisibleLogDates ] =
+		useState( LOG_DATES_PAGE_SIZE );
+	const [ visibleMeasurements, setVisibleMeasurements ] = useState(
+		MEASUREMENTS_PAGE_SIZE
+	);
 
 	const { updateClient } = useDispatch( STORE_NAME ) as {
 		updateClient: (
@@ -102,62 +95,16 @@ export default function ClientDetail( {
 		} ).then( setCompliance, () => setCompliance( undefined ) );
 		apiFetch< LogEntry[] >( {
 			path: `/nutrio/v1/clients/${ clientId }/logs?from=${ daysAgo(
-				HISTORY_PAGE_DAYS - 1
+				HISTORY_MAX_DAYS - 1
 			) }&to=${ today }`,
 		} ).then( setLogs, () => setLogs( [] ) );
 		apiFetch< Measurement[] >( {
 			path: `/nutrio/v1/clients/${ clientId }/measurements?from=${ daysAgo(
-				HISTORY_PAGE_DAYS - 1
+				HISTORY_MAX_DAYS - 1
 			) }&to=${ today }`,
 		} ).then( setMeasurements, () => setMeasurements( [] ) );
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- clientId/today are stable for the component's lifetime.
 	}, [] );
-
-	const loadMoreLogs = () => {
-		const nextRange = Math.min(
-			logsRangeDays + HISTORY_PAGE_DAYS,
-			HISTORY_MAX_DAYS
-		);
-		setIsLoadingMoreLogs( true );
-
-		apiFetch< LogEntry[] >( {
-			path: `/nutrio/v1/clients/${ clientId }/logs?from=${ daysAgo(
-				nextRange - 1
-			) }&to=${ today }`,
-		} )
-			.then( ( entries ) => {
-				// A wider window that returned nothing new means we've
-				// reached the start of the client's history.
-				setLogsExhausted( entries.length === ( logs ?? [] ).length );
-				setLogs( entries );
-				setLogsRangeDays( nextRange );
-			} )
-			.catch( () => {} )
-			.finally( () => setIsLoadingMoreLogs( false ) );
-	};
-
-	const loadMoreMeasurements = () => {
-		const nextRange = Math.min(
-			measurementsRangeDays + HISTORY_PAGE_DAYS,
-			HISTORY_MAX_DAYS
-		);
-		setIsLoadingMoreMeasurements( true );
-
-		apiFetch< Measurement[] >( {
-			path: `/nutrio/v1/clients/${ clientId }/measurements?from=${ daysAgo(
-				nextRange - 1
-			) }&to=${ today }`,
-		} )
-			.then( ( entries ) => {
-				setMeasurementsExhausted(
-					entries.length === ( measurements ?? [] ).length
-				);
-				setMeasurements( entries );
-				setMeasurementsRangeDays( nextRange );
-			} )
-			.catch( () => {} )
-			.finally( () => setIsLoadingMoreMeasurements( false ) );
-	};
 
 	const isLoading =
 		undefined === client ||
@@ -167,6 +114,13 @@ export default function ClientDetail( {
 	const logsByDate: Record< string, LogEntry[] > = {};
 	for ( const entry of logs ?? [] ) {
 		( logsByDate[ entry.log_date ] ??= [] ).push( entry );
+	}
+	const logDates = Object.keys( logsByDate ).sort( ( a, b ) =>
+		b.localeCompare( a )
+	);
+	const visibleLogsByDate: Record< string, LogEntry[] > = {};
+	for ( const date of logDates.slice( 0, visibleLogDates ) ) {
+		visibleLogsByDate[ date ] = logsByDate[ date ];
 	}
 
 	// Same latest-weight/delta-vs-previous calculation as the
@@ -338,22 +292,23 @@ export default function ClientDetail( {
 					{ 'logs' === activeTab && (
 						<Panel>
 							<PanelBody>
-								<LogHistoryList entriesByDate={ logsByDate } />
-								{ logsRangeDays < HISTORY_MAX_DAYS &&
-									! logsExhausted &&
-									( logs ?? [] ).length >=
-										LOAD_MORE_MIN_ITEMS && (
-										<button
-											type="button"
-											className={ styles.loadMore }
-											onClick={ loadMoreLogs }
-											disabled={ isLoadingMoreLogs }
-										>
-											{ isLoadingMoreLogs
-												? __( 'Loading…', 'nutrio' )
-												: __( 'Load more', 'nutrio' ) }
-										</button>
-									) }
+								<LogHistoryList
+									entriesByDate={ visibleLogsByDate }
+								/>
+								{ logDates.length > visibleLogDates && (
+									<button
+										type="button"
+										className={ styles.loadMore }
+										onClick={ () =>
+											setVisibleLogDates(
+												( count ) =>
+													count + LOG_DATES_PAGE_SIZE
+											)
+										}
+									>
+										{ __( 'Load more', 'nutrio' ) }
+									</button>
+								) }
 							</PanelBody>
 						</Panel>
 					) }
@@ -363,25 +318,25 @@ export default function ClientDetail( {
 							<PanelBody>
 								<MeasurementHistoryList
 									measurements={ measurements ?? [] }
+									limit={ visibleMeasurements }
 									unit={ unit }
 								/>
-								{ measurementsRangeDays < HISTORY_MAX_DAYS &&
-									! measurementsExhausted &&
-									( measurements ?? [] ).length >=
-										LOAD_MORE_MIN_ITEMS && (
-										<button
-											type="button"
-											className={ styles.loadMore }
-											onClick={ loadMoreMeasurements }
-											disabled={
-												isLoadingMoreMeasurements
-											}
-										>
-											{ isLoadingMoreMeasurements
-												? __( 'Loading…', 'nutrio' )
-												: __( 'Load more', 'nutrio' ) }
-										</button>
-									) }
+								{ ( measurements ?? [] ).length >
+									visibleMeasurements && (
+									<button
+										type="button"
+										className={ styles.loadMore }
+										onClick={ () =>
+											setVisibleMeasurements(
+												( count ) =>
+													count +
+													MEASUREMENTS_PAGE_SIZE
+											)
+										}
+									>
+										{ __( 'Load more', 'nutrio' ) }
+									</button>
+								) }
 							</PanelBody>
 						</Panel>
 					) }
