@@ -11,6 +11,7 @@ namespace Nutrio\RestApi;
 
 use Nutrio\Clients\ClientInviteService;
 use Nutrio\Clients\ComplianceCalculator;
+use Nutrio\Clients\LogEntryLabelResolver;
 use Nutrio\Email\Mailer;
 use Nutrio\Repositories\ClientRepository;
 use Nutrio\Repositories\LogEntryRepository;
@@ -52,6 +53,7 @@ final class ClientsController extends AbstractPractitionerController {
 	 * @param MeasurementRepository $measurements A client's weight/measurement entries.
 	 * @param ComplianceCalculator  $compliance   Computes a client's plan-compliance percentage.
 	 * @param Mailer                $mailer       Sends transactional/notification emails.
+	 * @param LogEntryLabelResolver $log_labels   Resolves food/recipe names for log entries.
 	 */
 	public function __construct(
 		private readonly ClientRepository $clients,
@@ -59,7 +61,8 @@ final class ClientsController extends AbstractPractitionerController {
 		private readonly LogEntryRepository $logs,
 		private readonly MeasurementRepository $measurements,
 		private readonly ComplianceCalculator $compliance,
-		private readonly Mailer $mailer
+		private readonly Mailer $mailer,
+		private readonly LogEntryLabelResolver $log_labels
 	) {}
 
 	/**
@@ -387,7 +390,7 @@ final class ClientsController extends AbstractPractitionerController {
 			)
 		);
 
-		return $this->success( $entries );
+		return $this->success( $this->log_labels->with_labels( $entries ) );
 	}
 
 	/**

@@ -47,7 +47,12 @@ final class ClientsControllerComplianceTest extends TestCase {
 				$this->createMock( PlanRepository::class ),
 				$this->createMock( LogEntryRepository::class )
 			),
-			new Mailer( new \Nutrio\Email\EmailTemplateService() )
+			new Mailer( new \Nutrio\Email\EmailTemplateService() ),
+			new \Nutrio\Clients\LogEntryLabelResolver(
+				$this->createMock( \Nutrio\Repositories\PlanRepository::class ),
+				$this->createMock( \Nutrio\Nutrition\FoodCache::class ),
+				$this->createMock( \Nutrio\Repositories\RecipeRepository::class )
+			)
 		);
 	}
 

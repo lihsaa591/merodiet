@@ -274,6 +274,34 @@ class PlanRepository {
 	}
 
 	/**
+	 * A single plan item's food/recipe reference, by its own ID. Returns
+	 * null for an item that no longer exists (items are deleted and
+	 * re-inserted when a plan is edited, so an old log entry can point at
+	 * an ID that's gone).
+	 *
+	 * @param int $id Internal plan_items ID.
+	 *
+	 * @return array{food_id:int|null, recipe_id:int|null}|null
+	 */
+	public function find_item( int $id ): ?array {
+		global $wpdb;
+
+		$row = $wpdb->get_row(
+			$wpdb->prepare( "SELECT food_id, recipe_id FROM {$wpdb->prefix}nutrio_plan_items WHERE id = %d", $id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
+			ARRAY_A
+		);
+
+		if ( null === $row ) {
+			return null;
+		}
+
+		return array(
+			'food_id'   => null === $row['food_id'] ? null : (int) $row['food_id'],
+			'recipe_id' => null === $row['recipe_id'] ? null : (int) $row['recipe_id'],
+		);
+	}
+
+	/**
 	 * A day's item rows, in their stored order.
 	 *
 	 * @param int $plan_day_id Internal plan_days ID.

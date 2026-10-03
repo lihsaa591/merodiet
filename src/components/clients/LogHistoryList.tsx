@@ -26,6 +26,10 @@ function entryLabel(
 		return itemLabels[ entry.plan_item_id ];
 	}
 
+	if ( entry.label ) {
+		return entry.label;
+	}
+
 	return entry.notes ?? __( 'Logged item', 'nutrio' );
 }
 
@@ -66,7 +70,9 @@ export default function LogHistoryList( {
 										{ entryLabel( entry, itemLabels ) }
 									</div>
 									{ entry.notes &&
-										null !== entry.plan_item_id && (
+										null !== entry.plan_item_id &&
+										entry.notes !==
+											entryLabel( entry, itemLabels ) && (
 											<div
 												className={ styles.historyNote }
 											>

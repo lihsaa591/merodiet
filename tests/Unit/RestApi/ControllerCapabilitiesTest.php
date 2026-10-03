@@ -54,6 +54,7 @@ final class ControllerCapabilitiesTest extends TestCase {
 					MeasurementRepository::class,
 					ComplianceCalculator::class,
 					Mailer::class,
+					\Nutrio\Clients\LogEntryLabelResolver::class,
 				),
 				'manage_nutrio_clients',
 			),
@@ -151,6 +152,14 @@ final class ControllerCapabilitiesTest extends TestCase {
 			return new ComplianceCalculator(
 				$this->createMock( \Nutrio\Repositories\PlanRepository::class ),
 				$this->createMock( LogEntryRepository::class )
+			);
+		}
+
+		if ( \Nutrio\Clients\LogEntryLabelResolver::class === $class ) {
+			return new \Nutrio\Clients\LogEntryLabelResolver(
+				$this->createMock( \Nutrio\Repositories\PlanRepository::class ),
+				$this->createMock( \Nutrio\Nutrition\FoodCache::class ),
+				$this->createMock( \Nutrio\Repositories\RecipeRepository::class )
 			);
 		}
 
