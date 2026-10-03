@@ -99,6 +99,7 @@ export default function PlanLibrary( {
 					alignItems: 'center',
 					gap: '10px',
 					color: 'inherit',
+					textDecoration: 'none',
 				} }
 			>
 				<Avatar
