@@ -298,7 +298,6 @@ export default function ClientRoster() {
 										</th>
 										<th>{ __( 'Name', 'nutrio' ) }</th>
 										<th>{ __( 'Email', 'nutrio' ) }</th>
-										<th>{ __( 'Allergies', 'nutrio' ) }</th>
 										<th>{ __( 'Account', 'nutrio' ) }</th>
 										<th>
 											{ __( 'Client Portal', 'nutrio' ) }
@@ -358,29 +357,6 @@ export default function ClientRoster() {
 												</div>
 											</td>
 											<td>{ client.email }</td>
-											<td>
-												{ ( client.allergies ?? [] )
-													.length > 0 ? (
-													client.allergies.map(
-														( allergy ) => (
-															<Chip
-																key={ allergy }
-																tone="clay"
-															>
-																{ allergy }
-															</Chip>
-														)
-													)
-												) : (
-													<span
-														style={ {
-															color: 'var(--ink-faint)',
-														} }
-													>
-														—
-													</span>
-												) }
-											</td>
 											<td>
 												{ client.status === 'active' ? (
 													<span
