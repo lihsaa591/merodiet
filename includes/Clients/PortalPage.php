@@ -59,17 +59,22 @@ final class PortalPage {
 			define( 'DONOTCACHEPAGE', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- a WP-core-recognized cache-plugin convention, not our own constant to prefix.
 		}
 
-		if ( ! is_user_logged_in() ) {
-			$action = isset( $_GET['nutrio_action'] ) ? sanitize_text_field( wp_unslash( $_GET['nutrio_action'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only routing choice, not itself a state-changing action; each form below carries its own nonce.
+		$action = isset( $_GET['nutrio_action'] ) ? sanitize_text_field( wp_unslash( $_GET['nutrio_action'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only routing choice, not itself a state-changing action; each form below carries its own nonce.
 
+		// A reset link is authorised by its key alone (like wp-login.php's
+		// own), so it must work even when the browser already holds some
+		// other session — e.g. a practitioner who just invited the client
+		// and opens the email on the same machine. Without this they were
+		// bounced to wp-admin instead of reaching the form.
+		if ( 'resetpass' === $action ) {
+			$this->handle_reset_password_request();
+			exit;
+		}
+
+		if ( ! is_user_logged_in() ) {
 			if ( 'lostpassword' === $action ) {
 				$result = $this->maybe_process_lost_password();
 				$this->render_lost_password_form( $result );
-				exit;
-			}
-
-			if ( 'resetpass' === $action ) {
-				$this->handle_reset_password_request();
 				exit;
 			}
 
@@ -470,8 +475,19 @@ final class PortalPage {
 	 * the client straight into the portal.
 	 */
 	private function handle_reset_password_request(): void {
-		$key   = isset( $_REQUEST['key'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['key'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only key/login lookup; check_password_reset_key() itself is what proves this request is legitimate, not a nonce.
-		$login = isset( $_REQUEST['login'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['login'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- see above.
+		// An invited client may not open the email on the day it arrives;
+		// core's 1-day default made the link read as "no longer valid".
+		add_filter(
+			'password_reset_expiration',
+			static fn (): int => WEEK_IN_SECONDS
+		);
+
+		// A link copied from the email's plain-text view can carry the
+		// HTML-escaped "&amp;" literally, which PHP parses into "amp;key"
+		// / "amp;login" params — accept those too rather than reporting a
+		// perfectly good key as invalid.
+		$key   = self::reset_param( 'key' );
+		$login = self::reset_param( 'login' );
 
 		$user = check_password_reset_key( $key, $login );
 
@@ -519,6 +535,22 @@ final class PortalPage {
 
 		wp_safe_redirect( PortalRewrite::url() );
 		exit;
+	}
+
+	/**
+	 * One reset-link query param, tolerating an "amp;" prefix left by a
+	 * pasted HTML-escaped URL.
+	 *
+	 * @param string $name Param name ('key' or 'login').
+	 */
+	private static function reset_param( string $name ): string {
+		foreach ( array( $name, 'amp;' . $name ) as $candidate ) {
+			if ( isset( $_REQUEST[ $candidate ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only key/login lookup; check_password_reset_key() itself is what proves this request is legitimate, not a nonce.
+				return sanitize_text_field( wp_unslash( $_REQUEST[ $candidate ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotValidated -- see above.
+			}
+		}
+
+		return '';
 	}
 
 	/**
