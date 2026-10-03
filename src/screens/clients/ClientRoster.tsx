@@ -299,9 +299,7 @@ export default function ClientRoster() {
 										<th>{ __( 'Name', 'nutrio' ) }</th>
 										<th>{ __( 'Email', 'nutrio' ) }</th>
 										<th>{ __( 'Allergies', 'nutrio' ) }</th>
-										<th>
-											{ __( 'Care status', 'nutrio' ) }
-										</th>
+										<th>{ __( 'Account', 'nutrio' ) }</th>
 										<th>
 											{ __( 'Client Portal', 'nutrio' ) }
 										</th>
