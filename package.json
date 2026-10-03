@@ -6,6 +6,7 @@
 	"private": true,
 	"scripts": {
 		"build": "wp-scripts build",
+		"make-pot": "npm run build && wp i18n make-pot . languages/nutrio.pot --slug=nutrio --domain=nutrio --include=nutrio.php,uninstall.php,includes,config,bootstrap,build --exclude=vendor,node_modules,tests,dist --skip-audit",
 		"start": "wp-scripts start --hot",
 		"lint:js": "wp-scripts lint-js",
 		"check-types": "tsc --noEmit",

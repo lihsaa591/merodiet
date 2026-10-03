@@ -12,7 +12,7 @@ WordPress plugin: PHP backend + React 18/TypeScript admin SPA and client portal.
 - `build/`, `vendor/`, `node_modules/`, `artifacts/`: generated, never edit
 
 ## Commands
-- JS: `npm run build`, `npm run start`, `npm run lint:js`, `npm run check-types`, `npm run format`, `npm run test:unit`, `npm run test:e2e:a11y`
+- JS: `npm run build`, `npm run start`, `npm run lint:js`, `npm run check-types`, `npm run format`, `npm run test:unit`, `npm run test:e2e:a11y`, `npm run make-pot` (builds, then regenerates `languages/nutrio.pot`; needs WP-CLI; run before each release)
 - PHP: `composer run test`, `composer run phpcs`, `composer run phpcbf`, `composer run phpstan`
 
 ## Conventions
