@@ -263,6 +263,10 @@ declare global {
 			dateFormat?: string;
 			/** This site's Settings → General → Time Format, a PHP date() format string (e.g. "g:i a"). */
 			timeFormat?: string;
+			/** The site's name, shown in the email editor's preview header/footer. */
+			siteName?: string;
+			/** URL of the leaf mark used in the email header. */
+			emailLogoUrl?: string;
 		};
 		nutrioClientPortal?: {
 			restUrl?: string;
@@ -282,6 +286,14 @@ export interface EmailTemplate {
 	body: string;
 	enabled: boolean;
 	tags: Record< string, string >;
+}
+
+/** The From name/address shared by every Nutrio email. Empty = WordPress's default. */
+export interface EmailSenderSettings {
+	from_name: string;
+	from_address: string;
+	/** What WordPress sends from when these are empty — shown as placeholders. */
+	defaults: { from_name: string; from_address: string };
 }
 
 export interface EmailDigestSettings {

@@ -1,9 +1,10 @@
-import { useRef, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import type { ReactNode } from 'react';
 import { __ } from '@wordpress/i18n';
 import Panel, { PanelBody, PanelHead } from '../ui/Panel';
 import Button from '../ui/Button';
 import Switch from '../ui/Switch';
+import EmailBodyEditor from './EmailBodyEditor';
 import type { EmailTemplate } from '../../types';
 import styles from './EmailTemplateEditor.module.css';
 
@@ -26,9 +27,8 @@ interface EmailTemplateEditorProps {
 
 // One email type's collapsed-by-default accordion row: a header (label +
 // optional enable toggle + expand/collapse chevron) and, when expanded,
-// the subject/body editor with a row of insert-tag buttons below the
-// body textarea — the "simple builder" the design spec calls for, not
-// raw HTML editing.
+// the subject field and the body editor (visual/code, with insert-tag
+// buttons — see EmailBodyEditor).
 export default function EmailTemplateEditor( {
 	template,
 	label,
@@ -41,26 +41,6 @@ export default function EmailTemplateEditor( {
 	const [ body, setBody ] = useState( template.body );
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ isToggling, setIsToggling ] = useState( false );
-	const bodyRef = useRef< HTMLTextAreaElement >( null );
-
-	const insertTag = ( tag: string ) => {
-		const textarea = bodyRef.current;
-		if ( ! textarea ) {
-			return;
-		}
-		const insertion = `{{${ tag }}}`;
-		const start = textarea.selectionStart ?? body.length;
-		const end = textarea.selectionEnd ?? body.length;
-		const next = body.slice( 0, start ) + insertion + body.slice( end );
-		setBody( next );
-		// Restore focus + caret after the inserted tag on the next tick,
-		// once React has re-rendered the textarea with the new value.
-		requestAnimationFrame( () => {
-			textarea.focus();
-			const caret = start + insertion.length;
-			textarea.setSelectionRange( caret, caret );
-		} );
-	};
 
 	const handleSave = async ( event: React.FormEvent ) => {
 		event.preventDefault();
@@ -145,42 +125,16 @@ export default function EmailTemplateEditor( {
 								required
 							/>
 						</div>
-						<div className="nutrio-field">
-							<label
-								htmlFor={ `nutrio-email-body-${ template.type }` }
-							>
-								{ __( 'Body', 'nutrio' ) }
-							</label>
-							<textarea
-								id={ `nutrio-email-body-${ template.type }` }
-								ref={ bodyRef }
-								rows={ 6 }
-								value={ body }
-								onChange={ ( event ) =>
-									setBody( event.target.value )
-								}
-								required
-							/>
-						</div>
-						<div className={ styles.tagRow }>
-							{ Object.entries( template.tags ).map(
-								( [ tag, description ] ) => (
-									<button
-										key={ tag }
-										type="button"
-										className={ styles.tagButton }
-										title={ description }
-										onClick={ () => insertTag( tag ) }
-									>
-										{ `{{${ tag }}}` }
-									</button>
-								)
-							) }
-						</div>
+						<EmailBodyEditor
+							id={ template.type }
+							value={ body }
+							onChange={ setBody }
+							tags={ template.tags }
+						/>
 						<Button
 							variant="primary"
 							type="submit"
-							disabled={ isSaving }
+							disabled={ isSaving || '' === body.trim() }
 							className={ styles.saveButton }
 						>
 							{ __( 'Save', 'nutrio' ) }

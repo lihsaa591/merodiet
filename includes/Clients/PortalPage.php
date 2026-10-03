@@ -9,6 +9,7 @@ declare( strict_types=1 );
 
 namespace Nutrio\Clients;
 
+use Nutrio\Email\EmailSender;
 use Nutrio\Email\Mailer;
 use Nutrio\Helper\Assets;
 use Nutrio\Repositories\ClientRepository;
@@ -198,6 +199,7 @@ final class PortalPage {
 	public static function force_html_email( PHPMailer $phpmailer ): void {
 		remove_action( 'phpmailer_init', array( self::class, 'force_html_email' ) );
 		$phpmailer->isHTML( true );
+		EmailSender::apply_to( $phpmailer );
 	}
 
 	/**

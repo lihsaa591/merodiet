@@ -68,12 +68,14 @@ final class Mailer {
 
 		$rendered = $this->render_html( $type, $context );
 
-		return wp_mail(
-			$to,
-			$rendered['subject'],
-			$rendered['body'],
-			array( 'Content-Type: text/html; charset=UTF-8' )
-		);
+		$headers = array( 'Content-Type: text/html; charset=UTF-8' );
+		$from    = EmailSender::header();
+
+		if ( null !== $from ) {
+			$headers[] = $from;
+		}
+
+		return wp_mail( $to, $rendered['subject'], $rendered['body'], $headers );
 	}
 
 	/**

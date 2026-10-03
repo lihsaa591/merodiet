@@ -106,9 +106,17 @@ if ( ! class_exists( 'Nutrio_Tests_PHPMailerStub' ) ) {
 	 */
 	class Nutrio_Tests_PHPMailerStub {
 		public bool $is_html = false;
+		public string $From = '';
+		public string $FromName = '';
 
 		public function isHTML( bool $is_html ): void {
 			$this->is_html = $is_html;
+		}
+
+		public function setFrom( string $address, string $name = '', bool $auto = true ): bool {
+			$this->From     = $address;
+			$this->FromName = $name;
+			return true;
 		}
 	}
 }

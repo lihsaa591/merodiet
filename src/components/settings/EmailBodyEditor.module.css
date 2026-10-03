@@ -1,0 +1,178 @@
+.editor {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+.label {
+	font-size: 12.5px;
+	font-weight: 600;
+	color: var(--ink-muted);
+}
+
+.modeSwitch {
+	display: inline-flex;
+	padding: 2px;
+	border: 1px solid var(--line);
+	border-radius: 8px;
+	background: var(--paper-dim);
+}
+.modeButton {
+	font-family: inherit;
+	font-size: 12px;
+	font-weight: 600;
+	padding: 4px 12px;
+	border: none;
+	border-radius: 6px;
+	background: none;
+	color: var(--ink-muted);
+	cursor: pointer;
+}
+.modeActive {
+	background: var(--surface);
+	color: var(--ink);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+/* ---------- Visual mode: a faithful copy of the sent email ---------- */
+
+/* The backdrop and email frame use fixed light colors on purpose: the
+   real email doesn't follow the admin's dark mode. Keep these in sync
+   with Mailer::wrap_in_skeleton(). */
+.stage {
+	position: relative;
+	padding: 20px 12px;
+	border: 1px solid var(--line);
+	border-radius: 10px;
+	background: #f4f4f6;
+	overflow-x: auto;
+}
+.email {
+	max-width: 480px;
+	margin: 0 auto;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+		sans-serif;
+}
+.emailHeader {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	padding: 28px 20px;
+	background: #5b5fa6;
+	border-radius: 10px 10px 0 0;
+	color: #ffffff;
+	font-size: 20px;
+	font-weight: 700;
+	white-space: nowrap;
+}
+.emailLogo {
+	display: block;
+	height: 36px;
+	width: auto;
+}
+.emailBody {
+	min-height: 120px;
+	padding: 32px 28px;
+	background: #ffffff;
+	border: 1px solid #e7e6ea;
+	border-top: none;
+	font-size: 15px;
+	line-height: 1.6;
+	color: #26262a;
+	white-space: pre-line;
+	word-break: break-word;
+	overflow-wrap: break-word;
+	outline: none;
+}
+.emailBody:focus {
+	box-shadow: inset 0 0 0 2px rgba(91, 95, 166, 0.35);
+}
+.emailFooter {
+	padding: 16px 28px;
+	text-align: center;
+	font-size: 12px;
+	line-height: 1.5;
+	color: #9d9da3;
+}
+
+/* ---------- Floating selection toolbar ---------- */
+
+.toolbar {
+	position: absolute;
+	z-index: 10;
+	display: flex;
+	gap: 2px;
+	padding: 4px;
+	background: var(--ink);
+	border-radius: 8px;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+	/* Centered above the selection's top edge. */
+	transform: translate(-50%, calc(-100% - 8px));
+}
+.toolbarButton {
+	width: 28px;
+	height: 28px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: none;
+	border-radius: 6px;
+	background: none;
+	color: var(--surface);
+	font-family: inherit;
+	font-size: 14px;
+	cursor: pointer;
+}
+.toolbarButton:hover {
+	background: rgba(255, 255, 255, 0.14);
+}
+.toolbarActive {
+	background: rgba(255, 255, 255, 0.24);
+}
+.glyphBold {
+	font-weight: 800;
+}
+.glyphItalic {
+	font-style: italic;
+	font-family: Georgia, serif;
+}
+.glyphUnderline {
+	text-decoration: underline;
+}
+
+/* ---------- Code mode ---------- */
+
+.code {
+	font-family: var(--font-mono, monospace);
+	font-size: 12.5px;
+	line-height: 1.5;
+	resize: vertical;
+}
+
+/* ---------- Merge tag buttons ---------- */
+
+.tagRow {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+.tagButton {
+	font-family: var(--font-mono, monospace);
+	font-size: 11px;
+	padding: 4px 8px;
+	border-radius: 6px;
+	border: 1px solid var(--line);
+	background: var(--paper-dim);
+	color: var(--ink-muted);
+	cursor: pointer;
+}
+.tagButton:hover {
+	border-color: var(--line-strong);
+	color: var(--ink);
+}
