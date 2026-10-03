@@ -29,12 +29,13 @@ final class EmailTemplateRegistry {
 		'client_invite'             => array(
 			'audience' => 'client',
 			'subject'  => "You've been invited to your client portal",
-			'body'     => "Hi {{client_first_name}},\n\n{{practitioner_name}} has invited you to your client portal at {{site_name}}. Click below to set your password and get started.\n\n<a href=\"{{portal_url}}\" style=\"display:inline-block;margin-top:4px;padding:12px 24px;background:#5b5fa6;color:#ffffff;text-decoration:none;border-radius:6px;font-weight:600;font-size:14px;\">Set your password</a>\n\nOr copy and paste this link into your browser:\n{{portal_url}}",
+			'body'     => "Hi {{client_first_name}},\n\n{{practitioner_name}} has invited you to your client portal at {{site_name}}. Click below to set your password and get started.\n\n<a href=\"{{reset_url}}\" style=\"display:inline-block;margin-top:4px;padding:12px 24px;background:#5b5fa6;color:#ffffff;text-decoration:none;border-radius:6px;font-weight:600;font-size:14px;\">Set your password</a>\n\nOr copy and paste this link into your browser:\n{{reset_url}}",
 			'tags'     => array(
 				'client_first_name' => "The client's first name",
 				'client_last_name'  => "The client's last name",
 				'practitioner_name' => "The practitioner's display name",
 				'portal_url'        => 'Link to the client portal',
+				'reset_url'         => 'Link for the client to set their password',
 				'site_name'         => "This site's name",
 			),
 		),
