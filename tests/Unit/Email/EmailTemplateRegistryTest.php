@@ -30,6 +30,15 @@ final class EmailTemplateRegistryTest extends TestCase {
 		self::assertTrue( EmailTemplateRegistry::is_known_type( 'client_invite' ) );
 	}
 
+	public function test_invite_email_links_to_the_password_reset_url_not_the_bare_portal(): void {
+		$default = EmailTemplateRegistry::get_default( 'client_invite' );
+
+		// The portal root is just the login page — the invitee has no
+		// password yet, so the invite must carry the one-time reset link.
+		self::assertStringContainsString( 'href="{{reset_url}}"', $default['body'] );
+		self::assertStringNotContainsString( '{{portal_url}}', $default['body'] );
+	}
+
 	public function test_get_default_returns_a_subject_and_body(): void {
 		$default = EmailTemplateRegistry::get_default( 'client_invite' );
 

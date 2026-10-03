@@ -326,6 +326,12 @@ export default function LogTab() {
 						</p>
 					) }
 
+					{ plan && 0 === todaysItems.length && (
+						<p className={ styles.empty }>
+							{ __( 'Nothing planned for today.', 'nutrio' ) }
+						</p>
+					) }
+
 					{ plan && todaysItems.length > 0 && (
 						<>
 							<p className={ styles.progress }>
@@ -674,6 +680,18 @@ export default function LogTab() {
 						<LogHistoryList
 							entriesByDate={ historyByDate }
 							itemLabels={ itemLabels }
+							emptyMessage={
+								hasOlderHistory
+									? sprintf(
+											/* translators: %d: number of days the history currently covers */
+											__(
+												'Nothing logged in the last %d days — use Load more to see older entries.',
+												'nutrio'
+											),
+											historyRangeDays
+									  )
+									: undefined
+							}
 						/>
 					) }
 

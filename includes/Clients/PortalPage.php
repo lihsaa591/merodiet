@@ -59,17 +59,22 @@ final class PortalPage {
 			define( 'DONOTCACHEPAGE', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- a WP-core-recognized cache-plugin convention, not our own constant to prefix.
 		}
 
-		if ( ! is_user_logged_in() ) {
-			$action = isset( $_GET['nutrio_action'] ) ? sanitize_text_field( wp_unslash( $_GET['nutrio_action'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only routing choice, not itself a state-changing action; each form below carries its own nonce.
+		$action = isset( $_GET['nutrio_action'] ) ? sanitize_text_field( wp_unslash( $_GET['nutrio_action'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only routing choice, not itself a state-changing action; each form below carries its own nonce.
 
+		// A reset link is authorised by its key alone (like wp-login.php's
+		// own), so it must work even when the browser already holds some
+		// other session — e.g. a practitioner who just invited the client
+		// and opens the email on the same machine. Without this they were
+		// bounced to wp-admin instead of reaching the form.
+		if ( 'resetpass' === $action ) {
+			$this->handle_reset_password_request();
+			exit;
+		}
+
+		if ( ! is_user_logged_in() ) {
 			if ( 'lostpassword' === $action ) {
 				$result = $this->maybe_process_lost_password();
 				$this->render_lost_password_form( $result );
-				exit;
-			}
-
-			if ( 'resetpass' === $action ) {
-				$this->handle_reset_password_request();
 				exit;
 			}
 

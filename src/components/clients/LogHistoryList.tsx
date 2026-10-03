@@ -7,6 +7,8 @@ interface LogHistoryListProps {
 	entriesByDate: Record< string, LogEntry[] >;
 	/** Plan item id -> display label, for entries logged against a plan item. Entries without a match fall back to their own notes. */
 	itemLabels?: Record< number, string >;
+	/** Shown when there is nothing to list. */
+	emptyMessage?: string;
 }
 
 export const STATUS_LABELS: Record< LogEntry[ 'status' ], string > = {
@@ -39,6 +41,7 @@ function entryLabel(
 export default function LogHistoryList( {
 	entriesByDate,
 	itemLabels = {},
+	emptyMessage,
 }: LogHistoryListProps ) {
 	const pastDates = Object.keys( entriesByDate ).sort( ( a, b ) =>
 		b.localeCompare( a )
@@ -47,7 +50,7 @@ export default function LogHistoryList( {
 	if ( 0 === pastDates.length ) {
 		return (
 			<p className={ styles.empty }>
-				{ __( 'Nothing logged yet.', 'nutrio' ) }
+				{ emptyMessage ?? __( 'Nothing logged yet.', 'nutrio' ) }
 			</p>
 		);
 	}
