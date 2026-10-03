@@ -77,8 +77,13 @@ body.toplevel_page_nutrio #wpbody-content {
 	color: var(--ink);
 	font-family: 'Public Sans', sans-serif;
 	font-weight: 700;
-	margin: 0;
 	letter-spacing: -0.01em;
+}
+
+/* Zero-specificity reset: a module class like .sectionTitle { margin: … }
+   must be able to win, which it can't against a class + element selector. */
+:where(.nutrio-client-portal-app) :is(h1, h2, h3, h4) {
+	margin: 0;
 }
 
 .nutrio-mono {

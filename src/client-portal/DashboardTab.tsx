@@ -13,6 +13,7 @@ import {
 	todaysDayOffset,
 } from './mealMeta';
 import NextPlanBanner from './NextPlanBanner';
+import { STATUS_LABELS } from '../components/clients/LogHistoryList';
 import { estimateDayNutrients, formatAmount } from '../utils/nutrients';
 import { gramsToDisplay, readStoredWeightUnit } from '../utils/weight';
 import { greeting, greetingEmoji } from '../utils/greeting';
@@ -277,11 +278,23 @@ export default function DashboardTab() {
 														item.id
 													] && (
 														<span
-															className={
-																styles.doneBadge
-															}
+															className={ `${
+																styles.statusPill
+															} ${
+																styles[
+																	loggedByItemId[
+																		item.id
+																	]
+																]
+															}` }
 														>
-															✓
+															{
+																STATUS_LABELS[
+																	loggedByItemId[
+																		item.id
+																	]
+																]
+															}
 														</span>
 													) }
 												</li>
