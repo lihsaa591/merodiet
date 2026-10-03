@@ -59,6 +59,31 @@ class RecipeNutrientResolver {
 	}
 
 	/**
+	 * Weight of one serving: the ingredients' combined grams spread
+	 * across the recipe's declared serving count — what a client sees
+	 * as "the portion size" for a recipe item.
+	 *
+	 * @param int $recipe_id Internal recipe ID.
+	 *
+	 * @return float|null Grams per serving, or null if the recipe doesn't exist or has no weighed ingredients.
+	 */
+	public function serving_grams( int $recipe_id ): ?float {
+		$recipe = $this->recipes->find( $recipe_id );
+
+		if ( null === $recipe ) {
+			return null;
+		}
+
+		$total = 0.0;
+
+		foreach ( $this->recipes->items_for_recipe( $recipe_id ) as $item ) {
+			$total += $item['quantity_grams'];
+		}
+
+		return $total > 0.0 ? round( $total / max( 1, $recipe['servings'] ), 1 ) : null;
+	}
+
+	/**
 	 * The recipe's totals divided across its declared serving count —
 	 * i.e. "nutrition per serving," what a plan item consuming some
 	 * number of servings actually scales from.

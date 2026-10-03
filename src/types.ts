@@ -129,6 +129,8 @@ export interface PlanItem {
 	> | null;
 	recipe_name: string | null;
 	recipe_nutrient_totals_per_serving: NutrientTotals | null;
+	/** Grams in one serving of a recipe item (portal plan only). */
+	recipe_serving_grams?: number | null;
 }
 
 export interface PlanDay {

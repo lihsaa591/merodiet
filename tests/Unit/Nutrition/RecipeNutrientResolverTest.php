@@ -48,6 +48,21 @@ final class RecipeNutrientResolverTest extends TestCase {
 		self::assertSame( 51900, $totals[ self::PROTEIN ] );
 	}
 
+	public function test_serving_grams_spreads_the_ingredient_weight_across_servings(): void {
+		$recipes = $this->createMock( RecipeRepository::class );
+		$recipes->method( 'find' )->with( 42 )->willReturn( array( 'id' => 42, 'servings' => 2 ) );
+		$recipes->method( 'items_for_recipe' )->with( 42 )->willReturn(
+			array(
+				array( 'id' => 1, 'food_id' => 100, 'quantity_grams' => 150.0 ),
+				array( 'id' => 2, 'food_id' => 200, 'quantity_grams' => 200.0 ),
+			)
+		);
+
+		$resolver = new RecipeNutrientResolver( $recipes, $this->createMock( FoodCache::class ) );
+
+		self::assertSame( 175.0, $resolver->serving_grams( 42 ) );
+	}
+
 	public function test_a_deleted_food_is_skipped_rather_than_failing_the_whole_calculation(): void {
 		$recipes = $this->createMock( RecipeRepository::class );
 		$recipes->method( 'items_for_recipe' )->willReturn(
