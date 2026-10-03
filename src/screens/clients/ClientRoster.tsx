@@ -1,7 +1,6 @@
 import { useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-import apiFetch from '@wordpress/api-fetch';
 import { STORE_NAME } from '../../store/clients';
 import { confirmDialog, alertDialog } from '../../utils/confirmDialog';
 import { useBulkSelection } from '../../hooks/useBulkSelection';
@@ -40,6 +39,15 @@ const CLIENT_STATUS_OPTIONS = [
 	{ value: 'paused', label: __( 'Paused', 'nutrio' ) },
 ];
 
+const PORTAL_STATUS = {
+	not_invited: {
+		label: __( 'Not invited', 'nutrio' ),
+		tone: 'clay' as const,
+	},
+	invited: { label: __( 'Invited', 'nutrio' ), tone: 'sage' as const },
+	active: { label: __( 'Active', 'nutrio' ), tone: 'success' as const },
+};
+
 export default function ClientRoster() {
 	const [ idParam, setIdParam ] = useQueryParam( 'id' );
 	const [ isDrawerOpen, setDrawerOpen ] = useState( false );
@@ -70,16 +78,16 @@ export default function ClientRoster() {
 	const isFiltering = Boolean( filters.search || filters.status );
 	const showFilters = useShowFilters( total, isFiltering );
 
-	const { createClient, updateClient, deleteClient } = useDispatch(
-		STORE_NAME
-	) as {
-		createClient: ( data: ClientInput ) => Promise< Client >;
-		updateClient: (
-			id: number,
-			data: Partial< ClientInput >
-		) => Promise< Client >;
-		deleteClient: ( id: number ) => Promise< void >;
-	};
+	const { createClient, updateClient, deleteClient, inviteClient } =
+		useDispatch( STORE_NAME ) as {
+			createClient: ( data: ClientInput ) => Promise< Client >;
+			updateClient: (
+				id: number,
+				data: Partial< ClientInput >
+			) => Promise< Client >;
+			deleteClient: ( id: number ) => Promise< void >;
+			inviteClient: ( id: number ) => Promise< Client >;
+		};
 
 	const bulk = useBulkSelection( clients );
 
@@ -130,10 +138,7 @@ export default function ClientRoster() {
 
 	const handleInvite = async ( client: Client ) => {
 		try {
-			await apiFetch( {
-				path: `/nutrio/v1/clients/${ client.id }/invite`,
-				method: 'POST',
-			} );
+			await inviteClient( client.id );
 			await alertDialog( {
 				message: sprintf(
 					/* translators: %s: client's full name */
@@ -295,6 +300,9 @@ export default function ClientRoster() {
 										<th>{ __( 'Email', 'nutrio' ) }</th>
 										<th>{ __( 'Allergies', 'nutrio' ) }</th>
 										<th>{ __( 'Status', 'nutrio' ) }</th>
+										<th>
+											{ __( 'Client Portal', 'nutrio' ) }
+										</th>
 										<th>{ __( 'Added', 'nutrio' ) }</th>
 										<th></th>
 									</tr>
@@ -386,6 +394,21 @@ export default function ClientRoster() {
 												</Chip>
 											</td>
 											<td>
+												<Chip
+													tone={
+														PORTAL_STATUS[
+															client.portal_status
+														].tone
+													}
+												>
+													{
+														PORTAL_STATUS[
+															client.portal_status
+														].label
+													}
+												</Chip>
+											</td>
+											<td>
 												{ formatDateTime(
 													client.created_at
 												) }
@@ -397,14 +420,26 @@ export default function ClientRoster() {
 											>
 												<div className="nutrio-row-actions">
 													<IconButton
-														label={ __(
-															'Invite to client portal',
-															'nutrio'
-														) }
+														label={
+															client.portal_status ===
+															'not_invited'
+																? __(
+																		'Invite to client portal',
+																		'nutrio'
+																  )
+																: __(
+																		'Already invited to client portal',
+																		'nutrio'
+																  )
+														}
 														onClick={ () =>
 															handleInvite(
 																client
 															)
+														}
+														disabled={
+															client.portal_status !==
+															'not_invited'
 														}
 													>
 														<InviteIcon />

@@ -210,7 +210,9 @@ final class ClientsController extends AbstractPractitionerController {
 			$this->filter_args( $request, self::LIST_FILTERS )
 		);
 
-		return $this->success( $this->paginated_response( $result['items'], $result['total'], $page, $per_page ) );
+		$items = array_map( array( self::class, 'with_portal_status' ), $result['items'] );
+
+		return $this->success( $this->paginated_response( $items, $result['total'], $page, $per_page ) );
 	}
 
 	/**
@@ -251,7 +253,7 @@ final class ClientsController extends AbstractPractitionerController {
 		 *
 		 * @var array<string, mixed> $client
 		 */
-		$client                 = $this->clients->find( $id );
+		$client                 = self::with_portal_status( $this->clients->find( $id ) );
 		$client['invite_error'] = $invite_error;
 
 		$this->mailer->send(
@@ -281,7 +283,7 @@ final class ClientsController extends AbstractPractitionerController {
 			return $owns;
 		}
 
-		return $this->success( $client );
+		return $this->success( self::with_portal_status( $client ) );
 	}
 
 	/**
@@ -315,7 +317,7 @@ final class ClientsController extends AbstractPractitionerController {
 		 */
 		$updated = $this->clients->find( $id );
 
-		return $this->success( $updated );
+		return $this->success( self::with_portal_status( $updated ) );
 	}
 
 	/**
@@ -358,7 +360,9 @@ final class ClientsController extends AbstractPractitionerController {
 			return $result;
 		}
 
-		return $this->success( array( 'invited' => true ) );
+		$invited = $this->clients->find( $id );
+
+		return $this->success( array_merge( array( 'invited' => true ), self::with_portal_status( $invited ) ) );
 	}
 
 	/**
@@ -500,5 +504,30 @@ final class ClientsController extends AbstractPractitionerController {
 		}
 
 		return __( 'invited', 'nutrio' );
+	}
+
+	/**
+	 * Annotate a client row with a derived `portal_status`, computed from
+	 * `user_id` (set once they're invited) and WordPress's own
+	 * `session_tokens` user meta (set once they've actually logged in) —
+	 * there's no dedicated status column, so this is read fresh each time
+	 * rather than stored.
+	 *
+	 * @param array<string, mixed> $client The client row, as returned by ClientRepository.
+	 *
+	 * @return array<string, mixed> The same row with `portal_status` added.
+	 */
+	private static function with_portal_status( array $client ): array {
+		$user_id = $client['user_id'] ?? null;
+
+		if ( null === $user_id ) {
+			$client['portal_status'] = 'not_invited';
+		} elseif ( get_user_meta( (int) $user_id, 'session_tokens', true ) ) {
+			$client['portal_status'] = 'active';
+		} else {
+			$client['portal_status'] = 'invited';
+		}
+
+		return $client;
 	}
 }
