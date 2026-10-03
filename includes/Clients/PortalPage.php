@@ -815,6 +815,7 @@ final class PortalPage {
 			<meta charset="<?php bloginfo( 'charset' ); ?>" />
 			<meta name="viewport" content="width=device-width, initial-scale=1" />
 			<title><?php echo esc_html( get_bloginfo( 'name' ) ); ?> — <?php esc_html_e( 'Client Portal', 'nutrio' ); ?></title>
+			<?php $this->render_theme_init_script(); ?>
 			<?php wp_head(); ?>
 		</head>
 		<body>

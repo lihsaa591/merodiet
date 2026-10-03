@@ -156,6 +156,17 @@ export default function LogTab() {
 			.finally( () => setIsLoadingMoreHistory( false ) );
 	};
 
+	// Collapses back to the first page. The entries already fetched are
+	// trimmed locally rather than re-requested.
+	const showLessHistory = () => {
+		const cutoff = daysAgo( HISTORY_PAGE_DAYS - 1 );
+		setHistory(
+			( entries ) =>
+				entries?.filter( ( entry ) => entry.log_date >= cutoff )
+		);
+		setHistoryRangeDays( HISTORY_PAGE_DAYS );
+	};
+
 	useEffect( () => {
 		apiFetch< Plan | null >( { path: '/nutrio/v1/me/plan' } ).then(
 			setPlan,
@@ -287,9 +298,11 @@ export default function LogTab() {
 		const status = loggedByItem[ item.id ]?.status;
 		return 'substituted' === status || 'skipped' === status;
 	} ).length;
-	const eatenKcal = estimateDayNutrients(
-		eatenItems.map( toEstimateInput )
-	).kcal;
+	// Nothing eaten yet is 0 kcal, not "unknown" — the summary stays
+	// visible whenever the day has a calorie target, instead of only
+	// appearing after the first plan item is marked eaten.
+	const eatenKcal =
+		estimateDayNutrients( eatenItems.map( toEstimateInput ) ).kcal ?? 0;
 	const plannedKcal = estimateDayNutrients(
 		todaysItems.map( toEstimateInput )
 	).kcal;
@@ -338,7 +351,7 @@ export default function LogTab() {
 								) }
 							</p>
 
-							{ null !== eatenKcal && (
+							{ null !== plannedKcal && (
 								<div className={ styles.kcalSummary }>
 									<span className={ styles.kcalValue }>
 										{ sprintf(
@@ -351,6 +364,14 @@ export default function LogTab() {
 											formatAmount( plannedKcal, '' )
 										) }
 									</span>
+									{ adHocToday.length > 0 && (
+										<span className={ styles.kcalFootnote }>
+											{ __(
+												'Free-text entries under "Also logged today" have no calorie info, so they are not counted toward this total.',
+												'nutrio'
+											) }
+										</span>
+									) }
 									{ notCountedCount > 0 && (
 										<span className={ styles.kcalFootnote }>
 											{ sprintf(
@@ -680,6 +701,17 @@ export default function LogTab() {
 							{ isLoadingMoreHistory
 								? __( 'Loading…', 'nutrio' )
 								: __( 'Load more', 'nutrio' ) }
+						</button>
+					) }
+
+					{ history && historyRangeDays > HISTORY_PAGE_DAYS && (
+						<button
+							type="button"
+							className={ styles.loadMore }
+							onClick={ showLessHistory }
+							disabled={ isLoadingMoreHistory }
+						>
+							{ __( 'Show less', 'nutrio' ) }
 						</button>
 					) }
 				</PanelBody>
