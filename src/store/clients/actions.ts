@@ -85,6 +85,19 @@ export function updateClient( id: number, data: Partial< ClientInput > ) {
 	};
 }
 
+export function inviteClient( id: number ) {
+	return async ( { dispatch }: ThunkArgs ) => {
+		const client: Client = await apiFetch( {
+			path: `/nutrio/v1/clients/${ id }/invite`,
+			method: 'POST',
+		} );
+
+		dispatch.receiveClient( client );
+
+		return client;
+	};
+}
+
 export function deleteClient( id: number ) {
 	return async ( { dispatch }: ThunkArgs ) => {
 		await apiFetch( {
