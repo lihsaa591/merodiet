@@ -2,7 +2,7 @@ import { useRef, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
-import { alertDialog } from '../../utils/confirmDialog';
+import { errorMessage, toast } from '../../utils/toast';
 import Button from '../../components/ui/Button';
 import Chip from '../../components/ui/Chip';
 import Tooltip from '../../components/ui/Tooltip';
@@ -123,15 +123,12 @@ function UsdaSearch( { onResolve }: FoodSearchProps ) {
 				return; // Superseded by a newer search — not a real failure.
 			}
 
-			const message =
-				error &&
-				typeof error === 'object' &&
-				'message' in error &&
-				typeof error.message === 'string'
-					? error.message
-					: __( 'Something went wrong searching.', 'nutrio' );
-
-			await alertDialog( { message } );
+			toast.error(
+				errorMessage(
+					error,
+					__( 'Something went wrong searching.', 'nutrio' )
+				)
+			);
 		} finally {
 			if ( abortRef.current === controller ) {
 				setIsSearching( false );
@@ -178,15 +175,12 @@ function UsdaSearch( { onResolve }: FoodSearchProps ) {
 			// here: this food can't be reliably converted to a per-100g
 			// profile (a non-gram serving size, or USDA reported no
 			// identifiable nutrient values for it).
-			const message =
-				error &&
-				typeof error === 'object' &&
-				'message' in error &&
-				typeof error.message === 'string'
-					? error.message
-					: __( 'Something went wrong adding this food.', 'nutrio' );
-
-			await alertDialog( { message } );
+			toast.error(
+				errorMessage(
+					error,
+					__( 'Something went wrong adding this food.', 'nutrio' )
+				)
+			);
 		} finally {
 			setResolvingId( null );
 		}

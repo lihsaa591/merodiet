@@ -7,6 +7,7 @@ import Tooltip from '../../components/ui/Tooltip';
 import InfoIcon from '../../components/ui/InfoIcon';
 import { useGlobalDirtyState } from '../../hooks/useGlobalDirtyState';
 import { confirmDialog } from '../../utils/confirmDialog';
+import { errorMessage, toast } from '../../utils/toast';
 import { SEND_INVITE_HELP_TEXT } from '../../utils/helpText';
 import type { Client, ClientInput } from '../../types';
 
@@ -98,6 +99,13 @@ export default function ClientForm( {
 				...( client ? {} : { send_invite: sendInvite } ),
 			} );
 			markClean();
+		} catch ( error ) {
+			toast.error(
+				errorMessage(
+					error,
+					__( 'Could not save this client.', 'nutrio' )
+				)
+			);
 		} finally {
 			setIsSaving( false );
 		}

@@ -4,6 +4,7 @@ import { __ } from '@wordpress/i18n';
 import Panel, { PanelBody, PanelHead } from '../../components/ui/Panel';
 import Button from '../../components/ui/Button';
 import ProUpsellModal from '../../components/ui/ProUpsellModal';
+import { errorMessage, toast } from '../../utils/toast';
 import type { EmailSenderSettings as EmailSenderSettingsData } from '../../types';
 import styles from './EmailSenderSettings.module.css';
 
@@ -29,10 +30,6 @@ export default function EmailSenderSettings() {
 	const [ fromName, setFromName ] = useState( '' );
 	const [ fromAddress, setFromAddress ] = useState( '' );
 	const [ isSaving, setIsSaving ] = useState( false );
-	const [ message, setMessage ] = useState< {
-		kind: 'success' | 'error';
-		text: string;
-	} | null >( null );
 	const [ isProModalOpen, setProModalOpen ] = useState( false );
 
 	useEffect( () => {
@@ -46,15 +43,6 @@ export default function EmailSenderSettings() {
 		} );
 	}, [] );
 
-	// Self-dismissing success message.
-	useEffect( () => {
-		if ( 'success' !== message?.kind ) {
-			return;
-		}
-		const timer = setTimeout( () => setMessage( null ), 2500 );
-		return () => clearTimeout( timer );
-	}, [ message ] );
-
 	if ( null === saved ) {
 		return null;
 	}
@@ -66,8 +54,13 @@ export default function EmailSenderSettings() {
 
 	const handleSubmit = async ( event: React.FormEvent ) => {
 		event.preventDefault();
+
+		if ( ! isDirty ) {
+			toast.info( __( 'No changes to save.', 'nutrio' ) );
+			return;
+		}
+
 		setIsSaving( true );
-		setMessage( null );
 
 		try {
 			const result = await apiFetch< EmailSenderSettingsData >( {
@@ -90,17 +83,14 @@ export default function EmailSenderSettings() {
 			setSaved( result );
 			setFromName( values.fromName );
 			setFromAddress( values.fromAddress );
-			setMessage( {
-				kind: 'success',
-				text: __( 'Sender saved.', 'nutrio' ),
-			} );
+			toast.success( __( 'Sender saved.', 'nutrio' ) );
 		} catch ( error ) {
-			setMessage( {
-				kind: 'error',
-				text:
-					( error as { message?: string } )?.message ??
-					__( 'Could not save the sender.', 'nutrio' ),
-			} );
+			toast.error(
+				errorMessage(
+					error,
+					__( 'Could not save the sender.', 'nutrio' )
+				)
+			);
 		} finally {
 			setIsSaving( false );
 		}
@@ -164,26 +154,10 @@ export default function EmailSenderSettings() {
 							<Button
 								variant="primary"
 								type="submit"
-								disabled={ isSaving || ! isDirty }
+								disabled={ isSaving }
 							>
 								{ __( 'Save', 'nutrio' ) }
 							</Button>
-							{ message && (
-								<span
-									role={
-										'error' === message.kind
-											? 'alert'
-											: 'status'
-									}
-									className={
-										'error' === message.kind
-											? styles.error
-											: styles.success
-									}
-								>
-									{ message.text }
-								</span>
-							) }
 						</div>
 					</form>
 

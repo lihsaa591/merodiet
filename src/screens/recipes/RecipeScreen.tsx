@@ -1,10 +1,11 @@
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { useQueryParam } from '../../hooks/useQueryParam';
 import { usePagination } from '../../hooks/usePagination';
 import { useShowFilters } from '../../hooks/useShowFilters';
 import { STORE_NAME } from '../../store/recipes';
 import { confirmDialog } from '../../utils/confirmDialog';
+import { errorMessage, reportBulkResult, toast } from '../../utils/toast';
 import RecipeLibrary from './RecipeLibrary';
 import RecipeBuilder from './RecipeBuilder';
 import type { Recipe, RecipeInput } from '../../types';
@@ -85,8 +86,10 @@ export default function RecipeScreen() {
 	const handleSave = async ( data: RecipeInput ) => {
 		if ( editingRecipe ) {
 			await updateRecipe( editingRecipe.id, data );
+			toast.success( __( 'Recipe saved.', 'nutrio' ) );
 		} else {
 			const created = await createRecipe( data );
+			toast.success( __( 'Recipe created.', 'nutrio' ) );
 			setIdParam( String( created.id ) );
 			return;
 		}
@@ -102,8 +105,20 @@ export default function RecipeScreen() {
 			confirmLabel: __( 'Remove', 'nutrio' ),
 			destructive: true,
 		} );
-		if ( confirmed ) {
-			deleteRecipe( recipe.id );
+		if ( ! confirmed ) {
+			return;
+		}
+
+		try {
+			await deleteRecipe( recipe.id );
+			toast.success( __( 'Recipe removed.', 'nutrio' ) );
+		} catch ( error ) {
+			toast.error(
+				errorMessage(
+					error,
+					__( 'Could not remove this recipe.', 'nutrio' )
+				)
+			);
 		}
 	};
 
@@ -121,9 +136,23 @@ export default function RecipeScreen() {
 			destructive: true,
 		} );
 		if ( confirmed ) {
-			await Promise.allSettled(
+			const results = await Promise.allSettled(
 				selected.map( ( r ) => deleteRecipe( r.id ) )
 			);
+			reportBulkResult( results, {
+				success: ( count ) =>
+					sprintf(
+						/* translators: %d: number of recipes removed */
+						_n(
+							'%d recipe removed.',
+							'%d recipes removed.',
+							count,
+							'nutrio'
+						),
+						count
+					),
+				failure: __( 'Some recipes could not be removed.', 'nutrio' ),
+			} );
 		}
 	};
 

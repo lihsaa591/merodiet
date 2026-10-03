@@ -7,6 +7,7 @@ import FoodSearch from './FoodSearch';
 import styles from './RecipeBuilder.module.css';
 import { useGlobalDirtyState } from '../../hooks/useGlobalDirtyState';
 import { confirmDialog } from '../../utils/confirmDialog';
+import { errorMessage, toast } from '../../utils/toast';
 import {
 	estimateNutrientsPerServing,
 	formatAmount,
@@ -87,6 +88,13 @@ export default function RecipeBuilder( {
 				} ) ),
 			} );
 			markClean();
+		} catch ( error ) {
+			toast.error(
+				errorMessage(
+					error,
+					__( 'Could not save this recipe.', 'nutrio' )
+				)
+			);
 		} finally {
 			setIsSaving( false );
 		}
