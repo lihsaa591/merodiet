@@ -10,6 +10,7 @@ declare( strict_types=1 );
 namespace Nutrio\RestApi;
 
 use Nutrio\Nutrition\FoodCache;
+use Nutrio\Nutrition\RecipeNutrientResolver;
 use Nutrio\Repositories\ClientRepository;
 use Nutrio\Repositories\LogEntryRepository;
 use Nutrio\Repositories\MeasurementRepository;
@@ -38,12 +39,13 @@ final class MeController extends AbstractClientController {
 	/**
 	 * Constructor.
 	 *
-	 * @param PlanRepository        $plans        Used to fetch the client's active assigned plan.
-	 * @param LogEntryRepository    $logs         Used for the client's own compliance log.
-	 * @param MeasurementRepository $measurements Used for the client's own measurements.
-	 * @param ClientRepository      $clients      Used only to resolve current_client_id() (see AbstractClientController).
-	 * @param FoodCache             $food_cache   Used to attach food detail to plan items.
-	 * @param RecipeRepository      $recipes      Used to attach recipe detail to plan items.
+	 * @param PlanRepository         $plans        Used to fetch the client's active assigned plan.
+	 * @param LogEntryRepository     $logs         Used for the client's own compliance log.
+	 * @param MeasurementRepository  $measurements Used for the client's own measurements.
+	 * @param ClientRepository       $clients      Used only to resolve current_client_id() (see AbstractClientController).
+	 * @param FoodCache              $food_cache   Used to attach food detail to plan items.
+	 * @param RecipeRepository       $recipes      Used to attach recipe detail to plan items.
+	 * @param RecipeNutrientResolver $recipe_resolver Computes a recipe item's per-serving nutrient totals, which the portal's day totals and kcal-eaten summary depend on.
 	 */
 	public function __construct(
 		private readonly PlanRepository $plans,
@@ -51,7 +53,8 @@ final class MeController extends AbstractClientController {
 		private readonly MeasurementRepository $measurements,
 		private readonly ClientRepository $clients,
 		private readonly FoodCache $food_cache,
-		private readonly RecipeRepository $recipes
+		private readonly RecipeRepository $recipes,
+		private readonly RecipeNutrientResolver $recipe_resolver
 	) {}
 
 	/**
@@ -539,7 +542,9 @@ final class MeController extends AbstractClientController {
 
 		$recipe                                     = $this->recipes->find_for_practitioner( (int) $item['recipe_id'], $owning_practitioner_id );
 		$item['recipe_name']                        = $recipe['name'] ?? null;
-		$item['recipe_nutrient_totals_per_serving'] = null;
+		$item['recipe_nutrient_totals_per_serving'] = null === $recipe
+			? null
+			: $this->recipe_resolver->calculate_per_serving_totals( (int) $item['recipe_id'] );
 		$item['food_description']                   = null;
 		$item['nutrients']                          = null;
 

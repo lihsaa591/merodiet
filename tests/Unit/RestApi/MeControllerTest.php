@@ -14,6 +14,7 @@ use Nutrio\Repositories\LogEntryRepository;
 use Nutrio\Repositories\MeasurementRepository;
 use Nutrio\Repositories\PlanRepository;
 use Nutrio\Repositories\RecipeRepository;
+use Nutrio\Nutrition\RecipeNutrientResolver;
 use Nutrio\RestApi\MeController;
 use Nutrio\Tests\TestCase;
 use WP_REST_Request;
@@ -48,7 +49,8 @@ final class MeControllerTest extends TestCase {
 			$this->createMock( MeasurementRepository::class ),
 			$clients,
 			$this->createMock( FoodCache::class ),
-			$this->createMock( RecipeRepository::class )
+			$this->createMock( RecipeRepository::class ),
+			$this->createMock( RecipeNutrientResolver::class )
 		);
 
 		$request = new WP_REST_Request();
@@ -82,7 +84,8 @@ final class MeControllerTest extends TestCase {
 			$measurements,
 			$clients,
 			$this->createMock( FoodCache::class ),
-			$this->createMock( RecipeRepository::class )
+			$this->createMock( RecipeRepository::class ),
+			$this->createMock( RecipeNutrientResolver::class )
 		);
 
 		$request = new WP_REST_Request();
@@ -92,5 +95,44 @@ final class MeControllerTest extends TestCase {
 		$response = $controller->create_measurement( $request );
 
 		self::assertSame( 201, $response->status );
+	}
+
+	public function test_get_plan_includes_recipe_per_serving_totals_for_recipe_items(): void {
+		Functions\when( 'get_current_user_id' )->justReturn( 42 );
+		Functions\when( 'current_time' )->justReturn( '2026-10-02' );
+
+		$clients = $this->createMock( ClientRepository::class );
+		$clients->method( 'find_for_user' )->with( 42 )->willReturn( array( 'id' => 7 ) );
+
+		$plans = $this->createMock( PlanRepository::class );
+		$plans->method( 'find_active_for_client' )->willReturn(
+			array(
+				'id'                   => 1,
+				'practitioner_user_id' => 5,
+			)
+		);
+		$plans->method( 'days_for_plan' )->willReturn( array( array( 'id' => 10, 'day_offset' => 0 ) ) );
+		$plans->method( 'items_for_day' )->willReturn( array( array( 'food_id' => null, 'recipe_id' => 3 ) ) );
+
+		$recipes = $this->createMock( RecipeRepository::class );
+		$recipes->method( 'find_for_practitioner' )->with( 3, 5 )->willReturn( array( 'name' => 'Chicken Bowl' ) );
+
+		$resolver = $this->createMock( RecipeNutrientResolver::class );
+		$resolver->method( 'calculate_per_serving_totals' )->with( 3 )->willReturn( array( '1008' => 450000 ) );
+
+		$controller = new MeController(
+			$plans,
+			$this->createMock( LogEntryRepository::class ),
+			$this->createMock( MeasurementRepository::class ),
+			$clients,
+			$this->createMock( FoodCache::class ),
+			$recipes,
+			$resolver
+		);
+
+		$response = $controller->get_plan( new WP_REST_Request() );
+		$item     = $response->data['days'][0]['items'][0];
+
+		self::assertSame( array( '1008' => 450000 ), $item['recipe_nutrient_totals_per_serving'] );
 	}
 }

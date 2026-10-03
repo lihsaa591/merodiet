@@ -691,28 +691,31 @@ export default function LogTab() {
 						/>
 					) }
 
-					{ history && historyRangeDays < HISTORY_MAX_DAYS && (
-						<button
-							type="button"
-							className={ styles.loadMore }
-							onClick={ loadMoreHistory }
-							disabled={ isLoadingMoreHistory }
-						>
-							{ isLoadingMoreHistory
-								? __( 'Loading…', 'nutrio' )
-								: __( 'Load more', 'nutrio' ) }
-						</button>
-					) }
-
-					{ history && historyRangeDays > HISTORY_PAGE_DAYS && (
-						<button
-							type="button"
-							className={ styles.loadMore }
-							onClick={ showLessHistory }
-							disabled={ isLoadingMoreHistory }
-						>
-							{ __( 'Show less', 'nutrio' ) }
-						</button>
+					{ history && (
+						<div className={ styles.historyActions }>
+							{ historyRangeDays > HISTORY_PAGE_DAYS && (
+								<button
+									type="button"
+									className={ styles.loadMore }
+									onClick={ showLessHistory }
+									disabled={ isLoadingMoreHistory }
+								>
+									{ __( 'Show less', 'nutrio' ) }
+								</button>
+							) }
+							{ historyRangeDays < HISTORY_MAX_DAYS && (
+								<button
+									type="button"
+									className={ styles.loadMore }
+									onClick={ loadMoreHistory }
+									disabled={ isLoadingMoreHistory }
+								>
+									{ isLoadingMoreHistory
+										? __( 'Loading…', 'nutrio' )
+										: __( 'Load more', 'nutrio' ) }
+								</button>
+							) }
+						</div>
 					) }
 				</PanelBody>
 			</Panel>
