@@ -26,3 +26,10 @@ WordPress plugin: PHP backend + React 18/TypeScript admin SPA and client portal.
 ## Working rules
 - Run only the relevant check (single test file / `check-types`), not the full suite, and avoid dumping long logs.
 - Prefer targeted edits over rewriting files.
+- Filter command output at the source (`| tail -n 20`, `grep -E`, `--reporter=line`); never print whole logs, HTML pages, CSS or JSON responses. For HTTP checks, grep the one thing needed.
+- Read files with `offset`/`limit` or grep first; don't read a whole large file for one function.
+- Delegate broad "where is X" searches to the `explore` subagent instead of chaining greps in the main session.
+- Batch independent tool calls in one message; don't re-run a check that already passed unless files changed.
+- Edit scripts: assert each replacement matches exactly once, so a miss fails fast instead of needing a redo.
+- One task per branch/PR; after a PR merges, suggest starting a fresh session (context grows every turn).
+- Use plain `curl`/`wp eval` for quick local checks (wp-cli needs the Local socket + PHP 8.x); don't hand-debug through the browser.
