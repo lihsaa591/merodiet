@@ -171,6 +171,53 @@ final class SettingsController extends AbstractController {
 			),
 			required_capability: 'manage_nutrio_settings'
 		);
+
+		$this->register_route(
+			'/data-retention',
+			array(
+				'methods'  => WP_REST_Server::READABLE,
+				'callback' => array( $this, 'get_data_retention' ),
+			),
+			required_capability: 'manage_nutrio_settings'
+		);
+
+		$this->register_route(
+			'/data-retention',
+			array(
+				'methods'  => WP_REST_Server::EDITABLE,
+				'callback' => array( $this, 'update_data_retention' ),
+				'args'     => array(
+					'delete_on_uninstall' => array(
+						'required' => true,
+						'type'     => 'boolean',
+					),
+				),
+			),
+			required_capability: 'manage_nutrio_settings'
+		);
+	}
+
+	/**
+	 * GET /settings/data-retention — whether deleting the plugin also
+	 * deletes all Nutrio data (read by uninstall.php).
+	 */
+	public function get_data_retention(): WP_REST_Response {
+		return $this->success( array( 'delete_on_uninstall' => '1' === get_option( 'nutrio_delete_data_on_uninstall' ) ) );
+	}
+
+	/**
+	 * PUT /settings/data-retention — opt in or out of deleting all data on uninstall.
+	 *
+	 * Stored as the string '1' / '0' because uninstall.php compares against '1'.
+	 *
+	 * @param WP_REST_Request $request The current request.
+	 */
+	public function update_data_retention( WP_REST_Request $request ): WP_REST_Response {
+		$delete = (bool) $request->get_param( 'delete_on_uninstall' );
+
+		self::save_option_no_autoload( 'nutrio_delete_data_on_uninstall', $delete ? '1' : '0' );
+
+		return $this->success( array( 'delete_on_uninstall' => $delete ) );
 	}
 
 	/**

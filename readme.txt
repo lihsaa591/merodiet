@@ -59,7 +59,7 @@ Yes. A free USDA FoodData Central key is required for food search and nutrient d
 
 = What happens to my data if I uninstall? =
 
-Data is preserved by default. Set the `nutrio_delete_data_on_uninstall` option to `1` before uninstalling to remove all Nutrio tables, options and roles.
+Data is preserved by default. To remove all Nutrio tables, options and roles when the plugin is deleted, turn on "Delete all Nutrio data when the plugin is deleted" under Nutrio > Settings > General first.
 
 = What are the requirements? =
 

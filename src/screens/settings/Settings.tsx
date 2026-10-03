@@ -12,6 +12,10 @@ interface UsdaKeyState {
 	masked: string | null;
 }
 
+interface DataRetentionState {
+	delete_on_uninstall: boolean;
+}
+
 type SettingsTab = 'general' | 'email';
 
 export default function Settings() {
@@ -20,6 +24,40 @@ export default function Settings() {
 	const [ isReplacing, setIsReplacing ] = useState( false );
 	const [ apiKeyInput, setApiKeyInput ] = useState( '' );
 	const [ isSaving, setIsSaving ] = useState( false );
+	const [ retention, setRetention ] = useState< DataRetentionState | null >(
+		null
+	);
+	const [ isSavingRetention, setIsSavingRetention ] = useState( false );
+
+	useEffect( () => {
+		apiFetch< DataRetentionState >( {
+			path: '/nutrio/v1/settings/data-retention',
+		} ).then( setRetention );
+	}, [] );
+
+	const handleRetentionChange = async ( deleteOnUninstall: boolean ) => {
+		setIsSavingRetention( true );
+
+		try {
+			const result = await apiFetch< DataRetentionState >( {
+				path: '/nutrio/v1/settings/data-retention',
+				method: 'PUT',
+				data: { delete_on_uninstall: deleteOnUninstall },
+			} );
+
+			setRetention( result );
+			toast.success( __( 'Data setting saved.', 'nutrio' ) );
+		} catch ( error ) {
+			toast.error(
+				errorMessage(
+					error,
+					__( 'Could not save the data setting.', 'nutrio' )
+				)
+			);
+		} finally {
+			setIsSavingRetention( false );
+		}
+	};
 
 	useEffect( () => {
 		apiFetch< UsdaKeyState >( {
@@ -177,6 +215,53 @@ export default function Settings() {
 								</Button>
 							</form>
 						) }
+					</PanelBody>
+				</Panel>
+			) }
+
+			{ 'general' === activeTab && (
+				<Panel>
+					<PanelHead>
+						<h3>{ __( 'Data on uninstall', 'nutrio' ) }</h3>
+					</PanelHead>
+					<PanelBody>
+						<p
+							style={ {
+								color: 'var(--ink-muted)',
+								marginTop: 0,
+							} }
+						>
+							{ __(
+								'By default your clients, plans, logs and measurements are kept when you delete the plugin. Turn this on to permanently remove all Nutrio data when the plugin is deleted.',
+								'nutrio'
+							) }
+						</p>
+						<label
+							htmlFor="nutrio-delete-on-uninstall"
+							style={ {
+								display: 'flex',
+								alignItems: 'center',
+								gap: '8px',
+							} }
+						>
+							<input
+								id="nutrio-delete-on-uninstall"
+								type="checkbox"
+								checked={ !! retention?.delete_on_uninstall }
+								disabled={
+									null === retention || isSavingRetention
+								}
+								onChange={ ( event ) =>
+									handleRetentionChange(
+										event.target.checked
+									)
+								}
+							/>
+							{ __(
+								'Delete all Nutrio data when the plugin is deleted',
+								'nutrio'
+							) }
+						</label>
 					</PanelBody>
 				</Panel>
 			) }
