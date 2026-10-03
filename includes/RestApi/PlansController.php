@@ -177,19 +177,24 @@ final class PlansController extends AbstractPractitionerController {
 
 		// Resolved server-side so the list never depends on the client
 		// roster having been loaded (or on it fitting in one page).
-		$names = array();
+		$summaries = array();
 		foreach ( $items as &$item ) {
 			$client_id = $item['client_id'];
 
-			if ( null !== $client_id && ! array_key_exists( $client_id, $names ) ) {
+			if ( null !== $client_id && ! array_key_exists( $client_id, $summaries ) ) {
 				$client = $this->clients->find_for_practitioner( $client_id, $this->current_practitioner_id() );
 
-				$names[ $client_id ] = null === $client
+				$summaries[ $client_id ] = null === $client
 					? null
-					: trim( $client['first_name'] . ' ' . $client['last_name'] );
+					: array(
+						'id'         => $client['id'],
+						'first_name' => $client['first_name'],
+						'last_name'  => $client['last_name'],
+						'avatar_url' => $client['avatar_url'] ?? null,
+					);
 			}
 
-			$item['client_name'] = null === $client_id ? null : $names[ $client_id ];
+			$item['client'] = null === $client_id ? null : $summaries[ $client_id ];
 		}
 		unset( $item );
 

@@ -11,6 +11,7 @@ import ListFilters, {
 import { useBulkSelection } from '../../hooks/useBulkSelection';
 import { formatAmount, summarizeNutrients } from '../../utils/nutrients';
 import { formatDate } from '../../utils/date';
+import Avatar from '../../components/ui/Avatar';
 import { clientDetailUrl } from '../../utils/clientUrl';
 import type { Client, Plan } from '../../types';
 
@@ -76,34 +77,39 @@ export default function PlanLibrary( {
 		bulk.clear();
 	};
 
-	// The list endpoint resolves the name itself; the loaded roster is only
+	// The list endpoint resolves the client itself; the loaded roster is only
 	// a fallback (e.g. a plan returned from a create/assign response).
-	const clientName = ( plan: Plan ): string | null => {
-		if ( plan.client_name ) {
-			return plan.client_name;
-		}
-
-		const client = clients.find( ( c ) => c.id === plan.client_id );
-
-		return client ? `${ client.first_name } ${ client.last_name }` : null;
-	};
-
-	const renderClientCell = ( plan: Plan ) => {
-		if ( null === plan.client_id ) {
+	const renderClientCell = ( row: Plan ) => {
+		if ( null === row.client_id ) {
 			return __( 'Unassigned', 'nutrio' );
 		}
 
-		const name = clientName( plan );
+		const client =
+			row.client ?? clients.find( ( c ) => c.id === row.client_id );
 
-		return name ? (
+		if ( ! client ) {
+			return __( 'Unknown client', 'nutrio' );
+		}
+
+		return (
 			<a
-				href={ clientDetailUrl( plan.client_id ) }
-				style={ { color: 'inherit', fontWeight: 600 } }
+				href={ clientDetailUrl( row.client_id ) }
+				style={ {
+					display: 'inline-flex',
+					alignItems: 'center',
+					gap: '10px',
+					color: 'inherit',
+				} }
 			>
-				{ name }
+				<Avatar
+					id={ client.id }
+					firstName={ client.first_name }
+					lastName={ client.last_name }
+					avatarUrl={ client.avatar_url }
+					size="sm"
+				/>
+				{ client.first_name } { client.last_name }
 			</a>
-		) : (
-			__( 'Unknown client', 'nutrio' )
 		);
 	};
 
