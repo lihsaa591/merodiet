@@ -40,6 +40,9 @@ interface ClientDetailProps {
 // true offset pagination.
 const HISTORY_PAGE_DAYS = 30;
 const HISTORY_MAX_DAYS = 180;
+// Don't offer "Load more" for a short list — a handful of entries almost
+// certainly means there's nothing older to fetch.
+const LOAD_MORE_MIN_ITEMS = 5;
 
 type DetailTab = 'logs' | 'measurements';
 
@@ -70,9 +73,12 @@ export default function ClientDetail( {
 	const [ activeTab, setActiveTab ] = useState< DetailTab >( 'logs' );
 	const [ logsRangeDays, setLogsRangeDays ] = useState( HISTORY_PAGE_DAYS );
 	const [ isLoadingMoreLogs, setIsLoadingMoreLogs ] = useState( false );
+	const [ logsExhausted, setLogsExhausted ] = useState( false );
 	const [ measurementsRangeDays, setMeasurementsRangeDays ] =
 		useState( HISTORY_PAGE_DAYS );
 	const [ isLoadingMoreMeasurements, setIsLoadingMoreMeasurements ] =
+		useState( false );
+	const [ measurementsExhausted, setMeasurementsExhausted ] =
 		useState( false );
 
 	const { updateClient } = useDispatch( STORE_NAME ) as {
@@ -120,6 +126,9 @@ export default function ClientDetail( {
 			) }&to=${ today }`,
 		} )
 			.then( ( entries ) => {
+				// A wider window that returned nothing new means we've
+				// reached the start of the client's history.
+				setLogsExhausted( entries.length === ( logs ?? [] ).length );
 				setLogs( entries );
 				setLogsRangeDays( nextRange );
 			} )
@@ -140,6 +149,9 @@ export default function ClientDetail( {
 			) }&to=${ today }`,
 		} )
 			.then( ( entries ) => {
+				setMeasurementsExhausted(
+					entries.length === ( measurements ?? [] ).length
+				);
 				setMeasurements( entries );
 				setMeasurementsRangeDays( nextRange );
 			} )
@@ -327,18 +339,21 @@ export default function ClientDetail( {
 						<Panel>
 							<PanelBody>
 								<LogHistoryList entriesByDate={ logsByDate } />
-								{ logsRangeDays < HISTORY_MAX_DAYS && (
-									<button
-										type="button"
-										className={ styles.loadMore }
-										onClick={ loadMoreLogs }
-										disabled={ isLoadingMoreLogs }
-									>
-										{ isLoadingMoreLogs
-											? __( 'Loading…', 'nutrio' )
-											: __( 'Load more', 'nutrio' ) }
-									</button>
-								) }
+								{ logsRangeDays < HISTORY_MAX_DAYS &&
+									! logsExhausted &&
+									( logs ?? [] ).length >=
+										LOAD_MORE_MIN_ITEMS && (
+										<button
+											type="button"
+											className={ styles.loadMore }
+											onClick={ loadMoreLogs }
+											disabled={ isLoadingMoreLogs }
+										>
+											{ isLoadingMoreLogs
+												? __( 'Loading…', 'nutrio' )
+												: __( 'Load more', 'nutrio' ) }
+										</button>
+									) }
 							</PanelBody>
 						</Panel>
 					) }
@@ -350,18 +365,23 @@ export default function ClientDetail( {
 									measurements={ measurements ?? [] }
 									unit={ unit }
 								/>
-								{ measurementsRangeDays < HISTORY_MAX_DAYS && (
-									<button
-										type="button"
-										className={ styles.loadMore }
-										onClick={ loadMoreMeasurements }
-										disabled={ isLoadingMoreMeasurements }
-									>
-										{ isLoadingMoreMeasurements
-											? __( 'Loading…', 'nutrio' )
-											: __( 'Load more', 'nutrio' ) }
-									</button>
-								) }
+								{ measurementsRangeDays < HISTORY_MAX_DAYS &&
+									! measurementsExhausted &&
+									( measurements ?? [] ).length >=
+										LOAD_MORE_MIN_ITEMS && (
+										<button
+											type="button"
+											className={ styles.loadMore }
+											onClick={ loadMoreMeasurements }
+											disabled={
+												isLoadingMoreMeasurements
+											}
+										>
+											{ isLoadingMoreMeasurements
+												? __( 'Loading…', 'nutrio' )
+												: __( 'Load more', 'nutrio' ) }
+										</button>
+									) }
 							</PanelBody>
 						</Panel>
 					) }
