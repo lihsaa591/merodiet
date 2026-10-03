@@ -1,13 +1,13 @@
 <?php
 /**
  * Plugin Name:       Nutrio
- * Plugin URI:        https://github.com/nutrio/nutrio
+ * Plugin URI:        https://github.com/lihsaa591/nutrio
  * Description:       Practice management for registered dietitians and nutritionists — meal planning, client compliance tracking, and USDA-backed nutrient calculations.
- * Version:           0.1.2
+ * Version:           0.1.0
  * Requires at least: 6.4
  * Requires PHP:      8.1
  * Author:            Nutrio Contributors
- * License:           GPL v2 or later
+ * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       nutrio
  * Domain Path:       /languages
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'NUTRIO_VERSION', '0.1.2' );
+define( 'NUTRIO_VERSION', '0.1.0' );
 define( 'NUTRIO_FILE', __FILE__ );
 define( 'NUTRIO_PATH', plugin_dir_path( __FILE__ ) );
 define( 'NUTRIO_URL', plugin_dir_url( __FILE__ ) );

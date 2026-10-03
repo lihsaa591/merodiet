@@ -75,7 +75,7 @@ Two breakpoints:
 - **≤900px**: the fixed sidebar becomes an off-canvas drawer (slides in from the left, dismissible via a scrim or by selecting a nav item), opened by a hamburger button that appears in its place. The sidebar gets extra top padding so its own content (starting with "Back to WordPress") clears the fixed hamburger button rather than rendering underneath it. The KPI row drops to 2 columns; the Recipe builder's and Plan Builder's two-column layouts stack to one column.
 - **≤560px**: KPI row and the dashboard's compliance/activity panels drop to a single column; the Add-client drawer becomes full-width; two-column form rows (e.g. first/last name) stack; tables shrink their font slightly (they already scroll horizontally, so no data is ever clipped).
 
-This covers the admin surfaces. The future client-portal frontend (Phase 3, not yet built — clients log meals, view their plan) must get the same responsive treatment from the start, since clients are far more likely than practitioners to be on a phone.
+This covers the admin surfaces. The client-portal frontend (clients log meals, view their plan) must get the same responsive treatment from the start, since clients are far more likely than practitioners to be on a phone.
 
 ## Full-screen takeover — implementation note
 
