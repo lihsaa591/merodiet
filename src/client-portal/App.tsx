@@ -8,6 +8,7 @@ import LogTab from './LogTab';
 import MeasurementsTab from './MeasurementsTab';
 import PortalSidebar from './PortalSidebar';
 import ProfileDrawer from './ProfileDrawer';
+import ToastHost from '../components/ui/ToastHost';
 import type { Client } from '../types';
 
 export interface Section {
@@ -100,6 +101,7 @@ export default function App() {
 
 	return (
 		<div className="nutrio-client-portal-app">
+			<ToastHost />
 			<button
 				className="nutrio-mobile-menu-btn"
 				onClick={ () => setSidebarOpen( ( open ) => ! open ) }

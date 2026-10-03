@@ -31,10 +31,6 @@
 .empty {
 	color: var(--ink-muted);
 }
-.error {
-	color: var(--critical, #c0392b);
-	font-size: 13px;
-}
 .historyItem {
 	padding: 8px 0;
 	border-bottom: 1px solid var(--line);

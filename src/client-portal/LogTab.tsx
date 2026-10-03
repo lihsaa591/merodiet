@@ -20,6 +20,7 @@ import {
 import { estimateDayNutrients, formatAmount } from '../utils/nutrients';
 import type { LogEntry, LogEntryInput, Plan, PlanItem } from '../types';
 import styles from './LogTab.module.css';
+import { errorMessage, toast } from '../utils/toast';
 
 type Status = 'eaten' | 'substituted' | 'skipped';
 
@@ -114,10 +115,6 @@ export default function LogTab() {
 	const [ pendingItemId, setPendingItemId ] = useState< number | null >(
 		null
 	);
-	const [ errorMessage, setErrorMessage ] = useState< string | null >( null );
-	const [ successMessage, setSuccessMessage ] = useState< string | null >(
-		null
-	);
 	const [ history, setHistory ] = useState< LogEntry[] | undefined >(
 		undefined
 	);
@@ -189,23 +186,12 @@ export default function LogTab() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- `today` is stable for the component's lifetime.
 	}, [ history ] );
 
-	// Self-dismissing success toast.
-	useEffect( () => {
-		if ( ! successMessage ) {
-			return;
-		}
-
-		const timer = setTimeout( () => setSuccessMessage( null ), 2200 );
-		return () => clearTimeout( timer );
-	}, [ successMessage ] );
-
 	const logPlanItem = async (
 		item: PlanItem,
 		status: Status,
 		notesForEntry?: string
 	) => {
 		setPendingItemId( item.id );
-		setErrorMessage( null );
 
 		const payload: LogEntryInput = {
 			plan_item_id: item.id,
@@ -232,11 +218,14 @@ export default function LogTab() {
 					notes: notesForEntry || null,
 				},
 			} ) );
-			setSuccessMessage( __( 'Logged.', 'nutrio' ) );
+			toast.success( __( 'Logged.', 'nutrio' ) );
 			loadHistory();
-		} catch {
-			setErrorMessage(
-				__( 'Something went wrong — please try again.', 'nutrio' )
+		} catch ( error ) {
+			toast.error(
+				errorMessage(
+					error,
+					__( 'Something went wrong — please try again.', 'nutrio' )
+				)
 			);
 		} finally {
 			setPendingItemId( null );
@@ -246,7 +235,6 @@ export default function LogTab() {
 	const logAdHoc = async ( event: React.FormEvent ) => {
 		event.preventDefault();
 		setIsSubmittingAdHoc( true );
-		setErrorMessage( null );
 
 		try {
 			const entry = await apiFetch< LogEntry >( {
@@ -260,11 +248,14 @@ export default function LogTab() {
 			} );
 			doAction( 'nutrio.clientPortal.logCreated', entry );
 			setNotes( '' );
-			setSuccessMessage( __( 'Logged.', 'nutrio' ) );
+			toast.success( __( 'Logged.', 'nutrio' ) );
 			loadHistory();
-		} catch {
-			setErrorMessage(
-				__( 'Something went wrong — please try again.', 'nutrio' )
+		} catch ( error ) {
+			toast.error(
+				errorMessage(
+					error,
+					__( 'Something went wrong — please try again.', 'nutrio' )
+				)
 			);
 		} finally {
 			setIsSubmittingAdHoc( false );
@@ -325,23 +316,6 @@ export default function LogTab() {
 			</div>
 			<Panel>
 				<PanelBody>
-					{ successMessage && (
-						<div className={ styles.toast } role="status">
-							<svg
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								strokeWidth="2.5"
-							>
-								<path d="M5 13l4 4L19 7" />
-							</svg>
-							{ successMessage }
-						</div>
-					) }
-					{ errorMessage && (
-						<p className={ styles.error }>{ errorMessage }</p>
-					) }
-
 					{ undefined === plan && <LogTabSkeleton /> }
 
 					{ null === plan && (
