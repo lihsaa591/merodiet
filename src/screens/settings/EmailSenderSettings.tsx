@@ -54,6 +54,12 @@ export default function EmailSenderSettings() {
 
 	const handleSubmit = async ( event: React.FormEvent ) => {
 		event.preventDefault();
+
+		if ( ! isDirty ) {
+			toast.info( __( 'No changes to save.', 'nutrio' ) );
+			return;
+		}
+
 		setIsSaving( true );
 
 		try {
@@ -148,7 +154,7 @@ export default function EmailSenderSettings() {
 							<Button
 								variant="primary"
 								type="submit"
-								disabled={ isSaving || ! isDirty }
+								disabled={ isSaving }
 							>
 								{ __( 'Save', 'nutrio' ) }
 							</Button>

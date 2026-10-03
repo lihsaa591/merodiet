@@ -4,6 +4,7 @@ import { __ } from '@wordpress/i18n';
 import Panel, { PanelBody, PanelHead } from '../ui/Panel';
 import Button from '../ui/Button';
 import Switch from '../ui/Switch';
+import { toast } from '../../utils/toast';
 import EmailBodyEditor from './EmailBodyEditor';
 import type { EmailTemplate } from '../../types';
 import styles from './EmailTemplateEditor.module.css';
@@ -44,6 +45,12 @@ export default function EmailTemplateEditor( {
 
 	const handleSave = async ( event: React.FormEvent ) => {
 		event.preventDefault();
+
+		if ( subject === template.subject && body === template.body ) {
+			toast.info( __( 'No changes to save.', 'nutrio' ) );
+			return;
+		}
+
 		setIsSaving( true );
 		try {
 			await onSave( template.type, subject, body );
