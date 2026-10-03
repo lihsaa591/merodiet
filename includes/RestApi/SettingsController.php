@@ -10,6 +10,7 @@ declare( strict_types=1 );
 namespace Nutrio\RestApi;
 
 use Nutrio\Email\DigestScheduler;
+use Nutrio\Email\EmailSender;
 use Nutrio\Email\EmailTemplateRegistry;
 use Nutrio\Email\EmailTemplateService;
 use WP_Error;
@@ -109,6 +110,34 @@ final class SettingsController extends AbstractController {
 					'enabled' => array(
 						'required' => true,
 						'type'     => 'boolean',
+					),
+				),
+			),
+			required_capability: 'manage_nutrio_settings'
+		);
+
+		$this->register_route(
+			'/email-sender',
+			array(
+				'methods'  => WP_REST_Server::READABLE,
+				'callback' => array( $this, 'get_email_sender' ),
+			),
+			required_capability: 'manage_nutrio_settings'
+		);
+
+		$this->register_route(
+			'/email-sender',
+			array(
+				'methods'  => WP_REST_Server::EDITABLE,
+				'callback' => array( $this, 'update_email_sender' ),
+				'args'     => array(
+					'from_name'    => array(
+						'required' => true,
+						'type'     => 'string',
+					),
+					'from_address' => array(
+						'required' => true,
+						'type'     => 'string',
 					),
 				),
 			),
@@ -244,6 +273,42 @@ final class SettingsController extends AbstractController {
 				'enabled' => $saved['enabled'],
 			)
 		);
+	}
+
+	/**
+	 * GET /settings/email-sender — the saved From name/address (either
+	 * may be empty) plus WordPress's own defaults, for placeholder text.
+	 */
+	public function get_email_sender(): WP_REST_Response {
+		return $this->success( self::describe_sender() );
+	}
+
+	/**
+	 * PUT /settings/email-sender — save the From name/address shared by
+	 * every Nutrio email. Either may be empty to fall back to WordPress's default.
+	 *
+	 * @param WP_REST_Request $request The current request.
+	 */
+	public function update_email_sender( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+		$from_name    = trim( sanitize_text_field( (string) $request->get_param( 'from_name' ) ) );
+		$from_address = trim( (string) $request->get_param( 'from_address' ) );
+
+		if ( ! EmailSender::is_valid_address( $from_address ) ) {
+			return $this->error( 'nutrio_invalid_from_address', __( 'Enter a valid email address.', 'nutrio' ), 400 );
+		}
+
+		EmailSender::save( $from_name, $from_address );
+
+		return $this->success( self::describe_sender() );
+	}
+
+	/**
+	 * The shape both email-sender routes return.
+	 *
+	 * @return array{from_name: string, from_address: string, defaults: array{from_name: string, from_address: string}}
+	 */
+	private static function describe_sender(): array {
+		return array_merge( EmailSender::get(), array( 'defaults' => EmailSender::defaults() ) );
 	}
 
 	/**

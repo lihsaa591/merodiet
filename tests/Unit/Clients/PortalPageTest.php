@@ -329,6 +329,7 @@ final class PortalPageTest extends TestCase {
 	 * into an unrelated later email in the same request.
 	 */
 	public function test_force_html_email_sets_html_mode_and_removes_its_own_action_after_firing(): void {
+		\Brain\Monkey\Functions\when( 'get_option' )->justReturn( array() );
 		add_action( 'phpmailer_init', array( PortalPage::class, 'force_html_email' ) );
 
 		self::assertNotFalse(

@@ -288,6 +288,14 @@ export interface EmailTemplate {
 	tags: Record< string, string >;
 }
 
+/** The From name/address shared by every Nutrio email. Empty = WordPress's default. */
+export interface EmailSenderSettings {
+	from_name: string;
+	from_address: string;
+	/** What WordPress sends from when these are empty — shown as placeholders. */
+	defaults: { from_name: string; from_address: string };
+}
+
 export interface EmailDigestSettings {
 	enabled: boolean;
 	send_time: string;

@@ -47,6 +47,29 @@ final class MailerTest extends TestCase {
 		self::assertContains( 'Content-Type: text/html; charset=UTF-8', $captured[3] );
 	}
 
+	public function test_send_adds_the_configured_from_header(): void {
+		Functions\when( 'get_option' )->justReturn(
+			array(
+				'from_name'    => 'Ana Practice',
+				'from_address' => 'hello@example.test',
+			)
+		);
+		Functions\when( 'get_theme_mod' )->justReturn( false );
+		Functions\when( 'get_bloginfo' )->justReturn( 'Test Practice' );
+
+		$headers = array();
+		Functions\when( 'wp_mail' )->alias(
+			static function ( $to, $subject, $body, $sent_headers ) use ( &$headers ) {
+				$headers = $sent_headers;
+				return true;
+			}
+		);
+
+		( new Mailer( new EmailTemplateService() ) )->send( 'client_invite', 'client@example.test', array() );
+
+		self::assertContains( 'From: "Ana Practice" <hello@example.test>', $headers );
+	}
+
 	public function test_send_skips_a_disabled_type_without_calling_wp_mail(): void {
 		Functions\when( 'get_option' )->justReturn( array( 'enabled' => false ) );
 

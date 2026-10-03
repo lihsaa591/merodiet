@@ -1,10 +1,14 @@
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import EmailSenderSettings from './EmailSenderSettings';
 import EmailSettingsTab from './EmailSettingsTab';
 import styles from './Settings.module.css';
 
 type EmailAudienceTab = 'practitioner' | 'client';
 
+// The sender (From name/address, plus Pro styling) is one site-wide
+// setting for every email, so it sits above the audience sub-tabs.
+//
 // Nested sub-tabs inside Settings' top-level "Email" tab — a
 // segmented-control style (not the parent's pill-tab style) so the
 // hierarchy is visually obvious: this is a filter within Email, not a
@@ -15,6 +19,8 @@ export default function EmailTab() {
 
 	return (
 		<>
+			<EmailSenderSettings />
+
 			<div className={ styles.subTabsWrap }>
 				<button
 					className={ `${ styles.subTab } ${
