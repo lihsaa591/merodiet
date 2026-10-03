@@ -45,7 +45,7 @@ const PORTAL_STATUS = {
 		tone: 'clay' as const,
 	},
 	invited: { label: __( 'Invited', 'nutrio' ), tone: 'sage' as const },
-	active: { label: __( 'Active', 'nutrio' ), tone: 'success' as const },
+	active: { label: __( 'Joined', 'nutrio' ), tone: 'success' as const },
 };
 
 export default function ClientRoster() {
@@ -299,7 +299,9 @@ export default function ClientRoster() {
 										<th>{ __( 'Name', 'nutrio' ) }</th>
 										<th>{ __( 'Email', 'nutrio' ) }</th>
 										<th>{ __( 'Allergies', 'nutrio' ) }</th>
-										<th>{ __( 'Status', 'nutrio' ) }</th>
+										<th>
+											{ __( 'Care status', 'nutrio' ) }
+										</th>
 										<th>
 											{ __( 'Client Portal', 'nutrio' ) }
 										</th>
@@ -382,16 +384,25 @@ export default function ClientRoster() {
 												) }
 											</td>
 											<td>
-												<Chip
-													tone={
-														client.status ===
-														'active'
-															? 'success'
-															: 'clay'
-													}
-												>
-													{ client.status }
-												</Chip>
+												{ client.status === 'active' ? (
+													<span
+														style={ {
+															color: 'var(--ink-faint)',
+														} }
+													>
+														{ __(
+															'Active',
+															'nutrio'
+														) }
+													</span>
+												) : (
+													<Chip tone="clay">
+														{ __(
+															'Paused',
+															'nutrio'
+														) }
+													</Chip>
+												) }
 											</td>
 											<td>
 												<Chip
