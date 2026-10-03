@@ -1,11 +1,12 @@
 import { useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { useQueryParam } from '../../hooks/useQueryParam';
 import { usePagination } from '../../hooks/usePagination';
 import { useShowFilters } from '../../hooks/useShowFilters';
 import { STORE_NAME } from '../../store/plans';
 import { confirmDialog } from '../../utils/confirmDialog';
+import { errorMessage, reportBulkResult, toast } from '../../utils/toast';
 import { STORE_NAME as CLIENTS_STORE } from '../../store/clients';
 import AssignModal from '../../components/plans/AssignModal';
 import PlanLibrary from './PlanLibrary';
@@ -108,8 +109,10 @@ export default function PlanScreen() {
 	const handleSave = async ( data: PlanInput ) => {
 		if ( editingPlan ) {
 			await updatePlan( editingPlan.id, data );
+			toast.success( __( 'Plan saved.', 'nutrio' ) );
 		} else {
 			const created = await createPlan( data );
+			toast.success( __( 'Plan created.', 'nutrio' ) );
 			setIdParam( String( created.id ) );
 			return;
 		}
@@ -122,8 +125,20 @@ export default function PlanScreen() {
 			confirmLabel: __( 'Remove', 'nutrio' ),
 			destructive: true,
 		} );
-		if ( confirmed ) {
-			deletePlan( plan.id );
+		if ( ! confirmed ) {
+			return;
+		}
+
+		try {
+			await deletePlan( plan.id );
+			toast.success( __( 'Plan removed.', 'nutrio' ) );
+		} catch ( error ) {
+			toast.error(
+				errorMessage(
+					error,
+					__( 'Could not remove this plan.', 'nutrio' )
+				)
+			);
 		}
 	};
 
@@ -141,9 +156,23 @@ export default function PlanScreen() {
 			destructive: true,
 		} );
 		if ( confirmed ) {
-			await Promise.allSettled(
+			const results = await Promise.allSettled(
 				selected.map( ( p ) => deletePlan( p.id ) )
 			);
+			reportBulkResult( results, {
+				success: ( count ) =>
+					sprintf(
+						/* translators: %d: number of plans removed */
+						_n(
+							'%d plan removed.',
+							'%d plans removed.',
+							count,
+							'nutrio'
+						),
+						count
+					),
+				failure: __( 'Some plans could not be removed.', 'nutrio' ),
+			} );
 		}
 	};
 
@@ -164,9 +193,23 @@ export default function PlanScreen() {
 			destructive: true,
 		} );
 		if ( confirmed ) {
-			await Promise.allSettled(
+			const results = await Promise.allSettled(
 				selected.map( ( p ) => unassignPlan( p.id ) )
 			);
+			reportBulkResult( results, {
+				success: ( count ) =>
+					sprintf(
+						/* translators: %d: number of plans unassigned */
+						_n(
+							'%d plan unassigned.',
+							'%d plans unassigned.',
+							count,
+							'nutrio'
+						),
+						count
+					),
+				failure: __( 'Some plans could not be unassigned.', 'nutrio' ),
+			} );
 		}
 	};
 
@@ -174,8 +217,18 @@ export default function PlanScreen() {
 		if ( ! editingPlan ) {
 			return;
 		}
-		await assignPlan( editingPlan.id, clientId );
-		setAssignModalOpen( false );
+		try {
+			await assignPlan( editingPlan.id, clientId );
+			setAssignModalOpen( false );
+			toast.success( __( 'Plan assigned.', 'nutrio' ) );
+		} catch ( error ) {
+			toast.error(
+				errorMessage(
+					error,
+					__( 'Could not assign this plan.', 'nutrio' )
+				)
+			);
+		}
 	};
 
 	const handleUnassign = async () => {
@@ -190,8 +243,20 @@ export default function PlanScreen() {
 			confirmLabel: __( 'Unassign', 'nutrio' ),
 			destructive: true,
 		} );
-		if ( confirmed ) {
-			unassignPlan( editingPlan.id );
+		if ( ! confirmed ) {
+			return;
+		}
+
+		try {
+			await unassignPlan( editingPlan.id );
+			toast.success( __( 'Plan unassigned.', 'nutrio' ) );
+		} catch ( error ) {
+			toast.error(
+				errorMessage(
+					error,
+					__( 'Could not unassign this plan.', 'nutrio' )
+				)
+			);
 		}
 	};
 
@@ -202,21 +267,35 @@ export default function PlanScreen() {
 		if ( ! editingPlan ) {
 			return;
 		}
-		const created = await createPlan( {
-			title: `${ editingPlan.title } (copy)`,
-			start_date: editingPlan.start_date,
-			end_date: editingPlan.end_date,
-			days: editingPlan.days.map( ( day ) => ( {
-				day_offset: day.day_offset,
-				items: day.items.map( ( item ) => ( {
-					meal_type: item.meal_type,
-					food_id: item.food_id ?? undefined,
-					recipe_id: item.recipe_id ?? undefined,
-					quantity_grams: item.quantity_grams ?? undefined,
-					servings: item.servings ?? undefined,
+		let created: Plan;
+
+		try {
+			created = await createPlan( {
+				title: `${ editingPlan.title } (copy)`,
+				start_date: editingPlan.start_date,
+				end_date: editingPlan.end_date,
+				days: editingPlan.days.map( ( day ) => ( {
+					day_offset: day.day_offset,
+					items: day.items.map( ( item ) => ( {
+						meal_type: item.meal_type,
+						food_id: item.food_id ?? undefined,
+						recipe_id: item.recipe_id ?? undefined,
+						quantity_grams: item.quantity_grams ?? undefined,
+						servings: item.servings ?? undefined,
+					} ) ),
 				} ) ),
-			} ) ),
-		} );
+			} );
+		} catch ( error ) {
+			toast.error(
+				errorMessage(
+					error,
+					__( 'Could not duplicate this plan.', 'nutrio' )
+				)
+			);
+			return;
+		}
+
+		toast.success( __( 'Plan duplicated as a new draft.', 'nutrio' ) );
 		setIdParam( String( created.id ) );
 	};
 

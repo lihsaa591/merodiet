@@ -2,6 +2,7 @@ import { useEffect, useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import EmailTemplateEditor from '../../components/settings/EmailTemplateEditor';
+import { errorMessage, toast } from '../../utils/toast';
 import type { EmailDigestSettings, EmailTemplate } from '../../types';
 import styles from './EmailSettingsTab.module.css';
 
@@ -38,18 +39,6 @@ export default function EmailSettingsTab( {
 	const [ digest, setDigest ] = useState< EmailDigestSettings | null >(
 		null
 	);
-	const [ toastMessage, setToastMessage ] = useState< string | null >( null );
-
-	// Self-dismissing success toast, same pattern as ProfileDrawer/LogTab.
-	useEffect( () => {
-		if ( ! toastMessage ) {
-			return;
-		}
-
-		const timer = setTimeout( () => setToastMessage( null ), 2500 );
-		return () => clearTimeout( timer );
-	}, [ toastMessage ] );
-
 	useEffect( () => {
 		apiFetch< EmailTemplate[] >( {
 			path: '/nutrio/v1/settings/email-templates',
@@ -67,15 +56,27 @@ export default function EmailSettingsTab( {
 		subject: string,
 		body: string
 	) => {
-		const result = await apiFetch< {
-			type: string;
-			subject: string;
-			body: string;
-		} >( {
-			path: `/nutrio/v1/settings/email-templates/${ type }`,
-			method: 'PUT',
-			data: { subject, body },
-		} );
+		let result: { type: string; subject: string; body: string };
+
+		try {
+			result = await apiFetch< {
+				type: string;
+				subject: string;
+				body: string;
+			} >( {
+				path: `/nutrio/v1/settings/email-templates/${ type }`,
+				method: 'PUT',
+				data: { subject, body },
+			} );
+		} catch ( error ) {
+			toast.error(
+				errorMessage(
+					error,
+					__( 'Could not save the email template.', 'nutrio' )
+				)
+			);
+			return;
+		}
 
 		setTemplates( ( previous ) =>
 			( previous ?? [] ).map( ( template ) =>
@@ -89,15 +90,27 @@ export default function EmailSettingsTab( {
 			)
 		);
 
-		setToastMessage( __( 'Email template saved.', 'nutrio' ) );
+		toast.success( __( 'Email template saved.', 'nutrio' ) );
 	};
 
 	const handleToggleTemplate = async ( type: string, enabled: boolean ) => {
-		const result = await apiFetch< { type: string; enabled: boolean } >( {
-			path: `/nutrio/v1/settings/email-templates/${ type }/enabled`,
-			method: 'PUT',
-			data: { enabled },
-		} );
+		let result: { type: string; enabled: boolean };
+
+		try {
+			result = await apiFetch< { type: string; enabled: boolean } >( {
+				path: `/nutrio/v1/settings/email-templates/${ type }/enabled`,
+				method: 'PUT',
+				data: { enabled },
+			} );
+		} catch ( error ) {
+			toast.error(
+				errorMessage(
+					error,
+					__( 'Could not update this email.', 'nutrio' )
+				)
+			);
+			return;
+		}
 
 		setTemplates( ( previous ) =>
 			( previous ?? [] ).map( ( template ) =>
@@ -106,15 +119,38 @@ export default function EmailSettingsTab( {
 					: template
 			)
 		);
+		toast.success(
+			result.enabled
+				? __( 'Email enabled.', 'nutrio' )
+				: __( 'Email disabled.', 'nutrio' )
+		);
 	};
 
 	const handleSaveDigest = async ( next: EmailDigestSettings ) => {
-		const result = await apiFetch< EmailDigestSettings >( {
-			path: '/nutrio/v1/settings/email-digest',
-			method: 'PUT',
-			data: next,
-		} );
-		setDigest( result );
+		try {
+			const result = await apiFetch< EmailDigestSettings >( {
+				path: '/nutrio/v1/settings/email-digest',
+				method: 'PUT',
+				data: next,
+			} );
+			setDigest( result );
+			if ( digest && next.enabled === digest.enabled ) {
+				toast.success( __( 'Digest send time saved.', 'nutrio' ) );
+			} else {
+				toast.success(
+					next.enabled
+						? __( 'Daily digest enabled.', 'nutrio' )
+						: __( 'Daily digest disabled.', 'nutrio' )
+				);
+			}
+		} catch ( error ) {
+			toast.error(
+				errorMessage(
+					error,
+					__( 'Could not save the digest settings.', 'nutrio' )
+				)
+			);
+		}
 	};
 
 	if ( null === templates ) {
@@ -127,20 +163,6 @@ export default function EmailSettingsTab( {
 
 	return (
 		<>
-			{ toastMessage && (
-				<div className={ styles.toast } role="status">
-					<svg
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						strokeWidth="2.5"
-					>
-						<path d="M5 13l4 4L19 7" />
-					</svg>
-					{ toastMessage }
-				</div>
-			) }
-
 			{ visibleTemplates.map( ( template ) => {
 				const isDigest = 'practitioner_daily_digest' === template.type;
 

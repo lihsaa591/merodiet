@@ -28,17 +28,6 @@
 	align-items: center;
 	gap: 12px;
 }
-.success {
-	font-size: 13px;
-	font-weight: 600;
-	color: var(--success);
-}
-.error {
-	font-size: 13px;
-	font-weight: 600;
-	color: var(--critical);
-}
-
 /* Pro showcase: styled like a disabled control group, clickable to open
    the upsell modal. */
 .proRow {

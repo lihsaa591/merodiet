@@ -1,8 +1,9 @@
 import { useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { STORE_NAME } from '../../store/clients';
-import { confirmDialog, alertDialog } from '../../utils/confirmDialog';
+import { confirmDialog } from '../../utils/confirmDialog';
+import { errorMessage, reportBulkResult, toast } from '../../utils/toast';
 import { useBulkSelection } from '../../hooks/useBulkSelection';
 import { usePagination } from '../../hooks/usePagination';
 import { useShowFilters } from '../../hooks/useShowFilters';
@@ -107,9 +108,8 @@ export default function ClientRoster() {
 		closeDrawer();
 
 		if ( data.send_invite && created.invite_error ) {
-			await alertDialog( {
-				title: __( 'Client added, but the invite failed', 'nutrio' ),
-				message: sprintf(
+			toast.error(
+				sprintf(
 					/* translators: 1: client's name, 2: the reason the invite failed */
 					__(
 						'%1$s did save, but the portal invite could not be sent: %2$s. You can invite them manually from the roster.',
@@ -117,8 +117,10 @@ export default function ClientRoster() {
 					),
 					`${ created.first_name } ${ created.last_name }`,
 					created.invite_error
-				),
-			} );
+				)
+			);
+		} else {
+			toast.success( __( 'Client added.', 'nutrio' ) );
 		}
 	};
 
@@ -131,36 +133,43 @@ export default function ClientRoster() {
 			confirmLabel: __( 'Remove', 'nutrio' ),
 			destructive: true,
 		} );
-		if ( confirmed ) {
-			deleteClient( client.id );
+		if ( ! confirmed ) {
+			return;
+		}
+
+		try {
+			await deleteClient( client.id );
+			toast.success( __( 'Client removed.', 'nutrio' ) );
+		} catch ( error ) {
+			toast.error(
+				errorMessage(
+					error,
+					__( 'Could not remove this client.', 'nutrio' )
+				)
+			);
 		}
 	};
 
 	const handleInvite = async ( client: Client ) => {
 		try {
 			await inviteClient( client.id );
-			await alertDialog( {
-				message: sprintf(
+			toast.success(
+				sprintf(
 					/* translators: %s: client's full name */
 					__( '%s has been invited to the client portal.', 'nutrio' ),
 					`${ client.first_name } ${ client.last_name }`
-				),
-			} );
+				)
+			);
 		} catch ( error ) {
-			// apiFetch rejects with the REST API's error envelope
-			// ({code, message, data}), not a native Error.
-			const message =
-				error &&
-				typeof error === 'object' &&
-				'message' in error &&
-				typeof error.message === 'string'
-					? error.message
-					: __(
-							'Could not send the invite. Please try again.',
-							'nutrio'
-					  );
-
-			await alertDialog( { message } );
+			toast.error(
+				errorMessage(
+					error,
+					__(
+						'Could not send the invite. Please try again.',
+						'nutrio'
+					)
+				)
+			);
 		}
 	};
 
@@ -178,18 +187,46 @@ export default function ClientRoster() {
 			destructive: true,
 		} );
 		if ( confirmed ) {
-			await Promise.allSettled(
+			const results = await Promise.allSettled(
 				bulk.selectedItems.map( ( c ) => deleteClient( c.id ) )
 			);
 			bulk.clear();
+			reportBulkResult( results, {
+				success: ( count ) =>
+					sprintf(
+						/* translators: %d: number of clients removed */
+						_n(
+							'%d client removed.',
+							'%d clients removed.',
+							count,
+							'nutrio'
+						),
+						count
+					),
+				failure: __( 'Some clients could not be removed.', 'nutrio' ),
+			} );
 		}
 	};
 
 	const handleBulkMarkStatus = async ( status: 'active' | 'paused' ) => {
-		await Promise.allSettled(
+		const results = await Promise.allSettled(
 			bulk.selectedItems.map( ( c ) => updateClient( c.id, { status } ) )
 		);
 		bulk.clear();
+		reportBulkResult( results, {
+			success: ( count ) =>
+				sprintf(
+					/* translators: %d: number of clients updated */
+					_n(
+						'%d client updated.',
+						'%d clients updated.',
+						count,
+						'nutrio'
+					),
+					count
+				),
+			failure: __( 'Some clients could not be updated.', 'nutrio' ),
+		} );
 	};
 
 	if ( idParam !== null ) {

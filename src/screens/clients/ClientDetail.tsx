@@ -12,6 +12,7 @@ import MeasurementHistoryList from '../../components/clients/MeasurementHistoryL
 import { readStoredWeightUnit, gramsToDisplay } from '../../utils/weight';
 import { formatShortDate } from '../../utils/date';
 import { confirmDialog } from '../../utils/confirmDialog';
+import { toast } from '../../utils/toast';
 import ClientForm from './ClientForm';
 import type { Client, ClientInput, LogEntry, Measurement } from '../../types';
 import styles from './ClientDetail.module.css';
@@ -191,6 +192,7 @@ export default function ClientDetail( {
 		if ( client ) {
 			const updated = await updateClient( client.id, data );
 			setClient( updated );
+			toast.success( __( 'Client updated.', 'nutrio' ) );
 		}
 		closeDrawer();
 	};

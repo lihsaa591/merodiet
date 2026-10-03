@@ -1,0 +1,80 @@
+/* Above drawers (41), pro modal (70) and confirm dialogs (80), so a notice
+   raised while one of them is open is still visible. */
+.region {
+	position: fixed;
+	top: 24px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 100;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	width: max-content;
+	max-width: calc(100vw - 32px);
+	pointer-events: none;
+}
+.toast {
+	pointer-events: auto;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	max-width: 420px;
+	padding: 10px 12px 10px 16px;
+	border-radius: 8px;
+	background: var(--ink);
+	color: var(--surface);
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.4;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+	animation: nutrio-toast-in 0.2s ease-out;
+}
+.toast > svg {
+	width: 16px;
+	height: 16px;
+	flex-shrink: 0;
+}
+.success > svg {
+	color: var(--sage);
+}
+.error > svg {
+	color: #ff8f86;
+}
+.info > svg {
+	color: var(--surface);
+	opacity: 0.8;
+}
+.message {
+	flex: 1;
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+.close {
+	flex-shrink: 0;
+	display: flex;
+	padding: 4px;
+	border: none;
+	border-radius: 4px;
+	background: none;
+	color: inherit;
+	opacity: 0.6;
+	cursor: pointer;
+}
+.close:hover {
+	opacity: 1;
+}
+.close svg {
+	width: 14px;
+	height: 14px;
+}
+@keyframes nutrio-toast-in {
+	from {
+		opacity: 0;
+		transform: translateY(-6px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}

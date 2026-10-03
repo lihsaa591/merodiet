@@ -4,7 +4,7 @@ import { __ } from '@wordpress/i18n';
 import Panel, { PanelBody, PanelHead } from '../../components/ui/Panel';
 import Button from '../../components/ui/Button';
 import EmailTab from './EmailTab';
-import { alertDialog } from '../../utils/confirmDialog';
+import { errorMessage, toast } from '../../utils/toast';
 import styles from './Settings.module.css';
 
 interface UsdaKeyState {
@@ -41,9 +41,14 @@ export default function Settings() {
 			setKeyState( result );
 			setIsReplacing( false );
 			setApiKeyInput( '' );
-			await alertDialog( {
-				message: __( 'USDA API key saved.', 'nutrio' ),
-			} );
+			toast.success( __( 'USDA API key saved.', 'nutrio' ) );
+		} catch ( error ) {
+			toast.error(
+				errorMessage(
+					error,
+					__( 'Could not save the USDA API key.', 'nutrio' )
+				)
+			);
 		} finally {
 			setIsSaving( false );
 		}

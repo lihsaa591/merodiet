@@ -3,6 +3,7 @@ import { __ } from '@wordpress/i18n';
 import { hasUnsavedChanges } from '../hooks/useGlobalDirtyState';
 import { confirmDialog } from '../utils/confirmDialog';
 import ConfirmDialogHost from '../components/ui/ConfirmDialogHost';
+import ToastHost from '../components/ui/ToastHost';
 import Sidebar from './Sidebar';
 import Dashboard from '../screens/dashboard/Dashboard';
 import ClientRoster from '../screens/clients/ClientRoster';
@@ -173,6 +174,7 @@ export default function App() {
 				</div>
 			</div>
 			<ConfirmDialogHost />
+			<ToastHost />
 		</div>
 	);
 }

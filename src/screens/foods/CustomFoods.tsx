@@ -1,8 +1,9 @@
 import { useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { STORE_NAME } from '../../store/customFoods';
-import { alertDialog, confirmDialog } from '../../utils/confirmDialog';
+import { confirmDialog } from '../../utils/confirmDialog';
+import { errorMessage, reportBulkResult, toast } from '../../utils/toast';
 import { useBulkSelection } from '../../hooks/useBulkSelection';
 import { usePagination } from '../../hooks/usePagination';
 import { useShowFilters } from '../../hooks/useShowFilters';
@@ -92,8 +93,10 @@ export default function CustomFoods() {
 	const handleSubmit = async ( data: CustomFoodInput ) => {
 		if ( editingFood ) {
 			await updateCustomFood( editingFood.id, data );
+			toast.success( __( 'Custom food updated.', 'nutrio' ) );
 		} else {
 			await createCustomFood( data );
+			toast.success( __( 'Custom food added.', 'nutrio' ) );
 		}
 		closeDrawer();
 	};
@@ -114,22 +117,15 @@ export default function CustomFoods() {
 
 		try {
 			await deleteCustomFood( food.id );
+			toast.success( __( 'Custom food removed.', 'nutrio' ) );
 		} catch ( error ) {
-			// apiFetch rejects with the REST API's error envelope
-			// ({code, message, data}), not a native Error — most likely
-			// here: 409, this food is still used in a recipe.
-			const message =
-				error &&
-				typeof error === 'object' &&
-				'message' in error &&
-				typeof error.message === 'string'
-					? error.message
-					: __(
-							'Something went wrong removing this food.',
-							'nutrio'
-					  );
-
-			await alertDialog( { message } );
+			// Most likely here: 409, this food is still used in a recipe.
+			toast.error(
+				errorMessage(
+					error,
+					__( 'Something went wrong removing this food.', 'nutrio' )
+				)
+			);
 		}
 	};
 
@@ -159,35 +155,40 @@ export default function CustomFoods() {
 		// A food still used in a recipe is blocked (409) rather than
 		// silently deleted — surface that rather than pretending every
 		// selected row was removed.
-		const failedCount = results.filter(
-			( result ) => result.status === 'rejected'
-		).length;
-
-		if ( failedCount > 0 ) {
-			await alertDialog( {
-				message: sprintf(
+		reportBulkResult( results, {
+			success: ( count ) =>
+				sprintf(
+					/* translators: %d: number of custom foods removed */
+					_n(
+						'%d custom food removed.',
+						'%d custom foods removed.',
+						count,
+						'nutrio'
+					),
+					count
+				),
+			failure: ( count ) =>
+				sprintf(
 					/* translators: %d: number of custom foods that could not be removed */
 					__(
 						"%d couldn't be removed because they're still used in a recipe.",
 						'nutrio'
 					),
-					failedCount
+					count
 				),
-			} );
-		}
+		} );
 	};
 
 	// Bulk import (e.g. a CSV of a client's regular branded products) isn't
 	// built yet — see JOURNEY.md. This is a placeholder entry point so the
 	// affordance exists in the UI ahead of the feature.
-	const handleImportClick = async () => {
-		await alertDialog( {
-			title: __( 'Import food data', 'nutrio' ),
-			message: __(
-				"This is coming soon — you'll be able to bulk-import custom foods (e.g. from a CSV) instead of adding them one at a time.",
+	const handleImportClick = () => {
+		toast.info(
+			__(
+				"Import is coming soon — you'll be able to bulk-import custom foods (e.g. from a CSV).",
 				'nutrio'
-			),
-		} );
+			)
+		);
 	};
 
 	return (

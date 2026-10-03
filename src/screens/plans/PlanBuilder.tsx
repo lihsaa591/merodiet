@@ -4,7 +4,8 @@ import Button from '../../components/ui/Button';
 import Panel, { PanelBody, PanelHead } from '../../components/ui/Panel';
 import UnsavedBadge from '../../components/ui/UnsavedBadge';
 import { useGlobalDirtyState } from '../../hooks/useGlobalDirtyState';
-import { alertDialog, confirmDialog } from '../../utils/confirmDialog';
+import { confirmDialog } from '../../utils/confirmDialog';
+import { errorMessage, toast } from '../../utils/toast';
 import { formatShortDate } from '../../utils/date';
 import ItemSearch from './ItemSearch';
 import styles from './PlanBuilder.module.css';
@@ -137,12 +138,12 @@ export default function PlanBuilder( {
 		const count = daysBetween( newStart, newEnd );
 
 		if ( count > MAX_PLAN_DAYS ) {
-			await alertDialog( {
-				message: __(
+			toast.error(
+				__(
 					'Plans can’t span more than 90 days — for a longer program, build one plan per stretch and duplicate between them.',
 					'nutrio'
-				),
-			} );
+				)
+			);
 			return;
 		}
 
@@ -425,6 +426,13 @@ export default function PlanBuilder( {
 			};
 			await onSave( data );
 			markClean();
+		} catch ( error ) {
+			toast.error(
+				errorMessage(
+					error,
+					__( 'Could not save this plan.', 'nutrio' )
+				)
+			);
 		} finally {
 			setIsSaving( false );
 		}
