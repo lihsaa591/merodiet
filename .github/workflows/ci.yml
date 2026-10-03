@@ -45,7 +45,7 @@ jobs:
     needs: [ lint-php, static-analysis ]
     strategy:
       matrix:
-        php: [ '8.1', '8.2', '8.3' ]
+        php: [ '8.1', '8.4' ]
     steps:
       - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
