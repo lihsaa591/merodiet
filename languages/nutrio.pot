@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-03T14:49:45+00:00\n"
+"POT-Creation-Date: 2026-10-03T15:45:41+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: nutrio\n"
@@ -209,8 +209,8 @@ msgstr ""
 msgid "This food cannot be reliably converted to a per-100g nutrient profile — for example, its serving size is not gram-based, or USDA did not report identifiable nutrient values for it."
 msgstr ""
 
-#: includes/Repositories/LogEntryRepository.php:54
-#: includes/Repositories/MeasurementRepository.php:46
+#: includes/Repositories/LogEntryRepository.php:56
+#: includes/Repositories/MeasurementRepository.php:48
 msgid "Could not save the entry."
 msgstr ""
 
@@ -285,16 +285,16 @@ msgstr ""
 msgid "This plan is not currently assigned."
 msgstr ""
 
-#: includes/RestApi/SettingsController.php:230
-#: includes/RestApi/SettingsController.php:261
+#: includes/RestApi/SettingsController.php:277
+#: includes/RestApi/SettingsController.php:308
 msgid "Unknown email template."
 msgstr ""
 
-#: includes/RestApi/SettingsController.php:297
+#: includes/RestApi/SettingsController.php:344
 msgid "Enter a valid email address."
 msgstr ""
 
-#: includes/RestApi/SettingsController.php:336
+#: includes/RestApi/SettingsController.php:383
 msgid "Send time must be in HH:MM (24-hour) format."
 msgstr ""
 
@@ -1841,6 +1841,26 @@ msgstr ""
 
 #: build/admin.js:31
 msgid "USDA API key"
+msgstr ""
+
+#: build/admin.js:31
+msgid "Data on uninstall"
+msgstr ""
+
+#: build/admin.js:31
+msgid "By default your clients, plans, logs and measurements are kept when you delete the plugin. Turn this on to permanently remove all Nutrio data when the plugin is deleted."
+msgstr ""
+
+#: build/admin.js:31
+msgid "Data setting saved."
+msgstr ""
+
+#: build/admin.js:31
+msgid "Could not save the data setting."
+msgstr ""
+
+#: build/admin.js:31
+msgid "Delete all Nutrio data when the plugin is deleted"
 msgstr ""
 
 #: build/admin.js:31
