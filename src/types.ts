@@ -263,6 +263,10 @@ declare global {
 			dateFormat?: string;
 			/** This site's Settings → General → Time Format, a PHP date() format string (e.g. "g:i a"). */
 			timeFormat?: string;
+			/** The site's name, shown in the email editor's preview header/footer. */
+			siteName?: string;
+			/** URL of the leaf mark used in the email header. */
+			emailLogoUrl?: string;
 		};
 		nutrioClientPortal?: {
 			restUrl?: string;

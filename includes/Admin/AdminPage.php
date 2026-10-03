@@ -164,6 +164,10 @@ final class AdminPage {
 				// than a hardcoded style.
 				'dateFormat'          => get_option( 'date_format', 'F j, Y' ),
 				'timeFormat'          => get_option( 'time_format', 'g:i a' ),
+				// Used by the Email settings' visual editor to mirror the
+				// real email's header/footer (see Mailer::wrap_in_skeleton()).
+				'siteName'            => get_bloginfo( 'name' ),
+				'emailLogoUrl'        => esc_url_raw( NUTRIO_URL . 'assets/images/nutrio-leaf-email.png' ),
 			)
 		);
 	}
