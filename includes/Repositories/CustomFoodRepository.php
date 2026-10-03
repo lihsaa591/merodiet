@@ -7,6 +7,8 @@
 
 declare( strict_types=1 );
 
+// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Plugin's own custom tables; table names come from $wpdb->prefix and every value is bound via $wpdb->prepare().
+
 namespace Nutrio\Repositories;
 
 use Nutrio\Database\QueryFilters;

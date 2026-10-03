@@ -7,6 +7,8 @@
 
 declare( strict_types=1 );
 
+// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Plugin's own custom tables; table names come from $wpdb->prefix and every value is bound via $wpdb->prepare().
+
 namespace Nutrio\Repositories;
 
 use Nutrio\Database\QueryFilters;
@@ -349,12 +351,14 @@ class PlanRepository {
 
 		if ( array() !== $existing_day_ids ) {
 			$placeholders = implode( ',', array_fill( 0, count( $existing_day_ids ), '%d' ) );
+			// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders -- table name is derived from $wpdb->prefix, not user input; $placeholders is a runtime-built "%d,%d,..." string PHPCS can't statically verify, but $wpdb->prepare() with an array as its second argument is the documented-correct pattern for a dynamic IN() clause.
 			$wpdb->query(
 				$wpdb->prepare(
-					"DELETE FROM {$wpdb->prefix}nutrio_plan_items WHERE plan_day_id IN ({$placeholders})", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- table name is derived from $wpdb->prefix, not user input; $placeholders is a runtime-built "%d,%d,..." string PHPCS can't statically verify, but $wpdb->prepare() with an array as its second argument is the documented-correct pattern for a dynamic IN() clause.
+					"DELETE FROM {$wpdb->prefix}nutrio_plan_items WHERE plan_day_id IN ({$placeholders})",
 					$existing_day_ids
 				)
 			);
+			// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders
 		}
 
 		$wpdb->delete( $wpdb->prefix . 'nutrio_plan_days', array( 'plan_id' => $plan_id ) );
