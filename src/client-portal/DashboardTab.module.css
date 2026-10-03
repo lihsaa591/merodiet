@@ -58,8 +58,22 @@
 	color: var(--ink-faint);
 	margin-top: 1px;
 }
-.doneBadge {
+.statusPill {
 	flex-shrink: 0;
+	font-size: 12px;
+	font-weight: 600;
+	padding: 4px 10px;
+	border-radius: 999px;
+}
+.statusPill.eaten {
+	background: var(--success-wash);
 	color: var(--success);
-	font-weight: 700;
+}
+.statusPill.substituted {
+	background: var(--warning-wash);
+	color: var(--warning);
+}
+.statusPill.skipped {
+	background: var(--clay-wash);
+	color: var(--clay);
 }

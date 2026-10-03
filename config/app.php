@@ -68,6 +68,7 @@ return array(
 				\Nutrio\Repositories\ClientRepository::class,
 				\Nutrio\Nutrition\FoodCache::class,
 				\Nutrio\Repositories\RecipeRepository::class,
+				\Nutrio\Nutrition\RecipeNutrientResolver::class,
 			),
 			\Nutrio\RestApi\DashboardController::class   => array(
 				\Nutrio\Repositories\ClientRepository::class,

@@ -70,6 +70,7 @@ final class ControllerCapabilitiesTest extends TestCase {
 					ClientRepository::class,
 					FoodCache::class,
 					RecipeRepository::class,
+					RecipeNutrientResolver::class,
 				),
 				'view_own_nutrio_plan',
 			),
