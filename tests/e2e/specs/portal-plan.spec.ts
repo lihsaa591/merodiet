@@ -12,7 +12,11 @@ test.describe( 'portal plan and dashboard', () => {
 		await expect( clientPage.getByText( '1 srv · 150 g' ) ).toBeVisible();
 
 		await expect( clientPage.getByText( 'Day total' ) ).toBeVisible();
-		await expect( clientPage.getByText( /^[\d.]+ kcal$/ ) ).toBeVisible();
+		// The first nutrient tile is Kcal (per-item kcal labels also match a
+		// bare text query, so target the tile itself).
+		await expect(
+			clientPage.locator( '[class*="nutrientVal"]' ).first()
+		).toHaveText( /^[1-9][\d.]* kcal$/ );
 	} );
 
 	test( "dashboard's today's plan shows status text, not a tick", async ( {

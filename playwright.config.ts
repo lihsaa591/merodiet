@@ -1,5 +1,11 @@
 import { defineConfig } from '@playwright/test';
 
+// @wordpress/e2e-test-utils-playwright defaults to wp-env's *tests* site
+// (:8889), but this suite seeds and tests the dev site on :8888 (see
+// baseURL below). Without this, a local run — where CI's WP_BASE_URL isn't
+// set — retries logins against the wrong site forever and never starts.
+process.env.WP_BASE_URL ??= 'http://localhost:8888';
+
 export default defineConfig( {
 	testDir: './tests/e2e/specs',
 	globalSetup: './tests/e2e/global-setup.ts',
