@@ -475,19 +475,8 @@ final class PortalPage {
 	 * the client straight into the portal.
 	 */
 	private function handle_reset_password_request(): void {
-		// An invited client may not open the email on the day it arrives;
-		// core's 1-day default made the link read as "no longer valid".
-		add_filter(
-			'password_reset_expiration',
-			static fn (): int => WEEK_IN_SECONDS
-		);
-
-		// A link copied from the email's plain-text view can carry the
-		// HTML-escaped "&amp;" literally, which PHP parses into "amp;key"
-		// / "amp;login" params — accept those too rather than reporting a
-		// perfectly good key as invalid.
-		$key   = self::reset_param( 'key' );
-		$login = self::reset_param( 'login' );
+		$key   = isset( $_REQUEST['key'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['key'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only key/login lookup; check_password_reset_key() itself is what proves this request is legitimate, not a nonce.
+		$login = isset( $_REQUEST['login'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['login'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- see above.
 
 		$user = check_password_reset_key( $key, $login );
 
@@ -535,22 +524,6 @@ final class PortalPage {
 
 		wp_safe_redirect( PortalRewrite::url() );
 		exit;
-	}
-
-	/**
-	 * One reset-link query param, tolerating an "amp;" prefix left by a
-	 * pasted HTML-escaped URL.
-	 *
-	 * @param string $name Param name ('key' or 'login').
-	 */
-	private static function reset_param( string $name ): string {
-		foreach ( array( $name, 'amp;' . $name ) as $candidate ) {
-			if ( isset( $_REQUEST[ $candidate ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only key/login lookup; check_password_reset_key() itself is what proves this request is legitimate, not a nonce.
-				return sanitize_text_field( wp_unslash( $_REQUEST[ $candidate ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotValidated -- see above.
-			}
-		}
-
-		return '';
 	}
 
 	/**
