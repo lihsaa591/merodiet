@@ -545,6 +545,9 @@ final class MeController extends AbstractClientController {
 		$item['recipe_nutrient_totals_per_serving'] = null === $recipe
 			? null
 			: $this->recipe_resolver->calculate_per_serving_totals( (int) $item['recipe_id'] );
+		$item['recipe_serving_grams']               = null === $recipe
+			? null
+			: $this->recipe_resolver->serving_grams( (int) $item['recipe_id'] );
 		$item['food_description']                   = null;
 		$item['nutrients']                          = null;
 

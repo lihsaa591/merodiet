@@ -119,6 +119,7 @@ final class MeControllerTest extends TestCase {
 
 		$resolver = $this->createMock( RecipeNutrientResolver::class );
 		$resolver->method( 'calculate_per_serving_totals' )->with( 3 )->willReturn( array( '1008' => 450000 ) );
+		$resolver->method( 'serving_grams' )->with( 3 )->willReturn( 150.0 );
 
 		$controller = new MeController(
 			$plans,
@@ -134,5 +135,6 @@ final class MeControllerTest extends TestCase {
 		$item     = $response->data['days'][0]['items'][0];
 
 		self::assertSame( array( '1008' => 450000 ), $item['recipe_nutrient_totals_per_serving'] );
+		self::assertSame( 150.0, $item['recipe_serving_grams'] );
 	}
 }

@@ -55,8 +55,8 @@ export function itemsByMeal(
 	return grouped;
 }
 
-// "150 g" for a food item, "2 srv" for a recipe item — same convention the
-// practitioner's own Plan builder uses for quantity/servings inputs.
+// "150 g" for a food item, "2 srv · 300 g" for a recipe item (weight shown
+// when the recipe's ingredients are weighed).
 export function itemQuantityLabel( item: PlanItem ): string | null {
 	if ( item.food_id ) {
 		return null === item.quantity_grams
@@ -64,9 +64,22 @@ export function itemQuantityLabel( item: PlanItem ): string | null {
 			: `${ item.quantity_grams } ${ __( 'g', 'nutrio' ) }`;
 	}
 
-	return null === item.servings
-		? null
-		: `${ item.servings } ${ __( 'srv', 'nutrio' ) }`;
+	if ( null === item.servings ) {
+		return null;
+	}
+
+	const servings = `${ item.servings } ${ __( 'srv', 'nutrio' ) }`;
+
+	// Recipes only have a serving *count*, which tells the client nothing
+	// about portion size — add the weight when the recipe has one.
+	if ( item.recipe_serving_grams ) {
+		const grams =
+			Math.round( item.recipe_serving_grams * item.servings * 10 ) / 10;
+
+		return `${ servings } · ${ grams } ${ __( 'g', 'nutrio' ) }`;
+	}
+
+	return servings;
 }
 
 // Converts a PlanItem into estimateDayNutrients()'s expected input shape —
