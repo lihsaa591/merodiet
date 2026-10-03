@@ -42,6 +42,7 @@ return array(
 				\Nutrio\Repositories\MeasurementRepository::class,
 				\Nutrio\Clients\ComplianceCalculator::class,
 				\Nutrio\Email\Mailer::class,
+				\Nutrio\Clients\LogEntryLabelResolver::class,
 			),
 			\Nutrio\RestApi\FoodsController::class       => array( \Nutrio\Nutrition\FoodDataService::class ),
 			\Nutrio\RestApi\CustomFoodsController::class => array( \Nutrio\Repositories\CustomFoodRepository::class ),

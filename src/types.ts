@@ -192,6 +192,8 @@ export interface LogEntry {
 	status: 'eaten' | 'substituted' | 'skipped';
 	source: 'manual' | 'ai_parsed';
 	notes: string | null;
+	/** Resolved food/recipe name, set by the practitioner-side /clients/{id}/logs endpoint only. */
+	label?: string | null;
 	created_at: string;
 }
 
