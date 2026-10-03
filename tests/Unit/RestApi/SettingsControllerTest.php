@@ -168,4 +168,33 @@ final class SettingsControllerTest extends TestCase {
 
 		self::assertSame( '08:30', $response->get_data()['send_time'] );
 	}
+
+	public function test_update_data_retention_stores_the_string_flag_uninstall_expects(): void {
+		$stored = null;
+
+		Functions\when( 'add_option' )->justReturn( true );
+		Functions\when( 'update_option' )->alias(
+			static function ( string $name, $value ) use ( &$stored ) {
+				$stored = array( $name, $value );
+				return true;
+			}
+		);
+
+		$request = new WP_REST_Request();
+		$request->set_param( 'delete_on_uninstall', true );
+
+		$controller = new SettingsController( new EmailTemplateService() );
+		$response   = $controller->update_data_retention( $request );
+
+		self::assertSame( array( 'nutrio_delete_data_on_uninstall', '1' ), $stored );
+		self::assertTrue( $response->get_data()['delete_on_uninstall'] );
+	}
+
+	public function test_get_data_retention_is_false_by_default(): void {
+		Functions\when( 'get_option' )->justReturn( false );
+
+		$controller = new SettingsController( new EmailTemplateService() );
+
+		self::assertFalse( $controller->get_data_retention()->get_data()['delete_on_uninstall'] );
+	}
 }
