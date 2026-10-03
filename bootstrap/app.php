@@ -11,6 +11,11 @@
 
 declare( strict_types=1 );
 
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use Nutrio\Plugin;
 
 $nutrio_config = require NUTRIO_PATH . 'config/app.php';

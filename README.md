@@ -65,7 +65,7 @@ full per-violation detail.
 
 ## Status
 
-Actively in development. See the project plan for phase-by-phase scope; not yet released.
+Pre-release (0.1.x), being prepared for submission to the WordPress.org plugin directory.
 
 ## License
 
