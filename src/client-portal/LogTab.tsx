@@ -120,7 +120,6 @@ export default function LogTab() {
 	);
 	const [ historyRangeDays, setHistoryRangeDays ] =
 		useState( HISTORY_PAGE_DAYS );
-	const [ isLoadingMoreHistory, setIsLoadingMoreHistory ] = useState( false );
 	const [ substitutingItemId, setSubstitutingItemId ] = useState<
 		number | null
 	>( null );
@@ -128,44 +127,23 @@ export default function LogTab() {
 
 	const today = new Date().toISOString().slice( 0, 10 );
 
+	// The whole look-back window is fetched once; "Load more" / "Show less"
+	// only change how much of it is shown, so we can tell exactly when
+	// there is nothing older left to reveal.
 	const loadHistory = () => {
 		apiFetch< LogEntry[] >( {
 			path: `/nutrio/v1/me/logs?from=${ daysAgo(
-				historyRangeDays - 1
+				HISTORY_MAX_DAYS - 1
 			) }&to=${ today }`,
 		} ).then( setHistory, () => setHistory( [] ) );
 	};
 
-	const loadMoreHistory = () => {
-		const nextRange = Math.min(
-			historyRangeDays + HISTORY_PAGE_DAYS,
-			HISTORY_MAX_DAYS
+	const loadMoreHistory = () =>
+		setHistoryRangeDays( ( days ) =>
+			Math.min( days + HISTORY_PAGE_DAYS, HISTORY_MAX_DAYS )
 		);
-		setIsLoadingMoreHistory( true );
 
-		apiFetch< LogEntry[] >( {
-			path: `/nutrio/v1/me/logs?from=${ daysAgo(
-				nextRange - 1
-			) }&to=${ today }`,
-		} )
-			.then( ( entries ) => {
-				setHistory( entries );
-				setHistoryRangeDays( nextRange );
-			} )
-			.catch( () => {} )
-			.finally( () => setIsLoadingMoreHistory( false ) );
-	};
-
-	// Collapses back to the first page. The entries already fetched are
-	// trimmed locally rather than re-requested.
-	const showLessHistory = () => {
-		const cutoff = daysAgo( HISTORY_PAGE_DAYS - 1 );
-		setHistory(
-			( entries ) =>
-				entries?.filter( ( entry ) => entry.log_date >= cutoff )
-		);
-		setHistoryRangeDays( HISTORY_PAGE_DAYS );
-	};
+	const showLessHistory = () => setHistoryRangeDays( HISTORY_PAGE_DAYS );
 
 	useEffect( () => {
 		apiFetch< Plan | null >( { path: '/nutrio/v1/me/plan' } ).then(
@@ -313,7 +291,15 @@ export default function LogTab() {
 	// they never appear in the meal groups above; shown in their own list
 	// instead of only via the toast (which fades) or tomorrow's history.
 	const adHocToday: LogEntry[] = [];
+	const historyCutoff = daysAgo( historyRangeDays - 1 );
+	const hasOlderHistory = ( history ?? [] ).some(
+		( entry ) => entry.log_date < historyCutoff
+	);
 	for ( const entry of history ?? [] ) {
+		if ( entry.log_date < historyCutoff ) {
+			continue;
+		}
+
 		if ( entry.log_date === today ) {
 			if ( null === entry.plan_item_id ) {
 				adHocToday.push( entry );
@@ -698,21 +684,17 @@ export default function LogTab() {
 									type="button"
 									className={ styles.loadMore }
 									onClick={ showLessHistory }
-									disabled={ isLoadingMoreHistory }
 								>
 									{ __( 'Show less', 'nutrio' ) }
 								</button>
 							) }
-							{ historyRangeDays < HISTORY_MAX_DAYS && (
+							{ hasOlderHistory && (
 								<button
 									type="button"
 									className={ styles.loadMore }
 									onClick={ loadMoreHistory }
-									disabled={ isLoadingMoreHistory }
 								>
-									{ isLoadingMoreHistory
-										? __( 'Loading…', 'nutrio' )
-										: __( 'Load more', 'nutrio' ) }
+									{ __( 'Load more', 'nutrio' ) }
 								</button>
 							) }
 						</div>
