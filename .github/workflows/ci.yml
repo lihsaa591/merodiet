@@ -104,7 +104,6 @@ jobs:
         run: npx playwright test tests/e2e
         env:
           WP_BASE_URL: http://localhost:8888
-        continue-on-error: true
       - name: Summarize accessibility findings
         if: always()
         run: node tests/e2e/helpers/summarize-report.js >> "$GITHUB_STEP_SUMMARY"
