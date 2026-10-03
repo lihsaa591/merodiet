@@ -51,14 +51,23 @@ final class Assets {
 
 		// In development, load from the running dev server for hot updates
 		// instead of the last-built file.
-		$src = NUTRIO_DEVELOPMENT
+		$src  = NUTRIO_DEVELOPMENT
 			? NUTRIO_DEV_SERVER_URL . "/{$entry}.js"
 			: rtrim( $build_url, '/' ) . "/{$entry}.js";
+		$deps = array_merge( $asset['dependencies'], $extra_deps );
+
+		// `wp-scripts start --hot` splits webpack's runtime into runtime.js.
+		// Entry chunks only register themselves and never boot without it, so
+		// it must load first or the page stays blank.
+		if ( NUTRIO_DEVELOPMENT ) { // @phpstan-ignore if.alwaysFalse (constant is set per-site in wp-config.php)
+			wp_register_script( 'nutrio-runtime', NUTRIO_DEV_SERVER_URL . '/runtime.js', array(), NUTRIO_VERSION, true );
+			$deps[] = 'nutrio-runtime';
+		}
 
 		wp_enqueue_script(
 			$handle,
 			$src,
-			array_merge( $asset['dependencies'], $extra_deps ),
+			$deps,
 			$asset['version'],
 			true
 		);
