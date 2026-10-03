@@ -17,7 +17,11 @@ export default function Tooltip( {
 	position = 'top',
 }: TooltipProps ) {
 	return (
-		<span className={ styles.wrapper }>
+		<span
+			className={ `${ styles.wrapper } ${
+				position === 'bottom' ? styles.arrowBottom : styles.arrowTop
+			}` }
+		>
 			{ children }
 			<span
 				className={ `${ styles.bubble } ${
