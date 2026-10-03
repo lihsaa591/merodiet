@@ -140,6 +140,8 @@ export interface Plan {
 	id: number;
 	practitioner_user_id: number;
 	client_id: number | null;
+	/** Resolved by the plans list endpoint; null when unassigned. */
+	client_name?: string | null;
 	title: string;
 	status: 'draft' | 'assigned';
 	start_date: string;

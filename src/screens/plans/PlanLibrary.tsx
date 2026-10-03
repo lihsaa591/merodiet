@@ -11,6 +11,7 @@ import ListFilters, {
 import { useBulkSelection } from '../../hooks/useBulkSelection';
 import { formatAmount, summarizeNutrients } from '../../utils/nutrients';
 import { formatDate } from '../../utils/date';
+import { clientDetailUrl } from '../../utils/clientUrl';
 import type { Client, Plan } from '../../types';
 
 interface PlanLibraryProps {
@@ -75,11 +76,35 @@ export default function PlanLibrary( {
 		bulk.clear();
 	};
 
-	const clientName = ( clientId: number | null ): string => {
-		const client = clients.find( ( c ) => c.id === clientId );
-		return client
-			? `${ client.first_name } ${ client.last_name }`
-			: __( 'Unassigned', 'nutrio' );
+	// The list endpoint resolves the name itself; the loaded roster is only
+	// a fallback (e.g. a plan returned from a create/assign response).
+	const clientName = ( plan: Plan ): string | null => {
+		if ( plan.client_name ) {
+			return plan.client_name;
+		}
+
+		const client = clients.find( ( c ) => c.id === plan.client_id );
+
+		return client ? `${ client.first_name } ${ client.last_name }` : null;
+	};
+
+	const renderClientCell = ( plan: Plan ) => {
+		if ( null === plan.client_id ) {
+			return __( 'Unassigned', 'nutrio' );
+		}
+
+		const name = clientName( plan );
+
+		return name ? (
+			<a
+				href={ clientDetailUrl( plan.client_id ) }
+				style={ { color: 'inherit', fontWeight: 600 } }
+			>
+				{ name }
+			</a>
+		) : (
+			__( 'Unknown client', 'nutrio' )
+		);
 	};
 
 	const avgDailyKcal = ( plan: Plan ): number | null => {
@@ -216,7 +241,7 @@ export default function PlanLibrary( {
 												{ plan.title }
 											</td>
 											<td>
-												{ clientName( plan.client_id ) }
+												{ renderClientCell( plan ) }
 											</td>
 											<td>
 												<div

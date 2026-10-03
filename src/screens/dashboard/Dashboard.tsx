@@ -8,6 +8,7 @@ import Panel, { PanelBody, PanelHead } from '../../components/ui/Panel';
 import Avatar from '../../components/ui/Avatar';
 import Skeleton from '../../components/ui/Skeleton';
 import { greeting, greetingEmoji } from '../../utils/greeting';
+import { clientDetailUrl } from '../../utils/clientUrl';
 import type { Client, Recipe } from '../../types';
 import type { ReactNode } from 'react';
 
@@ -24,17 +25,6 @@ interface DashboardOverview {
 	logged_today_count: number;
 	draft_plan_count: number;
 	compliance: ComplianceEntry[];
-}
-
-/**
- * Builds a link to a client's detail screen, preserving other URL params.
- * @param clientId
- */
-function clientDetailUrl( clientId: number ): string {
-	const url = new URL( window.location.href );
-	url.searchParams.set( 'view', 'clients' );
-	url.searchParams.set( 'id', String( clientId ) );
-	return url.toString();
 }
 
 interface ClientsStoreSelectors {
