@@ -490,6 +490,11 @@ body.toplevel_page_nutrio #wpbody-content {
 	display: flex;
 	gap: 4px;
 	justify-content: flex-end;
+	/* Right-align tooltips to the button so they don't overflow the table's
+	   right edge (see Tooltip.module.css). */
+	--tooltip-left: auto;
+	--tooltip-right: 0;
+	--tooltip-tx: 0;
 }
 /* Hidden-until-hover only makes sense with a pointer that can hover — a
    touch device has no hover state, so these would otherwise be invisible

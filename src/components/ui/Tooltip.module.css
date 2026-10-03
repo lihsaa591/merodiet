@@ -9,8 +9,12 @@
 }
 .bubble {
 	position: absolute;
-	left: 50%;
-	transform: translateX(-50%) translateY(4px);
+	/* Callers (e.g. .nutrio-row-actions) can set --tooltip-left/-right/-tx to
+	   anchor the bubble to the trigger's edge instead of centering it, so it
+	   doesn't get clipped by an overflow container at the viewport edge. */
+	left: var(--tooltip-left, 50%);
+	right: var(--tooltip-right, auto);
+	transform: translateX(var(--tooltip-tx, -50%)) translateY(4px);
 	width: max-content;
 	max-width: 220px;
 	padding: 6px 10px;
@@ -32,11 +36,11 @@
 }
 .bottom {
 	top: calc(100% + 6px);
-	transform: translateX(-50%) translateY(-4px);
+	transform: translateX(var(--tooltip-tx, -50%)) translateY(-4px);
 }
 .wrapper:hover .bubble,
 .wrapper:focus-within .bubble {
 	opacity: 1;
 	visibility: visible;
-	transform: translateX(-50%) translateY(0);
+	transform: translateX(var(--tooltip-tx, -50%)) translateY(0);
 }
