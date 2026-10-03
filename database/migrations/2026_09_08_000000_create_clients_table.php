@@ -22,6 +22,10 @@ declare( strict_types=1 );
 
 use Nutrio\Database\Migration;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 return new class() extends Migration {
 
 	/**

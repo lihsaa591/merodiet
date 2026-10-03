@@ -272,7 +272,7 @@ final class PortalPage {
 		// a failed attempt bounces back there instead of rendering inline on
 		// this dedicated page. wp_validate_redirect() collapses anything
 		// off-site (or absent) to '', which fail_login() treats as "not embedded".
-		$redirect_to = isset( $_POST['redirect_to'] ) ? wp_validate_redirect( (string) wp_unslash( $_POST['redirect_to'] ), '' ) : '';
+		$redirect_to = isset( $_POST['redirect_to'] ) ? wp_validate_redirect( (string) wp_unslash( $_POST['redirect_to'] ), '' ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- wp_validate_redirect() sanitizes.
 
 		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nutrio_login_nonce'] ) ), 'nutrio_portal_login' ) ) {
 			return $this->fail_login( new WP_Error( 'invalid_nonce', __( 'Your session expired — please try again.', 'nutrio' ) ), $redirect_to );
@@ -282,7 +282,7 @@ final class PortalPage {
 		// Deliberately not sanitize_text_field()'d — a password's exact bytes
 		// matter, and WordPress core's own wp-login.php passes it through
 		// wp_unslash() only, the same as here.
-		$password = isset( $_POST['pwd'] ) ? (string) wp_unslash( $_POST['pwd'] ) : '';
+		$password = isset( $_POST['pwd'] ) ? (string) wp_unslash( $_POST['pwd'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- passwords must not be altered.
 
 		$errors = new WP_Error();
 
@@ -495,8 +495,8 @@ final class PortalPage {
 			return;
 		}
 
-		$pass1 = isset( $_POST['pass1'] ) ? (string) wp_unslash( $_POST['pass1'] ) : '';
-		$pass2 = isset( $_POST['pass2'] ) ? (string) wp_unslash( $_POST['pass2'] ) : '';
+		$pass1 = isset( $_POST['pass1'] ) ? (string) wp_unslash( $_POST['pass1'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- passwords must not be altered.
+		$pass2 = isset( $_POST['pass2'] ) ? (string) wp_unslash( $_POST['pass2'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- passwords must not be altered.
 
 		$errors = new WP_Error();
 
