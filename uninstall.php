@@ -12,6 +12,8 @@
 
 declare( strict_types=1 );
 
+// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- Uninstall drops the plugin's own tables from a fixed list.
+
 // If this file is not called by WordPress, bail.
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
