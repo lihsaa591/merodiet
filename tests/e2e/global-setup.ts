@@ -103,7 +103,18 @@ async function globalSetup(): Promise< void > {
 	} );
 
 	// 5. Assign a plan covering today, so Plan/Log/Dashboard render a
-	// populated day instead of an empty state.
+	// populated day instead of an empty state. It holds a direct food
+	// (150 g) and a recipe, so the specs can cover both item kinds: a
+	// 2-serving recipe weighing 300 g, i.e. 150 g per serving.
+	const recipe = await requestUtils.rest( {
+		path: '/nutrio/v1/recipes',
+		method: 'POST',
+		data: {
+			name: 'E2E Seed Bowl',
+			servings: 2,
+			items: [ { food_id: Number( foodId ), quantity_grams: 300 } ],
+		},
+	} );
 	const today = new Date().toISOString().slice( 0, 10 );
 	const plan = await requestUtils.rest( {
 		path: '/nutrio/v1/plans',
@@ -120,6 +131,11 @@ async function globalSetup(): Promise< void > {
 							meal_type: 'breakfast',
 							food_id: Number( foodId ),
 							quantity_grams: 150,
+						},
+						{
+							meal_type: 'snack',
+							recipe_id: recipe.id,
+							servings: 1,
 						},
 					],
 				},
