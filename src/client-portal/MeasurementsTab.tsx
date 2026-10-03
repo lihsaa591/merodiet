@@ -57,39 +57,28 @@ export default function MeasurementsTab() {
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
 	const [ historyRangeDays, setHistoryRangeDays ] =
 		useState( HISTORY_PAGE_DAYS );
-	const [ isLoadingMore, setIsLoadingMore ] = useState( false );
 
 	const today = new Date().toISOString().slice( 0, 10 );
 
+	// The whole look-back window is fetched once; "Load more" / "Show less"
+	// only change how much of it is shown, so we know exactly when nothing
+	// older is left to reveal.
 	const loadMeasurements = () => {
 		apiFetch< Measurement[] >( {
 			path: `/nutrio/v1/me/measurements?from=${ daysAgo(
-				historyRangeDays - 1
+				HISTORY_MAX_DAYS - 1
 			) }&to=${ today }`,
 		} ).then( setMeasurements, () => setMeasurements( [] ) );
 	};
 
-	const loadMore = () => {
-		const nextRange = Math.min(
-			historyRangeDays + HISTORY_PAGE_DAYS,
-			HISTORY_MAX_DAYS
+	const loadMore = () =>
+		setHistoryRangeDays( ( days ) =>
+			Math.min( days + HISTORY_PAGE_DAYS, HISTORY_MAX_DAYS )
 		);
-		setIsLoadingMore( true );
 
-		apiFetch< Measurement[] >( {
-			path: `/nutrio/v1/me/measurements?from=${ daysAgo(
-				nextRange - 1
-			) }&to=${ today }`,
-		} )
-			.then( ( entries ) => {
-				setMeasurements( entries );
-				setHistoryRangeDays( nextRange );
-			} )
-			.catch( () => {} )
-			.finally( () => setIsLoadingMore( false ) );
-	};
+	const showLess = () => setHistoryRangeDays( HISTORY_PAGE_DAYS );
 
-	// eslint-disable-next-line react-hooks/exhaustive-deps -- mount-only fetch; loadMore() (not this effect) is what advances historyRangeDays.
+	// eslint-disable-next-line react-hooks/exhaustive-deps -- mount-only fetch.
 	useEffect( loadMeasurements, [] );
 
 	const changeUnit = ( next: WeightUnit ) => {
@@ -137,7 +126,12 @@ export default function MeasurementsTab() {
 
 	// Weighed entries only, in the same most-recent-first order the API
 	// returns — used to compute the per-row and overall trend deltas.
-	const weighed = ( measurements ?? [] ).filter(
+	const cutoff = daysAgo( historyRangeDays - 1 );
+	const visible = ( measurements ?? [] ).filter(
+		( m ) => m.measured_at >= cutoff
+	);
+	const hasOlder = ( measurements ?? [] ).length > visible.length;
+	const weighed = visible.filter(
 		( m ): m is Measurement & { weight_grams: number } =>
 			null !== m.weight_grams
 	);
@@ -254,25 +248,37 @@ export default function MeasurementsTab() {
 								  ) }
 						</p>
 					) }
-					{ measurements && measurements.length > 0 && (
+					{ visible.length > 0 && (
 						<MeasurementHistoryList
-							measurements={ measurements }
+							measurements={ visible }
 							unit={ unit }
 						/>
 					) }
 
-					{ measurements && historyRangeDays < HISTORY_MAX_DAYS && (
-						<button
-							type="button"
-							className={ styles.loadMore }
-							onClick={ loadMore }
-							disabled={ isLoadingMore }
-						>
-							{ isLoadingMore
-								? __( 'Loading…', 'nutrio' )
-								: __( 'Load more', 'nutrio' ) }
-						</button>
-					) }
+					{ measurements &&
+						( hasOlder ||
+							historyRangeDays > HISTORY_PAGE_DAYS ) && (
+							<div className={ styles.historyActions }>
+								{ historyRangeDays > HISTORY_PAGE_DAYS && (
+									<button
+										type="button"
+										className={ styles.loadMore }
+										onClick={ showLess }
+									>
+										{ __( 'Show less', 'nutrio' ) }
+									</button>
+								) }
+								{ hasOlder && (
+									<button
+										type="button"
+										className={ styles.loadMore }
+										onClick={ loadMore }
+									>
+										{ __( 'Load more', 'nutrio' ) }
+									</button>
+								) }
+							</div>
+						) }
 				</PanelBody>
 			</Panel>
 		</>
