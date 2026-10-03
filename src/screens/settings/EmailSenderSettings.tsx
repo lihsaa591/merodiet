@@ -9,6 +9,15 @@ import styles from './EmailSenderSettings.module.css';
 
 const PRO_FEATURE_NAME = __( 'Custom email styling', 'nutrio' );
 
+// The form shows what emails will actually be sent from: the saved
+// override, or WordPress's own default when nothing is saved.
+function toFormValues( settings: EmailSenderSettingsData ) {
+	return {
+		fromName: settings.from_name || settings.defaults.from_name,
+		fromAddress: settings.from_address || settings.defaults.from_address,
+	};
+}
+
 // The one site-wide "who do emails come from" setting, shared by every
 // email type (practitioner and client), so it lives above the audience
 // sub-tabs. From name/address are free; the header colour and logo are a
@@ -30,9 +39,10 @@ export default function EmailSenderSettings() {
 		apiFetch< EmailSenderSettingsData >( {
 			path: '/nutrio/v1/settings/email-sender',
 		} ).then( ( result ) => {
+			const values = toFormValues( result );
 			setSaved( result );
-			setFromName( result.from_name );
-			setFromAddress( result.from_address );
+			setFromName( values.fromName );
+			setFromAddress( values.fromAddress );
 		} );
 	}, [] );
 
@@ -49,8 +59,10 @@ export default function EmailSenderSettings() {
 		return null;
 	}
 
+	const savedValues = toFormValues( saved );
 	const isDirty =
-		fromName !== saved.from_name || fromAddress !== saved.from_address;
+		fromName !== savedValues.fromName ||
+		fromAddress !== savedValues.fromAddress;
 
 	const handleSubmit = async ( event: React.FormEvent ) => {
 		event.preventDefault();
@@ -61,14 +73,23 @@ export default function EmailSenderSettings() {
 			const result = await apiFetch< EmailSenderSettingsData >( {
 				path: '/nutrio/v1/settings/email-sender',
 				method: 'PUT',
+				// Sending the default back would pin it as an override, so
+				// treat an unchanged default (or an empty field) as "unset".
 				data: {
-					from_name: fromName.trim(),
-					from_address: fromAddress.trim(),
+					from_name:
+						fromName.trim() === saved.defaults.from_name
+							? ''
+							: fromName.trim(),
+					from_address:
+						fromAddress.trim() === saved.defaults.from_address
+							? ''
+							: fromAddress.trim(),
 				},
 			} );
+			const values = toFormValues( result );
 			setSaved( result );
-			setFromName( result.from_name );
-			setFromAddress( result.from_address );
+			setFromName( values.fromName );
+			setFromAddress( values.fromAddress );
 			setMessage( {
 				kind: 'success',
 				text: __( 'Sender saved.', 'nutrio' ),
@@ -94,7 +115,7 @@ export default function EmailSenderSettings() {
 				<PanelBody>
 					<p className={ styles.intro }>
 						{ __(
-							'Who your emails come from. Applies to every email below, for both practitioners and clients. Leave a field empty to use the WordPress default.',
+							'Who your emails come from. Applies to every email below, for both practitioners and clients. Pre-filled with the WordPress default; change either to override it.',
 							'nutrio'
 						) }
 					</p>
