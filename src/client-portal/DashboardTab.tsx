@@ -164,8 +164,8 @@ export default function DashboardTab() {
 								{ __( 'Kcal eaten', 'nutrio' ) }
 							</div>
 							<div className="nutrio-kpi-value">
-								{ null !== eatenKcal
-									? formatAmount( eatenKcal, '' )
+								{ null !== eatenKcal || null !== plannedKcal
+									? formatAmount( eatenKcal ?? 0, '' )
 									: '—' }
 							</div>
 							{ null !== plannedKcal && (

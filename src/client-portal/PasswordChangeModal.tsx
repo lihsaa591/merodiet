@@ -4,6 +4,7 @@ import apiFetch from '@wordpress/api-fetch';
 import Button from '../components/ui/Button';
 import styles from './PasswordChangeModal.module.css';
 import { nonceMiddleware } from './nonceMiddleware';
+import { errorMessage, toast } from '../utils/toast';
 
 interface PasswordChangeModalProps {
 	isOpen: boolean;
@@ -18,7 +19,6 @@ export default function PasswordChangeModal( {
 	const [ newPassword, setNewPassword ] = useState( '' );
 	const [ confirmPassword, setConfirmPassword ] = useState( '' );
 	const [ isSaving, setIsSaving ] = useState( false );
-	const [ errorMessage, setErrorMessage ] = useState< string | null >( null );
 	const [ isDone, setIsDone ] = useState( false );
 
 	if ( ! isOpen ) {
@@ -29,7 +29,6 @@ export default function PasswordChangeModal( {
 		setCurrentPassword( '' );
 		setNewPassword( '' );
 		setConfirmPassword( '' );
-		setErrorMessage( null );
 		setIsDone( false );
 		onClose();
 	};
@@ -37,7 +36,6 @@ export default function PasswordChangeModal( {
 	const submit = async ( event: React.FormEvent ) => {
 		event.preventDefault();
 		setIsSaving( true );
-		setErrorMessage( null );
 
 		try {
 			const response = await apiFetch< {
@@ -57,17 +55,12 @@ export default function PasswordChangeModal( {
 			nonceMiddleware.nonce = response.nonce;
 			setIsDone( true );
 		} catch ( error ) {
-			const message =
-				error &&
-				typeof error === 'object' &&
-				'message' in error &&
-				typeof error.message === 'string'
-					? error.message
-					: __(
-							'Something went wrong — please try again.',
-							'nutrio'
-					  );
-			setErrorMessage( message );
+			toast.error(
+				errorMessage(
+					error,
+					__( 'Something went wrong — please try again.', 'nutrio' )
+				)
+			);
 		} finally {
 			setIsSaving( false );
 		}
@@ -102,9 +95,6 @@ export default function PasswordChangeModal( {
 					</>
 				) : (
 					<form onSubmit={ submit } className={ styles.form }>
-						{ errorMessage && (
-							<p className={ styles.error }>{ errorMessage }</p>
-						) }
 						<div className="nutrio-field">
 							<label htmlFor="nutrio-current-password">
 								{ __( 'Current Password', 'nutrio' ) }

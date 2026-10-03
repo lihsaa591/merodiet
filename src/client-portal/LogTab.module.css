@@ -1,10 +1,6 @@
 .empty {
 	color: var(--ink-muted);
 }
-.error {
-	color: var(--critical, #c0392b);
-	font-size: 13px;
-}
 .progress {
 	font-size: 12.5px;
 	font-weight: 600;
@@ -109,36 +105,6 @@
 .statusPill.skipped {
 	background: var(--clay-wash);
 	color: var(--clay);
-}
-
-.toast {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	padding: 10px 14px;
-	border-radius: 8px;
-	background: var(--ink);
-	color: var(--surface);
-	font-size: 13px;
-	font-weight: 600;
-	margin-bottom: 14px;
-	animation: nutrio-log-toast-in 0.2s ease-out;
-}
-.toast svg {
-	width: 16px;
-	height: 16px;
-	flex-shrink: 0;
-	color: var(--sage);
-}
-@keyframes nutrio-log-toast-in {
-	from {
-		opacity: 0;
-		transform: translateY(-4px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
 }
 
 .adHocToday {

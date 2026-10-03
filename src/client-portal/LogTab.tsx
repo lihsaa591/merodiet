@@ -20,6 +20,7 @@ import {
 import { estimateDayNutrients, formatAmount } from '../utils/nutrients';
 import type { LogEntry, LogEntryInput, Plan, PlanItem } from '../types';
 import styles from './LogTab.module.css';
+import { errorMessage, toast } from '../utils/toast';
 
 type Status = 'eaten' | 'substituted' | 'skipped';
 
@@ -114,10 +115,6 @@ export default function LogTab() {
 	const [ pendingItemId, setPendingItemId ] = useState< number | null >(
 		null
 	);
-	const [ errorMessage, setErrorMessage ] = useState< string | null >( null );
-	const [ successMessage, setSuccessMessage ] = useState< string | null >(
-		null
-	);
 	const [ history, setHistory ] = useState< LogEntry[] | undefined >(
 		undefined
 	);
@@ -159,6 +156,17 @@ export default function LogTab() {
 			.finally( () => setIsLoadingMoreHistory( false ) );
 	};
 
+	// Collapses back to the first page. The entries already fetched are
+	// trimmed locally rather than re-requested.
+	const showLessHistory = () => {
+		const cutoff = daysAgo( HISTORY_PAGE_DAYS - 1 );
+		setHistory(
+			( entries ) =>
+				entries?.filter( ( entry ) => entry.log_date >= cutoff )
+		);
+		setHistoryRangeDays( HISTORY_PAGE_DAYS );
+	};
+
 	useEffect( () => {
 		apiFetch< Plan | null >( { path: '/nutrio/v1/me/plan' } ).then(
 			setPlan,
@@ -189,23 +197,12 @@ export default function LogTab() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- `today` is stable for the component's lifetime.
 	}, [ history ] );
 
-	// Self-dismissing success toast.
-	useEffect( () => {
-		if ( ! successMessage ) {
-			return;
-		}
-
-		const timer = setTimeout( () => setSuccessMessage( null ), 2200 );
-		return () => clearTimeout( timer );
-	}, [ successMessage ] );
-
 	const logPlanItem = async (
 		item: PlanItem,
 		status: Status,
 		notesForEntry?: string
 	) => {
 		setPendingItemId( item.id );
-		setErrorMessage( null );
 
 		const payload: LogEntryInput = {
 			plan_item_id: item.id,
@@ -232,11 +229,14 @@ export default function LogTab() {
 					notes: notesForEntry || null,
 				},
 			} ) );
-			setSuccessMessage( __( 'Logged.', 'nutrio' ) );
+			toast.success( __( 'Logged.', 'nutrio' ) );
 			loadHistory();
-		} catch {
-			setErrorMessage(
-				__( 'Something went wrong — please try again.', 'nutrio' )
+		} catch ( error ) {
+			toast.error(
+				errorMessage(
+					error,
+					__( 'Something went wrong — please try again.', 'nutrio' )
+				)
 			);
 		} finally {
 			setPendingItemId( null );
@@ -246,7 +246,6 @@ export default function LogTab() {
 	const logAdHoc = async ( event: React.FormEvent ) => {
 		event.preventDefault();
 		setIsSubmittingAdHoc( true );
-		setErrorMessage( null );
 
 		try {
 			const entry = await apiFetch< LogEntry >( {
@@ -260,11 +259,14 @@ export default function LogTab() {
 			} );
 			doAction( 'nutrio.clientPortal.logCreated', entry );
 			setNotes( '' );
-			setSuccessMessage( __( 'Logged.', 'nutrio' ) );
+			toast.success( __( 'Logged.', 'nutrio' ) );
 			loadHistory();
-		} catch {
-			setErrorMessage(
-				__( 'Something went wrong — please try again.', 'nutrio' )
+		} catch ( error ) {
+			toast.error(
+				errorMessage(
+					error,
+					__( 'Something went wrong — please try again.', 'nutrio' )
+				)
 			);
 		} finally {
 			setIsSubmittingAdHoc( false );
@@ -296,9 +298,11 @@ export default function LogTab() {
 		const status = loggedByItem[ item.id ]?.status;
 		return 'substituted' === status || 'skipped' === status;
 	} ).length;
-	const eatenKcal = estimateDayNutrients(
-		eatenItems.map( toEstimateInput )
-	).kcal;
+	// Nothing eaten yet is 0 kcal, not "unknown" — the summary stays
+	// visible whenever the day has a calorie target, instead of only
+	// appearing after the first plan item is marked eaten.
+	const eatenKcal =
+		estimateDayNutrients( eatenItems.map( toEstimateInput ) ).kcal ?? 0;
 	const plannedKcal = estimateDayNutrients(
 		todaysItems.map( toEstimateInput )
 	).kcal;
@@ -325,23 +329,6 @@ export default function LogTab() {
 			</div>
 			<Panel>
 				<PanelBody>
-					{ successMessage && (
-						<div className={ styles.toast } role="status">
-							<svg
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								strokeWidth="2.5"
-							>
-								<path d="M5 13l4 4L19 7" />
-							</svg>
-							{ successMessage }
-						</div>
-					) }
-					{ errorMessage && (
-						<p className={ styles.error }>{ errorMessage }</p>
-					) }
-
 					{ undefined === plan && <LogTabSkeleton /> }
 
 					{ null === plan && (
@@ -364,7 +351,7 @@ export default function LogTab() {
 								) }
 							</p>
 
-							{ null !== eatenKcal && (
+							{ null !== plannedKcal && (
 								<div className={ styles.kcalSummary }>
 									<span className={ styles.kcalValue }>
 										{ sprintf(
@@ -377,6 +364,14 @@ export default function LogTab() {
 											formatAmount( plannedKcal, '' )
 										) }
 									</span>
+									{ adHocToday.length > 0 && (
+										<span className={ styles.kcalFootnote }>
+											{ __(
+												'Free-text entries under "Also logged today" have no calorie info, so they are not counted toward this total.',
+												'nutrio'
+											) }
+										</span>
+									) }
 									{ notCountedCount > 0 && (
 										<span className={ styles.kcalFootnote }>
 											{ sprintf(
@@ -706,6 +701,17 @@ export default function LogTab() {
 							{ isLoadingMoreHistory
 								? __( 'Loading…', 'nutrio' )
 								: __( 'Load more', 'nutrio' ) }
+						</button>
+					) }
+
+					{ history && historyRangeDays > HISTORY_PAGE_DAYS && (
+						<button
+							type="button"
+							className={ styles.loadMore }
+							onClick={ showLessHistory }
+							disabled={ isLoadingMoreHistory }
+						>
+							{ __( 'Show less', 'nutrio' ) }
 						</button>
 					) }
 				</PanelBody>

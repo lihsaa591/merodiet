@@ -15,6 +15,7 @@ import {
 } from '../utils/weight';
 import type { Measurement, MeasurementInput } from '../types';
 import styles from './MeasurementsTab.module.css';
+import { errorMessage, toast } from '../utils/toast';
 
 // How many days back the history fetches, including today — starts at
 // one page, "Load more" widens the window up to the cap. Weigh-ins are
@@ -54,7 +55,6 @@ export default function MeasurementsTab() {
 	const [ weightInput, setWeightInput ] = useState( '' );
 	const [ notesInput, setNotesInput ] = useState( '' );
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
-	const [ errorMessage, setErrorMessage ] = useState< string | null >( null );
 	const [ historyRangeDays, setHistoryRangeDays ] =
 		useState( HISTORY_PAGE_DAYS );
 	const [ isLoadingMore, setIsLoadingMore ] = useState( false );
@@ -121,11 +121,14 @@ export default function MeasurementsTab() {
 			doAction( 'nutrio.clientPortal.measurementCreated', entry );
 			setWeightInput( '' );
 			setNotesInput( '' );
-			setErrorMessage( null );
+			toast.success( __( 'Measurement saved.', 'nutrio' ) );
 			loadMeasurements();
-		} catch {
-			setErrorMessage(
-				__( 'Something went wrong — please try again.', 'nutrio' )
+		} catch ( error ) {
+			toast.error(
+				errorMessage(
+					error,
+					__( 'Something went wrong — please try again.', 'nutrio' )
+				)
 			);
 		} finally {
 			setIsSubmitting( false );
@@ -158,9 +161,6 @@ export default function MeasurementsTab() {
 			<Panel>
 				<PanelBody>
 					<form onSubmit={ submit } className={ styles.form }>
-						{ errorMessage && (
-							<p className={ styles.error }>{ errorMessage }</p>
-						) }
 						<div className="nutrio-field">
 							<label htmlFor="nutrio-weight-input">
 								{ __( 'Weight', 'nutrio' ) }

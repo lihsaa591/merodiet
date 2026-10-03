@@ -7,6 +7,7 @@ import Skeleton from '../components/ui/Skeleton';
 import PasswordChangeModal from './PasswordChangeModal';
 import type { Client } from '../types';
 import styles from './ProfileDrawer.module.css';
+import { errorMessage, toast } from '../utils/toast';
 
 // Mirrors the avatar row + a handful of field rows below it.
 function ProfileDrawerSkeleton() {
@@ -62,10 +63,6 @@ export default function ProfileDrawer( {
 	const [ values, setValues ] = useState< FormValues >( EMPTY );
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ isUploadingAvatar, setIsUploadingAvatar ] = useState( false );
-	const [ errorMessage, setErrorMessage ] = useState< string | null >( null );
-	const [ successMessage, setSuccessMessage ] = useState< string | null >(
-		null
-	);
 	const [ loadError, setLoadError ] = useState< string | null >( null );
 	const [ isPasswordModalOpen, setPasswordModalOpen ] = useState( false );
 	const [ avatarPreviewUrl, setAvatarPreviewUrl ] = useState< string | null >(
@@ -130,16 +127,6 @@ export default function ProfileDrawer( {
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- only re-run when the drawer opens, not on every client/applyClient identity change.
 	}, [ isOpen ] );
 
-	// Self-dismissing success toast, cleared whenever a new one is shown.
-	useEffect( () => {
-		if ( ! successMessage ) {
-			return;
-		}
-
-		const timer = setTimeout( () => setSuccessMessage( null ), 2500 );
-		return () => clearTimeout( timer );
-	}, [ successMessage ] );
-
 	const setField =
 		( field: keyof FormValues ) =>
 		(
@@ -153,7 +140,6 @@ export default function ProfileDrawer( {
 	const handleSubmit = async ( event: React.FormEvent ) => {
 		event.preventDefault();
 		setIsSaving( true );
-		setErrorMessage( null );
 
 		try {
 			const updated = await apiFetch< Client >( {
@@ -172,10 +158,13 @@ export default function ProfileDrawer( {
 				},
 			} );
 			applyClient( updated );
-			setSuccessMessage( __( 'Saved.', 'nutrio' ) );
-		} catch {
-			setErrorMessage(
-				__( 'Something went wrong — please try again.', 'nutrio' )
+			toast.success( __( 'Saved.', 'nutrio' ) );
+		} catch ( error ) {
+			toast.error(
+				errorMessage(
+					error,
+					__( 'Something went wrong — please try again.', 'nutrio' )
+				)
 			);
 		} finally {
 			setIsSaving( false );
@@ -195,7 +184,6 @@ export default function ProfileDrawer( {
 		// finishes, so "Change photo" feels instant.
 		setAvatarPreviewUrl( URL.createObjectURL( file ) );
 		setIsUploadingAvatar( true );
-		setErrorMessage( null );
 
 		try {
 			const formData = new FormData();
@@ -207,13 +195,16 @@ export default function ProfileDrawer( {
 				body: formData,
 			} );
 			applyClient( updated );
-			setSuccessMessage( __( 'Photo updated.', 'nutrio' ) );
-		} catch {
+			toast.success( __( 'Photo updated.', 'nutrio' ) );
+		} catch ( error ) {
 			setAvatarPreviewUrl( null );
-			setErrorMessage(
-				__(
-					'Could not upload that image — please try a JPEG, PNG, or WebP file.',
-					'nutrio'
+			toast.error(
+				errorMessage(
+					error,
+					__(
+						'Could not upload that image — please try a JPEG, PNG, or WebP file.',
+						'nutrio'
+					)
 				)
 			);
 		} finally {
@@ -229,27 +220,10 @@ export default function ProfileDrawer( {
 				title={ __( 'My Profile', 'nutrio' ) }
 				onClose={ onClose }
 			>
-				{ successMessage && (
-					<div className={ styles.toast } role="status">
-						<svg
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="2.5"
-						>
-							<path d="M5 13l4 4L19 7" />
-						</svg>
-						{ successMessage }
-					</div>
-				) }
 				{ loadError && <p className={ styles.error }>{ loadError }</p> }
 				{ ! loadError && ! client && <ProfileDrawerSkeleton /> }
 				{ ! loadError && client && (
 					<form onSubmit={ handleSubmit } className={ styles.form }>
-						{ errorMessage && (
-							<p className={ styles.error }>{ errorMessage }</p>
-						) }
-
 						<div className={ styles.avatarRow }>
 							{ avatarPreviewUrl || client.avatar_url ? (
 								<button
