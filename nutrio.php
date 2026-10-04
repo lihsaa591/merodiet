@@ -2,9 +2,9 @@
 /**
  * Plugin Name:       Nutrio – Dietitian Practice Manager
  * Plugin URI:        https://github.com/lihsaa591/nutrio
- * Description:       Dietitian and nutritionist practice manager: client records, meal plans, food logs and USDA nutrition data in your WordPress dashboard.
+ * Description:       Dietitian and nutritionist practice manager: client records, meal plans, food logs and USDA nutrition data in one dashboard.
  * Version:           0.1.0
- * Requires at least: 6.4
+ * Requires at least: 6.9
  * Requires PHP:      8.1
  * Author:            Nutrio Contributors
  * License:           GPL-2.0-or-later

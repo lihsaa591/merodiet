@@ -1,14 +1,14 @@
 === Nutrio – Dietitian Practice Manager ===
 Contributors: lihsaa591
 Tags: dietitian, nutritionist, meal planner, nutrition, client management
-Requires at least: 6.4
+Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 8.1
 Stable tag: 0.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Dietitian and nutritionist practice manager: client records, meal plans, food logs and USDA nutrition data in your WordPress dashboard.
+Dietitian and nutritionist practice manager: client records, meal plans, food logs and USDA nutrition data in one dashboard.
 
 == Description ==
 
@@ -66,7 +66,7 @@ Data is preserved by default. To remove all Nutrio tables, options and roles whe
 
 = What are the requirements? =
 
-WordPress 6.4+ and PHP 8.1+.
+WordPress 6.9+ and PHP 8.1+.
 
 == Screenshots ==
 
