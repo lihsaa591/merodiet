@@ -49,6 +49,17 @@ Registered dietitians, nutritionists and nutrition coaches who work with individ
 * Nutrio adds two user roles, `practitioner` and `nutrition_client`. All access is limited to these roles.
 * Nutrio is a record-keeping and planning tool. It does not give medical advice.
 
+= Roadmap =
+
+Nutrio is at an early stage. These features are planned and are not available yet. There are no release dates, and plans can change.
+
+* **Analytics.** Deeper reports on client progress and compliance over time.
+* **White label.** Use your own practice name and branding in the app, the portal and the emails.
+* **GDPR tools.** Export and erase a client's data on request, to help you meet your privacy duties.
+* **Public REST API.** Documented endpoints so you can connect Nutrio to your own tools.
+* **MCP connector.** Let compatible AI assistants work with your Nutrio data, only when you allow it.
+* And more. Have an idea? Tell us at https://github.com/lihsaa591/nutrio/issues
+
 = Use of 3rd Party Services =
 
 Nutrio has one third-party service, and it is only contacted by a practitioner searching for or loading a food. No client or personal data is sent. Nutrio does not include tracking, advertising or usage telemetry.
