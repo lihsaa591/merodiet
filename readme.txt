@@ -29,19 +29,21 @@ Nutrio gives dietitians and nutritionists a client and meal-planning workspace i
 
 Nutrio adds two roles, `practitioner` and `nutrition_client`, and gates all access through them.
 
-Nutrio is a record-keeping and planning tool. It does not give medical advice. It is not affiliated with or endorsed by the U.S. Department of Agriculture (USDA).
+Nutrio is a record-keeping and planning tool. It does not give medical advice.
 
-= External services =
+= Use of 3rd Party Services =
 
-Nutrio connects to the USDA FoodData Central API to search foods and retrieve nutrient data.
+Nutrio has one third-party service, and it is only contacted by a practitioner searching for or loading a food. No client or personal data is sent. Nutrio does not include tracking, advertising or usage telemetry.
 
-* Service: USDA FoodData Central (https://fdc.nal.usda.gov/)
-* Endpoint: https://api.nal.usda.gov/fdc/v1
-* Data sent: the food search text or food ID you request, and the API key you enter in Nutrio settings. No client or personal data is sent.
-* When: only when a practitioner searches for or loads a food that is not already cached locally.
-* Terms of use and data policy: https://fdc.nal.usda.gov/api-guide.html and https://www.usda.gov/privacy-policy
+* **USDA FoodData Central** (food search and nutrient data): [Terms of Use](https://fdc.nal.usda.gov/api-guide.html) | [Privacy Policy](https://www.usda.gov/privacy-policy)
+  * Endpoint: https://api.nal.usda.gov/fdc/v1
+  * Data sent: the food search text or food ID being requested, and the API key you enter in Nutrio settings.
+  * When: only when a food is not already cached locally.
+  * You need your own free API key: https://fdc.nal.usda.gov/api-key-signup.html
 
-You must supply your own free API key from https://fdc.nal.usda.gov/api-key-signup.html.
+Emails (client invitations, plan notifications, the daily digest) are sent through your site's own mail setup using `wp_mail()`. Nutrio does not connect to an email service itself, so any SMTP or email plugin you use applies.
+
+Nutrio is not affiliated with or endorsed by the U.S. Department of Agriculture (USDA).
 
 = Data and privacy =
 
