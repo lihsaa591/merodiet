@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="Nutrio">
-	<rect width="256" height="256" fill="#4e7d5b"/>
-	<g transform="translate(27.1 47.9) scale(0.26)" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round">
-		<path d="M262 398C240 230 400 70 664 62C672 230 590 430 410 455C375 460 345 455 322 447" stroke-width="46"/>
-		<path d="M40 320C110 305 195 350 190 430C185 475 130 480 95 470C50 455 30 380 40 320Z" stroke-width="30"/>
-		<path d="M105 380L178 447" stroke-width="22"/>
-		<path d="M212 568L338 420L506 222" stroke-width="40"/>
-	</g>
-</svg>
