@@ -12,24 +12,42 @@ Dietitian and nutritionist practice manager: client records, meal plans, food lo
 
 == Description ==
 
-Nutrio gives dietitians and nutritionists a client and meal-planning workspace inside WordPress, plus a portal where clients log meals and follow their plan.
+Nutrio is a practice management tool for dietitians and nutritionists. It lives in your WordPress admin, so you can keep your clients, meal plans and progress notes in one place on your own website, without a separate monthly subscription.
 
-**For practitioners**
+You build a meal plan, give it to a client, and the client follows it from a simple page on your site. You then see how they are doing.
 
-* Client management with invitations and a dashboard of compliance and recent activity.
-* Meal plans built from days and items, with a recipe builder and custom foods.
-* Nutrient calculations backed by USDA FoodData Central.
-* Email digests and customizable email templates.
-* Settings to keep or delete all data when the plugin is deleted.
+= How it works =
 
-**For clients**
+1. **Build a plan.** Pick foods and recipes, and see the calories and nutrients add up as you go.
+2. **Give it to a client.** Invite a client by email. They get their own login and see only their own plan.
+3. **The client logs their day.** They tick off meals they ate, note any swaps, and record weight and other measurements.
+4. **You review progress.** A dashboard shows how all your clients are doing, and what was planned against what was eaten for each person.
 
-* A front-end portal where clients sign in, view their plan and log meals.
-* Accessibility-tested interface (axe) with a responsive layout for phones.
+= For practitioners =
 
-Nutrio adds two roles, `practitioner` and `nutrition_client`, and gates all access through them.
+* **Client list.** Add clients, send invitations, and see who has logged in.
+* **Meal plans.** Build plans made of days and meals, using a recipe builder and your own custom foods.
+* **Nutrition numbers.** Calories and nutrients come from USDA FoodData Central, a free and trusted public food database.
+* **Fixed plan totals.** When you give a plan to a client, its totals are saved at that moment. Later changes to the food data will not quietly change a plan the client already has.
+* **Dashboard.** See compliance and recent activity across your clients.
+* **Emails.** Edit the emails sent to clients, and turn on a daily digest of client activity.
+* **Your data, your choice.** Keep or delete all Nutrio data when you delete the plugin, with a setting under Nutrio > Settings.
 
-Nutrio is a record-keeping and planning tool. It does not give medical advice.
+= For clients =
+
+* **Their own portal.** Clients sign in at `yoursite.com/client-portal/`, or you can place the portal on any page with the `[nutrio_client_portal]` shortcode.
+* **Easy to use on a phone.** The layout adapts to small screens.
+* **Accessibility.** The interface is tested with automated accessibility checks (axe).
+
+= Who is it for? =
+
+Registered dietitians, nutritionists and nutrition coaches who work with individual clients and want their plans and records on their own WordPress site.
+
+= Good to know =
+
+* You need a free USDA FoodData Central API key. Nutrio guides you to get one in Settings.
+* Nutrio adds two user roles, `practitioner` and `nutrition_client`. All access is limited to these roles.
+* Nutrio is a record-keeping and planning tool. It does not give medical advice.
 
 = Use of 3rd Party Services =
 
