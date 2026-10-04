@@ -1,0 +1,18 @@
+.badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--warning);
+	background: var(--warning-wash);
+	padding: 4px 10px;
+	border-radius: 999px;
+}
+.badge::before {
+	content: '';
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--warning);
+}

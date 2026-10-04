@@ -27,21 +27,45 @@ npm install
 npm run build      # or: npm start, for watch mode
 ```
 
+To use `npm start`'s hot reload, add this to the WordPress install's
+`wp-config.php` (before `NUTRIO_DEVELOPMENT` is otherwise defined —
+i.e. before the line that loads plugins) — it defaults to `false`,
+regardless of `WP_DEBUG`, so the plugin never tries to load its JS
+from a dev server that isn't running:
+
+```php
+define( 'NUTRIO_DEVELOPMENT', true );
+```
+
 Then point `wp-env` (or a local WordPress install) at this directory as a plugin:
 
 ```bash
 npx wp-env start
 ```
 
+### Accessibility scans
+
+`npm run test:e2e:a11y` starts wp-env, seeds a practitioner/client/plan
+fixture, and runs axe-core against 8 core admin and client-portal
+screens (see `tests/e2e/`). It is run locally only, not in CI — see
+`docs/superpowers/specs/2026-09-26-accessibility-testing-design.md`
+for the full design and what's deliberately out of scope for this
+first pass. This wp-env instance is dedicated to automated testing;
+NUTRIO_DEVELOPMENT is forced off here so the plugin loads from the
+built files rather than a phantom dev server. Day-to-day interactive
+development with hot reload happens against a separate WordPress
+install. Open `playwright-report/index.html` after a local run for
+full per-violation detail.
+
 ## Requirements
 
 - PHP 8.1+
-- WordPress 6.4+
+- WordPress 6.9+
 - A free [USDA FoodData Central API key](https://fdc.nal.usda.gov/api-key-signup.html) (per-practitioner, entered in plugin settings)
 
 ## Status
 
-Actively in development. See the project plan for phase-by-phase scope; not yet released.
+Pre-release (0.1.x), being prepared for submission to the WordPress.org plugin directory.
 
 ## License
 

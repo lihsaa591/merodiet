@@ -1,0 +1,17 @@
+.panel {
+	background: var(--surface);
+	border: 1px solid var(--line);
+	border-radius: var(--radius);
+}
+.panelHead {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 16px 18px 0;
+}
+.panelHead h3 {
+	font-size: 15.5px;
+}
+.panelBody {
+	padding: 14px 18px 18px;
+}

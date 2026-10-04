@@ -1,0 +1,316 @@
+import { useEffect, useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import Avatar from '../../components/ui/Avatar';
+import Button from '../../components/ui/Button';
+import UnsavedBadge from '../../components/ui/UnsavedBadge';
+import Tooltip from '../../components/ui/Tooltip';
+import InfoIcon from '../../components/ui/InfoIcon';
+import { useGlobalDirtyState } from '../../hooks/useGlobalDirtyState';
+import { confirmDialog } from '../../utils/confirmDialog';
+import { errorMessage, toast } from '../../utils/toast';
+import { SEND_INVITE_HELP_TEXT } from '../../utils/helpText';
+import type { Client, ClientInput } from '../../types';
+
+interface FormValues {
+	first_name: string;
+	last_name: string;
+	email: string;
+	allergies: string;
+	goals: string;
+	dietary_restrictions: string;
+}
+
+const EMPTY: FormValues = {
+	first_name: '',
+	last_name: '',
+	email: '',
+	allergies: '',
+	goals: '',
+	dietary_restrictions: '',
+};
+
+// Checked by default: the common case is wanting the client to get
+// portal access right away, without a separate "Invite" step to
+// remember afterward.
+const DEFAULT_SEND_INVITE = true;
+
+interface ClientFormProps {
+	client?: Client | null;
+	onSubmit: ( data: ClientInput ) => Promise< void >;
+	onCancel: () => void;
+	/** Reports dirty state up so a wrapping Drawer's X/backdrop can also guard against discarding changes. */
+	onDirtyChange?: ( isDirty: boolean ) => void;
+}
+
+// Shared create/edit form. `client` is null for create, or an existing
+// client record for edit — the only difference the caller needs to
+// handle is which store action it dispatches on submit.
+export default function ClientForm( {
+	client,
+	onSubmit,
+	onCancel,
+	onDirtyChange,
+}: ClientFormProps ) {
+	const [ values, setValues ] = useState< FormValues >( () =>
+		client
+			? {
+					first_name: client.first_name,
+					last_name: client.last_name,
+					email: client.email,
+					allergies: ( client.allergies ?? [] ).join( ', ' ),
+					goals: client.goals ?? '',
+					dietary_restrictions: client.dietary_restrictions ?? '',
+			  }
+			: EMPTY
+	);
+	const [ sendInvite, setSendInvite ] = useState( DEFAULT_SEND_INVITE );
+	const [ isSaving, setIsSaving ] = useState( false );
+	const { isDirty, markClean } = useGlobalDirtyState( values );
+
+	useEffect( () => {
+		onDirtyChange?.( isDirty );
+	}, [ isDirty, onDirtyChange ] );
+
+	const setField =
+		( field: keyof FormValues ) =>
+		(
+			event: React.ChangeEvent< HTMLInputElement | HTMLTextAreaElement >
+		) =>
+			setValues( ( prev ) => ( {
+				...prev,
+				[ field ]: event.target.value,
+			} ) );
+
+	const handleSubmit = async ( event: React.FormEvent ) => {
+		event.preventDefault();
+		setIsSaving( true );
+
+		try {
+			await onSubmit( {
+				first_name: values.first_name,
+				last_name: values.last_name,
+				email: values.email,
+				allergies: values.allergies
+					.split( ',' )
+					.map( ( item ) => item.trim() )
+					.filter( Boolean ),
+				goals: values.goals,
+				dietary_restrictions: values.dietary_restrictions,
+				...( client ? {} : { send_invite: sendInvite } ),
+			} );
+			markClean();
+		} catch ( error ) {
+			toast.error(
+				errorMessage(
+					error,
+					__( 'Could not save this client.', 'nutrio' )
+				)
+			);
+		} finally {
+			setIsSaving( false );
+		}
+	};
+
+	const handleCancel = async () => {
+		if (
+			! isDirty ||
+			( await confirmDialog( {
+				message: __( 'Discard unsaved changes?', 'nutrio' ),
+				confirmLabel: __( 'Discard', 'nutrio' ),
+				destructive: true,
+			} ) )
+		) {
+			onCancel();
+		}
+	};
+
+	return (
+		<form
+			onSubmit={ handleSubmit }
+			style={ { display: 'flex', flexDirection: 'column', gap: '16px' } }
+		>
+			{ client && (
+				<div
+					style={ {
+						display: 'flex',
+						alignItems: 'center',
+						gap: '12px',
+					} }
+				>
+					<Avatar
+						id={ client.id }
+						firstName={ client.first_name }
+						lastName={ client.last_name }
+						avatarUrl={ client.avatar_url }
+						size="lg"
+					/>
+					<span
+						style={ {
+							fontSize: '12px',
+							color: 'var(--ink-muted)',
+						} }
+					>
+						{ client.avatar_url
+							? __(
+									'Uploaded by the client from their portal.',
+									'nutrio'
+							  )
+							: __(
+									'No photo yet — set by the client from their portal.',
+									'nutrio'
+							  ) }
+					</span>
+				</div>
+			) }
+			<div className="nutrio-field">
+				<label htmlFor="nutrio-first-name">
+					{ __( 'First name', 'nutrio' ) }
+					<RequiredMark />
+				</label>
+				<input
+					id="nutrio-first-name"
+					type="text"
+					value={ values.first_name }
+					onChange={ setField( 'first_name' ) }
+					required
+				/>
+			</div>
+			<div className="nutrio-field">
+				<label htmlFor="nutrio-last-name">
+					{ __( 'Last name', 'nutrio' ) }
+					<RequiredMark />
+				</label>
+				<input
+					id="nutrio-last-name"
+					type="text"
+					value={ values.last_name }
+					onChange={ setField( 'last_name' ) }
+					required
+				/>
+			</div>
+			<div className="nutrio-field">
+				<label htmlFor="nutrio-email">
+					{ __( 'Email', 'nutrio' ) }
+					<RequiredMark />
+				</label>
+				<input
+					id="nutrio-email"
+					type="email"
+					value={ values.email }
+					onChange={ setField( 'email' ) }
+					required
+				/>
+			</div>
+			<div className="nutrio-field">
+				<label htmlFor="nutrio-allergies">
+					{ __( 'Allergies', 'nutrio' ) }
+				</label>
+				<input
+					id="nutrio-allergies"
+					type="text"
+					value={ values.allergies }
+					onChange={ setField( 'allergies' ) }
+					placeholder={ __( 'Peanuts, shellfish', 'nutrio' ) }
+				/>
+				<div className="nutrio-field-hint">
+					{ __( 'Comma-separated', 'nutrio' ) }
+				</div>
+			</div>
+			<div className="nutrio-field">
+				<label htmlFor="nutrio-dietary-restrictions">
+					{ __( 'Dietary restrictions', 'nutrio' ) }
+				</label>
+				<textarea
+					id="nutrio-dietary-restrictions"
+					rows={ 2 }
+					value={ values.dietary_restrictions }
+					onChange={ setField( 'dietary_restrictions' ) }
+					placeholder={ __(
+						'Vegetarian, low-sodium, halal…',
+						'nutrio'
+					) }
+				/>
+			</div>
+			<div className="nutrio-field">
+				<label htmlFor="nutrio-goals">
+					{ __( 'Goals', 'nutrio' ) }
+				</label>
+				<textarea
+					id="nutrio-goals"
+					rows={ 3 }
+					value={ values.goals }
+					onChange={ setField( 'goals' ) }
+					placeholder={ __(
+						'Weight management, improve energy levels…',
+						'nutrio'
+					) }
+				/>
+			</div>
+
+			{ ! client && (
+				<label
+					htmlFor="nutrio-send-invite"
+					style={ {
+						display: 'flex',
+						alignItems: 'center',
+						gap: '6px',
+					} }
+				>
+					<input
+						id="nutrio-send-invite"
+						type="checkbox"
+						checked={ sendInvite }
+						onChange={ ( event ) =>
+							setSendInvite( event.target.checked )
+						}
+					/>
+					{ __( 'Send portal invite now', 'nutrio' ) }
+					<Tooltip content={ SEND_INVITE_HELP_TEXT }>
+						<InfoIcon
+							label={ __(
+								'What does sending the invite now do?',
+								'nutrio'
+							) }
+						/>
+					</Tooltip>
+				</label>
+			) }
+
+			{ isDirty && <UnsavedBadge /> }
+
+			<div style={ { display: 'flex', gap: '10px' } }>
+				<Button
+					variant="primary"
+					type="submit"
+					disabled={ isSaving }
+					style={ { flex: 1, justifyContent: 'center' } }
+				>
+					{ client
+						? __( 'Save changes', 'nutrio' )
+						: __( 'Add client', 'nutrio' ) }
+				</Button>
+				<Button
+					variant="ghost"
+					type="button"
+					onClick={ handleCancel }
+					disabled={ isSaving }
+				>
+					{ __( 'Cancel', 'nutrio' ) }
+				</Button>
+			</div>
+		</form>
+	);
+}
+
+/**
+ * A field's `required` attribute already tells assistive tech it's
+ * mandatory — this is purely the sighted-user visual cue, so it's hidden
+ * from the accessibility tree rather than announced twice.
+ */
+function RequiredMark() {
+	return (
+		<span style={ { color: 'var(--critical)' } } aria-hidden="true">
+			{ ' *' }
+		</span>
+	);
+}

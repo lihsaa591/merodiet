@@ -1,0 +1,54 @@
+.bar {
+	position: fixed;
+	left: 50%;
+	bottom: 28px;
+	transform: translateX(-50%);
+	z-index: 50;
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 10px 14px;
+	background: var(--surface-raised);
+	border: 1px solid var(--line-strong);
+	border-radius: 14px;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+	max-width: calc(100vw - 32px);
+	flex-wrap: nowrap;
+	overflow-x: auto;
+}
+.count {
+	font-size: 13px;
+	font-weight: 700;
+	color: var(--ink);
+	flex-shrink: 0;
+	padding-left: 4px;
+}
+.actions {
+	display: flex;
+	gap: 8px;
+	flex-shrink: 0;
+}
+.clear {
+	flex-shrink: 0;
+	font-family: inherit;
+	font-size: 12.5px;
+	font-weight: 600;
+	color: var(--ink-muted);
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 0 6px 0 4px;
+}
+.clear:hover {
+	color: var(--ink);
+}
+
+@media (max-width: 560px) {
+	.bar {
+		left: 16px;
+		right: 16px;
+		bottom: 16px;
+		transform: none;
+		max-width: none;
+	}
+}

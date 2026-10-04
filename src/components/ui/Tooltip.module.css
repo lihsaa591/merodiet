@@ -1,0 +1,76 @@
+.wrapper {
+	position: relative;
+	display: inline-flex;
+	/* Without this, an absolutely positioned bubble can still inflate an
+	   ancestor's intrinsic size in table auto-layout (e.g. widening a
+	   table column that hosts a tooltipped icon button) even though it's
+	   out of normal flow. contain: layout stops that. */
+	contain: layout;
+}
+.bubble {
+	position: absolute;
+	/* Callers (e.g. .nutrio-row-actions) can set --tooltip-left/-right/-tx to
+	   anchor the bubble to the trigger's edge instead of centering it, so it
+	   doesn't get clipped by an overflow container at the viewport edge. */
+	left: var(--tooltip-left, 50%);
+	right: var(--tooltip-right, auto);
+	transform: translateX(var(--tooltip-tx, -50%)) translateY(4px);
+	width: max-content;
+	max-width: 220px;
+	padding: 6px 10px;
+	border-radius: 6px;
+	background: var(--ink);
+	color: var(--surface);
+	font-size: 12px;
+	font-weight: 500;
+	line-height: 1.4;
+	text-align: center;
+	pointer-events: none;
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.12s ease, transform 0.12s ease;
+	z-index: 30;
+}
+.top {
+	bottom: calc(100% + 5px);
+}
+.bottom {
+	top: calc(100% + 5px);
+	transform: translateX(var(--tooltip-tx, -50%)) translateY(-4px);
+}
+.wrapper:hover .bubble,
+.wrapper:focus-within .bubble {
+	opacity: 1;
+	visibility: visible;
+	transform: translateX(var(--tooltip-tx, -50%)) translateY(0);
+}
+
+/* Arrow lives on the wrapper (not the bubble) so it always points at the
+   trigger's center, even when the bubble itself is edge-anchored. */
+.wrapper::after {
+	content: '';
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	border: 5px solid transparent;
+	pointer-events: none;
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.12s ease;
+	z-index: 30;
+}
+.arrowTop::after {
+	bottom: 100%;
+	border-top-color: var(--ink);
+	border-bottom-width: 0;
+}
+.arrowBottom::after {
+	top: 100%;
+	border-bottom-color: var(--ink);
+	border-top-width: 0;
+}
+.wrapper:hover::after,
+.wrapper:focus-within::after {
+	opacity: 1;
+	visibility: visible;
+}

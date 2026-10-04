@@ -1,0 +1,2134 @@
+# Copyright (C) 2026 Aashil
+# This file is distributed under the GPL-2.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nutrio – Dietitian Practice Manager 0.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/nutrio\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-10-04T07:09:29+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: nutrio\n"
+
+#. Plugin Name of the plugin
+#: nutrio.php
+msgid "Nutrio – Dietitian Practice Manager"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: nutrio.php
+msgid "https://github.com/lihsaa591/nutrio"
+msgstr ""
+
+#. Description of the plugin
+#: nutrio.php
+msgid "Dietitian and nutritionist practice manager: client records, meal plans, food logs and USDA nutrition data in one dashboard."
+msgstr ""
+
+#. Author of the plugin
+#: nutrio.php
+msgid "Aashil"
+msgstr ""
+
+#: config/app.php:94
+#: config/app.php:95
+msgid "Nutrio"
+msgstr ""
+
+#: includes/Clients/ClientInviteService.php:76
+#: includes/RestApi/PlansController.php:336
+msgid "Client not found."
+msgstr ""
+
+#: includes/Clients/ClientInviteService.php:100
+msgid "A WordPress account with this email already exists. Link or resolve it manually before inviting this client."
+msgstr ""
+
+#: includes/Clients/PortalPage.php:278
+#: includes/Clients/PortalPage.php:349
+#: includes/Clients/PortalPage.php:391
+#: includes/Clients/PortalPage.php:494
+msgid "Your session expired — please try again."
+msgstr ""
+
+#: includes/Clients/PortalPage.php:290
+#: includes/Clients/PortalPage.php:347
+#: includes/Clients/PortalPage.php:397
+msgid "Please enter your username or email address."
+msgstr ""
+
+#: includes/Clients/PortalPage.php:293
+#: includes/Clients/PortalPage.php:348
+msgid "Please enter your password."
+msgstr ""
+
+#: includes/Clients/PortalPage.php:350
+#: includes/Clients/PortalPage.php:506
+#: includes/RestApi/MeController.php:486
+msgid "The two passwords you entered do not match."
+msgstr ""
+
+#: includes/Clients/PortalPage.php:351
+msgid "This password reset link has expired. Please request a new one."
+msgstr ""
+
+#: includes/Clients/PortalPage.php:352
+msgid "This password reset link is no longer valid. Please request a new one."
+msgstr ""
+
+#: includes/Clients/PortalPage.php:358
+msgid "Incorrect username or password."
+msgstr ""
+
+#: includes/Clients/PortalPage.php:417
+#: includes/Clients/PortalPage.php:425
+#: includes/Clients/PortalPage.php:556
+#: includes/Clients/PortalPage.php:564
+msgid "Reset Password"
+msgstr ""
+
+#: includes/Clients/PortalPage.php:430
+#: includes/Clients/PortalPage.php:431
+#: includes/Clients/PortalPage.php:569
+#: includes/Clients/PortalPage.php:570
+#: includes/Clients/PortalPage.php:661
+#: includes/Clients/PortalPage.php:662
+#: build/admin.js:2
+#: build/client-portal.js:1
+msgid "Toggle dark mode"
+msgstr ""
+
+#: includes/Clients/PortalPage.php:439
+msgid "Check your email for a link to reset your password."
+msgstr ""
+
+#: includes/Clients/PortalPage.php:447
+#: includes/Clients/PortalPage.php:677
+msgid "Username or Email Address"
+msgstr ""
+
+#: includes/Clients/PortalPage.php:452
+msgid "Get New Password"
+msgstr ""
+
+#: includes/Clients/PortalPage.php:458
+#: includes/Clients/PortalPage.php:603
+msgid "← Back to log in"
+msgstr ""
+
+#: includes/Clients/PortalPage.php:504
+msgid "Please enter a new password."
+msgstr ""
+
+#: includes/Clients/PortalPage.php:582
+#: build/client-portal.js:1
+msgid "New Password"
+msgstr ""
+
+#: includes/Clients/PortalPage.php:586
+#: build/client-portal.js:1
+msgid "Confirm New Password"
+msgstr ""
+
+#: includes/Clients/PortalPage.php:591
+msgid "Save New Password"
+msgstr ""
+
+#: includes/Clients/PortalPage.php:597
+msgid "Request a new reset link"
+msgstr ""
+
+#: includes/Clients/PortalPage.php:627
+#: includes/Clients/PortalPage.php:655
+#: includes/Clients/PortalPage.php:822
+#: build/admin.js:8
+msgid "Client Portal"
+msgstr ""
+
+#: includes/Clients/PortalPage.php:681
+msgid "Password"
+msgstr ""
+
+#: includes/Clients/PortalPage.php:686
+msgid "Remember Me"
+msgstr ""
+
+#: includes/Clients/PortalPage.php:690
+msgid "Log In"
+msgstr ""
+
+#: includes/Clients/PortalPage.php:695
+msgid "Forgot your password?"
+msgstr ""
+
+#: includes/Clients/PortalPage.php:727
+msgid "You are already logged in — go to your portal →"
+msgstr ""
+
+#: includes/Email/DigestMailer.php:90
+#: build/admin.js:2
+#: build/client-portal.js:1
+msgid "Logged today"
+msgstr ""
+
+#: includes/Email/DigestMailer.php:91
+msgid "No activity"
+msgstr ""
+
+#. translators: %s: the site's name
+#: includes/Email/Mailer.php:129
+#: build/admin.js:31
+#, php-format,js-format
+msgid "Sent by %s. If you weren't expecting this email, you can safely ignore it."
+msgstr ""
+
+#: includes/Nutrition/FoodDataClient.php:128
+msgid "USDA FoodData Central rate limit exceeded."
+msgstr ""
+
+#: includes/Nutrition/FoodDataClient.php:132
+msgid "Food not found."
+msgstr ""
+
+#. translators: %d: HTTP status code
+#: includes/Nutrition/FoodDataClient.php:145
+#, php-format
+msgid "USDA FoodData Central returned an unexpected status: %d"
+msgstr ""
+
+#: includes/Nutrition/FoodDataClient.php:154
+msgid "USDA FoodData Central returned an unreadable response."
+msgstr ""
+
+#: includes/Nutrition/FoodDataClient.php:161
+msgid "USDA FoodData Central returned an unexpected status."
+msgstr ""
+
+#: includes/Nutrition/FoodDataService.php:94
+msgid "This food cannot be reliably converted to a per-100g nutrient profile — for example, its serving size is not gram-based, or USDA did not report identifiable nutrient values for it."
+msgstr ""
+
+#: includes/Repositories/LogEntryRepository.php:56
+#: includes/Repositories/MeasurementRepository.php:48
+msgid "Could not save the entry."
+msgstr ""
+
+#: includes/RestApi/AbstractClientController.php:54
+msgid "No client record is linked to this account."
+msgstr ""
+
+#. translators: %s: required WordPress capability
+#: includes/RestApi/AbstractController.php:95
+#, php-format
+msgid "You do not have the \"%s\" capability required for this request."
+msgstr ""
+
+#: includes/RestApi/AbstractPractitionerController.php:55
+#: includes/RestApi/AbstractPractitionerController.php:62
+msgid "Resource not found."
+msgstr ""
+
+#: includes/RestApi/ClientsController.php:498
+msgid "not invited (added without sending an invite)"
+msgstr ""
+
+#. translators: %s: the reason the invite failed
+#: includes/RestApi/ClientsController.php:504
+#, php-format
+msgid "invite failed: %s"
+msgstr ""
+
+#: includes/RestApi/ClientsController.php:509
+msgid "invited"
+msgstr ""
+
+#: includes/RestApi/CustomFoodsController.php:182
+msgid "This food is used in at least one recipe and cannot be deleted. Remove it from every recipe first."
+msgstr ""
+
+#: includes/RestApi/MeController.php:428
+msgid "No image file was uploaded."
+msgstr ""
+
+#: includes/RestApi/MeController.php:440
+msgid "Please upload a JPEG, PNG, or WebP image."
+msgstr ""
+
+#: includes/RestApi/MeController.php:478
+msgid "Your current password is incorrect."
+msgstr ""
+
+#: includes/RestApi/MeController.php:482
+msgid "Your new password must be at least 8 characters."
+msgstr ""
+
+#: includes/RestApi/PlansController.php:262
+msgid "An assigned plan cannot be edited."
+msgstr ""
+
+#: includes/RestApi/PlansController.php:301
+msgid "An assigned plan cannot be deleted."
+msgstr ""
+
+#: includes/RestApi/PlansController.php:329
+msgid "This plan has already been assigned."
+msgstr ""
+
+#. translators: 1: the already-assigned plan's title, 2: its end date
+#: includes/RestApi/PlansController.php:346
+#, php-format
+msgid "This client already has an active plan (\"%1$s\", through %2$s). Unassign it before assigning another for an overlapping date range."
+msgstr ""
+
+#: includes/RestApi/PlansController.php:398
+msgid "This plan is not currently assigned."
+msgstr ""
+
+#: includes/RestApi/SettingsController.php:277
+#: includes/RestApi/SettingsController.php:308
+msgid "Unknown email template."
+msgstr ""
+
+#: includes/RestApi/SettingsController.php:344
+msgid "Enter a valid email address."
+msgstr ""
+
+#: includes/RestApi/SettingsController.php:383
+msgid "Send time must be in HH:MM (24-hour) format."
+msgstr ""
+
+#: nutrio.php:58
+msgid "Nutrio: run \"composer install\" before activating this plugin."
+msgstr ""
+
+#: build/admin.js:1
+msgid "Confirm"
+msgstr ""
+
+#: build/admin.js:1
+#: build/admin.js:5
+#: build/admin.js:13
+#: build/admin.js:16
+#: build/admin.js:19
+#: build/admin.js:21
+#: build/admin.js:25
+#: build/admin.js:31
+#: build/client-portal.js:1
+#: build/client-portal.js:5
+msgid "Cancel"
+msgstr ""
+
+#: build/admin.js:1
+msgid "OK"
+msgstr ""
+
+#: build/admin.js:1
+#: build/client-portal.js:1
+msgid "Dismiss"
+msgstr ""
+
+#: build/admin.js:1
+#: build/admin.js:3
+#: build/client-portal.js:1
+msgid "Close"
+msgstr ""
+
+#: build/admin.js:1
+msgid "This is a Pro feature"
+msgstr ""
+
+#. translators: %s: the locked feature's name
+#: build/admin.js:2
+#, js-format
+msgid "%s is part of Nutrio Pro. Upgrade to unlock it for your practice."
+msgstr ""
+
+#: build/admin.js:2
+msgid "Upgrade to Pro"
+msgstr ""
+
+#: build/admin.js:2
+msgid "Maybe later"
+msgstr ""
+
+#: build/admin.js:2
+#: build/client-portal.js:1
+msgid "Dashboard"
+msgstr ""
+
+#: build/admin.js:2
+#: build/admin.js:6
+msgid "Clients"
+msgstr ""
+
+#: build/admin.js:2
+msgid "Recipes"
+msgstr ""
+
+#: build/admin.js:2
+msgid "Plans"
+msgstr ""
+
+#: build/admin.js:2
+msgid "Food database"
+msgstr ""
+
+#: build/admin.js:2
+#: build/admin.js:31
+msgid "Settings"
+msgstr ""
+
+#: build/admin.js:2
+msgid "Back to WordPress"
+msgstr ""
+
+#: build/admin.js:2
+msgid "Analytics"
+msgstr ""
+
+#: build/admin.js:2
+#: build/admin.js:31
+msgid "Practitioner"
+msgstr ""
+
+#: build/admin.js:2
+#: build/client-portal.js:1
+msgid "Good night"
+msgstr ""
+
+#: build/admin.js:2
+#: build/client-portal.js:1
+msgid "Good morning"
+msgstr ""
+
+#: build/admin.js:2
+#: build/client-portal.js:1
+msgid "Good afternoon"
+msgstr ""
+
+#: build/admin.js:2
+#: build/client-portal.js:1
+msgid "Good evening"
+msgstr ""
+
+#: build/admin.js:2
+msgid "active clients"
+msgstr ""
+
+#: build/admin.js:2
+msgid "Active clients"
+msgstr ""
+
+#: build/admin.js:2
+msgid "Plans awaiting review"
+msgstr ""
+
+#: build/admin.js:2
+msgid "Recipe library"
+msgstr ""
+
+#: build/admin.js:2
+msgid "Client compliance, last 7 days"
+msgstr ""
+
+#: build/admin.js:2
+msgid "client(s) have no active plan."
+msgstr ""
+
+#. translators: %d: number of selected rows
+#: build/admin.js:3
+#, js-format
+msgid "%d selected"
+msgstr ""
+
+#: build/admin.js:3
+#: build/admin.js:20
+msgid "Clear"
+msgstr ""
+
+#: build/admin.js:3
+msgid "No results"
+msgstr ""
+
+#. translators: 1: first row number shown, 2: last row number shown, 3: total row count
+#: build/admin.js:4
+#, js-format
+msgid "Showing %1$d–%2$d of %3$d"
+msgstr ""
+
+#: build/admin.js:4
+msgid "Per page"
+msgstr ""
+
+#: build/admin.js:4
+msgid "Previous"
+msgstr ""
+
+#. translators: 1: current page number, 2: total number of pages
+#: build/admin.js:5
+#, js-format
+msgid "Page %1$d of %2$d"
+msgstr ""
+
+#: build/admin.js:5
+msgid "Next"
+msgstr ""
+
+#: build/admin.js:5
+msgid "Search…"
+msgstr ""
+
+#: build/admin.js:5
+msgid "Unsaved changes"
+msgstr ""
+
+#: build/admin.js:5
+msgid "Branded (manufacturer-supplied) products are hidden by default — some report their serving size in a way that can't be reliably added to a recipe. Foundation & SR Legacy always work."
+msgstr ""
+
+#: build/admin.js:5
+msgid "Creates the client's portal account and emails them a link to set their password, right away. Leave this unchecked to add their details now and invite them later from the roster."
+msgstr ""
+
+#: build/admin.js:5
+msgid "Could not save this client."
+msgstr ""
+
+#: build/admin.js:5
+msgid "Uploaded by the client from their portal."
+msgstr ""
+
+#: build/admin.js:5
+msgid "No photo yet — set by the client from their portal."
+msgstr ""
+
+#: build/admin.js:5
+#: build/client-portal.js:1
+msgid "First name"
+msgstr ""
+
+#: build/admin.js:5
+#: build/client-portal.js:1
+msgid "Last name"
+msgstr ""
+
+#: build/admin.js:5
+#: build/admin.js:8
+#: build/admin.js:31
+#: build/client-portal.js:1
+msgid "Email"
+msgstr ""
+
+#: build/admin.js:5
+#: build/client-portal.js:1
+msgid "Allergies"
+msgstr ""
+
+#: build/admin.js:5
+#: build/client-portal.js:1
+msgid "Peanuts, shellfish"
+msgstr ""
+
+#: build/admin.js:5
+#: build/client-portal.js:1
+msgid "Comma-separated"
+msgstr ""
+
+#: build/admin.js:5
+#: build/client-portal.js:1
+msgid "Dietary restrictions"
+msgstr ""
+
+#: build/admin.js:5
+msgid "Vegetarian, low-sodium, halal…"
+msgstr ""
+
+#: build/admin.js:5
+#: build/client-portal.js:1
+msgid "Goals"
+msgstr ""
+
+#: build/admin.js:5
+msgid "Weight management, improve energy levels…"
+msgstr ""
+
+#: build/admin.js:5
+msgid "Send portal invite now"
+msgstr ""
+
+#: build/admin.js:5
+msgid "What does sending the invite now do?"
+msgstr ""
+
+#: build/admin.js:5
+#: build/admin.js:13
+#: build/admin.js:19
+#: build/admin.js:25
+msgid "Save changes"
+msgstr ""
+
+#: build/admin.js:5
+#: build/admin.js:6
+#: build/admin.js:10
+msgid "Add client"
+msgstr ""
+
+#: build/admin.js:5
+#: build/admin.js:10
+#: build/admin.js:13
+#: build/admin.js:19
+#: build/admin.js:25
+#: build/admin.js:30
+#: build/admin.js:31
+msgid "Discard unsaved changes?"
+msgstr ""
+
+#: build/admin.js:5
+#: build/admin.js:10
+#: build/admin.js:13
+#: build/admin.js:19
+#: build/admin.js:25
+#: build/admin.js:30
+#: build/admin.js:31
+msgid "Discard"
+msgstr ""
+
+#: build/admin.js:5
+#: build/client-portal.js:1
+msgid "Eaten"
+msgstr ""
+
+#: build/admin.js:5
+#: build/client-portal.js:1
+#: build/client-portal.js:5
+msgid "Substituted"
+msgstr ""
+
+#: build/admin.js:5
+#: build/client-portal.js:1
+msgid "Skipped"
+msgstr ""
+
+#: build/admin.js:5
+#: build/client-portal.js:1
+msgid "Logged item"
+msgstr ""
+
+#: build/admin.js:5
+#: build/client-portal.js:1
+msgid "Nothing logged yet."
+msgstr ""
+
+#: build/admin.js:5
+#: build/client-portal.js:1
+msgid "No measurements logged yet."
+msgstr ""
+
+#: build/admin.js:5
+msgid "← Back to clients"
+msgstr ""
+
+#: build/admin.js:5
+#: build/admin.js:15
+#: build/admin.js:18
+#: build/admin.js:31
+#: build/client-portal.js:1
+msgid "Client"
+msgstr ""
+
+#: build/admin.js:5
+msgid "Edit"
+msgstr ""
+
+#: build/admin.js:5
+msgid "Compliance"
+msgstr ""
+
+#: build/admin.js:5
+msgid "No active plan assigned."
+msgstr ""
+
+#: build/admin.js:5
+msgid "No items scheduled"
+msgstr ""
+
+#: build/admin.js:5
+msgid "items logged"
+msgstr ""
+
+#: build/admin.js:5
+msgid "Plan"
+msgstr ""
+
+#: build/admin.js:5
+#: build/client-portal.js:2
+msgid "Current weight"
+msgstr ""
+
+#: build/admin.js:5
+#: build/client-portal.js:2
+msgid "since last"
+msgstr ""
+
+#: build/admin.js:5
+msgid "Log history"
+msgstr ""
+
+#: build/admin.js:5
+#: build/client-portal.js:6
+msgid "Measurements"
+msgstr ""
+
+#: build/admin.js:5
+#: build/admin.js:13
+#: build/client-portal.js:6
+#: build/client-portal.js:9
+msgid "Load more"
+msgstr ""
+
+#: build/admin.js:5
+msgid "Edit client"
+msgstr ""
+
+#: build/admin.js:5
+msgid "Client updated."
+msgstr ""
+
+#: build/admin.js:5
+#: build/admin.js:21
+msgid "All statuses"
+msgstr ""
+
+#: build/admin.js:5
+#: build/admin.js:9
+msgid "Active"
+msgstr ""
+
+#: build/admin.js:5
+#: build/admin.js:9
+msgid "Paused"
+msgstr ""
+
+#: build/admin.js:5
+msgid "Not invited"
+msgstr ""
+
+#: build/admin.js:5
+msgid "Invited"
+msgstr ""
+
+#: build/admin.js:5
+msgid "Joined"
+msgstr ""
+
+#. translators: %d: number of clients updated
+#: build/admin.js:6
+#, js-format
+msgid "%d client updated."
+msgid_plural "%d clients updated."
+msgstr[0] ""
+msgstr[1] ""
+
+#: build/admin.js:6
+msgid "Some clients could not be updated."
+msgstr ""
+
+#: build/admin.js:6
+msgid "Search name or email…"
+msgstr ""
+
+#: build/admin.js:6
+#: build/admin.js:11
+#: build/admin.js:13
+#: build/admin.js:16
+#: build/admin.js:21
+#: build/admin.js:25
+#: build/admin.js:31
+msgid "Loading…"
+msgstr ""
+
+#: build/admin.js:6
+msgid "No clients match your search."
+msgstr ""
+
+#: build/admin.js:6
+msgid "No clients yet. Add your first client to get started."
+msgstr ""
+
+#: build/admin.js:6
+msgid "Mark active"
+msgstr ""
+
+#: build/admin.js:6
+msgid "Mark paused"
+msgstr ""
+
+#. translators: %d: number of clients being removed
+#: build/admin.js:7
+#, js-format
+msgid "Remove %d selected client(s)? This cannot be undone."
+msgstr ""
+
+#: build/admin.js:7
+#: build/admin.js:10
+#: build/admin.js:13
+#: build/admin.js:14
+#: build/admin.js:21
+#: build/admin.js:22
+#: build/admin.js:26
+#: build/admin.js:30
+msgid "Remove"
+msgstr ""
+
+#. translators: %d: number of clients removed
+#: build/admin.js:8
+#, js-format
+msgid "%d client removed."
+msgid_plural "%d clients removed."
+msgstr[0] ""
+msgstr[1] ""
+
+#: build/admin.js:8
+msgid "Some clients could not be removed."
+msgstr ""
+
+#: build/admin.js:8
+msgid "Delete selected"
+msgstr ""
+
+#: build/admin.js:8
+msgid "Select all clients"
+msgstr ""
+
+#: build/admin.js:8
+#: build/admin.js:12
+#: build/admin.js:29
+msgid "Name"
+msgstr ""
+
+#: build/admin.js:8
+msgid "Account"
+msgstr ""
+
+#: build/admin.js:8
+msgid "Added"
+msgstr ""
+
+#. translators: %s: client's full name
+#. translators: %s: recipe name
+#. translators: %s: plan title
+#. translators: %s: custom food name
+#: build/admin.js:9
+#: build/admin.js:13
+#: build/admin.js:19
+#: build/admin.js:30
+#, js-format
+msgid "Select %s"
+msgstr ""
+
+#: build/admin.js:9
+msgid "Invite to client portal"
+msgstr ""
+
+#: build/admin.js:9
+msgid "Already invited to client portal"
+msgstr ""
+
+#. translators: %s: client's full name
+#: build/admin.js:10
+#, js-format
+msgid "%s has been invited to the client portal."
+msgstr ""
+
+#: build/admin.js:10
+msgid "Could not send the invite. Please try again."
+msgstr ""
+
+#: build/admin.js:10
+msgid "Remove client"
+msgstr ""
+
+#: build/admin.js:10
+msgid "Remove this client? This cannot be undone."
+msgstr ""
+
+#: build/admin.js:10
+msgid "Client removed."
+msgstr ""
+
+#: build/admin.js:10
+msgid "Could not remove this client."
+msgstr ""
+
+#. translators: 1: client's name, 2: the reason the invite failed
+#: build/admin.js:11
+#, js-format
+msgid "%1$s did save, but the portal invite could not be sent: %2$s. You can invite them manually from the roster."
+msgstr ""
+
+#: build/admin.js:11
+msgid "Client added."
+msgstr ""
+
+#: build/admin.js:11
+#: build/admin.js:25
+#: build/client-portal.js:1
+msgid "Saturated fat"
+msgstr ""
+
+#: build/admin.js:11
+#: build/admin.js:25
+#: build/client-portal.js:1
+msgid "Fiber"
+msgstr ""
+
+#: build/admin.js:11
+#: build/admin.js:25
+#: build/client-portal.js:1
+msgid "Sugar"
+msgstr ""
+
+#: build/admin.js:11
+#: build/admin.js:25
+#: build/client-portal.js:1
+msgid "Sodium"
+msgstr ""
+
+#: build/admin.js:11
+#: build/admin.js:25
+#: build/client-portal.js:1
+msgid "Cholesterol"
+msgstr ""
+
+#: build/admin.js:11
+#: build/admin.js:25
+#: build/client-portal.js:1
+msgid "Potassium"
+msgstr ""
+
+#: build/admin.js:11
+#: build/admin.js:25
+#: build/client-portal.js:1
+msgid "Calcium"
+msgstr ""
+
+#: build/admin.js:11
+#: build/admin.js:25
+#: build/client-portal.js:1
+msgid "Iron"
+msgstr ""
+
+#: build/admin.js:11
+#: build/admin.js:25
+#: build/client-portal.js:1
+msgid "Vitamin C"
+msgstr ""
+
+#: build/admin.js:11
+#: build/admin.js:25
+#: build/client-portal.js:1
+msgid "Vitamin D"
+msgstr ""
+
+#: build/admin.js:11
+msgid "Recipe builder"
+msgstr ""
+
+#: build/admin.js:11
+#: build/admin.js:13
+msgid "New recipe"
+msgstr ""
+
+#: build/admin.js:11
+msgid "Search recipes…"
+msgstr ""
+
+#: build/admin.js:11
+msgid "No recipes match your search."
+msgstr ""
+
+#: build/admin.js:11
+msgid "No recipes yet. Add your first recipe to start building your library."
+msgstr ""
+
+#. translators: %d: number of recipes selected
+#. translators: %d: number of plans selected
+#. translators: %d: number of custom foods selected
+#: build/admin.js:12
+#: build/admin.js:18
+#: build/admin.js:29
+#, js-format
+msgid "Delete selected (%d)"
+msgstr ""
+
+#: build/admin.js:12
+msgid "Select all recipes"
+msgstr ""
+
+#: build/admin.js:12
+#: build/admin.js:13
+msgid "Servings"
+msgstr ""
+
+#: build/admin.js:12
+msgid "Kcal / serving"
+msgstr ""
+
+#: build/admin.js:12
+#: build/admin.js:29
+msgid "Updated"
+msgstr ""
+
+#: build/admin.js:13
+msgid "Edit recipe"
+msgstr ""
+
+#: build/admin.js:13
+msgid "Remove recipe"
+msgstr ""
+
+#: build/admin.js:13
+msgid "USDA"
+msgstr ""
+
+#: build/admin.js:13
+msgid "My custom foods"
+msgstr ""
+
+#: build/admin.js:13
+msgid "Something went wrong searching."
+msgstr ""
+
+#: build/admin.js:13
+msgid "Search ingredient…"
+msgstr ""
+
+#: build/admin.js:13
+msgid "Include branded products"
+msgstr ""
+
+#: build/admin.js:13
+msgid "Why are branded products hidden?"
+msgstr ""
+
+#: build/admin.js:13
+msgid "Searching…"
+msgstr ""
+
+#: build/admin.js:13
+#: build/admin.js:19
+msgid "No matches."
+msgstr ""
+
+#: build/admin.js:13
+msgid "Something went wrong adding this food."
+msgstr ""
+
+#: build/admin.js:13
+msgid "Adding…"
+msgstr ""
+
+#: build/admin.js:13
+msgid "Branded"
+msgstr ""
+
+#: build/admin.js:13
+msgid "Search your custom foods…"
+msgstr ""
+
+#: build/admin.js:13
+msgid "No custom foods yet — add one from the Food database screen."
+msgstr ""
+
+#: build/admin.js:13
+msgid "Custom"
+msgstr ""
+
+#: build/admin.js:13
+msgid "Could not save this recipe."
+msgstr ""
+
+#: build/admin.js:13
+msgid "Create recipe"
+msgstr ""
+
+#: build/admin.js:13
+msgid "Recipe name"
+msgstr ""
+
+#: build/admin.js:13
+msgid "e.g. Lentil & Roast Vegetable Bowl"
+msgstr ""
+
+#: build/admin.js:13
+msgid "Ingredient"
+msgstr ""
+
+#: build/admin.js:13
+msgid "Qty (g)"
+msgstr ""
+
+#: build/admin.js:13
+msgid "Food"
+msgstr ""
+
+#: build/admin.js:13
+msgid "No ingredients yet — search for one on the right to add it."
+msgstr ""
+
+#: build/admin.js:13
+msgid "(unknown food)"
+msgstr ""
+
+#: build/admin.js:13
+#: build/admin.js:21
+#: build/client-portal.js:1
+msgid "g"
+msgstr ""
+
+#: build/admin.js:13
+msgid "Remove ingredient"
+msgstr ""
+
+#: build/admin.js:13
+msgid "Per serving"
+msgstr ""
+
+#: build/admin.js:13
+msgid "Add an ingredient to see estimated totals."
+msgstr ""
+
+#: build/admin.js:13
+#: build/admin.js:21
+#: build/client-portal.js:2
+msgid "Kcal"
+msgstr ""
+
+#: build/admin.js:13
+#: build/admin.js:21
+#: build/admin.js:25
+#: build/admin.js:29
+#: build/client-portal.js:2
+msgid "Protein"
+msgstr ""
+
+#: build/admin.js:13
+#: build/admin.js:21
+#: build/admin.js:29
+#: build/client-portal.js:2
+msgid "Carbs"
+msgstr ""
+
+#: build/admin.js:13
+#: build/admin.js:21
+#: build/admin.js:25
+#: build/admin.js:29
+#: build/client-portal.js:2
+msgid "Fat"
+msgstr ""
+
+#: build/admin.js:13
+msgid "Search foods"
+msgstr ""
+
+#: build/admin.js:13
+msgid "Recipe created."
+msgstr ""
+
+#: build/admin.js:13
+msgid "Recipe saved."
+msgstr ""
+
+#: build/admin.js:13
+msgid "Remove this recipe? This cannot be undone."
+msgstr ""
+
+#: build/admin.js:13
+msgid "Recipe removed."
+msgstr ""
+
+#: build/admin.js:13
+msgid "Could not remove this recipe."
+msgstr ""
+
+#. translators: %d: number of recipes being removed
+#: build/admin.js:14
+#, js-format
+msgid "Remove %d selected recipe(s)? This cannot be undone."
+msgstr ""
+
+#. translators: %d: number of recipes removed
+#: build/admin.js:15
+#, js-format
+msgid "%d recipe removed."
+msgid_plural "%d recipes removed."
+msgstr[0] ""
+msgstr[1] ""
+
+#: build/admin.js:15
+msgid "Some recipes could not be removed."
+msgstr ""
+
+#: build/admin.js:15
+#: build/admin.js:19
+msgid "Assign to client"
+msgstr ""
+
+#: build/admin.js:15
+msgid "Select a client…"
+msgstr ""
+
+#: build/admin.js:15
+msgid "Client's declared allergies"
+msgstr ""
+
+#. translators: %s: comma-separated list of the client's declared allergies found in this plan
+#: build/admin.js:16
+#, js-format
+msgid "This plan contains an item matching this client's declared allergies: %s. Assignment is blocked."
+msgstr ""
+
+#: build/admin.js:16
+msgid "Once assigned, this plan becomes read-only — its numbers are frozen and it can no longer be edited directly. To make changes later, unassign it or duplicate it as a new plan."
+msgstr ""
+
+#: build/admin.js:16
+#: build/client-portal.js:1
+#: build/client-portal.js:2
+#: build/client-portal.js:5
+#: build/client-portal.js:6
+msgid "Something went wrong — please try again."
+msgstr ""
+
+#: build/admin.js:16
+msgid "Assign"
+msgstr ""
+
+#: build/admin.js:16
+msgid "Unassigned"
+msgstr ""
+
+#: build/admin.js:16
+msgid "Unknown client"
+msgstr ""
+
+#: build/admin.js:16
+msgid "Meal plans"
+msgstr ""
+
+#: build/admin.js:16
+#: build/admin.js:19
+msgid "New plan"
+msgstr ""
+
+#: build/admin.js:16
+msgid "Search plans…"
+msgstr ""
+
+#: build/admin.js:16
+msgid "No plans match your search."
+msgstr ""
+
+#: build/admin.js:16
+msgid "No plans yet. Build your first plan to start assigning nutrition to clients."
+msgstr ""
+
+#. translators: %d: number of assigned plans selected
+#: build/admin.js:17
+#, js-format
+msgid "Unassign selected (%d)"
+msgstr ""
+
+#: build/admin.js:18
+msgid "Select all plans"
+msgstr ""
+
+#: build/admin.js:18
+msgid "Title"
+msgstr ""
+
+#: build/admin.js:18
+msgid "Dates"
+msgstr ""
+
+#: build/admin.js:18
+msgid "Avg. kcal/day"
+msgstr ""
+
+#: build/admin.js:18
+msgid "Status"
+msgstr ""
+
+#: build/admin.js:19
+msgid "Start:"
+msgstr ""
+
+#: build/admin.js:19
+msgid "End:"
+msgstr ""
+
+#: build/admin.js:19
+msgid "Open plan"
+msgstr ""
+
+#: build/admin.js:19
+msgid "Remove plan"
+msgstr ""
+
+#: build/admin.js:19
+msgid "My Recipes"
+msgstr ""
+
+#: build/admin.js:19
+msgid "Foods"
+msgstr ""
+
+#: build/admin.js:19
+msgid "Search your recipes…"
+msgstr ""
+
+#: build/admin.js:19
+msgid "No recipes in your library yet."
+msgstr ""
+
+#: build/admin.js:19
+msgid "Servings:"
+msgstr ""
+
+#: build/admin.js:19
+#: build/client-portal.js:1
+msgid "Breakfast"
+msgstr ""
+
+#: build/admin.js:19
+#: build/client-portal.js:1
+msgid "Lunch"
+msgstr ""
+
+#: build/admin.js:19
+#: build/client-portal.js:1
+msgid "Dinner"
+msgstr ""
+
+#: build/admin.js:19
+#: build/client-portal.js:1
+msgid "Snack"
+msgstr ""
+
+#: build/admin.js:19
+msgid "(unknown item)"
+msgstr ""
+
+#: build/admin.js:19
+msgid "Plans can’t span more than 90 days — for a longer program, build one plan per stretch and duplicate between them."
+msgstr ""
+
+#: build/admin.js:19
+msgid "Shortening the date range will remove items already added on the dropped days. Continue?"
+msgstr ""
+
+#: build/admin.js:19
+#: build/admin.js:21
+msgid "Continue"
+msgstr ""
+
+#: build/admin.js:19
+msgid "Assigned — read only"
+msgstr ""
+
+#: build/admin.js:19
+msgid "Back"
+msgstr ""
+
+#: build/admin.js:19
+msgid "Could not save this plan."
+msgstr ""
+
+#: build/admin.js:19
+msgid "Create plan"
+msgstr ""
+
+#: build/admin.js:19
+#: build/admin.js:21
+#: build/admin.js:24
+msgid "Unassign"
+msgstr ""
+
+#: build/admin.js:19
+msgid "Duplicate as new plan"
+msgstr ""
+
+#: build/admin.js:19
+msgid "Plan title"
+msgstr ""
+
+#: build/admin.js:19
+msgid "Start date"
+msgstr ""
+
+#: build/admin.js:19
+msgid "End date"
+msgstr ""
+
+#: build/admin.js:19
+#: build/client-portal.js:2
+msgid "Week"
+msgstr ""
+
+#: build/admin.js:19
+#: build/admin.js:20
+#: build/client-portal.js:2
+msgid "Day"
+msgstr ""
+
+#: build/admin.js:19
+msgid "Repeat this day on other days"
+msgstr ""
+
+#: build/admin.js:19
+msgid "Repeat day"
+msgstr ""
+
+#. translators: %d: the day number (1-based) currently being copied
+#: build/admin.js:20
+#, js-format
+msgid "Repeat Day %d on…"
+msgstr ""
+
+#: build/admin.js:20
+msgid "All"
+msgstr ""
+
+#. translators: %d: number of days selected to copy into
+#: build/admin.js:21
+#, js-format
+msgid "%d day selected"
+msgid_plural "%d days selected"
+msgstr[0] ""
+msgstr[1] ""
+
+#: build/admin.js:21
+msgid "This replaces any meals already on the selected day(s) with today’s meals. Continue?"
+msgstr ""
+
+#: build/admin.js:21
+msgid "Repeat"
+msgstr ""
+
+#: build/admin.js:21
+msgid "Add"
+msgstr ""
+
+#: build/admin.js:21
+msgid "Nothing added yet."
+msgstr ""
+
+#: build/admin.js:21
+#: build/client-portal.js:1
+msgid "srv"
+msgstr ""
+
+#: build/admin.js:21
+msgid "Remove item"
+msgstr ""
+
+#: build/admin.js:21
+msgid "Day totals"
+msgstr ""
+
+#: build/admin.js:21
+msgid "Add to"
+msgstr ""
+
+#: build/admin.js:21
+msgid "Select a meal slot"
+msgstr ""
+
+#: build/admin.js:21
+msgid "Click \"+ Add\" on a meal above to search for a food or recipe."
+msgstr ""
+
+#: build/admin.js:21
+msgid "Draft"
+msgstr ""
+
+#: build/admin.js:21
+msgid "Assigned"
+msgstr ""
+
+#: build/admin.js:21
+msgid "Plan created."
+msgstr ""
+
+#: build/admin.js:21
+msgid "Plan saved."
+msgstr ""
+
+#: build/admin.js:21
+msgid "Could not duplicate this plan."
+msgstr ""
+
+#: build/admin.js:21
+msgid "Plan duplicated as a new draft."
+msgstr ""
+
+#: build/admin.js:21
+msgid "Unassign this plan? It goes back to being an editable draft, and the client no longer has access to it."
+msgstr ""
+
+#: build/admin.js:21
+msgid "Plan unassigned."
+msgstr ""
+
+#: build/admin.js:21
+msgid "Could not unassign this plan."
+msgstr ""
+
+#: build/admin.js:21
+msgid "Plan assigned."
+msgstr ""
+
+#: build/admin.js:21
+msgid "Could not assign this plan."
+msgstr ""
+
+#: build/admin.js:21
+msgid "Remove this plan? This cannot be undone."
+msgstr ""
+
+#: build/admin.js:21
+msgid "Plan removed."
+msgstr ""
+
+#: build/admin.js:21
+msgid "Could not remove this plan."
+msgstr ""
+
+#. translators: %d: number of plans being removed
+#: build/admin.js:22
+#, js-format
+msgid "Remove %d selected plan(s)? This cannot be undone."
+msgstr ""
+
+#. translators: %d: number of plans removed
+#: build/admin.js:23
+#, js-format
+msgid "%d plan removed."
+msgid_plural "%d plans removed."
+msgstr[0] ""
+msgstr[1] ""
+
+#: build/admin.js:23
+msgid "Some plans could not be removed."
+msgstr ""
+
+#. translators: %d: number of assigned plans being unassigned
+#: build/admin.js:24
+#, js-format
+msgid "Unassign %d selected plan(s)? They go back to being editable drafts, and their clients no longer have access."
+msgstr ""
+
+#. translators: %d: number of plans unassigned
+#: build/admin.js:25
+#, js-format
+msgid "%d plan unassigned."
+msgid_plural "%d plans unassigned."
+msgstr[0] ""
+msgstr[1] ""
+
+#: build/admin.js:25
+msgid "Some plans could not be unassigned."
+msgstr ""
+
+#: build/admin.js:25
+#: build/admin.js:29
+msgid "Calories"
+msgstr ""
+
+#: build/admin.js:25
+msgid "Carbohydrates"
+msgstr ""
+
+#: build/admin.js:25
+msgid "Something went wrong saving this food."
+msgstr ""
+
+#: build/admin.js:25
+msgid "Food name"
+msgstr ""
+
+#: build/admin.js:25
+msgid "Client's branded protein shake"
+msgstr ""
+
+#: build/admin.js:25
+msgid "Macros (per 100g)"
+msgstr ""
+
+#: build/admin.js:25
+msgid "Vitamins & minerals (per 100g)"
+msgstr ""
+
+#: build/admin.js:25
+#: build/admin.js:30
+msgid "Add custom food"
+msgstr ""
+
+#: build/admin.js:25
+msgid "Custom foods"
+msgstr ""
+
+#: build/admin.js:25
+msgid "Import is coming soon — you'll be able to bulk-import custom foods (e.g. from a CSV)."
+msgstr ""
+
+#: build/admin.js:25
+msgid "Import food data"
+msgstr ""
+
+#: build/admin.js:25
+msgid "Soon"
+msgstr ""
+
+#: build/admin.js:25
+msgid "Search custom foods…"
+msgstr ""
+
+#: build/admin.js:25
+msgid "No custom foods match your search."
+msgstr ""
+
+#: build/admin.js:25
+msgid "No custom foods yet."
+msgstr ""
+
+#. translators: %d: number of custom foods being removed
+#: build/admin.js:26
+#, js-format
+msgid "Remove %d selected custom food(s)? This cannot be undone."
+msgstr ""
+
+#. translators: %d: number of custom foods removed
+#: build/admin.js:27
+#, js-format
+msgid "%d custom food removed."
+msgid_plural "%d custom foods removed."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of custom foods that could not be removed
+#: build/admin.js:28
+#, js-format
+msgid "%d couldn't be removed because they're still used in a recipe."
+msgstr ""
+
+#: build/admin.js:29
+msgid "Select all custom foods"
+msgstr ""
+
+#: build/admin.js:30
+msgid "Edit custom food"
+msgstr ""
+
+#: build/admin.js:30
+msgid "Remove custom food"
+msgstr ""
+
+#: build/admin.js:30
+msgid "Remove this custom food? This cannot be undone."
+msgstr ""
+
+#: build/admin.js:30
+msgid "Custom food removed."
+msgstr ""
+
+#: build/admin.js:30
+msgid "Something went wrong removing this food."
+msgstr ""
+
+#: build/admin.js:30
+msgid "Custom food updated."
+msgstr ""
+
+#: build/admin.js:30
+msgid "Custom food added."
+msgstr ""
+
+#: build/admin.js:30
+msgid "Custom email styling"
+msgstr ""
+
+#: build/admin.js:30
+msgid "Sender"
+msgstr ""
+
+#: build/admin.js:30
+msgid "Who your emails come from. Applies to every email below, for both practitioners and clients. Pre-filled with the WordPress default; change either to override it."
+msgstr ""
+
+#: build/admin.js:30
+msgid "Sender saved."
+msgstr ""
+
+#: build/admin.js:30
+msgid "Could not save the sender."
+msgstr ""
+
+#: build/admin.js:30
+#: build/admin.js:31
+msgid "No changes to save."
+msgstr ""
+
+#: build/admin.js:30
+msgid "From name"
+msgstr ""
+
+#: build/admin.js:30
+msgid "From address"
+msgstr ""
+
+#: build/admin.js:30
+msgid "Use an address on your own domain. Many mail servers reject or spam-folder mail sent from an address they do not recognise."
+msgstr ""
+
+#: build/admin.js:30
+#: build/admin.js:31
+#: build/client-portal.js:1
+#: build/client-portal.js:5
+msgid "Save"
+msgstr ""
+
+#: build/admin.js:30
+msgid "Header colour and your own logo"
+msgstr ""
+
+#: build/admin.js:30
+msgid "Pro"
+msgstr ""
+
+#: build/admin.js:30
+msgid "Bold"
+msgstr ""
+
+#: build/admin.js:30
+msgid "Italic"
+msgstr ""
+
+#: build/admin.js:30
+msgid "Underline"
+msgstr ""
+
+#: build/admin.js:30
+msgid "Body"
+msgstr ""
+
+#: build/admin.js:30
+msgid "Editor mode"
+msgstr ""
+
+#: build/admin.js:30
+msgid "Visual"
+msgstr ""
+
+#: build/admin.js:30
+msgid "Code"
+msgstr ""
+
+#: build/admin.js:30
+msgid "Text formatting"
+msgstr ""
+
+#: build/admin.js:31
+msgid "Enabled"
+msgstr ""
+
+#: build/admin.js:31
+msgid "Subject"
+msgstr ""
+
+#: build/admin.js:31
+msgid "Client invite"
+msgstr ""
+
+#: build/admin.js:31
+msgid "Client password reset"
+msgstr ""
+
+#: build/admin.js:31
+msgid "Plan assigned"
+msgstr ""
+
+#: build/admin.js:31
+msgid "New client added"
+msgstr ""
+
+#: build/admin.js:31
+msgid "Daily client activity digest"
+msgstr ""
+
+#: build/admin.js:31
+msgid "Could not save the email template."
+msgstr ""
+
+#: build/admin.js:31
+msgid "Email template saved."
+msgstr ""
+
+#: build/admin.js:31
+msgid "Digest send time saved."
+msgstr ""
+
+#: build/admin.js:31
+msgid "Daily digest enabled."
+msgstr ""
+
+#: build/admin.js:31
+msgid "Daily digest disabled."
+msgstr ""
+
+#: build/admin.js:31
+msgid "Could not save the digest settings."
+msgstr ""
+
+#: build/admin.js:31
+msgid "Could not update this email."
+msgstr ""
+
+#: build/admin.js:31
+msgid "Email enabled."
+msgstr ""
+
+#: build/admin.js:31
+msgid "Email disabled."
+msgstr ""
+
+#: build/admin.js:31
+msgid "Send at"
+msgstr ""
+
+#: build/admin.js:31
+msgid "General"
+msgstr ""
+
+#: build/admin.js:31
+msgid "USDA FoodData Central"
+msgstr ""
+
+#: build/admin.js:31
+msgid "Required for recipe and plan building — this key lets Nutrio search and pull nutrient data from the USDA FoodData Central database. Get a free key at api.data.gov/signup."
+msgstr ""
+
+#: build/admin.js:31
+msgid "No key set"
+msgstr ""
+
+#: build/admin.js:31
+msgid "Replace key"
+msgstr ""
+
+#: build/admin.js:31
+msgid "Add key"
+msgstr ""
+
+#: build/admin.js:31
+msgid "USDA API key saved."
+msgstr ""
+
+#: build/admin.js:31
+msgid "Could not save the USDA API key."
+msgstr ""
+
+#: build/admin.js:31
+msgid "USDA API key"
+msgstr ""
+
+#: build/admin.js:31
+msgid "Data on uninstall"
+msgstr ""
+
+#: build/admin.js:31
+msgid "By default your clients, plans, logs and measurements are kept when you delete the plugin. Turn this on to permanently remove all Nutrio data when the plugin is deleted."
+msgstr ""
+
+#: build/admin.js:31
+msgid "Data setting saved."
+msgstr ""
+
+#: build/admin.js:31
+msgid "Could not save the data setting."
+msgstr ""
+
+#: build/admin.js:31
+msgid "Delete all Nutrio data when the plugin is deleted"
+msgstr ""
+
+#: build/admin.js:31
+#: build/client-portal.js:9
+msgid "Open menu"
+msgstr ""
+
+#: build/admin.js:31
+#: build/client-portal.js:9
+msgid "Close menu"
+msgstr ""
+
+#: build/client-portal.js:1
+msgid "Next up:"
+msgstr ""
+
+#: build/client-portal.js:1
+msgid "starts"
+msgstr ""
+
+#: build/client-portal.js:1
+msgid "Log out"
+msgstr ""
+
+#: build/client-portal.js:1
+msgid "Open profile"
+msgstr ""
+
+#: build/client-portal.js:1
+msgid "Change Password"
+msgstr ""
+
+#: build/client-portal.js:1
+msgid "Your password has been changed."
+msgstr ""
+
+#: build/client-portal.js:1
+msgid "Done"
+msgstr ""
+
+#: build/client-portal.js:1
+msgid "Current Password"
+msgstr ""
+
+#: build/client-portal.js:1
+msgid "Save Password"
+msgstr ""
+
+#: build/client-portal.js:1
+msgid "Could not load your profile — please try again."
+msgstr ""
+
+#: build/client-portal.js:1
+msgid "My Profile"
+msgstr ""
+
+#: build/client-portal.js:1
+msgid "Saved."
+msgstr ""
+
+#: build/client-portal.js:1
+msgid "View profile photo"
+msgstr ""
+
+#: build/client-portal.js:1
+msgid "Uploading…"
+msgstr ""
+
+#: build/client-portal.js:1
+msgid "Change photo"
+msgstr ""
+
+#: build/client-portal.js:1
+msgid "Photo updated."
+msgstr ""
+
+#: build/client-portal.js:1
+msgid "Could not upload that image — please try a JPEG, PNG, or WebP file."
+msgstr ""
+
+#: build/client-portal.js:1
+msgid "Change password"
+msgstr ""
+
+#: build/client-portal.js:1
+msgid "Kcal eaten"
+msgstr ""
+
+#. translators: %s: total kcal planned for today
+#: build/client-portal.js:2
+#, js-format
+msgid "of %s planned"
+msgstr ""
+
+#: build/client-portal.js:2
+msgid "Today's plan"
+msgstr ""
+
+#: build/client-portal.js:2
+msgid "No plan assigned yet — check back once your practitioner assigns one."
+msgstr ""
+
+#: build/client-portal.js:2
+msgid "Nothing planned for today."
+msgstr ""
+
+#: build/client-portal.js:2
+#: build/client-portal.js:5
+msgid "Item"
+msgstr ""
+
+#: build/client-portal.js:2
+msgid "My Plan"
+msgstr ""
+
+#: build/client-portal.js:2
+msgid "Today"
+msgstr ""
+
+#: build/client-portal.js:2
+msgid "Nothing planned for this day."
+msgstr ""
+
+#: build/client-portal.js:2
+msgid "Day total"
+msgstr ""
+
+#: build/client-portal.js:2
+msgid "Hide full nutrition"
+msgstr ""
+
+#: build/client-portal.js:2
+msgid "Show full nutrition"
+msgstr ""
+
+#: build/client-portal.js:2
+msgid "Log"
+msgstr ""
+
+#: build/client-portal.js:2
+#: build/client-portal.js:5
+msgid "Logged."
+msgstr ""
+
+#. translators: 1: number of items logged so far today, 2: total items planned for today
+#: build/client-portal.js:3
+#, js-format
+msgid "%1$d of %2$d logged today"
+msgstr ""
+
+#. translators: 1: kcal eaten so far today, 2: kcal planned for today
+#: build/client-portal.js:4
+#, js-format
+msgid "%1$s of %2$s kcal eaten today"
+msgstr ""
+
+#: build/client-portal.js:4
+msgid "Free-text entries under \"Also logged today\" have no calorie info, so they are not counted toward this total."
+msgstr ""
+
+#. translators: %d: number of items substituted or skipped today, excluded from the kcal count
+#: build/client-portal.js:5
+#, js-format
+msgid "%d item substituted or skipped, not counted toward this total."
+msgid_plural "%d items substituted or skipped, not counted toward this total."
+msgstr[0] ""
+msgstr[1] ""
+
+#: build/client-portal.js:5
+msgid "Mark eaten"
+msgstr ""
+
+#: build/client-portal.js:5
+msgid "Skip"
+msgstr ""
+
+#: build/client-portal.js:5
+msgid "What did you have instead?"
+msgstr ""
+
+#: build/client-portal.js:5
+msgid "Also logged today"
+msgstr ""
+
+#: build/client-portal.js:5
+msgid "Log something else"
+msgstr ""
+
+#: build/client-portal.js:5
+msgid "What did you eat?"
+msgstr ""
+
+#: build/client-portal.js:5
+msgid "Log it"
+msgstr ""
+
+#: build/client-portal.js:5
+msgid "Recent history"
+msgstr ""
+
+#. translators: %d: number of days the history currently covers
+#: build/client-portal.js:6
+#, js-format
+msgid "Nothing logged in the last %d days — use Load more to see older entries."
+msgstr ""
+
+#: build/client-portal.js:6
+#: build/client-portal.js:9
+msgid "Show less"
+msgstr ""
+
+#: build/client-portal.js:6
+msgid "Measurement saved."
+msgstr ""
+
+#: build/client-portal.js:6
+msgid "Weight"
+msgstr ""
+
+#: build/client-portal.js:6
+msgid "kg"
+msgstr ""
+
+#: build/client-portal.js:6
+msgid "lb"
+msgstr ""
+
+#: build/client-portal.js:6
+msgid "Notes (optional)"
+msgstr ""
+
+#: build/client-portal.js:6
+msgid "e.g. measured after workout"
+msgstr ""
+
+#: build/client-portal.js:6
+msgid "Log weight"
+msgstr ""
+
+#: build/client-portal.js:6
+msgid "History"
+msgstr ""
+
+#. translators: %d: number of weigh-ins the summary covers
+#: build/client-portal.js:7
+#, js-format
+msgid "No change over your last %d entries."
+msgstr ""
+
+#. translators: 1: "Up"/"Down", 2: the amount changed, 3: unit (kg/lb), 4: number of weigh-ins the summary covers
+#: build/client-portal.js:8
+#, js-format
+msgid "%1$s %2$s %3$s over your last %4$d entries."
+msgstr ""
+
+#: build/client-portal.js:8
+msgid "Up"
+msgstr ""
+
+#: build/client-portal.js:8
+msgid "Down"
+msgstr ""
+
+#. translators: %d: number of days the history currently covers
+#: build/client-portal.js:9
+#, js-format
+msgid "No measurements in the last %d days — use Load more to see older ones."
+msgstr ""

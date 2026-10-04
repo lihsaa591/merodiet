@@ -1,0 +1,60 @@
+.pagination {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 14px;
+	padding: 14px 0 4px;
+}
+.controls {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+}
+.perPage {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+.perPage label {
+	font-size: 12.5px;
+	color: var(--ink-muted);
+}
+.perPage :global(.nutrio-field) {
+	margin: 0;
+}
+.perPage select {
+	box-sizing: border-box;
+	height: 31px;
+	padding: 0 26px 0 12px;
+	font-size: 12.5px;
+	font-weight: 600;
+	background-position: right 10px center;
+	background-size: 11px;
+}
+.navBtn {
+	box-sizing: border-box;
+	height: 31px;
+	font-family: inherit;
+	font-size: 12.5px;
+	font-weight: 600;
+	padding: 0 14px;
+	border-radius: 8px;
+	border: 1px solid var(--line-strong);
+	background: var(--surface);
+	color: var(--ink-muted);
+	cursor: pointer;
+}
+.navBtn:hover:not(:disabled) {
+	color: var(--ink);
+	border-color: var(--ink-faint);
+}
+.navBtn:disabled {
+	opacity: 0.4;
+	cursor: default;
+}
+.status {
+	font-size: 12.5px;
+	color: var(--ink-muted);
+	font-variant-numeric: tabular-nums;
+}

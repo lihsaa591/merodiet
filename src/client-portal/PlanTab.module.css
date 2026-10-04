@@ -1,0 +1,196 @@
+.empty {
+	color: var(--ink-muted);
+}
+.planTitle {
+	margin: 0 0 4px;
+}
+.dateRange {
+	color: var(--ink-muted);
+	font-size: 13px;
+	margin: 0 0 18px;
+}
+
+.weekTabs {
+	display: flex;
+	gap: 6px;
+	overflow-x: auto;
+	margin-bottom: 10px;
+	padding-bottom: 4px;
+}
+.weekTab {
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	font-family: inherit;
+	font-size: 11.5px;
+	font-weight: 600;
+	padding: 6px 12px;
+	border-radius: 999px;
+	border: 1px solid var(--line);
+	background: var(--paper-dim);
+	color: var(--ink-faint);
+	cursor: pointer;
+}
+.weekTab.isActive {
+	background: var(--ink);
+	border-color: var(--ink);
+	color: var(--surface);
+}
+.weekTabDate {
+	font-size: 9.5px;
+	font-weight: 400;
+}
+
+.dayTabs {
+	display: flex;
+	gap: 6px;
+	overflow-x: auto;
+	/* overflow-x: auto implicitly makes the y-axis clip too — top padding
+	   keeps the "Today" badge (position: absolute; top: -8px) from being
+	   cut off by that. */
+	padding: 10px 0 4px;
+	margin: -10px 0 20px;
+}
+.dayTab {
+	position: relative;
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	font-family: inherit;
+	font-size: 12.5px;
+	font-weight: 600;
+	padding: 8px 14px;
+	border-radius: 8px;
+	border: 1px solid var(--line-strong);
+	background: var(--surface);
+	color: var(--ink-muted);
+	cursor: pointer;
+}
+.dayTab.isActive {
+	background: var(--sage-wash);
+	border-color: var(--sage-deep);
+	color: var(--sage-deep);
+}
+.dayTabDate {
+	font-size: 10.5px;
+	font-weight: 400;
+	color: var(--ink-faint);
+}
+.todayBadge {
+	position: absolute;
+	top: -8px;
+	right: -6px;
+	background: var(--sage);
+	color: #fff;
+	font-size: 9px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+	padding: 2px 5px;
+	border-radius: 999px;
+}
+
+.meal {
+	margin-bottom: 18px;
+}
+.mealTitle {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	font-size: 13.5px;
+	font-weight: 700;
+	color: var(--ink);
+	margin: 0 0 8px;
+}
+.mealTitle svg {
+	width: 16px;
+	height: 16px;
+	color: var(--sage);
+	flex-shrink: 0;
+}
+.itemList {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 9px 0;
+	border-bottom: 1px solid var(--line);
+	font-size: 13.5px;
+}
+.itemName {
+	min-width: 0;
+}
+.itemMeta {
+	font-size: 11.5px;
+	color: var(--ink-faint);
+	margin-top: 1px;
+}
+.itemKcal {
+	flex-shrink: 0;
+	color: var(--ink-muted);
+	font-size: 12.5px;
+	font-variant-numeric: tabular-nums;
+}
+
+.totals {
+	margin-top: 20px;
+	padding-top: 14px;
+	border-top: 1px solid var(--line-strong);
+}
+.totalsTitle {
+	font-size: 14px;
+	margin: 0 0 10px;
+}
+
+
+.nutritionToggle {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	margin-top: 12px;
+	background: none;
+	border: none;
+	padding: 0;
+	font-family: inherit;
+	font-size: 12.5px;
+	font-weight: 600;
+	color: var(--sage);
+	cursor: pointer;
+}
+.nutritionToggleIcon {
+	width: 13px;
+	height: 13px;
+	transition: transform 0.15s ease;
+}
+.nutritionToggleIcon.isOpen {
+	transform: rotate(180deg);
+}
+.nutrientGrid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 10px;
+	margin-top: 12px;
+}
+.nutrientTile {
+	background: var(--paper-dim);
+	border-radius: 8px;
+	padding: 10px 12px;
+}
+.nutrientVal {
+	font-family: 'IBM Plex Mono', monospace;
+	font-size: 15px;
+	font-weight: 600;
+}
+.nutrientLbl {
+	font-size: 11.5px;
+	color: var(--ink-muted);
+	font-weight: 600;
+	margin-top: 2px;
+}

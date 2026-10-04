@@ -1,0 +1,6 @@
+package-lock.json
+composer.lock
+docs/superpowers/
+.claude/
+.superpowers/
+*.png
