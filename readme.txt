@@ -20,6 +20,7 @@ Nutrio gives dietitians and nutritionists a client and meal-planning workspace i
 * Meal plans built from days and items, with a recipe builder and custom foods.
 * Nutrient calculations backed by USDA FoodData Central.
 * Email digests and customizable email templates.
+* Settings to keep or delete all data when the plugin is deleted.
 
 **For clients**
 
@@ -27,6 +28,8 @@ Nutrio gives dietitians and nutritionists a client and meal-planning workspace i
 * Accessibility-tested interface (axe) with a responsive layout for phones.
 
 Nutrio adds two roles, `practitioner` and `nutrition_client`, and gates all access through them.
+
+Nutrio is a record-keeping and planning tool. It does not give medical advice. It is not affiliated with or endorsed by the U.S. Department of Agriculture (USDA).
 
 = External services =
 
@@ -42,7 +45,7 @@ You must supply your own free API key from https://fdc.nal.usda.gov/api-key-sign
 
 = Data and privacy =
 
-Client records, plans, food logs and measurements are stored in custom tables in your WordPress database. Nothing is sent to the plugin author. Data is kept on uninstall unless the `nutrio_delete_data_on_uninstall` option is set to `1`.
+Client records, plans, food logs and measurements are stored in custom tables in your WordPress database. Nothing is sent to the plugin author. Data is kept when you delete the plugin unless you turn on "Delete all Nutrio data when the plugin is deleted" under Nutrio > Settings > General.
 
 == Installation ==
 
