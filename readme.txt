@@ -1,6 +1,6 @@
 === Nutrio ===
 Contributors: lihsaa591
-Tags: nutrition, dietitian, meal planning, clients, health
+Tags: dietitian, nutritionist, meal planner, nutrition, client management
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 8.1
@@ -8,7 +8,7 @@ Stable tag: 0.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Practice management for registered dietitians and nutritionists: meal planning, client compliance tracking and USDA-backed nutrient calculations.
+Dietitian and nutritionist practice manager: client records, meal plans, food logs and USDA nutrition data in your WordPress dashboard.
 
 == Description ==
 
