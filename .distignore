@@ -34,3 +34,4 @@
 /eslint.config.cjs
 /tsconfig.json
 *.map
+/.wordpress-org
