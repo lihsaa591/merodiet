@@ -1,4 +1,4 @@
-# Copyright (C) 2026 Aashil Bijukshe
+# Copyright (C) 2026 Aashil
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
