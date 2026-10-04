@@ -60,7 +60,7 @@ full per-violation detail.
 ## Requirements
 
 - PHP 8.1+
-- WordPress 6.4+
+- WordPress 6.9+
 - A free [USDA FoodData Central API key](https://fdc.nal.usda.gov/api-key-signup.html) (per-practitioner, entered in plugin settings)
 
 ## Status

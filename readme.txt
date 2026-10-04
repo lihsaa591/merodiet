@@ -1,48 +1,82 @@
-=== Nutrio ===
+=== Nutrio – Dietitian Practice Manager ===
 Contributors: lihsaa591
-Tags: nutrition, dietitian, meal planning, clients, health
-Requires at least: 6.4
+Tags: dietitian, nutritionist, meal planner, nutrition, client management
+Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 8.1
 Stable tag: 0.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Practice management for registered dietitians and nutritionists: meal planning, client compliance tracking and USDA-backed nutrient calculations.
+Dietitian and nutritionist practice manager: client records, meal plans, food logs and USDA nutrition data in one dashboard.
 
 == Description ==
 
-Nutrio gives dietitians and nutritionists a client and meal-planning workspace inside WordPress, plus a portal where clients log meals and follow their plan.
+Nutrio is a practice management tool for dietitians and nutritionists. It lives in your WordPress admin, so you can keep your clients, meal plans and progress notes in one place on your own website, without a separate monthly subscription.
 
-**For practitioners**
+You build a meal plan, give it to a client, and the client follows it from a simple page on your site. You then see how they are doing.
 
-* Client management with invitations and a dashboard of compliance and recent activity.
-* Meal plans built from days and items, with a recipe builder and custom foods.
-* Nutrient calculations backed by USDA FoodData Central.
-* Email digests and customizable email templates.
+= How it works =
 
-**For clients**
+1. **Build a plan.** Pick foods and recipes, and see the calories and nutrients add up as you go.
+2. **Give it to a client.** Invite a client by email. They get their own login and see only their own plan.
+3. **The client logs their day.** They tick off meals they ate, note any swaps, and record weight and other measurements.
+4. **You review progress.** A dashboard shows how all your clients are doing, and what was planned against what was eaten for each person.
 
-* A front-end portal where clients sign in, view their plan and log meals.
-* Accessibility-tested interface (axe) with a responsive layout for phones.
+= For practitioners =
 
-Nutrio adds two roles, `practitioner` and `nutrition_client`, and gates all access through them.
+* **Client list.** Add clients, and send invitations to the client portal.
+* **Meal plans.** Build plans made of days and meals, using a recipe builder and your own custom foods.
+* **Nutrition numbers.** Calories and nutrients come from USDA FoodData Central, a free and trusted public food database.
+* **Fixed plan totals.** When you give a plan to a client, its totals are saved at that moment. Later changes to the food data will not quietly change a plan the client already has.
+* **Dashboard.** See compliance and recent activity across your clients.
+* **Emails.** Edit the emails sent to clients, and turn on a daily digest of client activity.
+* **Your data, your choice.** Keep or delete all Nutrio data when you delete the plugin, with a setting under Nutrio > Settings.
 
-= External services =
+= For clients =
 
-Nutrio connects to the USDA FoodData Central API to search foods and retrieve nutrient data.
+* **Their own portal.** Clients sign in at `yoursite.com/client-portal/`, or you can place the portal on any page with the `[nutrio_client_portal]` shortcode.
+* **Easy to use on a phone.** The layout adapts to small screens.
+* **Accessibility.** The interface is tested with automated accessibility checks (axe).
 
-* Service: USDA FoodData Central (https://fdc.nal.usda.gov/)
-* Endpoint: https://api.nal.usda.gov/fdc/v1
-* Data sent: the food search text or food ID you request, and the API key you enter in Nutrio settings. No client or personal data is sent.
-* When: only when a practitioner searches for or loads a food that is not already cached locally.
-* Terms of use and data policy: https://fdc.nal.usda.gov/api-guide.html and https://www.usda.gov/privacy-policy
+= Who is it for? =
 
-You must supply your own free API key from https://fdc.nal.usda.gov/api-key-signup.html.
+Registered dietitians, nutritionists and nutrition coaches who work with individual clients and want their plans and records on their own WordPress site.
+
+= Good to know =
+
+* You need a free USDA FoodData Central API key. Nutrio guides you to get one in Settings.
+* Nutrio adds two user roles, `practitioner` and `nutrition_client`. All access is limited to these roles.
+* Nutrio is a record-keeping and planning tool. It does not give medical advice.
+
+= Roadmap =
+
+Nutrio is at an early stage. These features are planned and are not available yet. There are no release dates, and plans can change.
+
+* **Analytics.** Deeper reports on client progress and compliance over time.
+* **White label.** Use your own practice name and branding in the app, the portal and the emails.
+* **GDPR tools.** Export and erase a client's data on request, to help you meet your privacy duties.
+* **Public REST API.** Documented endpoints so you can connect Nutrio to your own tools.
+* **MCP connector.** Let compatible AI assistants work with your Nutrio data, only when you allow it.
+* And more. Have an idea? Tell us at https://github.com/lihsaa591/nutrio/issues
+
+= Use of 3rd Party Services =
+
+Nutrio has one third-party service, and it is only contacted by a practitioner searching for or loading a food. No client or personal data is sent. Nutrio does not include tracking, advertising or usage telemetry.
+
+* **USDA FoodData Central** (food search and nutrient data): [Terms of Use](https://fdc.nal.usda.gov/api-guide.html) | [Privacy Policy](https://www.usda.gov/privacy-policy)
+  * Endpoint: https://api.nal.usda.gov/fdc/v1
+  * Data sent: the food search text or food ID being requested, and the API key you enter in Nutrio settings.
+  * When: only when a food is not already cached locally.
+  * You need your own free API key: https://fdc.nal.usda.gov/api-key-signup.html
+
+Emails (client invitations, plan notifications, the daily digest) are sent through your site's own mail setup using `wp_mail()`. Nutrio does not connect to an email service itself, so any SMTP or email plugin you use applies.
+
+Nutrio is not affiliated with or endorsed by the U.S. Department of Agriculture (USDA).
 
 = Data and privacy =
 
-Client records, plans, food logs and measurements are stored in custom tables in your WordPress database. Nothing is sent to the plugin author. Data is kept on uninstall unless the `nutrio_delete_data_on_uninstall` option is set to `1`.
+Client records, plans, food logs and measurements are stored in custom tables in your WordPress database. Nothing is sent to the plugin author. Data is kept when you delete the plugin unless you turn on "Delete all Nutrio data when the plugin is deleted" under Nutrio > Settings > General.
 
 == Installation ==
 
@@ -63,7 +97,7 @@ Data is preserved by default. To remove all Nutrio tables, options and roles whe
 
 = What are the requirements? =
 
-WordPress 6.4+ and PHP 8.1+.
+WordPress 6.9+ and PHP 8.1+.
 
 == Screenshots ==
 
