@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:       Nutrio
+ * Plugin Name:       Nutrio – Dietitian Practice Manager
  * Plugin URI:        https://github.com/lihsaa591/nutrio
  * Description:       Practice management for registered dietitians and nutritionists — meal planning, client compliance tracking, and USDA-backed nutrient calculations.
  * Version:           0.1.0

@@ -1,4 +1,4 @@
-=== Nutrio ===
+=== Nutrio – Dietitian Practice Manager ===
 Contributors: lihsaa591
 Tags: dietitian, nutritionist, meal planner, nutrition, client management
 Requires at least: 6.4
