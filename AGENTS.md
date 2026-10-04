@@ -21,7 +21,7 @@ WordPress plugin: PHP backend + React 18/TypeScript admin SPA and client portal.
 - Routing: no router lib; `src/hooks/useQueryParam.ts` switches screens via URL query params.
 - Styling: `src/styles/tokens.css`, `base.css`; CSS modules (`*.module.css`) in the client portal.
 - i18n: `@wordpress/i18n`. Components PascalCase, hooks `useX`, utils camelCase.
-- Keep a11y passing (axe tests).
+- Keep a11y passing (axe tests; run locally with `npm run test:e2e:a11y`, not in CI).
 
 ## Working rules
 - Run only the relevant check (single test file / `check-types`), not the full suite, and avoid dumping long logs.
