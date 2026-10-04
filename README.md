@@ -47,7 +47,7 @@ npx wp-env start
 
 `npm run test:e2e:a11y` starts wp-env, seeds a practitioner/client/plan
 fixture, and runs axe-core against 8 core admin and client-portal
-screens (see `tests/e2e/`). Results are non-blocking in CI today — see
+screens (see `tests/e2e/`). It is run locally only, not in CI — see
 `docs/superpowers/specs/2026-09-26-accessibility-testing-design.md`
 for the full design and what's deliberately out of scope for this
 first pass. This wp-env instance is dedicated to automated testing;
