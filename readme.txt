@@ -25,7 +25,7 @@ You build a meal plan, give it to a client, and the client follows it from a sim
 
 = For practitioners =
 
-* **Client list.** Add clients, send invitations, and see who has logged in.
+* **Client list.** Add clients, and send invitations to the client portal.
 * **Meal plans.** Build plans made of days and meals, using a recipe builder and your own custom foods.
 * **Nutrition numbers.** Calories and nutrients come from USDA FoodData Central, a free and trusted public food database.
 * **Fixed plan totals.** When you give a plan to a client, its totals are saved at that moment. Later changes to the food data will not quietly change a plan the client already has.
