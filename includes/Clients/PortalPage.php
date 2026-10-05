@@ -757,8 +757,8 @@ final class PortalPage {
 	 * click handler, since this page has no React runtime to attach one.
 	 */
 	private function render_theme_init_script(): void {
-		?>
-		<script>
+		wp_print_inline_script_tag(
+			<<<'JS'
 			( function () {
 				try {
 					var saved = window.localStorage.getItem( 'nutrio-theme' );
@@ -783,8 +783,8 @@ final class PortalPage {
 					}
 				};
 			} )();
-		</script>
-		<?php
+JS
+		);
 	}
 
 	/**

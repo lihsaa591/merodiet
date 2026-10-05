@@ -49,7 +49,7 @@ final class AdminPage {
 	public function register(): void {
 		add_action( 'admin_menu', array( $this, 'register_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'maybe_enqueue' ) );
-		add_action( 'admin_head', array( $this, 'print_icon_style_override' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'print_icon_style_override' ) );
 	}
 
 	/**
@@ -72,22 +72,14 @@ final class AdminPage {
 			return;
 		}
 
-		printf(
-			'<style>
-				#toplevel_page_%1$s .wp-menu-image {
-					display: flex;
-					align-items: center;
-					justify-content: center;
-				}
-				#toplevel_page_%1$s .wp-menu-image img {
-					opacity: 1;
-					width: 20px;
-					height: 20px;
-					padding: 0;
-				}
-			</style>',
+		$css    = sprintf(
+			'#toplevel_page_%1$s .wp-menu-image{display:flex;align-items:center;justify-content:center;}#toplevel_page_%1$s .wp-menu-image img{opacity:1;width:20px;height:20px;padding:0;}',
 			esc_attr( $this->menu_slug )
 		);
+		$handle = 'nutrio-menu-icon-' . $this->menu_slug;
+		wp_register_style( $handle, false, array(), NUTRIO_VERSION );
+		wp_enqueue_style( $handle );
+		wp_add_inline_style( $handle, $css );
 	}
 
 	/**

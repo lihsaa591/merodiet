@@ -1,5 +1,5 @@
 === Nutrio – Dietitian Practice Manager ===
-Contributors: lihsaa591
+Contributors: lihsaa
 Tags: dietitian, nutritionist, meal planner, nutrition, client management
 Requires at least: 6.9
 Tested up to: 7.1
