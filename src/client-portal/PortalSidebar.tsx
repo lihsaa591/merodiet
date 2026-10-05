@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import ThemeToggle from './ThemeToggle';
 import type { Section } from './App';
-import merodietLeaf from './merodiet-leaf.png';
+import merodietLogo from './merodiet-logo.png';
 
 interface PortalSidebarProps {
 	isOpen: boolean;
@@ -46,7 +46,7 @@ export default function PortalSidebar( {
 			<div className="merodiet-brand">
 				<img
 					className="merodiet-brand-mark"
-					src={ merodietLeaf }
+					src={ merodietLogo }
 					alt=""
 				/>
 				<div className="merodiet-brand-name">MeroDiet</div>

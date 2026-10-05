@@ -159,7 +159,7 @@ final class AdminPage {
 				// Used by the Email settings' visual editor to mirror the
 				// real email's header/footer (see Mailer::wrap_in_skeleton()).
 				'siteName'            => get_bloginfo( 'name' ),
-				'emailLogoUrl'        => esc_url_raw( MERODIET_URL . 'assets/images/merodiet-leaf-email.png' ),
+				'emailLogoUrl'        => esc_url_raw( MERODIET_URL . 'assets/images/merodiet-logo-email.png' ),
 			)
 		);
 	}

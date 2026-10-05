@@ -798,7 +798,7 @@ JS
 	private function render_site_logo(): void {
 		printf(
 			'<div class="merodiet-portal-login-brand"><img src="%1$s" alt="" class="merodiet-portal-login-logo" /><span class="merodiet-portal-login-brand-name">%2$s</span></div>',
-			esc_url( MERODIET_URL . 'assets/images/merodiet-leaf-email.png' ),
+			esc_url( MERODIET_URL . 'assets/images/merodiet-logo-email.png' ),
 			esc_html( get_bloginfo( 'name' ) )
 		);
 	}

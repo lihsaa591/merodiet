@@ -97,7 +97,7 @@ return array(
 				'menu_slug'        => 'merodiet',
 				'mount_element_id' => 'merodiet-admin-app',
 				'script_entry'     => 'admin',
-				'icon'             => MERODIET_URL . 'assets/images/merodiet-leaf.png',
+				'icon'             => MERODIET_URL . 'assets/images/merodiet-logo.png',
 				'position'         => 30,
 			),
 		),

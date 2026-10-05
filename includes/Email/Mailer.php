@@ -113,7 +113,7 @@ final class Mailer {
 			'<td style="color:#ffffff;font-size:20px;font-weight:700;white-space:nowrap;">%2$s</td>' .
 			'</tr>' .
 			'</table>',
-			esc_url( MERODIET_URL . 'assets/images/merodiet-leaf-email.png' ),
+			esc_url( MERODIET_URL . 'assets/images/merodiet-logo-email.png' ),
 			esc_html( get_bloginfo( 'name' ) )
 		);
 	}
