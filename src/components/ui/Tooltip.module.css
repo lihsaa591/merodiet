@@ -9,7 +9,7 @@
 }
 .bubble {
 	position: absolute;
-	/* Callers (e.g. .nutrio-row-actions) can set --tooltip-left/-right/-tx to
+	/* Callers (e.g. .merodiet-row-actions) can set --tooltip-left/-right/-tx to
 	   anchor the bubble to the trigger's edge instead of centering it, so it
 	   doesn't get clipped by an overflow container at the viewport edge. */
 	left: var(--tooltip-left, 50%);

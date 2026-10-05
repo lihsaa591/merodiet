@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add automated accessibility (axe-core) scanning of 8 core Nutrio admin/client-portal screens via Playwright, running in a new non-blocking CI job.
+**Goal:** Add automated accessibility (axe-core) scanning of 8 core MeroDiet admin/client-portal screens via Playwright, running in a new non-blocking CI job.
 
 **Architecture:** `@wordpress/e2e-test-utils-playwright` drives Playwright against the project's existing `.wp-env.json` instance, providing an authenticated-admin fixture and REST-seeding helpers out of the box. A small custom fixture adds client-portal login (the official package only knows wp-admin login). `@axe-core/playwright` scans each screen after it settles; a shared helper attaches results to the Playwright HTML report. A new `a11y` CI job runs the suite with `continue-on-error: true` and posts a violation summary to the job's GitHub Actions summary — visible, but never blocking a PR.
 
@@ -136,7 +136,7 @@ git commit -m "chore: add Playwright + axe-core tooling for a11y testing"
 
 **Interfaces:**
 - Consumes: `runWpCli` from `tests/e2e/helpers/wp-cli.ts` (Task 1).
-- Produces: after this script runs, the wp-env instance has: one client user (login `e2e-client`, password `E2eTest123!`, email `e2e-client@example.test`) with role `nutrition_client`, one Nutrio client record linked to that user via `user_id`, one plan assigned to that client covering today's date with one breakfast item, and one measurement logged for that client. Later tasks' specs rely on these existing so Plan/Log/Measurements/Dashboard render populated states.
+- Produces: after this script runs, the wp-env instance has: one client user (login `e2e-client`, password `E2eTest123!`, email `e2e-client@example.test`) with role `nutrition_client`, one MeroDiet client record linked to that user via `user_id`, one plan assigned to that client covering today's date with one breakfast item, and one measurement logged for that client. Later tasks' specs rely on these existing so Plan/Log/Measurements/Dashboard render populated states.
 
 - [ ] **Step 1: Confirm the target REST shapes exist**
 
@@ -191,17 +191,17 @@ async function globalSetup(): Promise< void > {
 	} ).replace( /"/g, '\\"' );
 
 	runWpCli(
-		`db query "INSERT INTO wp_nutrio_foods (source, source_id, description, data_type, nutrients, source_synced_at, created_at, updated_at) VALUES ('usda', ${ SEED_FOOD_SOURCE_ID }, 'E2E Seed Oatmeal', 'Foundation', \\"${ nutrientsJson }\\", '${ nowSql }', '${ nowSql }', '${ nowSql }')"`
+		`db query "INSERT INTO wp_merodiet_foods (source, source_id, description, data_type, nutrients, source_synced_at, created_at, updated_at) VALUES ('usda', ${ SEED_FOOD_SOURCE_ID }, 'E2E Seed Oatmeal', 'Foundation', \\"${ nutrientsJson }\\", '${ nowSql }', '${ nowSql }', '${ nowSql }')"`
 	);
 	const foodId = runWpCli(
-		`db query "SELECT id FROM wp_nutrio_foods WHERE source_id=${ SEED_FOOD_SOURCE_ID }" --skip-column-names`
+		`db query "SELECT id FROM wp_merodiet_foods WHERE source_id=${ SEED_FOOD_SOURCE_ID }" --skip-column-names`
 	);
 
 	// 2. Create the client record (as the practitioner — wp-env's default
 	// admin already has every practitioner capability, see
 	// includes/Roles/RoleRegistrar.php).
 	const client = await requestUtils.rest( {
-		path: '/nutrio/v1/clients',
+		path: '/merodiet/v1/clients',
 		method: 'POST',
 		data: {
 			first_name: 'E2E',
@@ -213,7 +213,7 @@ async function globalSetup(): Promise< void > {
 	// 3. Invite — this creates the linked WP user (role nutrition_client)
 	// and emails a random-password reset link we don't need.
 	await requestUtils.rest( {
-		path: `/nutrio/v1/clients/${ client.id }/invite`,
+		path: `/merodiet/v1/clients/${ client.id }/invite`,
 		method: 'POST',
 	} );
 
@@ -234,7 +234,7 @@ async function globalSetup(): Promise< void > {
 	// populated day instead of an empty state.
 	const today = new Date().toISOString().slice( 0, 10 );
 	const plan = await requestUtils.rest( {
-		path: '/nutrio/v1/plans',
+		path: '/merodiet/v1/plans',
 		method: 'POST',
 		data: {
 			title: 'E2E Seed Plan',
@@ -256,7 +256,7 @@ async function globalSetup(): Promise< void > {
 	} );
 
 	await requestUtils.rest( {
-		path: `/nutrio/v1/plans/${ plan.id }/assign`,
+		path: `/merodiet/v1/plans/${ plan.id }/assign`,
 		method: 'POST',
 		data: { client_id: client.id, start_date: today, end_date: today },
 	} );
@@ -270,11 +270,11 @@ async function globalSetup(): Promise< void > {
 	await page.fill( '#user_login', CLIENT_LOGIN );
 	await page.fill( '#user_pass', CLIENT_PASSWORD );
 	await page.click( '#wp-submit' );
-	await page.waitForSelector( '.nutrio-rail' );
+	await page.waitForSelector( '.merodiet-rail' );
 
 	const restNonce = await page.evaluate(
-		() => ( window as unknown as { nutrioClientPortal: { restNonce: string } } )
-			.nutrioClientPortal.restNonce
+		() => ( window as unknown as { merodietClientPortal: { restNonce: string } } )
+			.merodietClientPortal.restNonce
 	);
 
 	const clientRequest = await playwrightRequest.newContext( {
@@ -282,7 +282,7 @@ async function globalSetup(): Promise< void > {
 		storageState: await page.context().storageState(),
 	} );
 
-	await clientRequest.post( '/wp-json/nutrio/v1/me/measurements', {
+	await clientRequest.post( '/wp-json/merodiet/v1/me/measurements', {
 		headers: { 'X-WP-Nonce': restNonce },
 		data: { measured_at: today, weight_grams: 75000 },
 	} );
@@ -306,13 +306,13 @@ Expected: exits with no error.
 
 Run:
 ```bash
-npx wp-env run cli -- wp db query "SELECT email, user_id FROM wp_nutrio_clients WHERE email='e2e-client@example.test'"
+npx wp-env run cli -- wp db query "SELECT email, user_id FROM wp_merodiet_clients WHERE email='e2e-client@example.test'"
 ```
 Expected: one row, with a non-null `user_id`.
 
 Run:
 ```bash
-npx wp-env run cli -- wp db query "SELECT status FROM wp_nutrio_plans WHERE title='E2E Seed Plan'"
+npx wp-env run cli -- wp db query "SELECT status FROM wp_merodiet_plans WHERE title='E2E Seed Plan'"
 ```
 Expected: one row with `status = assigned`.
 
@@ -367,13 +367,13 @@ export const test = base.extend< { clientPage: Page } >( {
 		await page.fill( '#user_pass', CLIENT_PASSWORD );
 		await page.click( '#wp-submit' );
 
-		const rail = page.locator( '.nutrio-rail' );
+		const rail = page.locator( '.merodiet-rail' );
 
 		try {
 			await rail.waitFor( { timeout: 10000 } );
 		} catch {
 			throw new Error(
-				'Client-portal login fixture failed: the sidebar (.nutrio-rail) never appeared after submitting the login form. ' +
+				'Client-portal login fixture failed: the sidebar (.merodiet-rail) never appeared after submitting the login form. ' +
 					'Check that global-setup.ts has seeded the "e2e-client" user (see tests/e2e/global-setup.ts) and that wp-env is running.'
 			);
 		}
@@ -431,7 +431,7 @@ test( 'client portal dashboard loads and scans without throwing', async ( {
 	clientPage,
 }, testInfo ) => {
 	await clientPage.goto( '/client-portal/?view=dashboard' );
-	await expect( clientPage.locator( '.nutrio-rail' ) ).toBeVisible();
+	await expect( clientPage.locator( '.merodiet-rail' ) ).toBeVisible();
 
 	await scanForA11yViolations( clientPage, 'smoke-dashboard', testInfo );
 } );
@@ -457,7 +457,7 @@ scan reports it.
 
 Temporarily edit `src/client-portal/DashboardTab.tsx`: find the
 `<h1>` element rendering the greeting (inside the
-`className="nutrio-topbar"` block) and wrap its text in an empty
+`className="merodiet-topbar"` block) and wrap its text in an empty
 `<span aria-hidden="true">` instead of rendering it as visible text,
 e.g. temporarily change:
 
@@ -511,8 +511,8 @@ import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 import { scanForA11yViolations } from '../helpers/axe-scan';
 
 test( 'admin dashboard has no axe violations', async ( { admin, page }, testInfo ) => {
-	await admin.visitAdminPage( 'admin.php', 'page=nutrio&view=dashboard' );
-	await expect( page.locator( '.nutrio-topbar h1' ) ).toBeVisible();
+	await admin.visitAdminPage( 'admin.php', 'page=merodiet&view=dashboard' );
+	await expect( page.locator( '.merodiet-topbar h1' ) ).toBeVisible();
 
 	await scanForA11yViolations( page, 'admin-dashboard', testInfo );
 } );
@@ -527,8 +527,8 @@ import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 import { scanForA11yViolations } from '../helpers/axe-scan';
 
 test( 'admin client roster has no axe violations', async ( { admin, page }, testInfo ) => {
-	await admin.visitAdminPage( 'admin.php', 'page=nutrio&view=clients' );
-	await expect( page.locator( '.nutrio-topbar h1' ) ).toBeVisible();
+	await admin.visitAdminPage( 'admin.php', 'page=merodiet&view=clients' );
+	await expect( page.locator( '.merodiet-topbar h1' ) ).toBeVisible();
 
 	await scanForA11yViolations( page, 'admin-roster', testInfo );
 } );
@@ -543,8 +543,8 @@ import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 import { scanForA11yViolations } from '../helpers/axe-scan';
 
 test( 'admin plan builder has no axe violations', async ( { admin, page }, testInfo ) => {
-	await admin.visitAdminPage( 'admin.php', 'page=nutrio&view=plans&id=new' );
-	await expect( page.locator( '.nutrio-topbar h1' ) ).toBeVisible();
+	await admin.visitAdminPage( 'admin.php', 'page=merodiet&view=plans&id=new' );
+	await expect( page.locator( '.merodiet-topbar h1' ) ).toBeVisible();
 
 	await scanForA11yViolations( page, 'admin-plan-builder', testInfo );
 } );
@@ -609,7 +609,7 @@ import { scanForA11yViolations } from '../helpers/axe-scan';
 
 test( 'client portal dashboard has no axe violations', async ( { clientPage }, testInfo ) => {
 	await clientPage.goto( '/client-portal/?view=dashboard' );
-	await expect( clientPage.locator( '.nutrio-topbar h1' ) ).toBeVisible();
+	await expect( clientPage.locator( '.merodiet-topbar h1' ) ).toBeVisible();
 
 	await scanForA11yViolations( clientPage, 'portal-dashboard', testInfo );
 } );
@@ -625,7 +625,7 @@ import { scanForA11yViolations } from '../helpers/axe-scan';
 
 test( 'client portal plan tab has no axe violations', async ( { clientPage }, testInfo ) => {
 	await clientPage.goto( '/client-portal/?view=plan' );
-	await expect( clientPage.locator( '.nutrio-topbar h1' ) ).toBeVisible();
+	await expect( clientPage.locator( '.merodiet-topbar h1' ) ).toBeVisible();
 
 	await scanForA11yViolations( clientPage, 'portal-plan', testInfo );
 } );
@@ -641,7 +641,7 @@ import { scanForA11yViolations } from '../helpers/axe-scan';
 
 test( 'client portal log tab has no axe violations', async ( { clientPage }, testInfo ) => {
 	await clientPage.goto( '/client-portal/?view=log' );
-	await expect( clientPage.locator( '.nutrio-topbar h1' ) ).toBeVisible();
+	await expect( clientPage.locator( '.merodiet-topbar h1' ) ).toBeVisible();
 
 	await scanForA11yViolations( clientPage, 'portal-log', testInfo );
 } );
@@ -657,7 +657,7 @@ import { scanForA11yViolations } from '../helpers/axe-scan';
 
 test( 'client portal measurements tab has no axe violations', async ( { clientPage }, testInfo ) => {
 	await clientPage.goto( '/client-portal/?view=measurements' );
-	await expect( clientPage.locator( '.nutrio-topbar h1' ) ).toBeVisible();
+	await expect( clientPage.locator( '.merodiet-topbar h1' ) ).toBeVisible();
 
 	await scanForA11yViolations( clientPage, 'portal-measurements', testInfo );
 } );

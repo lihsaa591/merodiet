@@ -35,18 +35,18 @@ interface ClientsStoreSelectors {
 
 const CLIENT_FILTER_DEFAULTS = { search: '', status: '' };
 const CLIENT_STATUS_OPTIONS = [
-	{ value: '', label: __( 'All statuses', 'nutrio' ) },
-	{ value: 'active', label: __( 'Active', 'nutrio' ) },
-	{ value: 'paused', label: __( 'Paused', 'nutrio' ) },
+	{ value: '', label: __( 'All statuses', 'merodiet' ) },
+	{ value: 'active', label: __( 'Active', 'merodiet' ) },
+	{ value: 'paused', label: __( 'Paused', 'merodiet' ) },
 ];
 
 const PORTAL_STATUS = {
 	not_invited: {
-		label: __( 'Not invited', 'nutrio' ),
+		label: __( 'Not invited', 'merodiet' ),
 		tone: 'clay' as const,
 	},
-	invited: { label: __( 'Invited', 'nutrio' ), tone: 'sage' as const },
-	active: { label: __( 'Joined', 'nutrio' ), tone: 'success' as const },
+	invited: { label: __( 'Invited', 'merodiet' ), tone: 'sage' as const },
+	active: { label: __( 'Joined', 'merodiet' ), tone: 'success' as const },
 };
 
 export default function ClientRoster() {
@@ -113,14 +113,14 @@ export default function ClientRoster() {
 					/* translators: 1: client's name, 2: the reason the invite failed */
 					__(
 						'%1$s did save, but the portal invite could not be sent: %2$s. You can invite them manually from the roster.',
-						'nutrio'
+						'merodiet'
 					),
 					`${ created.first_name } ${ created.last_name }`,
 					created.invite_error
 				)
 			);
 		} else {
-			toast.success( __( 'Client added.', 'nutrio' ) );
+			toast.success( __( 'Client added.', 'merodiet' ) );
 		}
 	};
 
@@ -128,9 +128,9 @@ export default function ClientRoster() {
 		const confirmed = await confirmDialog( {
 			message: __(
 				'Remove this client? This cannot be undone.',
-				'nutrio'
+				'merodiet'
 			),
-			confirmLabel: __( 'Remove', 'nutrio' ),
+			confirmLabel: __( 'Remove', 'merodiet' ),
 			destructive: true,
 		} );
 		if ( ! confirmed ) {
@@ -139,12 +139,12 @@ export default function ClientRoster() {
 
 		try {
 			await deleteClient( client.id );
-			toast.success( __( 'Client removed.', 'nutrio' ) );
+			toast.success( __( 'Client removed.', 'merodiet' ) );
 		} catch ( error ) {
 			toast.error(
 				errorMessage(
 					error,
-					__( 'Could not remove this client.', 'nutrio' )
+					__( 'Could not remove this client.', 'merodiet' )
 				)
 			);
 		}
@@ -156,7 +156,10 @@ export default function ClientRoster() {
 			toast.success(
 				sprintf(
 					/* translators: %s: client's full name */
-					__( '%s has been invited to the client portal.', 'nutrio' ),
+					__(
+						'%s has been invited to the client portal.',
+						'merodiet'
+					),
 					`${ client.first_name } ${ client.last_name }`
 				)
 			);
@@ -166,7 +169,7 @@ export default function ClientRoster() {
 					error,
 					__(
 						'Could not send the invite. Please try again.',
-						'nutrio'
+						'merodiet'
 					)
 				)
 			);
@@ -179,11 +182,11 @@ export default function ClientRoster() {
 				/* translators: %d: number of clients being removed */
 				__(
 					'Remove %d selected client(s)? This cannot be undone.',
-					'nutrio'
+					'merodiet'
 				),
 				bulk.count
 			),
-			confirmLabel: __( 'Remove', 'nutrio' ),
+			confirmLabel: __( 'Remove', 'merodiet' ),
 			destructive: true,
 		} );
 		if ( confirmed ) {
@@ -199,11 +202,11 @@ export default function ClientRoster() {
 							'%d client removed.',
 							'%d clients removed.',
 							count,
-							'nutrio'
+							'merodiet'
 						),
 						count
 					),
-				failure: __( 'Some clients could not be removed.', 'nutrio' ),
+				failure: __( 'Some clients could not be removed.', 'merodiet' ),
 			} );
 		}
 	};
@@ -221,11 +224,11 @@ export default function ClientRoster() {
 						'%d client updated.',
 						'%d clients updated.',
 						count,
-						'nutrio'
+						'merodiet'
 					),
 					count
 				),
-			failure: __( 'Some clients could not be updated.', 'nutrio' ),
+			failure: __( 'Some clients could not be updated.', 'merodiet' ),
 		} );
 	};
 
@@ -240,13 +243,13 @@ export default function ClientRoster() {
 
 	return (
 		<>
-			<div className="nutrio-topbar">
+			<div className="merodiet-topbar">
 				<div>
-					<h1>{ __( 'Clients', 'nutrio' ) }</h1>
+					<h1>{ __( 'Clients', 'merodiet' ) }</h1>
 				</div>
 				<Button variant="primary" onClick={ openAdd }>
 					<PlusIcon />
-					{ __( 'Add client', 'nutrio' ) }
+					{ __( 'Add client', 'merodiet' ) }
 				</Button>
 			</div>
 
@@ -256,7 +259,7 @@ export default function ClientRoster() {
 					onSearchChange={ ( value ) => setFilter( 'search', value ) }
 					searchPlaceholder={ __(
 						'Search name or email…',
-						'nutrio'
+						'merodiet'
 					) }
 					status={ filters.status }
 					onStatusChange={ ( value ) => setFilter( 'status', value ) }
@@ -265,19 +268,19 @@ export default function ClientRoster() {
 			) }
 
 			<Panel>
-				<PanelBody className="nutrio-table-wrap">
-					{ isLoading && <p>{ __( 'Loading…', 'nutrio' ) }</p> }
+				<PanelBody className="merodiet-table-wrap">
+					{ isLoading && <p>{ __( 'Loading…', 'merodiet' ) }</p> }
 
 					{ ! isLoading && clients.length === 0 && (
 						<p>
 							{ isFiltering
 								? __(
 										'No clients match your search.',
-										'nutrio'
+										'merodiet'
 								  )
 								: __(
 										'No clients yet. Add your first client to get started.',
-										'nutrio'
+										'merodiet'
 								  ) }
 						</p>
 					) }
@@ -294,7 +297,7 @@ export default function ClientRoster() {
 										handleBulkMarkStatus( 'active' )
 									}
 								>
-									{ __( 'Mark active', 'nutrio' ) }
+									{ __( 'Mark active', 'merodiet' ) }
 								</Button>
 								<Button
 									variant="ghost"
@@ -302,18 +305,18 @@ export default function ClientRoster() {
 										handleBulkMarkStatus( 'paused' )
 									}
 								>
-									{ __( 'Mark paused', 'nutrio' ) }
+									{ __( 'Mark paused', 'merodiet' ) }
 								</Button>
 								<Button
 									variant="primary"
 									destructive
 									onClick={ handleBulkDelete }
 								>
-									{ __( 'Delete selected', 'nutrio' ) }
+									{ __( 'Delete selected', 'merodiet' ) }
 								</Button>
 							</BulkActionBar>
 
-							<table className="nutrio-table">
+							<table className="merodiet-table">
 								<thead>
 									<tr>
 										<th>
@@ -329,17 +332,20 @@ export default function ClientRoster() {
 												onChange={ bulk.toggleAll }
 												aria-label={ __(
 													'Select all clients',
-													'nutrio'
+													'merodiet'
 												) }
 											/>
 										</th>
-										<th>{ __( 'Name', 'nutrio' ) }</th>
-										<th>{ __( 'Email', 'nutrio' ) }</th>
-										<th>{ __( 'Account', 'nutrio' ) }</th>
+										<th>{ __( 'Name', 'merodiet' ) }</th>
+										<th>{ __( 'Email', 'merodiet' ) }</th>
+										<th>{ __( 'Account', 'merodiet' ) }</th>
 										<th>
-											{ __( 'Client Portal', 'nutrio' ) }
+											{ __(
+												'Client Portal',
+												'merodiet'
+											) }
 										</th>
-										<th>{ __( 'Added', 'nutrio' ) }</th>
+										<th>{ __( 'Added', 'merodiet' ) }</th>
 										<th></th>
 									</tr>
 								</thead>
@@ -347,7 +353,7 @@ export default function ClientRoster() {
 									{ clients.map( ( client ) => (
 										<tr
 											key={ client.id }
-											className="nutrio-row-clickable"
+											className="merodiet-row-clickable"
 											onClick={ () =>
 												openDetail( client.id )
 											}
@@ -369,14 +375,14 @@ export default function ClientRoster() {
 														/* translators: %s: client's full name */
 														__(
 															'Select %s',
-															'nutrio'
+															'merodiet'
 														),
 														`${ client.first_name } ${ client.last_name }`
 													) }
 												/>
 											</td>
 											<td>
-												<div className="nutrio-cell-name">
+												<div className="merodiet-cell-name">
 													<Avatar
 														id={ client.id }
 														firstName={
@@ -403,14 +409,14 @@ export default function ClientRoster() {
 													>
 														{ __(
 															'Active',
-															'nutrio'
+															'merodiet'
 														) }
 													</span>
 												) : (
 													<Chip tone="clay">
 														{ __(
 															'Paused',
-															'nutrio'
+															'merodiet'
 														) }
 													</Chip>
 												) }
@@ -440,18 +446,18 @@ export default function ClientRoster() {
 													event.stopPropagation()
 												}
 											>
-												<div className="nutrio-row-actions">
+												<div className="merodiet-row-actions">
 													<IconButton
 														label={
 															client.portal_status ===
 															'not_invited'
 																? __(
 																		'Invite to client portal',
-																		'nutrio'
+																		'merodiet'
 																  )
 																: __(
 																		'Already invited to client portal',
-																		'nutrio'
+																		'merodiet'
 																  )
 														}
 														onClick={ () =>
@@ -469,7 +475,7 @@ export default function ClientRoster() {
 													<IconButton
 														label={ __(
 															'Remove client',
-															'nutrio'
+															'merodiet'
 														) }
 														onClick={ () =>
 															handleDelete(
@@ -501,13 +507,13 @@ export default function ClientRoster() {
 
 			<Drawer
 				isOpen={ isDrawerOpen }
-				title={ __( 'Add client', 'nutrio' ) }
+				title={ __( 'Add client', 'merodiet' ) }
 				onClose={ closeDrawer }
 				confirmClose={ async () =>
 					! isFormDirty ||
 					confirmDialog( {
-						message: __( 'Discard unsaved changes?', 'nutrio' ),
-						confirmLabel: __( 'Discard', 'nutrio' ),
+						message: __( 'Discard unsaved changes?', 'merodiet' ),
+						confirmLabel: __( 'Discard', 'merodiet' ),
 						destructive: true,
 					} )
 				}

@@ -2,17 +2,17 @@
 /**
  * The client portal's front-end request handler.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Clients;
+namespace MeroDiet\Clients;
 
-use Nutrio\Email\EmailSender;
-use Nutrio\Email\Mailer;
-use Nutrio\Helper\Assets;
-use Nutrio\Repositories\ClientRepository;
+use MeroDiet\Email\EmailSender;
+use MeroDiet\Email\Mailer;
+use MeroDiet\Helper\Assets;
+use MeroDiet\Repositories\ClientRepository;
 use PHPMailer\PHPMailer\PHPMailer;
 use WP_Error;
 use WP_User;
@@ -28,7 +28,7 @@ use WP_User;
  */
 final class PortalPage {
 
-	private const MOUNT_ELEMENT_ID = 'nutrio-client-portal-app';
+	private const MOUNT_ELEMENT_ID = 'merodiet-client-portal-app';
 	private const SCRIPT_ENTRY     = 'client-portal';
 
 	/**
@@ -59,7 +59,7 @@ final class PortalPage {
 			define( 'DONOTCACHEPAGE', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- a WP-core-recognized cache-plugin convention, not our own constant to prefix.
 		}
 
-		$action = isset( $_GET['nutrio_action'] ) ? sanitize_text_field( wp_unslash( $_GET['nutrio_action'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only routing choice, not itself a state-changing action; each form below carries its own nonce.
+		$action = isset( $_GET['merodiet_action'] ) ? sanitize_text_field( wp_unslash( $_GET['merodiet_action'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only routing choice, not itself a state-changing action; each form below carries its own nonce.
 
 		// A reset link is authorised by its key alone (like wp-login.php's
 		// own), so it must work even when the browser already holds some
@@ -103,7 +103,7 @@ final class PortalPage {
 	 * @param WP_User $current_user The logged-in user, as resolved from the session.
 	 */
 	public function current_user_is_a_linked_client( WP_User $current_user ): bool {
-		if ( ! $current_user->has_cap( 'view_own_nutrio_plan' ) ) {
+		if ( ! $current_user->has_cap( 'view_own_merodiet_plan' ) ) {
 			return false;
 		}
 
@@ -124,7 +124,7 @@ final class PortalPage {
 			return $redirect_to;
 		}
 
-		if ( ! $user->has_cap( 'view_own_nutrio_plan' ) ) {
+		if ( ! $user->has_cap( 'view_own_merodiet_plan' ) ) {
 			return $redirect_to;
 		}
 
@@ -145,7 +145,7 @@ final class PortalPage {
 	 * @param WP_User $user_data  The user the reset is for.
 	 */
 	public function customize_reset_password_email( string $message, string $key, string $user_login, WP_User $user_data ): string {
-		if ( ! $user_data->has_cap( 'view_own_nutrio_plan' ) ) {
+		if ( ! $user_data->has_cap( 'view_own_merodiet_plan' ) ) {
 			return $message;
 		}
 
@@ -174,7 +174,7 @@ final class PortalPage {
 	 * @param WP_User $user_data  The user the reset is for.
 	 */
 	public function customize_reset_password_subject( string $title, string $user_login, WP_User $user_data ): string {
-		if ( ! $user_data->has_cap( 'view_own_nutrio_plan' ) ) {
+		if ( ! $user_data->has_cap( 'view_own_merodiet_plan' ) ) {
 			return $title;
 		}
 
@@ -234,9 +234,9 @@ final class PortalPage {
 		$reset_url = '' !== $key
 			? add_query_arg(
 				array(
-					'nutrio_action' => 'resetpass',
-					'key'           => $key,
-					'login'         => rawurlencode( $user_login ),
+					'merodiet_action' => 'resetpass',
+					'key'             => $key,
+					'login'           => rawurlencode( $user_login ),
 				),
 				PortalRewrite::url()
 			)
@@ -263,19 +263,19 @@ final class PortalPage {
 	 * @return WP_Error|null The failure, if the attempt (or its nonce) was invalid; null if there was no attempt, or on success (which redirects and exits before returning).
 	 */
 	private function maybe_process_login(): ?WP_Error {
-		if ( ! isset( $_POST['nutrio_login_nonce'] ) ) {
+		if ( ! isset( $_POST['merodiet_login_nonce'] ) ) {
 			return null;
 		}
 
-		// Present only when this submission came from the [nutrio_client_portal]
+		// Present only when this submission came from the [merodiet_client_portal]
 		// shortcode embedded on a themed page (see render_login_card_markup()) —
 		// a failed attempt bounces back there instead of rendering inline on
 		// this dedicated page. wp_validate_redirect() collapses anything
 		// off-site (or absent) to '', which fail_login() treats as "not embedded".
 		$redirect_to = isset( $_POST['redirect_to'] ) ? wp_validate_redirect( (string) wp_unslash( $_POST['redirect_to'] ), '' ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- wp_validate_redirect() sanitizes.
 
-		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nutrio_login_nonce'] ) ), 'nutrio_portal_login' ) ) {
-			return $this->fail_login( new WP_Error( 'invalid_nonce', __( 'Your session expired — please try again.', 'nutrio' ) ), $redirect_to );
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['merodiet_login_nonce'] ) ), 'merodiet_portal_login' ) ) {
+			return $this->fail_login( new WP_Error( 'invalid_nonce', __( 'Your session expired — please try again.', 'merodiet' ) ), $redirect_to );
 		}
 
 		$username = isset( $_POST['log'] ) ? sanitize_text_field( wp_unslash( $_POST['log'] ) ) : '';
@@ -287,10 +287,10 @@ final class PortalPage {
 		$errors = new WP_Error();
 
 		if ( '' === trim( $username ) ) {
-			$errors->add( 'empty_username', __( 'Please enter your username or email address.', 'nutrio' ) );
+			$errors->add( 'empty_username', __( 'Please enter your username or email address.', 'merodiet' ) );
 		}
 		if ( '' === $password ) {
-			$errors->add( 'empty_password', __( 'Please enter your password.', 'nutrio' ) );
+			$errors->add( 'empty_password', __( 'Please enter your password.', 'merodiet' ) );
 		}
 
 		if ( $errors->has_errors() ) {
@@ -331,7 +331,7 @@ final class PortalPage {
 			return $error;
 		}
 
-		wp_safe_redirect( add_query_arg( 'nutrio_login_error', $error->get_error_code(), $redirect_to ) );
+		wp_safe_redirect( add_query_arg( 'merodiet_login_error', $error->get_error_code(), $redirect_to ) );
 		exit;
 	}
 
@@ -344,18 +344,18 @@ final class PortalPage {
 	 */
 	private function render_login_errors( WP_Error $error ): void {
 		$messages = array(
-			'empty_username'    => __( 'Please enter your username or email address.', 'nutrio' ),
-			'empty_password'    => __( 'Please enter your password.', 'nutrio' ),
-			'invalid_nonce'     => __( 'Your session expired — please try again.', 'nutrio' ),
-			'password_mismatch' => __( 'The two passwords you entered do not match.', 'nutrio' ),
-			'expired_key'       => __( 'This password reset link has expired. Please request a new one.', 'nutrio' ),
-			'invalid_key'       => __( 'This password reset link is no longer valid. Please request a new one.', 'nutrio' ),
+			'empty_username'    => __( 'Please enter your username or email address.', 'merodiet' ),
+			'empty_password'    => __( 'Please enter your password.', 'merodiet' ),
+			'invalid_nonce'     => __( 'Your session expired — please try again.', 'merodiet' ),
+			'password_mismatch' => __( 'The two passwords you entered do not match.', 'merodiet' ),
+			'expired_key'       => __( 'This password reset link has expired. Please request a new one.', 'merodiet' ),
+			'invalid_key'       => __( 'This password reset link is no longer valid. Please request a new one.', 'merodiet' ),
 		);
 
 		// Any credential-mismatch code (invalid_username, incorrect_password,
 		// invalid_email, ...) collapses to one generic message — deliberately
 		// not confirming or denying whether the username/email exists.
-		$generic = __( 'Incorrect username or password.', 'nutrio' );
+		$generic = __( 'Incorrect username or password.', 'merodiet' );
 
 		$shown = array();
 
@@ -365,7 +365,7 @@ final class PortalPage {
 
 		$shown = array_unique( $shown );
 		?>
-		<div class="nutrio-portal-login-error">
+		<div class="merodiet-portal-login-error">
 			<?php foreach ( $shown as $message ) : ?>
 				<p><?php echo esc_html( $message ); ?></p>
 			<?php endforeach; ?>
@@ -383,18 +383,18 @@ final class PortalPage {
 	 * @return true|WP_Error|null True on a sent email, a WP_Error on failure, or null if this request wasn't a submission (just viewing the form).
 	 */
 	private function maybe_process_lost_password(): bool|WP_Error|null {
-		if ( ! isset( $_POST['nutrio_lostpassword_nonce'] ) ) {
+		if ( ! isset( $_POST['merodiet_lostpassword_nonce'] ) ) {
 			return null;
 		}
 
-		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nutrio_lostpassword_nonce'] ) ), 'nutrio_portal_lostpassword' ) ) {
-			return new WP_Error( 'invalid_nonce', __( 'Your session expired — please try again.', 'nutrio' ) );
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['merodiet_lostpassword_nonce'] ) ), 'merodiet_portal_lostpassword' ) ) {
+			return new WP_Error( 'invalid_nonce', __( 'Your session expired — please try again.', 'merodiet' ) );
 		}
 
 		$login = isset( $_POST['user_login'] ) ? sanitize_text_field( wp_unslash( $_POST['user_login'] ) ) : '';
 
 		if ( '' === trim( $login ) ) {
-			return new WP_Error( 'empty_username', __( 'Please enter your username or email address.', 'nutrio' ) );
+			return new WP_Error( 'empty_username', __( 'Please enter your username or email address.', 'merodiet' ) );
 		}
 
 		return retrieve_password( $login );
@@ -407,55 +407,55 @@ final class PortalPage {
 	 * @param true|WP_Error|null $result The outcome of a just-submitted request, if any (null when just viewing the form).
 	 */
 	private function render_lost_password_form( bool|WP_Error|null $result ): void {
-		Assets::enqueue_style( 'nutrio-portal-login', NUTRIO_PATH . 'build', NUTRIO_URL . 'build', 'portal-login' );
+		Assets::enqueue_style( 'merodiet-portal-login', MERODIET_PATH . 'build', MERODIET_URL . 'build', 'portal-login' );
 		?>
 		<!DOCTYPE html>
 		<html <?php language_attributes(); ?>>
 		<head>
 			<meta charset="<?php bloginfo( 'charset' ); ?>" />
 			<meta name="viewport" content="width=device-width, initial-scale=1" />
-			<title><?php echo esc_html( get_bloginfo( 'name' ) ); ?> — <?php esc_html_e( 'Reset Password', 'nutrio' ); ?></title>
+			<title><?php echo esc_html( get_bloginfo( 'name' ) ); ?> — <?php esc_html_e( 'Reset Password', 'merodiet' ); ?></title>
 			<?php $this->render_theme_init_script(); ?>
 			<?php wp_head(); ?>
 		</head>
-		<body class="nutrio-portal-login">
-			<main class="nutrio-portal-login-card">
+		<body class="merodiet-portal-login">
+			<main class="merodiet-portal-login-card">
 				<?php $this->render_site_logo(); ?>
-				<div class="nutrio-portal-login-heading">
-					<h1><?php esc_html_e( 'Reset Password', 'nutrio' ); ?></h1>
+				<div class="merodiet-portal-login-heading">
+					<h1><?php esc_html_e( 'Reset Password', 'merodiet' ); ?></h1>
 					<button
 						type="button"
-						class="nutrio-portal-theme-toggle"
-						onclick="window.nutrioTogglePortalTheme()"
-						aria-label="<?php esc_attr_e( 'Toggle dark mode', 'nutrio' ); ?>"
-						title="<?php esc_attr_e( 'Toggle dark mode', 'nutrio' ); ?>"
+						class="merodiet-portal-theme-toggle"
+						onclick="window.merodietTogglePortalTheme()"
+						aria-label="<?php esc_attr_e( 'Toggle dark mode', 'merodiet' ); ?>"
+						title="<?php esc_attr_e( 'Toggle dark mode', 'merodiet' ); ?>"
 					>
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nutrio-portal-theme-icon-sun"><circle cx="12" cy="12" r="4" /><path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" /></svg>
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nutrio-portal-theme-icon-moon"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" /></svg>
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="merodiet-portal-theme-icon-sun"><circle cx="12" cy="12" r="4" /><path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" /></svg>
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="merodiet-portal-theme-icon-moon"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" /></svg>
 					</button>
 				</div>
 				<?php if ( true === $result ) : ?>
-					<div class="nutrio-portal-login-success">
-						<p><?php esc_html_e( 'Check your email for a link to reset your password.', 'nutrio' ); ?></p>
+					<div class="merodiet-portal-login-success">
+						<p><?php esc_html_e( 'Check your email for a link to reset your password.', 'merodiet' ); ?></p>
 					</div>
 				<?php elseif ( $result instanceof WP_Error ) : ?>
 					<?php $this->render_login_errors( $result ); ?>
 				<?php endif; ?>
 				<?php if ( true !== $result ) : ?>
-					<form name="lostpasswordform" id="loginform" method="post" action="<?php echo esc_url( add_query_arg( 'nutrio_action', 'lostpassword', PortalRewrite::url() ) ); ?>">
+					<form name="lostpasswordform" id="loginform" method="post" action="<?php echo esc_url( add_query_arg( 'merodiet_action', 'lostpassword', PortalRewrite::url() ) ); ?>">
 						<p class="login-username">
-							<label for="user_login"><?php esc_html_e( 'Username or Email Address', 'nutrio' ); ?></label>
+							<label for="user_login"><?php esc_html_e( 'Username or Email Address', 'merodiet' ); ?></label>
 							<input type="text" name="user_login" id="user_login" class="input" value="" size="20" autocapitalize="off" autocomplete="username" />
 						</p>
 						<p class="login-submit">
-							<?php wp_nonce_field( 'nutrio_portal_lostpassword', 'nutrio_lostpassword_nonce' ); ?>
-							<input type="submit" name="wp-submit" id="wp-submit" value="<?php esc_attr_e( 'Get New Password', 'nutrio' ); ?>" />
+							<?php wp_nonce_field( 'merodiet_portal_lostpassword', 'merodiet_lostpassword_nonce' ); ?>
+							<input type="submit" name="wp-submit" id="wp-submit" value="<?php esc_attr_e( 'Get New Password', 'merodiet' ); ?>" />
 						</p>
 					</form>
 				<?php endif; ?>
-				<p class="nutrio-portal-login-lostpassword">
+				<p class="merodiet-portal-login-lostpassword">
 					<a href="<?php echo esc_url( PortalRewrite::url() ); ?>">
-						<?php esc_html_e( '← Back to log in', 'nutrio' ); ?>
+						<?php esc_html_e( '← Back to log in', 'merodiet' ); ?>
 					</a>
 				</p>
 			</main>
@@ -485,13 +485,13 @@ final class PortalPage {
 			return;
 		}
 
-		if ( ! isset( $_POST['nutrio_resetpass_nonce'] ) ) {
+		if ( ! isset( $_POST['merodiet_resetpass_nonce'] ) ) {
 			$this->render_reset_password_form( $key, $login, null );
 			return;
 		}
 
-		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nutrio_resetpass_nonce'] ) ), 'nutrio_portal_resetpass' ) ) {
-			$this->render_reset_password_form( $key, $login, new WP_Error( 'invalid_nonce', __( 'Your session expired — please try again.', 'nutrio' ) ) );
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['merodiet_resetpass_nonce'] ) ), 'merodiet_portal_resetpass' ) ) {
+			$this->render_reset_password_form( $key, $login, new WP_Error( 'invalid_nonce', __( 'Your session expired — please try again.', 'merodiet' ) ) );
 			return;
 		}
 
@@ -501,9 +501,9 @@ final class PortalPage {
 		$errors = new WP_Error();
 
 		if ( '' === $pass1 ) {
-			$errors->add( 'empty_password', __( 'Please enter a new password.', 'nutrio' ) );
+			$errors->add( 'empty_password', __( 'Please enter a new password.', 'merodiet' ) );
 		} elseif ( $pass1 !== $pass2 ) {
-			$errors->add( 'password_mismatch', __( 'The two passwords you entered do not match.', 'nutrio' ) );
+			$errors->add( 'password_mismatch', __( 'The two passwords you entered do not match.', 'merodiet' ) );
 		}
 
 		if ( $errors->has_errors() ) {
@@ -535,12 +535,12 @@ final class PortalPage {
 	 * @param WP_Error|null $error  A failure from this same request, if any (an expired/invalid key, a validation failure, or a bad nonce).
 	 */
 	private function render_reset_password_form( string $key, string $login, ?WP_Error $error ): void {
-		Assets::enqueue_style( 'nutrio-portal-login', NUTRIO_PATH . 'build', NUTRIO_URL . 'build', 'portal-login' );
+		Assets::enqueue_style( 'merodiet-portal-login', MERODIET_PATH . 'build', MERODIET_URL . 'build', 'portal-login' );
 		$action_url = add_query_arg(
 			array(
-				'nutrio_action' => 'resetpass',
-				'key'           => $key,
-				'login'         => rawurlencode( $login ),
+				'merodiet_action' => 'resetpass',
+				'key'             => $key,
+				'login'           => rawurlencode( $login ),
 			),
 			PortalRewrite::url()
 		);
@@ -553,24 +553,24 @@ final class PortalPage {
 		<head>
 			<meta charset="<?php bloginfo( 'charset' ); ?>" />
 			<meta name="viewport" content="width=device-width, initial-scale=1" />
-			<title><?php echo esc_html( get_bloginfo( 'name' ) ); ?> — <?php esc_html_e( 'Reset Password', 'nutrio' ); ?></title>
+			<title><?php echo esc_html( get_bloginfo( 'name' ) ); ?> — <?php esc_html_e( 'Reset Password', 'merodiet' ); ?></title>
 			<?php $this->render_theme_init_script(); ?>
 			<?php wp_head(); ?>
 		</head>
-		<body class="nutrio-portal-login">
-			<main class="nutrio-portal-login-card">
+		<body class="merodiet-portal-login">
+			<main class="merodiet-portal-login-card">
 				<?php $this->render_site_logo(); ?>
-				<div class="nutrio-portal-login-heading">
-					<h1><?php esc_html_e( 'Reset Password', 'nutrio' ); ?></h1>
+				<div class="merodiet-portal-login-heading">
+					<h1><?php esc_html_e( 'Reset Password', 'merodiet' ); ?></h1>
 					<button
 						type="button"
-						class="nutrio-portal-theme-toggle"
-						onclick="window.nutrioTogglePortalTheme()"
-						aria-label="<?php esc_attr_e( 'Toggle dark mode', 'nutrio' ); ?>"
-						title="<?php esc_attr_e( 'Toggle dark mode', 'nutrio' ); ?>"
+						class="merodiet-portal-theme-toggle"
+						onclick="window.merodietTogglePortalTheme()"
+						aria-label="<?php esc_attr_e( 'Toggle dark mode', 'merodiet' ); ?>"
+						title="<?php esc_attr_e( 'Toggle dark mode', 'merodiet' ); ?>"
 					>
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nutrio-portal-theme-icon-sun"><circle cx="12" cy="12" r="4" /><path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" /></svg>
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nutrio-portal-theme-icon-moon"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" /></svg>
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="merodiet-portal-theme-icon-sun"><circle cx="12" cy="12" r="4" /><path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" /></svg>
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="merodiet-portal-theme-icon-moon"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" /></svg>
 					</button>
 				</div>
 				<?php if ( $error instanceof WP_Error ) : ?>
@@ -579,28 +579,28 @@ final class PortalPage {
 				<?php if ( $key_is_valid ) : ?>
 					<form name="resetpassform" id="loginform" method="post" action="<?php echo esc_url( $action_url ); ?>">
 						<p class="login-password">
-							<label for="pass1"><?php esc_html_e( 'New Password', 'nutrio' ); ?></label>
+							<label for="pass1"><?php esc_html_e( 'New Password', 'merodiet' ); ?></label>
 							<input type="password" name="pass1" id="pass1" class="input" value="" size="20" autocomplete="new-password" />
 						</p>
 						<p class="login-password">
-							<label for="pass2"><?php esc_html_e( 'Confirm New Password', 'nutrio' ); ?></label>
+							<label for="pass2"><?php esc_html_e( 'Confirm New Password', 'merodiet' ); ?></label>
 							<input type="password" name="pass2" id="pass2" class="input" value="" size="20" autocomplete="new-password" />
 						</p>
 						<p class="login-submit">
-							<?php wp_nonce_field( 'nutrio_portal_resetpass', 'nutrio_resetpass_nonce' ); ?>
-							<input type="submit" name="wp-submit" id="wp-submit" value="<?php esc_attr_e( 'Save New Password', 'nutrio' ); ?>" />
+							<?php wp_nonce_field( 'merodiet_portal_resetpass', 'merodiet_resetpass_nonce' ); ?>
+							<input type="submit" name="wp-submit" id="wp-submit" value="<?php esc_attr_e( 'Save New Password', 'merodiet' ); ?>" />
 						</p>
 					</form>
 				<?php else : ?>
-					<p class="nutrio-portal-login-lostpassword">
-						<a href="<?php echo esc_url( add_query_arg( 'nutrio_action', 'lostpassword', PortalRewrite::url() ) ); ?>">
-							<?php esc_html_e( 'Request a new reset link', 'nutrio' ); ?>
+					<p class="merodiet-portal-login-lostpassword">
+						<a href="<?php echo esc_url( add_query_arg( 'merodiet_action', 'lostpassword', PortalRewrite::url() ) ); ?>">
+							<?php esc_html_e( 'Request a new reset link', 'merodiet' ); ?>
 						</a>
 					</p>
 				<?php endif; ?>
-				<p class="nutrio-portal-login-lostpassword">
+				<p class="merodiet-portal-login-lostpassword">
 					<a href="<?php echo esc_url( PortalRewrite::url() ); ?>">
-						<?php esc_html_e( '← Back to log in', 'nutrio' ); ?>
+						<?php esc_html_e( '← Back to log in', 'merodiet' ); ?>
 					</a>
 				</p>
 			</main>
@@ -617,18 +617,18 @@ final class PortalPage {
 	 * @param WP_Error|null $error A failed attempt from this same request, if any.
 	 */
 	private function render_login_form( ?WP_Error $error = null ): void {
-		Assets::enqueue_style( 'nutrio-portal-login', NUTRIO_PATH . 'build', NUTRIO_URL . 'build', 'portal-login' );
+		Assets::enqueue_style( 'merodiet-portal-login', MERODIET_PATH . 'build', MERODIET_URL . 'build', 'portal-login' );
 		?>
 		<!DOCTYPE html>
 		<html <?php language_attributes(); ?>>
 		<head>
 			<meta charset="<?php bloginfo( 'charset' ); ?>" />
 			<meta name="viewport" content="width=device-width, initial-scale=1" />
-			<title><?php echo esc_html( get_bloginfo( 'name' ) ); ?> — <?php esc_html_e( 'Client Portal', 'nutrio' ); ?></title>
+			<title><?php echo esc_html( get_bloginfo( 'name' ) ); ?> — <?php esc_html_e( 'Client Portal', 'merodiet' ); ?></title>
 			<?php $this->render_theme_init_script(); ?>
 			<?php wp_head(); ?>
 		</head>
-		<body class="nutrio-portal-login">
+		<body class="merodiet-portal-login">
 			<?php $this->render_login_card_markup( $error ); ?>
 			<?php wp_footer(); ?>
 		</body>
@@ -638,31 +638,31 @@ final class PortalPage {
 
 	/**
 	 * The login card fragment — shared by this page's own full-screen
-	 * render_login_form() and the [nutrio_client_portal] shortcode's
+	 * render_login_form() and the [merodiet_client_portal] shortcode's
 	 * embedded render_shortcode(). Never rendered standalone: always
-	 * inside either that page's <body class="nutrio-portal-login"> or a
+	 * inside either that page's <body class="merodiet-portal-login"> or a
 	 * themed page's content area.
 	 *
 	 * @param WP_Error|null $error            A failed attempt to show inline, if any.
 	 * @param string        $redirect_to      When embedded, the themed page to bounce a failed attempt back to — carried as a hidden field so maybe_process_login()/fail_login() can read it back. Empty on the dedicated page itself, where a failure just re-renders in place.
-	 * @param bool          $show_theme_toggle The toggle button calls window.nutrioTogglePortalTheme(), only defined by render_theme_init_script() in this page's own <head> — dead on a themed page, which also already has its own light/dark story. False when embedded.
+	 * @param bool          $show_theme_toggle The toggle button calls window.merodietTogglePortalTheme(), only defined by render_theme_init_script() in this page's own <head> — dead on a themed page, which also already has its own light/dark story. False when embedded.
 	 */
 	private function render_login_card_markup( ?WP_Error $error, string $redirect_to = '', bool $show_theme_toggle = true ): void {
 		?>
-		<main class="nutrio-portal-login-card">
+		<main class="merodiet-portal-login-card">
 			<?php $this->render_site_logo(); ?>
-			<div class="nutrio-portal-login-heading">
-				<h1><?php esc_html_e( 'Client Portal', 'nutrio' ); ?></h1>
+			<div class="merodiet-portal-login-heading">
+				<h1><?php esc_html_e( 'Client Portal', 'merodiet' ); ?></h1>
 				<?php if ( $show_theme_toggle ) : ?>
 					<button
 						type="button"
-						class="nutrio-portal-theme-toggle"
-						onclick="window.nutrioTogglePortalTheme()"
-						aria-label="<?php esc_attr_e( 'Toggle dark mode', 'nutrio' ); ?>"
-						title="<?php esc_attr_e( 'Toggle dark mode', 'nutrio' ); ?>"
+						class="merodiet-portal-theme-toggle"
+						onclick="window.merodietTogglePortalTheme()"
+						aria-label="<?php esc_attr_e( 'Toggle dark mode', 'merodiet' ); ?>"
+						title="<?php esc_attr_e( 'Toggle dark mode', 'merodiet' ); ?>"
 					>
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nutrio-portal-theme-icon-sun"><circle cx="12" cy="12" r="4" /><path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" /></svg>
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nutrio-portal-theme-icon-moon"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" /></svg>
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="merodiet-portal-theme-icon-sun"><circle cx="12" cy="12" r="4" /><path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" /></svg>
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="merodiet-portal-theme-icon-moon"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" /></svg>
 					</button>
 				<?php endif; ?>
 			</div>
@@ -674,25 +674,25 @@ final class PortalPage {
 					<input type="hidden" name="redirect_to" value="<?php echo esc_attr( $redirect_to ); ?>" />
 				<?php endif; ?>
 				<p class="login-username">
-					<label for="user_login"><?php esc_html_e( 'Username or Email Address', 'nutrio' ); ?></label>
+					<label for="user_login"><?php esc_html_e( 'Username or Email Address', 'merodiet' ); ?></label>
 					<input type="text" name="log" id="user_login" class="input" value="" size="20" autocapitalize="off" autocomplete="username" />
 				</p>
 				<p class="login-password">
-					<label for="user_pass"><?php esc_html_e( 'Password', 'nutrio' ); ?></label>
+					<label for="user_pass"><?php esc_html_e( 'Password', 'merodiet' ); ?></label>
 					<input type="password" name="pwd" id="user_pass" class="input" value="" size="20" autocomplete="current-password" />
 				</p>
 				<p class="forgetmenot">
 					<input name="rememberme" type="checkbox" id="rememberme" value="forever" />
-					<label for="rememberme"><?php esc_html_e( 'Remember Me', 'nutrio' ); ?></label>
+					<label for="rememberme"><?php esc_html_e( 'Remember Me', 'merodiet' ); ?></label>
 				</p>
 				<p class="login-submit">
-					<?php wp_nonce_field( 'nutrio_portal_login', 'nutrio_login_nonce' ); ?>
-					<input type="submit" name="wp-submit" id="wp-submit" value="<?php esc_attr_e( 'Log In', 'nutrio' ); ?>" />
+					<?php wp_nonce_field( 'merodiet_portal_login', 'merodiet_login_nonce' ); ?>
+					<input type="submit" name="wp-submit" id="wp-submit" value="<?php esc_attr_e( 'Log In', 'merodiet' ); ?>" />
 				</p>
 			</form>
-			<p class="nutrio-portal-login-lostpassword">
-				<a href="<?php echo esc_url( add_query_arg( 'nutrio_action', 'lostpassword', PortalRewrite::url() ) ); ?>">
-					<?php esc_html_e( 'Forgot your password?', 'nutrio' ); ?>
+			<p class="merodiet-portal-login-lostpassword">
+				<a href="<?php echo esc_url( add_query_arg( 'merodiet_action', 'lostpassword', PortalRewrite::url() ) ); ?>">
+					<?php esc_html_e( 'Forgot your password?', 'merodiet' ); ?>
 				</a>
 			</p>
 		</main>
@@ -700,10 +700,10 @@ final class PortalPage {
 	}
 
 	/**
-	 * [nutrio_client_portal] — embeds just the login card inside an
+	 * [merodiet_client_portal] — embeds just the login card inside an
 	 * ordinary themed page (header/footer stay intact around it); the
 	 * full app still needs its own dedicated page (see class docblock —
-	 * .nutrio-shell/.nutrio-rail assume a full 100vh layout an arbitrary
+	 * .merodiet-shell/.merodiet-rail assume a full 100vh layout an arbitrary
 	 * theme's content area can't provide). The login form itself still
 	 * posts to the dedicated page (see render_login_card_markup()) —
 	 * this shortcode never processes a login attempt directly.
@@ -714,32 +714,32 @@ final class PortalPage {
 	 * @param array<string, string>|string $atts Shortcode attributes — only `theme` ("light", the default, or "dark") is recognized; anything else is ignored. Unlike the dedicated page, there's no toggle button here (see render_login_card_markup()) and no data-theme on <html> to read, so this is a fixed, author-chosen setting rather than something the visitor can flip.
 	 */
 	public function render_shortcode( $atts = array() ): string {
-		Assets::enqueue_style( 'nutrio-portal-login', NUTRIO_PATH . 'build', NUTRIO_URL . 'build', 'portal-login' );
+		Assets::enqueue_style( 'merodiet-portal-login', MERODIET_PATH . 'build', MERODIET_URL . 'build', 'portal-login' );
 
-		$atts  = shortcode_atts( array( 'theme' => 'light' ), $atts, 'nutrio_client_portal' );
+		$atts  = shortcode_atts( array( 'theme' => 'light' ), $atts, 'merodiet_client_portal' );
 		$theme = 'dark' === $atts['theme'] ? 'dark' : 'light';
 
 		if ( is_user_logged_in() && $this->current_user_is_a_linked_client( wp_get_current_user() ) ) {
 			return sprintf(
-				'<div class="nutrio-portal-embed" data-theme="%s"><p class="nutrio-portal-login-lostpassword"><a href="%s">%s</a></p></div>',
+				'<div class="merodiet-portal-embed" data-theme="%s"><p class="merodiet-portal-login-lostpassword"><a href="%s">%s</a></p></div>',
 				esc_attr( $theme ),
 				esc_url( PortalRewrite::url() ),
-				esc_html__( 'You are already logged in — go to your portal →', 'nutrio' )
+				esc_html__( 'You are already logged in — go to your portal →', 'merodiet' )
 			);
 		}
 
 		// Set only when we just bounced back from a failed attempt (see
 		// fail_login()) — the code is our own, never user-supplied free text.
-		$error_code = isset( $_GET['nutrio_login_error'] ) ? sanitize_text_field( wp_unslash( $_GET['nutrio_login_error'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display of a code this same class generated via a redirect, not a state-changing action.
+		$error_code = isset( $_GET['merodiet_login_error'] ) ? sanitize_text_field( wp_unslash( $_GET['merodiet_login_error'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display of a code this same class generated via a redirect, not a state-changing action.
 		$error      = '' !== $error_code ? new WP_Error( $error_code ) : null;
 
 		// Where a failed resubmission should bounce back to — this same
 		// page, with the error code itself stripped so a retry starts clean.
-		$redirect_to = remove_query_arg( 'nutrio_login_error' );
+		$redirect_to = remove_query_arg( 'merodiet_login_error' );
 
 		ob_start();
 		?>
-		<div class="nutrio-portal-embed" data-theme="<?php echo esc_attr( $theme ); ?>">
+		<div class="merodiet-portal-embed" data-theme="<?php echo esc_attr( $theme ); ?>">
 			<?php $this->render_login_card_markup( $error, $redirect_to, false ); ?>
 		</div>
 		<?php
@@ -757,11 +757,10 @@ final class PortalPage {
 	 * click handler, since this page has no React runtime to attach one.
 	 */
 	private function render_theme_init_script(): void {
-		?>
-		<script>
+		$script = <<<'JS'
 			( function () {
 				try {
-					var saved = window.localStorage.getItem( 'nutrio-theme' );
+					var saved = window.localStorage.getItem( 'merodiet-theme' );
 					if ( 'dark' === saved || 'light' === saved ) {
 						document.documentElement.setAttribute( 'data-theme', saved );
 					}
@@ -770,21 +769,26 @@ final class PortalPage {
 					// back to the system preference tokens.css already handles.
 				}
 
-				window.nutrioTogglePortalTheme = function () {
+				window.merodietTogglePortalTheme = function () {
 					var current = document.documentElement.getAttribute( 'data-theme' );
 					var isDark = 'dark' === current ||
 						( ! current && window.matchMedia && window.matchMedia( '(prefers-color-scheme: dark)' ).matches );
 					var next = isDark ? 'light' : 'dark';
 					document.documentElement.setAttribute( 'data-theme', next );
 					try {
-						window.localStorage.setItem( 'nutrio-theme', next );
+						window.localStorage.setItem( 'merodiet-theme', next );
 					} catch ( error ) {
 						// Storage unavailable — the choice just won't persist.
 					}
 				};
 			} )();
-		</script>
-		<?php
+JS;
+
+		// Handle-only script (no src), printed in <head> by the wp_head()
+		// that follows every call to this method.
+		wp_register_script( 'merodiet-portal-theme', false, array(), MERODIET_VERSION, false );
+		wp_enqueue_script( 'merodiet-portal-theme' );
+		wp_add_inline_script( 'merodiet-portal-theme', $script );
 	}
 
 	/**
@@ -797,8 +801,8 @@ final class PortalPage {
 	 */
 	private function render_site_logo(): void {
 		printf(
-			'<div class="nutrio-portal-login-brand"><img src="%1$s" alt="" class="nutrio-portal-login-logo" /><span class="nutrio-portal-login-brand-name">%2$s</span></div>',
-			esc_url( NUTRIO_URL . 'assets/images/nutrio-leaf-email.png' ),
+			'<div class="merodiet-portal-login-brand"><img src="%1$s" alt="" class="merodiet-portal-login-logo" /><span class="merodiet-portal-login-brand-name">%2$s</span></div>',
+			esc_url( MERODIET_URL . 'assets/images/merodiet-logo-email.png' ),
 			esc_html( get_bloginfo( 'name' ) )
 		);
 	}
@@ -812,14 +816,14 @@ final class PortalPage {
 		$this->enqueue_assets( $current_user );
 
 		// Lets an add-on enqueue its own script on this exact page load.
-		do_action( 'nutrio_client_portal_render', $current_user );
+		do_action( 'merodiet_client_portal_render', $current_user );
 		?>
 		<!DOCTYPE html>
 		<html <?php language_attributes(); ?>>
 		<head>
 			<meta charset="<?php bloginfo( 'charset' ); ?>" />
 			<meta name="viewport" content="width=device-width, initial-scale=1" />
-			<title><?php echo esc_html( get_bloginfo( 'name' ) ); ?> — <?php esc_html_e( 'Client Portal', 'nutrio' ); ?></title>
+			<title><?php echo esc_html( get_bloginfo( 'name' ) ); ?> — <?php esc_html_e( 'Client Portal', 'merodiet' ); ?></title>
 			<?php $this->render_theme_init_script(); ?>
 			<?php wp_head(); ?>
 		</head>
@@ -837,16 +841,16 @@ final class PortalPage {
 	 * @param WP_User $current_user The logged-in client's WP user.
 	 */
 	private function enqueue_assets( WP_User $current_user ): void {
-		$handle = 'nutrio-' . self::SCRIPT_ENTRY;
+		$handle = 'merodiet-' . self::SCRIPT_ENTRY;
 
 		Assets::enqueue_script(
 			$handle,
-			NUTRIO_PATH . 'build',
-			NUTRIO_URL . 'build',
+			MERODIET_PATH . 'build',
+			MERODIET_URL . 'build',
 			self::SCRIPT_ENTRY
 		);
-		wp_set_script_translations( $handle, 'nutrio', NUTRIO_PATH . 'languages' );
-		Assets::enqueue_style( $handle, NUTRIO_PATH . 'build', NUTRIO_URL . 'build', self::SCRIPT_ENTRY );
+		wp_set_script_translations( $handle, 'merodiet', MERODIET_PATH . 'languages' );
+		Assets::enqueue_style( $handle, MERODIET_PATH . 'build', MERODIET_URL . 'build', self::SCRIPT_ENTRY );
 
 		$bootstrap_data = array(
 			'restUrl'    => esc_url_raw( rest_url() ),
@@ -864,8 +868,8 @@ final class PortalPage {
 		 * @param array<string, mixed> $bootstrap_data The default bootstrap payload.
 		 * @param WP_User              $current_user   The logged-in client's WP user.
 		 */
-		$bootstrap_data = apply_filters( 'nutrio_client_portal_bootstrap_data', $bootstrap_data, $current_user );
+		$bootstrap_data = apply_filters( 'merodiet_client_portal_bootstrap_data', $bootstrap_data, $current_user );
 
-		wp_localize_script( $handle, 'nutrioClientPortal', $bootstrap_data );
+		wp_localize_script( $handle, 'merodietClientPortal', $bootstrap_data );
 	}
 }

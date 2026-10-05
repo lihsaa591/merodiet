@@ -6,11 +6,11 @@
  * selector below targets that form's actual, fixed output (element
  * ids/classes WordPress core has used unchanged for years:
  * #loginform, .login-username, #user_login, etc.), styled with the
- * same tokens and .nutrio-field look the practitioner admin app uses,
+ * same tokens and .merodiet-field look the practitioner admin app uses,
  * so the two apps read as one product.
  */
 
-body.nutrio-portal-login {
+body.merodiet-portal-login {
 	margin: 0;
 	min-height: 100vh;
 	display: flex;
@@ -22,7 +22,7 @@ body.nutrio-portal-login {
 }
 
 /*
- * [nutrio_client_portal] embeds the card into an arbitrary themed page,
+ * [merodiet_client_portal] embeds the card into an arbitrary themed page,
  * which never runs render_theme_init_script() — so there's no data-theme
  * on <html> to opt out of the @media (prefers-color-scheme: dark) block
  * above, and no toggle button to change it (see render_login_card_markup()
@@ -33,18 +33,18 @@ body.nutrio-portal-login {
  * defined directly on this element, not inherited from :root.
  */
 /*
- * Unlike body.nutrio-portal-login above, this wrapper sits inside a
+ * Unlike body.merodiet-portal-login above, this wrapper sits inside a
  * theme's own content column (any width) rather than a dedicated
  * full-viewport page — it centers the card within whatever space the
  * theme gives it instead of assuming the full page.
  */
-.nutrio-portal-embed {
+.merodiet-portal-embed {
 	display: flex;
 	justify-content: center;
 	padding: 24px 0;
 }
 
-.nutrio-portal-embed[data-theme='light'] {
+.merodiet-portal-embed[data-theme='light'] {
 	--paper: #fafafa;
 	--paper-dim: #f1f1f2;
 	--surface: #ffffff;
@@ -68,7 +68,7 @@ body.nutrio-portal-login {
 	color-scheme: light;
 }
 
-.nutrio-portal-embed[data-theme='dark'] {
+.merodiet-portal-embed[data-theme='dark'] {
 	--paper: #1c1a20;
 	--paper-dim: #151318;
 	--surface: #242229;
@@ -92,7 +92,7 @@ body.nutrio-portal-login {
 	color-scheme: dark;
 }
 
-.nutrio-portal-login-card {
+.merodiet-portal-login-card {
 	background: var(--surface);
 	border: 1px solid var(--line);
 	border-radius: var(--radius);
@@ -102,18 +102,18 @@ body.nutrio-portal-login {
 	box-shadow: 0 1px 4px rgba( 0, 0, 0, 0.08 );
 }
 
-.nutrio-portal-login-heading {
+.merodiet-portal-login-heading {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	gap: 12px;
 	margin: 0 0 24px;
 }
-.nutrio-portal-login-heading h1 {
+.merodiet-portal-login-heading h1 {
 	margin: 0;
 }
 
-.nutrio-portal-theme-toggle {
+.merodiet-portal-theme-toggle {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -127,61 +127,61 @@ body.nutrio-portal-login {
 	cursor: pointer;
 }
 
-.nutrio-portal-theme-toggle:hover {
+.merodiet-portal-theme-toggle:hover {
 	color: var(--ink);
 	border-color: var(--line-strong);
 }
 
-.nutrio-portal-theme-toggle svg {
+.merodiet-portal-theme-toggle svg {
 	width: 15px;
 	height: 15px;
 }
 
-.nutrio-portal-theme-icon-moon {
+.merodiet-portal-theme-icon-moon {
 	display: none;
 }
 
 /* Matches tokens.css's own convention: an explicit data-theme wins,
    otherwise the system preference decides which icon shows. */
 @media (prefers-color-scheme: dark) {
-	:root:not([data-theme='light']) .nutrio-portal-theme-icon-sun {
+	:root:not([data-theme='light']) .merodiet-portal-theme-icon-sun {
 		display: none;
 	}
-	:root:not([data-theme='light']) .nutrio-portal-theme-icon-moon {
+	:root:not([data-theme='light']) .merodiet-portal-theme-icon-moon {
 		display: block;
 	}
 }
-:root[data-theme='dark'] .nutrio-portal-theme-icon-sun {
+:root[data-theme='dark'] .merodiet-portal-theme-icon-sun {
 	display: none;
 }
-:root[data-theme='dark'] .nutrio-portal-theme-icon-moon {
+:root[data-theme='dark'] .merodiet-portal-theme-icon-moon {
 	display: block;
 }
 
-.nutrio-portal-login-brand {
+.merodiet-portal-login-brand {
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	gap: 10px;
 	margin: 0 0 20px;
 }
-.nutrio-portal-login-logo {
+.merodiet-portal-login-logo {
 	display: block;
 	height: 32px;
 	width: auto;
 }
-.nutrio-portal-login-brand-name {
+.merodiet-portal-login-brand-name {
 	font-size: 22px;
 	font-weight: 700;
 	color: var(--ink);
 }
 
-.nutrio-portal-login-card h1 {
+.merodiet-portal-login-card h1 {
 	font-size: 20px;
 	color: var(--ink);
 }
 
-.nutrio-portal-login-error {
+.merodiet-portal-login-error {
 	background: var(--critical-wash);
 	border-left: 3px solid var(--critical);
 	border-radius: 4px;
@@ -189,17 +189,17 @@ body.nutrio-portal-login {
 	margin: 0 0 16px;
 }
 
-.nutrio-portal-login-error p {
+.merodiet-portal-login-error p {
 	margin: 0;
 	font-size: 13px;
 	color: var(--ink);
 }
 
-.nutrio-portal-login-error p + p {
+.merodiet-portal-login-error p + p {
 	margin-top: 4px;
 }
 
-.nutrio-portal-login-success {
+.merodiet-portal-login-success {
 	background: var(--success-wash);
 	border-left: 3px solid var(--success);
 	border-radius: 4px;
@@ -207,7 +207,7 @@ body.nutrio-portal-login {
 	margin: 0 0 16px;
 }
 
-.nutrio-portal-login-success p {
+.merodiet-portal-login-success p {
 	margin: 0;
 	font-size: 13px;
 	color: var(--ink);
@@ -285,17 +285,17 @@ body.nutrio-portal-login {
 	background: var(--sage-deep);
 }
 
-.nutrio-portal-login-lostpassword {
+.merodiet-portal-login-lostpassword {
 	margin: 16px 0 0;
 	text-align: center;
 	font-size: 13px;
 }
 
-.nutrio-portal-login-lostpassword a {
+.merodiet-portal-login-lostpassword a {
 	color: var(--sage);
 	text-decoration: none;
 }
 
-.nutrio-portal-login-lostpassword a:hover {
+.merodiet-portal-login-lostpassword a:hover {
 	text-decoration: underline;
 }

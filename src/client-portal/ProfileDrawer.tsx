@@ -18,7 +18,7 @@ function ProfileDrawerSkeleton() {
 				<Skeleton width="90px" height="13px" />
 			</div>
 			{ [ 0, 1, 2, 3 ].map( ( row ) => (
-				<div key={ row } className="nutrio-field">
+				<div key={ row } className="merodiet-field">
 					<Skeleton width="70px" height="11px" />
 					<div style={ { marginTop: '6px' } }>
 						<Skeleton width="100%" height="36px" shape="block" />
@@ -104,7 +104,7 @@ export default function ProfileDrawer( {
 		let cancelled = false;
 		setLoadError( null );
 
-		apiFetch< Client >( { path: '/nutrio/v1/me/profile' } )
+		apiFetch< Client >( { path: '/merodiet/v1/me/profile' } )
 			.then( ( data ) => {
 				if ( ! cancelled ) {
 					applyClient( data );
@@ -115,7 +115,7 @@ export default function ProfileDrawer( {
 					setLoadError(
 						__(
 							'Could not load your profile — please try again.',
-							'nutrio'
+							'merodiet'
 						)
 					);
 				}
@@ -143,7 +143,7 @@ export default function ProfileDrawer( {
 
 		try {
 			const updated = await apiFetch< Client >( {
-				path: '/nutrio/v1/me/profile',
+				path: '/merodiet/v1/me/profile',
 				method: 'PATCH',
 				data: {
 					first_name: values.first_name,
@@ -158,12 +158,12 @@ export default function ProfileDrawer( {
 				},
 			} );
 			applyClient( updated );
-			toast.success( __( 'Saved.', 'nutrio' ) );
+			toast.success( __( 'Saved.', 'merodiet' ) );
 		} catch ( error ) {
 			toast.error(
 				errorMessage(
 					error,
-					__( 'Something went wrong — please try again.', 'nutrio' )
+					__( 'Something went wrong — please try again.', 'merodiet' )
 				)
 			);
 		} finally {
@@ -190,12 +190,12 @@ export default function ProfileDrawer( {
 			formData.append( 'avatar', file );
 
 			const updated = await apiFetch< Client >( {
-				path: '/nutrio/v1/me/profile/avatar',
+				path: '/merodiet/v1/me/profile/avatar',
 				method: 'POST',
 				body: formData,
 			} );
 			applyClient( updated );
-			toast.success( __( 'Photo updated.', 'nutrio' ) );
+			toast.success( __( 'Photo updated.', 'merodiet' ) );
 		} catch ( error ) {
 			setAvatarPreviewUrl( null );
 			toast.error(
@@ -203,7 +203,7 @@ export default function ProfileDrawer( {
 					error,
 					__(
 						'Could not upload that image — please try a JPEG, PNG, or WebP file.',
-						'nutrio'
+						'merodiet'
 					)
 				)
 			);
@@ -217,7 +217,7 @@ export default function ProfileDrawer( {
 		<>
 			<Drawer
 				isOpen={ isOpen }
-				title={ __( 'My Profile', 'nutrio' ) }
+				title={ __( 'My Profile', 'merodiet' ) }
 				onClose={ onClose }
 			>
 				{ loadError && <p className={ styles.error }>{ loadError }</p> }
@@ -232,7 +232,7 @@ export default function ProfileDrawer( {
 									onClick={ () => setIsViewingAvatar( true ) }
 									aria-label={ __(
 										'View profile photo',
-										'nutrio'
+										'merodiet'
 									) }
 								>
 									<img
@@ -253,13 +253,13 @@ export default function ProfileDrawer( {
 							) }
 							<label
 								className={ styles.avatarUpload }
-								htmlFor="nutrio-profile-avatar"
+								htmlFor="merodiet-profile-avatar"
 							>
 								{ isUploadingAvatar
-									? __( 'Uploading…', 'nutrio' )
-									: __( 'Change photo', 'nutrio' ) }
+									? __( 'Uploading…', 'merodiet' )
+									: __( 'Change photo', 'merodiet' ) }
 								<input
-									id="nutrio-profile-avatar"
+									id="merodiet-profile-avatar"
 									type="file"
 									accept="image/jpeg,image/png,image/webp"
 									onChange={ handleAvatarChange }
@@ -269,80 +269,80 @@ export default function ProfileDrawer( {
 							</label>
 						</div>
 
-						<div className="nutrio-field">
-							<label htmlFor="nutrio-profile-first-name">
-								{ __( 'First name', 'nutrio' ) }
+						<div className="merodiet-field">
+							<label htmlFor="merodiet-profile-first-name">
+								{ __( 'First name', 'merodiet' ) }
 							</label>
 							<input
-								id="nutrio-profile-first-name"
+								id="merodiet-profile-first-name"
 								type="text"
 								value={ values.first_name }
 								onChange={ setField( 'first_name' ) }
 								required
 							/>
 						</div>
-						<div className="nutrio-field">
-							<label htmlFor="nutrio-profile-last-name">
-								{ __( 'Last name', 'nutrio' ) }
+						<div className="merodiet-field">
+							<label htmlFor="merodiet-profile-last-name">
+								{ __( 'Last name', 'merodiet' ) }
 							</label>
 							<input
-								id="nutrio-profile-last-name"
+								id="merodiet-profile-last-name"
 								type="text"
 								value={ values.last_name }
 								onChange={ setField( 'last_name' ) }
 								required
 							/>
 						</div>
-						<div className="nutrio-field">
-							<label htmlFor="nutrio-profile-email">
-								{ __( 'Email', 'nutrio' ) }
+						<div className="merodiet-field">
+							<label htmlFor="merodiet-profile-email">
+								{ __( 'Email', 'merodiet' ) }
 							</label>
 							<input
-								id="nutrio-profile-email"
+								id="merodiet-profile-email"
 								type="email"
 								value={ values.email }
 								onChange={ setField( 'email' ) }
 								required
 							/>
 						</div>
-						<div className="nutrio-field">
-							<label htmlFor="nutrio-profile-goals">
-								{ __( 'Goals', 'nutrio' ) }
+						<div className="merodiet-field">
+							<label htmlFor="merodiet-profile-goals">
+								{ __( 'Goals', 'merodiet' ) }
 							</label>
 							<textarea
-								id="nutrio-profile-goals"
+								id="merodiet-profile-goals"
 								rows={ 3 }
 								value={ values.goals }
 								onChange={ setField( 'goals' ) }
 							/>
 						</div>
-						<div className="nutrio-field">
-							<label htmlFor="nutrio-profile-dietary">
-								{ __( 'Dietary restrictions', 'nutrio' ) }
+						<div className="merodiet-field">
+							<label htmlFor="merodiet-profile-dietary">
+								{ __( 'Dietary restrictions', 'merodiet' ) }
 							</label>
 							<textarea
-								id="nutrio-profile-dietary"
+								id="merodiet-profile-dietary"
 								rows={ 2 }
 								value={ values.dietary_restrictions }
 								onChange={ setField( 'dietary_restrictions' ) }
 							/>
 						</div>
-						<div className="nutrio-field">
-							<label htmlFor="nutrio-profile-allergies">
-								{ __( 'Allergies', 'nutrio' ) }
+						<div className="merodiet-field">
+							<label htmlFor="merodiet-profile-allergies">
+								{ __( 'Allergies', 'merodiet' ) }
 							</label>
 							<input
-								id="nutrio-profile-allergies"
+								id="merodiet-profile-allergies"
 								type="text"
 								value={ values.allergies }
 								onChange={ setField( 'allergies' ) }
 								placeholder={ __(
 									'Peanuts, shellfish',
-									'nutrio'
+									'merodiet'
 								) }
 							/>
-							<div className="nutrio-field-hint">
-								{ __( 'Comma-separated', 'nutrio' ) }
+							<div className="merodiet-field-hint">
+								{ __( 'Comma-separated', 'merodiet' ) }
 							</div>
 						</div>
 
@@ -351,7 +351,7 @@ export default function ProfileDrawer( {
 							variant="primary"
 							disabled={ isSaving }
 						>
-							{ __( 'Save', 'nutrio' ) }
+							{ __( 'Save', 'merodiet' ) }
 						</Button>
 
 						<button
@@ -359,7 +359,7 @@ export default function ProfileDrawer( {
 							className={ styles.passwordLink }
 							onClick={ () => setPasswordModalOpen( true ) }
 						>
-							{ __( 'Change password', 'nutrio' ) }
+							{ __( 'Change password', 'merodiet' ) }
 						</button>
 					</form>
 				) }
@@ -375,7 +375,7 @@ export default function ProfileDrawer( {
 					className={ styles.lightboxScrim }
 					role="button"
 					tabIndex={ -1 }
-					aria-label={ __( 'Close', 'nutrio' ) }
+					aria-label={ __( 'Close', 'merodiet' ) }
 					onClick={ () => setIsViewingAvatar( false ) }
 					onKeyDown={ ( event ) => {
 						if ( 'Escape' === event.key ) {

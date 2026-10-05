@@ -2,14 +2,14 @@
 /**
  * Food search REST endpoints.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\RestApi;
+namespace MeroDiet\RestApi;
 
-use Nutrio\Nutrition\FoodDataService;
+use MeroDiet\Nutrition\FoodDataService;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -26,7 +26,7 @@ use WP_REST_Server;
 final class FoodsController extends AbstractPractitionerController {
 
 	/**
-	 * Route base — registers under nutrio/v1/foods.
+	 * Route base — registers under merodiet/v1/foods.
 	 *
 	 * @var string
 	 */
@@ -73,7 +73,7 @@ final class FoodsController extends AbstractPractitionerController {
 					),
 				),
 			),
-			required_capability: 'manage_nutrio_foods'
+			required_capability: 'manage_merodiet_foods'
 		);
 
 		$this->register_route(
@@ -82,7 +82,7 @@ final class FoodsController extends AbstractPractitionerController {
 				'methods'  => WP_REST_Server::CREATABLE,
 				'callback' => array( $this, 'resolve' ),
 			),
-			required_capability: 'manage_nutrio_foods'
+			required_capability: 'manage_merodiet_foods'
 		);
 	}
 

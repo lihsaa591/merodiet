@@ -2,17 +2,17 @@
 /**
  * Line items within a recipe.
  *
- * `quantity_grams` is the canonical unit throughout Nutrio's schema —
+ * `quantity_grams` is the canonical unit throughout MeroDiet's schema —
  * every quantity, everywhere, is stored in grams. A future UI can offer
  * "1 cup" / "2 tbsp" entry, but it converts to grams before storage so
  * the nutrient engine only ever has one unit to reason about.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-use Nutrio\Database\Migration;
+use MeroDiet\Database\Migration;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -26,10 +26,10 @@ return new class() extends Migration {
 	 * Create the recipe_items table.
 	 */
 	public function up(): void {
-		$table           = $this->table( 'nutrio_recipe_items' );
+		$table           = $this->table( 'merodiet_recipe_items' );
 		$charset_collate = $this->wpdb->get_charset_collate();
 
-		// food_id references nutrio_foods.id — dbDelta() cannot create
+		// food_id references merodiet_foods.id — dbDelta() cannot create
 		// foreign keys, and WordPress convention doesn't rely on them;
 		// referential integrity is enforced in application code.
 		$this->delta(
@@ -51,7 +51,7 @@ return new class() extends Migration {
 	 * Drop the recipe_items table.
 	 */
 	public function down(): void {
-		$table = $this->table( 'nutrio_recipe_items' );
+		$table = $this->table( 'merodiet_recipe_items' );
 		$this->wpdb->query( "DROP TABLE IF EXISTS {$table}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input.
 	}
 };

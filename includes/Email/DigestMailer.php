@@ -2,15 +2,15 @@
 /**
  * Builds and sends the daily per-practitioner client-activity digest.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Email;
+namespace MeroDiet\Email;
 
-use Nutrio\Repositories\ClientRepository;
-use Nutrio\Repositories\LogEntryRepository;
+use MeroDiet\Repositories\ClientRepository;
+use MeroDiet\Repositories\LogEntryRepository;
 
 /**
  * Hooked to DigestScheduler::CRON_HOOK (see AppServiceProvider::boot()).
@@ -87,8 +87,8 @@ final class DigestMailer {
 				esc_html( (string) ( $client['first_name'] ?? '' ) ),
 				esc_html( (string) ( $client['last_name'] ?? '' ) ),
 				count( $todays_logs ) > 0
-					? esc_html__( 'Logged today', 'nutrio' )
-					: esc_html__( 'No activity', 'nutrio' )
+					? esc_html__( 'Logged today', 'merodiet' )
+					: esc_html__( 'No activity', 'merodiet' )
 			);
 		}
 

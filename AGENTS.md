@@ -1,9 +1,9 @@
-# Nutrio
+# MeroDiet
 
 WordPress plugin: PHP backend + React 18/TypeScript admin SPA and client portal. Uses the WordPress DB (custom migrations), no external backend.
 
 ## Layout
-- `nutrio.php`, `uninstall.php`: entry points
+- `merodiet.php`, `uninstall.php`: entry points
 - `includes/`: PHP (Admin, Clients, Contracts, Database, Email, Helper, Nutrition, Providers, Repositories, RestApi, Roles)
 - `src/`: TS/React (`admin`, `client-portal`, `components`, `hooks`, `screens/<domain>`, `store`, `styles`, `utils`)
 - `database/migrations/`: timestamped class migrations implementing `MigrationInterface`
@@ -12,7 +12,7 @@ WordPress plugin: PHP backend + React 18/TypeScript admin SPA and client portal.
 - `build/`, `vendor/`, `node_modules/`, `artifacts/`: generated, never edit
 
 ## Commands
-- JS: `npm run build`, `npm run start`, `npm run lint:js`, `npm run check-types`, `npm run format`, `npm run test:unit`, `npm run test:e2e:a11y`, `npm run make-pot` (builds, then regenerates `languages/nutrio.pot`; needs WP-CLI; run before each release)
+- JS: `npm run build`, `npm run start`, `npm run lint:js`, `npm run check-types`, `npm run format`, `npm run test:unit`, `npm run test:e2e:a11y`, `npm run make-pot` (builds, then regenerates `languages/merodiet.pot`; needs WP-CLI; run before each release)
 - PHP: `composer run test`, `composer run phpcs`, `composer run phpcbf`, `composer run phpstan`
 
 ## Conventions

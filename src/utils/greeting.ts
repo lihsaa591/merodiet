@@ -10,18 +10,18 @@ export function greeting(): string {
 	const hour = new Date().getHours();
 
 	if ( hour < 5 ) {
-		return __( 'Good night', 'nutrio' );
+		return __( 'Good night', 'merodiet' );
 	}
 	if ( hour < 12 ) {
-		return __( 'Good morning', 'nutrio' );
+		return __( 'Good morning', 'merodiet' );
 	}
 	if ( hour < 17 ) {
-		return __( 'Good afternoon', 'nutrio' );
+		return __( 'Good afternoon', 'merodiet' );
 	}
 	if ( hour < 21 ) {
-		return __( 'Good evening', 'nutrio' );
+		return __( 'Good evening', 'merodiet' );
 	}
-	return __( 'Good night', 'nutrio' );
+	return __( 'Good night', 'merodiet' );
 }
 
 export function greetingEmoji(): string {

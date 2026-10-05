@@ -64,20 +64,20 @@ export default function ListFilters( {
 	return (
 		<div className={ styles.bar }>
 			<div className={ styles.searchWrap }>
-				<div className="nutrio-field">
+				<div className="merodiet-field">
 					<input
 						type="text"
 						value={ localSearch }
 						onChange={ handleSearchChange }
 						placeholder={
-							searchPlaceholder ?? __( 'Search…', 'nutrio' )
+							searchPlaceholder ?? __( 'Search…', 'merodiet' )
 						}
 					/>
 				</div>
 			</div>
 			{ hasStatusFilter && (
 				<div className={ styles.statusWrap }>
-					<div className="nutrio-field">
+					<div className="merodiet-field">
 						<select
 							value={ status }
 							onChange={ ( event ) =>

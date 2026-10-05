@@ -1,21 +1,21 @@
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\RestApi;
+namespace MeroDiet\Tests\Unit\RestApi;
 
-use Nutrio\Clients\ClientInviteService;
-use Nutrio\Clients\ComplianceCalculator;
-use Nutrio\Email\Mailer;
-use Nutrio\Repositories\ClientRepository;
-use Nutrio\Repositories\LogEntryRepository;
-use Nutrio\Repositories\MeasurementRepository;
-use Nutrio\Repositories\PlanRepository;
-use Nutrio\RestApi\ClientsController;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Clients\ClientInviteService;
+use MeroDiet\Clients\ComplianceCalculator;
+use MeroDiet\Email\Mailer;
+use MeroDiet\Repositories\ClientRepository;
+use MeroDiet\Repositories\LogEntryRepository;
+use MeroDiet\Repositories\MeasurementRepository;
+use MeroDiet\Repositories\PlanRepository;
+use MeroDiet\RestApi\ClientsController;
+use MeroDiet\Tests\TestCase;
 use WP_REST_Request;
 
 /**
@@ -47,11 +47,11 @@ final class ClientsControllerComplianceTest extends TestCase {
 				$this->createMock( PlanRepository::class ),
 				$this->createMock( LogEntryRepository::class )
 			),
-			new Mailer( new \Nutrio\Email\EmailTemplateService() ),
-			new \Nutrio\Clients\LogEntryLabelResolver(
-				$this->createMock( \Nutrio\Repositories\PlanRepository::class ),
-				$this->createMock( \Nutrio\Nutrition\FoodCache::class ),
-				$this->createMock( \Nutrio\Repositories\RecipeRepository::class )
+			new Mailer( new \MeroDiet\Email\EmailTemplateService() ),
+			new \MeroDiet\Clients\LogEntryLabelResolver(
+				$this->createMock( \MeroDiet\Repositories\PlanRepository::class ),
+				$this->createMock( \MeroDiet\Nutrition\FoodCache::class ),
+				$this->createMock( \MeroDiet\Repositories\RecipeRepository::class )
 			)
 		);
 	}

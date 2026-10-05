@@ -2,16 +2,16 @@
 /**
  * Recipe library REST endpoints.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\RestApi;
+namespace MeroDiet\RestApi;
 
-use Nutrio\Nutrition\FoodCache;
-use Nutrio\Nutrition\RecipeNutrientResolver;
-use Nutrio\Repositories\RecipeRepository;
+use MeroDiet\Nutrition\FoodCache;
+use MeroDiet\Nutrition\RecipeNutrientResolver;
+use MeroDiet\Repositories\RecipeRepository;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -27,7 +27,7 @@ use WP_REST_Server;
 final class RecipesController extends AbstractPractitionerController {
 
 	/**
-	 * Route base — registers under nutrio/v1/recipes.
+	 * Route base — registers under merodiet/v1/recipes.
 	 *
 	 * @var string
 	 */
@@ -67,7 +67,7 @@ final class RecipesController extends AbstractPractitionerController {
 					self::filter_route_args( self::LIST_FILTERS )
 				),
 			),
-			required_capability: 'manage_nutrio_recipes'
+			required_capability: 'manage_merodiet_recipes'
 		);
 
 		$this->register_route(
@@ -77,7 +77,7 @@ final class RecipesController extends AbstractPractitionerController {
 				'callback' => array( $this, 'create_recipe' ),
 				'args'     => self::recipe_write_args( require_all: true ),
 			),
-			required_capability: 'manage_nutrio_recipes'
+			required_capability: 'manage_merodiet_recipes'
 		);
 
 		$this->register_route(
@@ -86,7 +86,7 @@ final class RecipesController extends AbstractPractitionerController {
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( $this, 'get_recipe' ),
 			),
-			required_capability: 'manage_nutrio_recipes'
+			required_capability: 'manage_merodiet_recipes'
 		);
 
 		$this->register_route(
@@ -96,7 +96,7 @@ final class RecipesController extends AbstractPractitionerController {
 				'callback' => array( $this, 'update_recipe' ),
 				'args'     => self::recipe_write_args( require_all: false ),
 			),
-			required_capability: 'manage_nutrio_recipes'
+			required_capability: 'manage_merodiet_recipes'
 		);
 
 		$this->register_route(
@@ -105,7 +105,7 @@ final class RecipesController extends AbstractPractitionerController {
 				'methods'  => WP_REST_Server::DELETABLE,
 				'callback' => array( $this, 'delete_recipe' ),
 			),
-			required_capability: 'manage_nutrio_recipes'
+			required_capability: 'manage_merodiet_recipes'
 		);
 	}
 

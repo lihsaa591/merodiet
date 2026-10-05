@@ -1,18 +1,18 @@
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\RestApi;
+namespace MeroDiet\Tests\Unit\RestApi;
 
-use Nutrio\Clients\ComplianceCalculator;
-use Nutrio\Repositories\ClientRepository;
-use Nutrio\Repositories\LogEntryRepository;
-use Nutrio\Repositories\PlanRepository;
-use Nutrio\RestApi\DashboardController;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Clients\ComplianceCalculator;
+use MeroDiet\Repositories\ClientRepository;
+use MeroDiet\Repositories\LogEntryRepository;
+use MeroDiet\Repositories\PlanRepository;
+use MeroDiet\RestApi\DashboardController;
+use MeroDiet\Tests\TestCase;
 use WP_REST_Request;
 
 final class DashboardControllerTest extends TestCase {

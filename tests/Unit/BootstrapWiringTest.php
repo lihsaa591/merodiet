@@ -1,15 +1,15 @@
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit;
+namespace MeroDiet\Tests\Unit;
 
 use Brain\Monkey\Functions;
 use League\Container\Container;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Tests\TestCase;
 
 /**
  * Loads the REAL config/app.php and runs every REAL provider's

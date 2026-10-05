@@ -2,12 +2,12 @@
 /**
  * USDA FoodData Central HTTP client.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Nutrition;
+namespace MeroDiet\Nutrition;
 
 use WP_Error;
 
@@ -125,11 +125,11 @@ final class FoodDataClient {
 			$status = wp_remote_retrieve_response_code( $response );
 
 			if ( 429 === $status ) {
-				return new WP_Error( 'nutrio_fooddata_rate_limited', __( 'USDA FoodData Central rate limit exceeded.', 'nutrio' ) );
+				return new WP_Error( 'merodiet_fooddata_rate_limited', __( 'USDA FoodData Central rate limit exceeded.', 'merodiet' ) );
 			}
 
 			if ( 404 === $status ) {
-				return new WP_Error( 'nutrio_fooddata_not_found', __( 'Food not found.', 'nutrio' ) );
+				return new WP_Error( 'merodiet_fooddata_not_found', __( 'Food not found.', 'merodiet' ) );
 			}
 
 			if ( $status < 200 || $status >= 300 ) {
@@ -139,10 +139,10 @@ final class FoodDataClient {
 				}
 
 				return new WP_Error(
-					'nutrio_fooddata_http_error',
+					'merodiet_fooddata_http_error',
 					sprintf(
 						/* translators: %d: HTTP status code */
-						__( 'USDA FoodData Central returned an unexpected status: %d', 'nutrio' ),
+						__( 'USDA FoodData Central returned an unexpected status: %d', 'merodiet' ),
 						$status
 					)
 				);
@@ -151,13 +151,13 @@ final class FoodDataClient {
 			$decoded = json_decode( wp_remote_retrieve_body( $response ), true );
 
 			if ( ! is_array( $decoded ) ) {
-				return new WP_Error( 'nutrio_fooddata_invalid_response', __( 'USDA FoodData Central returned an unreadable response.', 'nutrio' ) );
+				return new WP_Error( 'merodiet_fooddata_invalid_response', __( 'USDA FoodData Central returned an unreadable response.', 'merodiet' ) );
 			}
 
 			return $decoded;
 		}
 
 		// Unreachable — the loop above always returns by its final iteration.
-		return new WP_Error( 'nutrio_fooddata_http_error', __( 'USDA FoodData Central returned an unexpected status.', 'nutrio' ) );
+		return new WP_Error( 'merodiet_fooddata_http_error', __( 'USDA FoodData Central returned an unexpected status.', 'merodiet' ) );
 	}
 }

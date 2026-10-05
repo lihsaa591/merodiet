@@ -31,9 +31,9 @@ interface ClientsStoreSelectors {
 
 const PLAN_FILTER_DEFAULTS = { search: '', status: '' };
 const PLAN_STATUS_OPTIONS = [
-	{ value: '', label: __( 'All statuses', 'nutrio' ) },
-	{ value: 'draft', label: __( 'Draft', 'nutrio' ) },
-	{ value: 'assigned', label: __( 'Assigned', 'nutrio' ) },
+	{ value: '', label: __( 'All statuses', 'merodiet' ) },
+	{ value: 'draft', label: __( 'Draft', 'merodiet' ) },
+	{ value: 'assigned', label: __( 'Assigned', 'merodiet' ) },
 ];
 
 export default function PlanScreen() {
@@ -109,10 +109,10 @@ export default function PlanScreen() {
 	const handleSave = async ( data: PlanInput ) => {
 		if ( editingPlan ) {
 			await updatePlan( editingPlan.id, data );
-			toast.success( __( 'Plan saved.', 'nutrio' ) );
+			toast.success( __( 'Plan saved.', 'merodiet' ) );
 		} else {
 			const created = await createPlan( data );
-			toast.success( __( 'Plan created.', 'nutrio' ) );
+			toast.success( __( 'Plan created.', 'merodiet' ) );
 			setIdParam( String( created.id ) );
 			return;
 		}
@@ -121,8 +121,11 @@ export default function PlanScreen() {
 
 	const handleDelete = async ( plan: Plan ) => {
 		const confirmed = await confirmDialog( {
-			message: __( 'Remove this plan? This cannot be undone.', 'nutrio' ),
-			confirmLabel: __( 'Remove', 'nutrio' ),
+			message: __(
+				'Remove this plan? This cannot be undone.',
+				'merodiet'
+			),
+			confirmLabel: __( 'Remove', 'merodiet' ),
 			destructive: true,
 		} );
 		if ( ! confirmed ) {
@@ -131,12 +134,12 @@ export default function PlanScreen() {
 
 		try {
 			await deletePlan( plan.id );
-			toast.success( __( 'Plan removed.', 'nutrio' ) );
+			toast.success( __( 'Plan removed.', 'merodiet' ) );
 		} catch ( error ) {
 			toast.error(
 				errorMessage(
 					error,
-					__( 'Could not remove this plan.', 'nutrio' )
+					__( 'Could not remove this plan.', 'merodiet' )
 				)
 			);
 		}
@@ -148,11 +151,11 @@ export default function PlanScreen() {
 				/* translators: %d: number of plans being removed */
 				__(
 					'Remove %d selected plan(s)? This cannot be undone.',
-					'nutrio'
+					'merodiet'
 				),
 				selected.length
 			),
-			confirmLabel: __( 'Remove', 'nutrio' ),
+			confirmLabel: __( 'Remove', 'merodiet' ),
 			destructive: true,
 		} );
 		if ( confirmed ) {
@@ -167,11 +170,11 @@ export default function PlanScreen() {
 							'%d plan removed.',
 							'%d plans removed.',
 							count,
-							'nutrio'
+							'merodiet'
 						),
 						count
 					),
-				failure: __( 'Some plans could not be removed.', 'nutrio' ),
+				failure: __( 'Some plans could not be removed.', 'merodiet' ),
 			} );
 		}
 	};
@@ -185,11 +188,11 @@ export default function PlanScreen() {
 				/* translators: %d: number of assigned plans being unassigned */
 				__(
 					'Unassign %d selected plan(s)? They go back to being editable drafts, and their clients no longer have access.',
-					'nutrio'
+					'merodiet'
 				),
 				selected.length
 			),
-			confirmLabel: __( 'Unassign', 'nutrio' ),
+			confirmLabel: __( 'Unassign', 'merodiet' ),
 			destructive: true,
 		} );
 		if ( confirmed ) {
@@ -204,11 +207,14 @@ export default function PlanScreen() {
 							'%d plan unassigned.',
 							'%d plans unassigned.',
 							count,
-							'nutrio'
+							'merodiet'
 						),
 						count
 					),
-				failure: __( 'Some plans could not be unassigned.', 'nutrio' ),
+				failure: __(
+					'Some plans could not be unassigned.',
+					'merodiet'
+				),
 			} );
 		}
 	};
@@ -220,12 +226,12 @@ export default function PlanScreen() {
 		try {
 			await assignPlan( editingPlan.id, clientId );
 			setAssignModalOpen( false );
-			toast.success( __( 'Plan assigned.', 'nutrio' ) );
+			toast.success( __( 'Plan assigned.', 'merodiet' ) );
 		} catch ( error ) {
 			toast.error(
 				errorMessage(
 					error,
-					__( 'Could not assign this plan.', 'nutrio' )
+					__( 'Could not assign this plan.', 'merodiet' )
 				)
 			);
 		}
@@ -238,9 +244,9 @@ export default function PlanScreen() {
 		const confirmed = await confirmDialog( {
 			message: __(
 				'Unassign this plan? It goes back to being an editable draft, and the client no longer has access to it.',
-				'nutrio'
+				'merodiet'
 			),
-			confirmLabel: __( 'Unassign', 'nutrio' ),
+			confirmLabel: __( 'Unassign', 'merodiet' ),
 			destructive: true,
 		} );
 		if ( ! confirmed ) {
@@ -249,12 +255,12 @@ export default function PlanScreen() {
 
 		try {
 			await unassignPlan( editingPlan.id );
-			toast.success( __( 'Plan unassigned.', 'nutrio' ) );
+			toast.success( __( 'Plan unassigned.', 'merodiet' ) );
 		} catch ( error ) {
 			toast.error(
 				errorMessage(
 					error,
-					__( 'Could not unassign this plan.', 'nutrio' )
+					__( 'Could not unassign this plan.', 'merodiet' )
 				)
 			);
 		}
@@ -289,19 +295,19 @@ export default function PlanScreen() {
 			toast.error(
 				errorMessage(
 					error,
-					__( 'Could not duplicate this plan.', 'nutrio' )
+					__( 'Could not duplicate this plan.', 'merodiet' )
 				)
 			);
 			return;
 		}
 
-		toast.success( __( 'Plan duplicated as a new draft.', 'nutrio' ) );
+		toast.success( __( 'Plan duplicated as a new draft.', 'merodiet' ) );
 		setIdParam( String( created.id ) );
 	};
 
 	if ( idParam !== null ) {
 		if ( isEditingPlanLoading || ( editingId !== null && ! editingPlan ) ) {
-			return <p>{ __( 'Loading…', 'nutrio' ) }</p>;
+			return <p>{ __( 'Loading…', 'merodiet' ) }</p>;
 		}
 
 		return (

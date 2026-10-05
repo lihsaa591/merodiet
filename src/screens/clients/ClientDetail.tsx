@@ -85,22 +85,21 @@ export default function ClientDetail( {
 	const today = new Date().toISOString().slice( 0, 10 );
 
 	useEffect( () => {
-		apiFetch< Client >( { path: `/nutrio/v1/clients/${ clientId }` } ).then(
-			setClient,
-			() => setClient( null )
-		);
+		apiFetch< Client >( {
+			path: `/merodiet/v1/clients/${ clientId }`,
+		} ).then( setClient, () => setClient( null ) );
 		apiFetch< ComplianceResult >( {
-			path: `/nutrio/v1/clients/${ clientId }/compliance?from=${ daysAgo(
+			path: `/merodiet/v1/clients/${ clientId }/compliance?from=${ daysAgo(
 				6
 			) }&to=${ today }`,
 		} ).then( setCompliance, () => setCompliance( undefined ) );
 		apiFetch< LogEntry[] >( {
-			path: `/nutrio/v1/clients/${ clientId }/logs?from=${ daysAgo(
+			path: `/merodiet/v1/clients/${ clientId }/logs?from=${ daysAgo(
 				HISTORY_MAX_DAYS - 1
 			) }&to=${ today }`,
 		} ).then( setLogs, () => setLogs( [] ) );
 		apiFetch< Measurement[] >( {
-			path: `/nutrio/v1/clients/${ clientId }/measurements?from=${ daysAgo(
+			path: `/merodiet/v1/clients/${ clientId }/measurements?from=${ daysAgo(
 				HISTORY_MAX_DAYS - 1
 			) }&to=${ today }`,
 		} ).then( setMeasurements, () => setMeasurements( [] ) );
@@ -146,26 +145,26 @@ export default function ClientDetail( {
 		if ( client ) {
 			const updated = await updateClient( client.id, data );
 			setClient( updated );
-			toast.success( __( 'Client updated.', 'nutrio' ) );
+			toast.success( __( 'Client updated.', 'merodiet' ) );
 		}
 		closeDrawer();
 	};
 
 	return (
 		<>
-			<div className="nutrio-topbar">
+			<div className="merodiet-topbar">
 				<div>
 					<button
 						type="button"
 						className={ styles.backLink }
 						onClick={ onBack }
 					>
-						{ __( '← Back to clients', 'nutrio' ) }
+						{ __( '← Back to clients', 'merodiet' ) }
 					</button>
 					<h1>
 						{ client
 							? `${ client.first_name } ${ client.last_name }`
-							: __( 'Client', 'nutrio' ) }
+							: __( 'Client', 'merodiet' ) }
 					</h1>
 				</div>
 				{ client && (
@@ -173,7 +172,7 @@ export default function ClientDetail( {
 						variant="ghost"
 						onClick={ () => setDrawerOpen( true ) }
 					>
-						{ __( 'Edit', 'nutrio' ) }
+						{ __( 'Edit', 'merodiet' ) }
 					</Button>
 				) }
 			</div>
@@ -191,12 +190,12 @@ export default function ClientDetail( {
 						<Panel>
 							<PanelBody>
 								<h3 className={ styles.sectionTitle }>
-									{ __( 'Compliance', 'nutrio' ) }
+									{ __( 'Compliance', 'merodiet' ) }
 								</h3>
 								<p className={ styles.empty }>
 									{ __(
 										'No active plan assigned.',
-										'nutrio'
+										'merodiet'
 									) }
 								</p>
 							</PanelBody>
@@ -204,37 +203,40 @@ export default function ClientDetail( {
 					) }
 
 					{ compliance && compliance.plan && (
-						<div className="nutrio-kpi-row">
-							<div className="nutrio-kpi">
-								<div className="nutrio-kpi-label">
-									{ __( 'Compliance', 'nutrio' ) }
+						<div className="merodiet-kpi-row">
+							<div className="merodiet-kpi">
+								<div className="merodiet-kpi-label">
+									{ __( 'Compliance', 'merodiet' ) }
 								</div>
 								{ null === compliance.percent ? (
-									<div className="nutrio-kpi-value">
-										{ __( 'No items scheduled', 'nutrio' ) }
+									<div className="merodiet-kpi-value">
+										{ __(
+											'No items scheduled',
+											'merodiet'
+										) }
 									</div>
 								) : (
 									<>
-										<div className="nutrio-kpi-value">
+										<div className="merodiet-kpi-value">
 											{ compliance.percent }%
 										</div>
-										<div className="nutrio-kpi-delta">
+										<div className="merodiet-kpi-delta">
 											{ compliance.logged_count } /{ ' ' }
 											{ compliance.total_count }{ ' ' }
-											{ __( 'items logged', 'nutrio' ) }
+											{ __( 'items logged', 'merodiet' ) }
 										</div>
 									</>
 								) }
 							</div>
 
-							<div className="nutrio-kpi">
-								<div className="nutrio-kpi-label">
-									{ __( 'Plan', 'nutrio' ) }
+							<div className="merodiet-kpi">
+								<div className="merodiet-kpi-label">
+									{ __( 'Plan', 'merodiet' ) }
 								</div>
-								<div className="nutrio-kpi-value">
+								<div className="merodiet-kpi-value">
 									{ compliance.plan.title }
 								</div>
-								<div className="nutrio-kpi-delta">
+								<div className="merodiet-kpi-delta">
 									{ formatShortDate(
 										compliance.plan.start_date
 									) }{ ' ' }
@@ -245,11 +247,11 @@ export default function ClientDetail( {
 								</div>
 							</div>
 
-							<div className="nutrio-kpi">
-								<div className="nutrio-kpi-label">
-									{ __( 'Current weight', 'nutrio' ) }
+							<div className="merodiet-kpi">
+								<div className="merodiet-kpi-label">
+									{ __( 'Current weight', 'merodiet' ) }
 								</div>
-								<div className="nutrio-kpi-value">
+								<div className="merodiet-kpi-value">
 									{ latestWeight
 										? `${ gramsToDisplay(
 												latestWeight.weight_grams,
@@ -258,10 +260,10 @@ export default function ClientDetail( {
 										: '—' }
 								</div>
 								{ null !== weightDelta && 0 !== weightDelta && (
-									<div className="nutrio-kpi-delta">
+									<div className="merodiet-kpi-delta">
 										{ weightDelta > 0 ? '↑' : '↓' }{ ' ' }
 										{ Math.abs( weightDelta ) } { unit }{ ' ' }
-										{ __( 'since last', 'nutrio' ) }
+										{ __( 'since last', 'merodiet' ) }
 									</div>
 								) }
 							</div>
@@ -276,7 +278,7 @@ export default function ClientDetail( {
 							}`.trim() }
 							onClick={ () => setActiveTab( 'logs' ) }
 						>
-							{ __( 'Log history', 'nutrio' ) }
+							{ __( 'Log history', 'merodiet' ) }
 						</button>
 						<button
 							type="button"
@@ -287,7 +289,7 @@ export default function ClientDetail( {
 							}`.trim() }
 							onClick={ () => setActiveTab( 'measurements' ) }
 						>
-							{ __( 'Measurements', 'nutrio' ) }
+							{ __( 'Measurements', 'merodiet' ) }
 						</button>
 					</div>
 
@@ -308,7 +310,7 @@ export default function ClientDetail( {
 											)
 										}
 									>
-										{ __( 'Load more', 'nutrio' ) }
+										{ __( 'Load more', 'merodiet' ) }
 									</button>
 								) }
 							</PanelBody>
@@ -336,7 +338,7 @@ export default function ClientDetail( {
 											)
 										}
 									>
-										{ __( 'Load more', 'nutrio' ) }
+										{ __( 'Load more', 'merodiet' ) }
 									</button>
 								) }
 							</PanelBody>
@@ -348,13 +350,16 @@ export default function ClientDetail( {
 			{ client && (
 				<Drawer
 					isOpen={ isDrawerOpen }
-					title={ __( 'Edit client', 'nutrio' ) }
+					title={ __( 'Edit client', 'merodiet' ) }
 					onClose={ closeDrawer }
 					confirmClose={ async () =>
 						! isFormDirty ||
 						confirmDialog( {
-							message: __( 'Discard unsaved changes?', 'nutrio' ),
-							confirmLabel: __( 'Discard', 'nutrio' ),
+							message: __(
+								'Discard unsaved changes?',
+								'merodiet'
+							),
+							confirmLabel: __( 'Discard', 'merodiet' ),
 							destructive: true,
 						} )
 					}

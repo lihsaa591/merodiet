@@ -65,7 +65,7 @@ export default function MeasurementsTab() {
 	// older is left to reveal.
 	const loadMeasurements = () => {
 		apiFetch< Measurement[] >( {
-			path: `/nutrio/v1/me/measurements?from=${ daysAgo(
+			path: `/merodiet/v1/me/measurements?from=${ daysAgo(
 				HISTORY_MAX_DAYS - 1
 			) }&to=${ today }`,
 		} ).then( setMeasurements, () => setMeasurements( [] ) );
@@ -103,20 +103,20 @@ export default function MeasurementsTab() {
 				notes: notesInput.trim() || undefined,
 			};
 			const entry = await apiFetch< Measurement >( {
-				path: '/nutrio/v1/me/measurements',
+				path: '/merodiet/v1/me/measurements',
 				method: 'POST',
 				data: payload,
 			} );
-			doAction( 'nutrio.clientPortal.measurementCreated', entry );
+			doAction( 'merodiet.clientPortal.measurementCreated', entry );
 			setWeightInput( '' );
 			setNotesInput( '' );
-			toast.success( __( 'Measurement saved.', 'nutrio' ) );
+			toast.success( __( 'Measurement saved.', 'merodiet' ) );
 			loadMeasurements();
 		} catch ( error ) {
 			toast.error(
 				errorMessage(
 					error,
-					__( 'Something went wrong — please try again.', 'nutrio' )
+					__( 'Something went wrong — please try again.', 'merodiet' )
 				)
 			);
 		} finally {
@@ -149,19 +149,19 @@ export default function MeasurementsTab() {
 
 	return (
 		<>
-			<div className="nutrio-topbar">
-				<h1>{ __( 'Measurements', 'nutrio' ) }</h1>
+			<div className="merodiet-topbar">
+				<h1>{ __( 'Measurements', 'merodiet' ) }</h1>
 			</div>
 			<Panel>
 				<PanelBody>
 					<form onSubmit={ submit } className={ styles.form }>
-						<div className="nutrio-field">
-							<label htmlFor="nutrio-weight-input">
-								{ __( 'Weight', 'nutrio' ) }
+						<div className="merodiet-field">
+							<label htmlFor="merodiet-weight-input">
+								{ __( 'Weight', 'merodiet' ) }
 							</label>
 							<div className={ styles.weightRow }>
 								<input
-									id="nutrio-weight-input"
+									id="merodiet-weight-input"
 									type="number"
 									step="0.1"
 									min="0"
@@ -180,27 +180,27 @@ export default function MeasurementsTab() {
 									}
 								>
 									<option value="kg">
-										{ __( 'kg', 'nutrio' ) }
+										{ __( 'kg', 'merodiet' ) }
 									</option>
 									<option value="lb">
-										{ __( 'lb', 'nutrio' ) }
+										{ __( 'lb', 'merodiet' ) }
 									</option>
 								</select>
 							</div>
 						</div>
-						<div className="nutrio-field">
-							<label htmlFor="nutrio-weight-notes">
-								{ __( 'Notes (optional)', 'nutrio' ) }
+						<div className="merodiet-field">
+							<label htmlFor="merodiet-weight-notes">
+								{ __( 'Notes (optional)', 'merodiet' ) }
 							</label>
 							<textarea
-								id="nutrio-weight-notes"
+								id="merodiet-weight-notes"
 								value={ notesInput }
 								onChange={ ( event ) =>
 									setNotesInput( event.target.value )
 								}
 								placeholder={ __(
 									'e.g. measured after workout',
-									'nutrio'
+									'merodiet'
 								) }
 							/>
 						</div>
@@ -209,12 +209,12 @@ export default function MeasurementsTab() {
 							variant="primary"
 							disabled={ isSubmitting }
 						>
-							{ __( 'Log weight', 'nutrio' ) }
+							{ __( 'Log weight', 'merodiet' ) }
 						</Button>
 					</form>
 
 					<h3 className={ styles.historyTitle }>
-						{ __( 'History', 'nutrio' ) }
+						{ __( 'History', 'merodiet' ) }
 					</h3>
 					{ undefined === measurements && <HistorySkeleton /> }
 					{ null !== netChange && (
@@ -224,7 +224,7 @@ export default function MeasurementsTab() {
 										/* translators: %d: number of weigh-ins the summary covers */
 										__(
 											'No change over your last %d entries.',
-											'nutrio'
+											'merodiet'
 										),
 										weighed.length
 								  )
@@ -232,11 +232,11 @@ export default function MeasurementsTab() {
 										/* translators: 1: "Up"/"Down", 2: the amount changed, 3: unit (kg/lb), 4: number of weigh-ins the summary covers */
 										__(
 											'%1$s %2$s %3$s over your last %4$d entries.',
-											'nutrio'
+											'merodiet'
 										),
 										netChange > 0
-											? __( 'Up', 'nutrio' )
-											: __( 'Down', 'nutrio' ),
+											? __( 'Up', 'merodiet' )
+											: __( 'Down', 'merodiet' ),
 										String( Math.abs( netChange ) ),
 										unit,
 										weighed.length
@@ -253,7 +253,7 @@ export default function MeasurementsTab() {
 											/* translators: %d: number of days the history currently covers */
 											__(
 												'No measurements in the last %d days — use Load more to see older ones.',
-												'nutrio'
+												'merodiet'
 											),
 											historyRangeDays
 									  )
@@ -272,7 +272,7 @@ export default function MeasurementsTab() {
 										className={ styles.loadMore }
 										onClick={ showLess }
 									>
-										{ __( 'Show less', 'nutrio' ) }
+										{ __( 'Show less', 'merodiet' ) }
 									</button>
 								) }
 								{ hasOlder && (
@@ -281,7 +281,7 @@ export default function MeasurementsTab() {
 										className={ styles.loadMore }
 										onClick={ loadMore }
 									>
-										{ __( 'Load more', 'nutrio' ) }
+										{ __( 'Load more', 'merodiet' ) }
 									</button>
 								) }
 							</div>

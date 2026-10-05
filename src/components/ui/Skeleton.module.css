@@ -7,7 +7,7 @@
 		var(--paper-dim) 75%
 	);
 	background-size: 200% 100%;
-	animation: nutrio-skeleton-shimmer 1.4s ease-in-out infinite;
+	animation: merodiet-skeleton-shimmer 1.4s ease-in-out infinite;
 }
 .text {
 	border-radius: 4px;
@@ -19,7 +19,7 @@
 	border-radius: 50%;
 }
 
-@keyframes nutrio-skeleton-shimmer {
+@keyframes merodiet-skeleton-shimmer {
 	0% {
 		background-position: 200% 0;
 	}

@@ -124,7 +124,7 @@ export default function ToastHost() {
 					<button
 						type="button"
 						className={ styles.close }
-						aria-label={ __( 'Dismiss', 'nutrio' ) }
+						aria-label={ __( 'Dismiss', 'merodiet' ) }
 						onClick={ () => dismiss( item.id ) }
 					>
 						<svg

@@ -2,17 +2,17 @@
 /**
  * Plugin activation.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio;
+namespace MeroDiet;
 
-use Nutrio\Clients\PortalRewrite;
-use Nutrio\Database\Migrator;
-use Nutrio\Email\DigestScheduler;
-use Nutrio\Roles\RoleRegistrar;
+use MeroDiet\Clients\PortalRewrite;
+use MeroDiet\Database\Migrator;
+use MeroDiet\Email\DigestScheduler;
+use MeroDiet\Roles\RoleRegistrar;
 
 /**
  * Deliberately self-contained: activation hooks run outside the normal
@@ -25,10 +25,10 @@ final class Activation {
 	 * Run pending migrations, sync roles, and flush rewrite rules on activation.
 	 */
 	public static function activate(): void {
-		$migrator = new Migrator( NUTRIO_PATH . 'database/migrations', 'nutrio_applied_migrations' );
+		$migrator = new Migrator( MERODIET_PATH . 'database/migrations', 'merodiet_applied_migrations' );
 		$migrator->migrate();
 
-		update_option( 'nutrio_db_version', NUTRIO_VERSION );
+		update_option( 'merodiet_db_version', MERODIET_VERSION );
 
 		RoleRegistrar::register();
 		PortalRewrite::register();

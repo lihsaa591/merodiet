@@ -4,7 +4,7 @@
 
 **Goal:** Let practitioners customize five transactional emails (subject + body, with merge tags via an insert-tag builder) across a Practitioner tab and a Client tab in the existing Settings screen, plus wire up the two new email triggers (plan-assigned, client-added) and a scheduled daily client-activity digest.
 
-**Architecture:** A small `Nutrio\Email` namespace (`EmailTemplateRegistry` — static defaults/tags; `EmailTemplateService` — per-type option storage + `{{tag}}` rendering; `Mailer` — HTML-wraps a rendered template and either returns it (for WP-core-triggered sends) or calls `wp_mail()` directly (for our own new triggers)). Five email types are wired at their real trigger points: two existing (invite, password reset — both currently share one undifferentiated WP-core email, split via a short-lived static flag) and three new (plan assigned, client added, and a WP-Cron daily digest).
+**Architecture:** A small `MeroDiet\Email` namespace (`EmailTemplateRegistry` — static defaults/tags; `EmailTemplateService` — per-type option storage + `{{tag}}` rendering; `Mailer` — HTML-wraps a rendered template and either returns it (for WP-core-triggered sends) or calls `wp_mail()` directly (for our own new triggers)). Five email types are wired at their real trigger points: two existing (invite, password reset — both currently share one undifferentiated WP-core email, split via a short-lived static flag) and three new (plan assigned, client added, and a WP-Cron daily digest).
 
 **Tech Stack:** PHP 8.1, WordPress core APIs (`wp_mail`, `wp_schedule_event`, options API), League/container DI (existing `bind_recursively` auto-wiring), PHPUnit + Brain Monkey, React/TypeScript with `@wordpress/element` + `@wordpress/api-fetch` (existing frontend stack, no new libraries).
 
@@ -12,17 +12,17 @@
 
 ## Global Constraints
 
-- Per-type option storage: each email type is its own WordPress option (`nutrio_email_{type}`), never a single shared array — see spec's "Storage" section for the WooCommerce-precedent rationale. Every one of these options, plus the two digest options, is created with `autoload = false`.
+- Per-type option storage: each email type is its own WordPress option (`merodiet_email_{type}`), never a single shared array — see spec's "Storage" section for the WooCommerce-precedent rationale. Every one of these options, plus the two digest options, is created with `autoload = false`.
 - `EmailTemplateService`'s public API is type-keyed (`get($type)`/`save($type, ...)`) — callers never see the storage layout.
 - No raw HTML/CSS template editor is built. "Email styles" is a locked entry using the existing `ProUpsellModal` pattern (`Sidebar.tsx`'s "Analytics" entry) — no backend flag, no license check.
 - The daily digest is scheduled-only, one global (not per-practitioner) send time — multi-practitioner clinics are an explicit v1 non-goal.
-- New capability `manage_nutrio_settings`, added to `RoleRegistrar::PRACTITIONER_CAPS`, gates every new route in this plan. The existing `/settings/usda-key` routes are untouched (stay on `manage_nutrio_foods`).
+- New capability `manage_merodiet_settings`, added to `RoleRegistrar::PRACTITIONER_CAPS`, gates every new route in this plan. The existing `/settings/usda-key` routes are untouched (stay on `manage_merodiet_foods`).
 - Every merge-tag context value is HTML-escaped at substitution time by default — the one exception (`report_table`, pre-built trusted HTML) is passed wrapped in a new `RawHtml` value object, never as a plain string, so the exception is explicit at every call site rather than a silent special case inside the renderer.
 - PHP file style: `declare( strict_types=1 );`, tab indentation, one class per file, matching every existing file in `includes/`.
 
 ## Review Focus
 
-- **Unknown `type` on `PUT /email-templates/{type}`** — must 404 (`nutrio_unknown_email_type`), never silently create a new, unregistered option. Covered in Task 5.
+- **Unknown `type` on `PUT /email-templates/{type}`** — must 404 (`merodiet_unknown_email_type`), never silently create a new, unregistered option. Covered in Task 5.
 - **Malformed `send_time` on `PUT /email-digest`** — must 400, never reach `wp_schedule_event()` with garbage. Covered in Task 6.
 - **A genuine password-reset request right after an invite** — `ClientInviteService`'s "sending an invite" flag must reset to `false` even when `retrieve_password()` itself returns a `WP_Error` mid-`invite()`, via `try/finally`, not a bare set-then-unset, so a failed invite never leaves the *next*, unrelated reset request in the same PHP process reading the invite copy. Covered in Task 7.
 - **A merge-tag value containing markup** (e.g. a client's first name typed as `<b>Al</b>`) must render as literal text in the email, not break the surrounding HTML — while `report_table`, the one deliberately-trusted tag, must render as real HTML, not escaped into visible tags. Covered in Task 2 and Task 11.
@@ -45,15 +45,15 @@
 ```php
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Email;
+namespace MeroDiet\Tests\Unit\Email;
 
-use Nutrio\Email\EmailTemplateRegistry;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Email\EmailTemplateRegistry;
+use MeroDiet\Tests\TestCase;
 
 final class EmailTemplateRegistryTest extends TestCase {
 
@@ -98,21 +98,21 @@ final class EmailTemplateRegistryTest extends TestCase {
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `vendor/bin/phpunit tests/Unit/Email/EmailTemplateRegistryTest.php`
-Expected: FAIL — `Class "Nutrio\Email\EmailTemplateRegistry" not found`.
+Expected: FAIL — `Class "MeroDiet\Email\EmailTemplateRegistry" not found`.
 
 - [ ] **Step 3: Write the implementation**
 
 ```php
 <?php
 /**
- * The fixed catalog of every email Nutrio sends.
+ * The fixed catalog of every email MeroDiet sends.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Email;
+namespace MeroDiet\Email;
 
 /**
  * Deliberately static (same pattern as RoleRegistrar/PortalRewrite) —
@@ -258,7 +258,7 @@ Expected: PASS (5 tests).
 
 ```bash
 git add includes/Email/EmailTemplateRegistry.php tests/Unit/Email/EmailTemplateRegistryTest.php
-git commit -m "feat: add EmailTemplateRegistry, the fixed catalog of Nutrio's emails"
+git commit -m "feat: add EmailTemplateRegistry, the fixed catalog of MeroDiet's emails"
 ```
 
 ---
@@ -279,18 +279,18 @@ git commit -m "feat: add EmailTemplateRegistry, the fixed catalog of Nutrio's em
 ```php
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Email;
+namespace MeroDiet\Tests\Unit\Email;
 
 use Brain\Monkey\Functions;
 use InvalidArgumentException;
-use Nutrio\Email\EmailTemplateService;
-use Nutrio\Email\RawHtml;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Email\EmailTemplateService;
+use MeroDiet\Email\RawHtml;
+use MeroDiet\Tests\TestCase;
 
 final class EmailTemplateServiceTest extends TestCase {
 
@@ -376,7 +376,7 @@ final class EmailTemplateServiceTest extends TestCase {
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `vendor/bin/phpunit tests/Unit/Email/EmailTemplateServiceTest.php`
-Expected: FAIL — `Class "Nutrio\Email\EmailTemplateService" not found`.
+Expected: FAIL — `Class "MeroDiet\Email\EmailTemplateService" not found`.
 
 - [ ] **Step 3: Write the implementation**
 
@@ -385,12 +385,12 @@ Expected: FAIL — `Class "Nutrio\Email\EmailTemplateService" not found`.
 /**
  * A merge-tag value that must render as raw HTML, never escaped.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Email;
+namespace MeroDiet\Email;
 
 /**
  * Wraps a pre-built, trusted HTML fragment (currently only
@@ -416,19 +416,19 @@ final class RawHtml {
 ```php
 <?php
 /**
- * Per-type storage and merge-tag rendering for Nutrio's emails.
+ * Per-type storage and merge-tag rendering for MeroDiet's emails.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Email;
+namespace MeroDiet\Email;
 
 use InvalidArgumentException;
 
 /**
- * Each type is its own WordPress option (nutrio_email_{type}), not one
+ * Each type is its own WordPress option (merodiet_email_{type}), not one
  * shared array — see the design spec's "Storage" section for why
  * (WooCommerce precedent, future add-on extensibility). Callers never
  * see that storage layout: every public method here is keyed by type.
@@ -513,7 +513,7 @@ final class EmailTemplateService {
 	 * @param string $type A known type.
 	 */
 	private static function option_name( string $type ): string {
-		return "nutrio_email_{$type}";
+		return "merodiet_email_{$type}";
 	}
 }
 ```
@@ -547,17 +547,17 @@ git commit -m "feat: add EmailTemplateService (per-type storage + tag rendering)
 ```php
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Email;
+namespace MeroDiet\Tests\Unit\Email;
 
 use Brain\Monkey\Functions;
-use Nutrio\Email\EmailTemplateService;
-use Nutrio\Email\Mailer;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Email\EmailTemplateService;
+use MeroDiet\Email\Mailer;
+use MeroDiet\Tests\TestCase;
 
 final class MailerTest extends TestCase {
 
@@ -599,7 +599,7 @@ final class MailerTest extends TestCase {
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `vendor/bin/phpunit tests/Unit/Email/MailerTest.php`
-Expected: FAIL — `Class "Nutrio\Email\Mailer" not found`.
+Expected: FAIL — `Class "MeroDiet\Email\Mailer" not found`.
 
 - [ ] **Step 3: Write the implementation**
 
@@ -607,14 +607,14 @@ Expected: FAIL — `Class "Nutrio\Email\Mailer" not found`.
 <?php
 /**
  * Wraps a rendered email template in one shared HTML skeleton and,
- * for Nutrio's own new triggers, sends it.
+ * for MeroDiet's own new triggers, sends it.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Email;
+namespace MeroDiet\Email;
 
 /**
  * render_html() (rendered content only, no send) exists separately
@@ -728,18 +728,18 @@ git commit -m "feat: add Mailer (HTML skeleton + send)"
 
 **Interfaces:**
 - Consumes: `EmailTemplateService` (Task 2), `Mailer` (Task 3).
-- Produces: the `manage_nutrio_settings` capability (synced to `practitioner` and `administrator` automatically — `DatabaseServiceProvider` already re-runs `RoleRegistrar::register()` on every migration catch-up, so no separate upgrade step is needed for existing installs). `EmailTemplateService::class` and `Mailer::class` bound as shared services in the container, so every later task's controller/class can list them as a config dependency (`Nutrio\Email\Mailer::class`) and get them auto-wired via `RestApiServiceProvider::bind_recursively()`, or reference them directly for a manually-wired class like `PortalPage`.
+- Produces: the `manage_merodiet_settings` capability (synced to `practitioner` and `administrator` automatically — `DatabaseServiceProvider` already re-runs `RoleRegistrar::register()` on every migration catch-up, so no separate upgrade step is needed for existing installs). `EmailTemplateService::class` and `Mailer::class` bound as shared services in the container, so every later task's controller/class can list them as a config dependency (`MeroDiet\Email\Mailer::class`) and get them auto-wired via `RestApiServiceProvider::bind_recursively()`, or reference them directly for a manually-wired class like `PortalPage`.
 
 - [ ] **Step 1: Modify `RoleRegistrar::PRACTITIONER_CAPS`**
 
 ```php
 	private const PRACTITIONER_CAPS = array(
 		'read',
-		'manage_nutrio_clients',
-		'manage_nutrio_recipes',
-		'manage_nutrio_plans',
-		'manage_nutrio_foods',
-		'manage_nutrio_settings',
+		'manage_merodiet_clients',
+		'manage_merodiet_recipes',
+		'manage_merodiet_plans',
+		'manage_merodiet_foods',
+		'manage_merodiet_settings',
 	);
 ```
 
@@ -750,18 +750,18 @@ git commit -m "feat: add Mailer (HTML skeleton + send)"
 /**
  * General application bindings.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Providers;
+namespace MeroDiet\Providers;
 
 use League\Container\Container;
-use Nutrio\Clients\ClientInviteService;
-use Nutrio\Email\EmailTemplateService;
-use Nutrio\Email\Mailer;
-use Nutrio\Repositories\ClientRepository;
+use MeroDiet\Clients\ClientInviteService;
+use MeroDiet\Email\EmailTemplateService;
+use MeroDiet\Email\Mailer;
+use MeroDiet\Repositories\ClientRepository;
 
 /**
  * Home for bindings that don't belong to a more specific provider.
@@ -792,7 +792,7 @@ Expected: PASS (all existing + new tests) — this task adds no new tests of its
 
 ```bash
 git add includes/Roles/RoleRegistrar.php includes/Providers/AppServiceProvider.php
-git commit -m "feat: add manage_nutrio_settings capability and bind EmailTemplateService/Mailer"
+git commit -m "feat: add manage_merodiet_settings capability and bind EmailTemplateService/Mailer"
 ```
 
 ---
@@ -806,24 +806,24 @@ git commit -m "feat: add manage_nutrio_settings capability and bind EmailTemplat
 
 **Interfaces:**
 - Consumes: `EmailTemplateService::get()`/`::save()` (Task 2), `EmailTemplateRegistry::all_types()`/`::get_audience()`/`::get_tags()` (Task 1).
-- Produces: `GET /nutrio/v1/settings/email-templates`, `PUT /nutrio/v1/settings/email-templates/{type}` — both gated by `manage_nutrio_settings`.
+- Produces: `GET /merodiet/v1/settings/email-templates`, `PUT /merodiet/v1/settings/email-templates/{type}` — both gated by `manage_merodiet_settings`.
 
 - [ ] **Step 1: Write the failing test**
 
 ```php
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\RestApi;
+namespace MeroDiet\Tests\Unit\RestApi;
 
 use Brain\Monkey\Functions;
-use Nutrio\Email\EmailTemplateService;
-use Nutrio\RestApi\SettingsController;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Email\EmailTemplateService;
+use MeroDiet\RestApi\SettingsController;
+use MeroDiet\Tests\TestCase;
 use WP_REST_Request;
 
 final class SettingsControllerTest extends TestCase {
@@ -888,8 +888,8 @@ Expected: FAIL — `Too few arguments to function ...SettingsController::__const
 Add these imports at the top, alongside the existing ones:
 
 ```php
-use Nutrio\Email\EmailTemplateRegistry;
-use Nutrio\Email\EmailTemplateService;
+use MeroDiet\Email\EmailTemplateRegistry;
+use MeroDiet\Email\EmailTemplateService;
 ```
 
 Add a constructor (this class had none before) and the four new methods, leaving `get_usda_key()`/`update_usda_key()`/`describe()` exactly as they are:
@@ -910,7 +910,7 @@ Add to the end of `register_routes()`, after the existing two `usda-key` routes:
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( $this, 'get_email_templates' ),
 			),
-			required_capability: 'manage_nutrio_settings'
+			required_capability: 'manage_merodiet_settings'
 		);
 
 		$this->register_route(
@@ -929,7 +929,7 @@ Add to the end of `register_routes()`, after the existing two `usda-key` routes:
 					),
 				),
 			),
-			required_capability: 'manage_nutrio_settings'
+			required_capability: 'manage_merodiet_settings'
 		);
 ```
 
@@ -968,7 +968,7 @@ Add the two new methods anywhere after `update_usda_key()`:
 		$type = (string) $request->get_param( 'type' );
 
 		if ( ! EmailTemplateRegistry::is_known_type( $type ) ) {
-			return $this->error( 'nutrio_unknown_email_type', __( 'Unknown email template.', 'nutrio' ), 404 );
+			return $this->error( 'merodiet_unknown_email_type', __( 'Unknown email template.', 'merodiet' ), 404 );
 		}
 
 		$this->templates->save(
@@ -996,13 +996,13 @@ Add `use WP_Error;` to the top-of-file imports if it isn't already there (check 
 Change:
 
 ```php
-			\Nutrio\RestApi\SettingsController::class    => array(),
+			\MeroDiet\RestApi\SettingsController::class    => array(),
 ```
 
 to:
 
 ```php
-			\Nutrio\RestApi\SettingsController::class    => array( \Nutrio\Email\EmailTemplateService::class ),
+			\MeroDiet\RestApi\SettingsController::class    => array( \MeroDiet\Email\EmailTemplateService::class ),
 ```
 
 - [ ] **Step 5: Run test to verify it passes**
@@ -1034,24 +1034,24 @@ git commit -m "feat: add GET/PUT /settings/email-templates routes"
 
 **Interfaces:**
 - Consumes: nothing new.
-- Produces: `DigestScheduler::CRON_HOOK` (string constant, `'nutrio_daily_digest'` — Task 11's cron handler and Task 12's `Deactivation` both reference this exact constant, never a hardcoded string), `DigestScheduler::reschedule(): void`. `GET /nutrio/v1/settings/email-digest`, `PUT /nutrio/v1/settings/email-digest`.
+- Produces: `DigestScheduler::CRON_HOOK` (string constant, `'merodiet_daily_digest'` — Task 11's cron handler and Task 12's `Deactivation` both reference this exact constant, never a hardcoded string), `DigestScheduler::reschedule(): void`. `GET /merodiet/v1/settings/email-digest`, `PUT /merodiet/v1/settings/email-digest`.
 
 - [ ] **Step 1: Write the failing test**
 
 ```php
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Email;
+namespace MeroDiet\Tests\Unit\Email;
 
 use Brain\Monkey\Functions;
 use DateTimeZone;
-use Nutrio\Email\DigestScheduler;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Email\DigestScheduler;
+use MeroDiet\Tests\TestCase;
 
 final class DigestSchedulerTest extends TestCase {
 
@@ -1076,10 +1076,10 @@ final class DigestSchedulerTest extends TestCase {
 		Functions\when( 'wp_timezone' )->justReturn( new DateTimeZone( 'UTC' ) );
 		Functions\when( 'get_option' )->alias(
 			static function ( string $name, $default = false ) {
-				if ( 'nutrio_digest_enabled' === $name ) {
+				if ( 'merodiet_digest_enabled' === $name ) {
 					return true;
 				}
-				if ( 'nutrio_digest_time' === $name ) {
+				if ( 'merodiet_digest_time' === $name ) {
 					return '00:01'; // Almost certainly already passed "today" in any real run.
 				}
 				return $default;
@@ -1104,7 +1104,7 @@ final class DigestSchedulerTest extends TestCase {
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `vendor/bin/phpunit tests/Unit/Email/DigestSchedulerTest.php`
-Expected: FAIL — `Class "Nutrio\Email\DigestScheduler" not found`.
+Expected: FAIL — `Class "MeroDiet\Email\DigestScheduler" not found`.
 
 - [ ] **Step 3: Write the implementation**
 
@@ -1113,12 +1113,12 @@ Expected: FAIL — `Class "Nutrio\Email\DigestScheduler" not found`.
 /**
  * Schedules (or clears) the daily practitioner digest's WP-Cron event.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Email;
+namespace MeroDiet\Email;
 
 use DateTimeImmutable;
 
@@ -1134,21 +1134,21 @@ use DateTimeImmutable;
  */
 final class DigestScheduler {
 
-	public const CRON_HOOK = 'nutrio_daily_digest';
+	public const CRON_HOOK = 'merodiet_daily_digest';
 
 	/**
-	 * Called whenever nutrio_digest_enabled/nutrio_digest_time is
+	 * Called whenever merodiet_digest_enabled/merodiet_digest_time is
 	 * saved (SettingsController::update_email_digest()), and once from
 	 * Activation::activate().
 	 */
 	public static function reschedule(): void {
 		wp_clear_scheduled_hook( self::CRON_HOOK );
 
-		if ( ! (bool) get_option( 'nutrio_digest_enabled', false ) ) {
+		if ( ! (bool) get_option( 'merodiet_digest_enabled', false ) ) {
 			return;
 		}
 
-		$time = (string) get_option( 'nutrio_digest_time', '20:00' );
+		$time = (string) get_option( 'merodiet_digest_time', '20:00' );
 		$now  = new DateTimeImmutable( 'now', wp_timezone() );
 
 		$target = DateTimeImmutable::createFromFormat(
@@ -1234,7 +1234,7 @@ Expected: FAIL — `Call to undefined method ...SettingsController::get_email_di
 
 - [ ] **Step 6: Add the routes and methods to `SettingsController`**
 
-Add `use Nutrio\Email\DigestScheduler;` to the imports. Append to `register_routes()`:
+Add `use MeroDiet\Email\DigestScheduler;` to the imports. Append to `register_routes()`:
 
 ```php
 		$this->register_route(
@@ -1243,7 +1243,7 @@ Add `use Nutrio\Email\DigestScheduler;` to the imports. Append to `register_rout
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( $this, 'get_email_digest' ),
 			),
-			required_capability: 'manage_nutrio_settings'
+			required_capability: 'manage_merodiet_settings'
 		);
 
 		$this->register_route(
@@ -1262,7 +1262,7 @@ Add `use Nutrio\Email\DigestScheduler;` to the imports. Append to `register_rout
 					),
 				),
 			),
-			required_capability: 'manage_nutrio_settings'
+			required_capability: 'manage_merodiet_settings'
 		);
 ```
 
@@ -1276,8 +1276,8 @@ Add the two methods:
 	public function get_email_digest(): WP_REST_Response {
 		return $this->success(
 			array(
-				'enabled'   => (bool) get_option( 'nutrio_digest_enabled', false ),
-				'send_time' => (string) get_option( 'nutrio_digest_time', '20:00' ),
+				'enabled'   => (bool) get_option( 'merodiet_digest_enabled', false ),
+				'send_time' => (string) get_option( 'merodiet_digest_time', '20:00' ),
 			)
 		);
 	}
@@ -1291,18 +1291,18 @@ Add the two methods:
 		$send_time = (string) $request->get_param( 'send_time' );
 
 		if ( 1 !== preg_match( '/^([01]\d|2[0-3]):[0-5]\d$/', $send_time ) ) {
-			return $this->error( 'nutrio_invalid_time', __( 'Send time must be in HH:MM (24-hour) format.', 'nutrio' ), 400 );
+			return $this->error( 'merodiet_invalid_time', __( 'Send time must be in HH:MM (24-hour) format.', 'merodiet' ), 400 );
 		}
 
-		self::save_option_no_autoload( 'nutrio_digest_enabled', (bool) $request->get_param( 'enabled' ) );
-		self::save_option_no_autoload( 'nutrio_digest_time', $send_time );
+		self::save_option_no_autoload( 'merodiet_digest_enabled', (bool) $request->get_param( 'enabled' ) );
+		self::save_option_no_autoload( 'merodiet_digest_time', $send_time );
 
 		DigestScheduler::reschedule();
 
 		return $this->success(
 			array(
-				'enabled'   => (bool) get_option( 'nutrio_digest_enabled', false ),
-				'send_time' => (string) get_option( 'nutrio_digest_time', '20:00' ),
+				'enabled'   => (bool) get_option( 'merodiet_digest_enabled', false ),
+				'send_time' => (string) get_option( 'merodiet_digest_time', '20:00' ),
 			)
 		);
 	}
@@ -1420,7 +1420,7 @@ Then change the method signature area so the whole existing body is wrapped:
 			$client = $this->clients->find( $client_id );
 
 			if ( null === $client ) {
-				return new WP_Error( 'nutrio_not_found', __( 'Client not found.', 'nutrio' ), array( 'status' => 404 ) );
+				return new WP_Error( 'merodiet_not_found', __( 'Client not found.', 'merodiet' ), array( 'status' => 404 ) );
 			}
 
 			if ( null !== $client['user_id'] ) {
@@ -1443,8 +1443,8 @@ Then change the method signature area so the whole existing body is wrapped:
 
 			if ( false !== $existing ) {
 				return new WP_Error(
-					'nutrio_email_in_use',
-					__( 'A WordPress account with this email already exists. Link or resolve it manually before inviting this client.', 'nutrio' ),
+					'merodiet_email_in_use',
+					__( 'A WordPress account with this email already exists. Link or resolve it manually before inviting this client.', 'merodiet' ),
 					array( 'status' => 409 )
 				);
 			}
@@ -1473,7 +1473,7 @@ Then change the method signature area so the whole existing body is wrapped:
 			}
 
 			// Fires after a client is invited to the portal.
-			do_action( 'nutrio_client_invited', $client_id, $user_id );
+			do_action( 'merodiet_client_invited', $client_id, $user_id );
 
 			return true;
 		} finally {
@@ -1522,7 +1522,7 @@ git commit -m "feat: flag invite() calls so retrieve_password() emails can be to
 		Functions\when( 'esc_html' )->returnArg( 1 );
 
 		$user = $this->createMock( WP_User::class );
-		$user->method( 'has_cap' )->with( 'view_own_nutrio_plan' )->willReturn( true );
+		$user->method( 'has_cap' )->with( 'view_own_merodiet_plan' )->willReturn( true );
 		$user->ID = 42;
 
 		$clients = $this->createMock( ClientRepository::class );
@@ -1547,14 +1547,14 @@ This test needs a tiny reflection helper (since `ClientInviteService::$sending_i
 ```php
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Clients;
+namespace MeroDiet\Tests\Unit\Clients;
 
-use Nutrio\Clients\ClientInviteService;
+use MeroDiet\Clients\ClientInviteService;
 use ReflectionProperty;
 
 /**
@@ -1576,7 +1576,7 @@ final class ClientInviteServiceTestHelper {
 }
 ```
 
-Add `use Nutrio\Email\EmailTemplateService;`, `use Nutrio\Email\Mailer;`, `use Nutrio\Clients\ClientInviteService;` to `PortalPageTest.php`'s imports.
+Add `use MeroDiet\Email\EmailTemplateService;`, `use MeroDiet\Email\Mailer;`, `use MeroDiet\Clients\ClientInviteService;` to `PortalPageTest.php`'s imports.
 
 - [ ] **Step 2: Run test to verify it fails**
 
@@ -1588,8 +1588,8 @@ Expected: FAIL — `Too few arguments to function ...PortalPage::__construct()`.
 Add imports:
 
 ```php
-use Nutrio\Clients\ClientInviteService;
-use Nutrio\Email\Mailer;
+use MeroDiet\Clients\ClientInviteService;
+use MeroDiet\Email\Mailer;
 ```
 
 Change the constructor:
@@ -1605,7 +1605,7 @@ Replace `customize_reset_password_email()`'s body:
 
 ```php
 	public function customize_reset_password_email( string $message, string $key, string $user_login, WP_User $user_data ): string {
-		if ( ! $user_data->has_cap( 'view_own_nutrio_plan' ) ) {
+		if ( ! $user_data->has_cap( 'view_own_merodiet_plan' ) ) {
 			return $message;
 		}
 
@@ -1634,7 +1634,7 @@ Replace `customize_reset_password_email()`'s body:
 	 * @param WP_User $user_data  The user the reset is for.
 	 */
 	public function customize_reset_password_subject( string $title, string $user_login, WP_User $user_data ): string {
-		if ( ! $user_data->has_cap( 'view_own_nutrio_plan' ) ) {
+		if ( ! $user_data->has_cap( 'view_own_merodiet_plan' ) ) {
 			return $title;
 		}
 
@@ -1688,7 +1688,7 @@ Replace `customize_reset_password_email()`'s body:
 		$reset_url = '' !== $key
 			? add_query_arg(
 				array(
-					'nutrio_action' => 'resetpass',
+					'merodiet_action' => 'resetpass',
 					'key'           => $key,
 					'login'         => rawurlencode( $user_login ),
 				),
@@ -1719,7 +1719,7 @@ Update the `PortalPage` binding in `register()` to add `Mailer` as a second argu
 		$container->add( PortalPage::class )
 			->setShared( true )
 			->addArgument( ClientRepository::class )
-			->addArgument( \Nutrio\Email\Mailer::class );
+			->addArgument( \MeroDiet\Email\Mailer::class );
 ```
 
 (`Mailer::class` and its own `EmailTemplateService::class` dependency are both already bound by `AppServiceProvider`, which runs before `PortalServiceProvider` in `config/app.php`'s providers list — no `if ( ! $container->has(...) )` guard needed for either.)
@@ -1784,7 +1784,7 @@ git commit -m "feat: send branded client_invite/client_password_reset emails"
 		$current_user->user_email   = 'practitioner@example.test';
 		Functions\when( 'wp_get_current_user' )->justReturn( $current_user );
 
-		$mailer = $this->createMock( \Nutrio\Email\Mailer::class );
+		$mailer = $this->createMock( \MeroDiet\Email\Mailer::class );
 		$mailer->expects( self::once() )
 			->method( 'send' )
 			->with(
@@ -1829,7 +1829,7 @@ Expected: FAIL — `Too few arguments to function ...ClientsController::__constr
 
 - [ ] **Step 3: Modify `ClientsController`**
 
-Add `use Nutrio\Email\Mailer;` to the imports. Add `Mailer $mailer` as a sixth constructor parameter:
+Add `use MeroDiet\Email\Mailer;` to the imports. Add `Mailer $mailer` as a sixth constructor parameter:
 
 ```php
 	public function __construct(
@@ -1866,18 +1866,18 @@ Add the small helper:
 	 */
 	private static function invite_status_copy( bool $send_invite_requested, ?string $invite_error ): string {
 		if ( ! $send_invite_requested ) {
-			return __( 'not invited (added without sending an invite)', 'nutrio' );
+			return __( 'not invited (added without sending an invite)', 'merodiet' );
 		}
 
 		if ( null !== $invite_error ) {
 			return sprintf(
 				/* translators: %s: the reason the invite failed */
-				__( 'invite failed: %s', 'nutrio' ),
+				__( 'invite failed: %s', 'merodiet' ),
 				$invite_error
 			);
 		}
 
-		return __( 'invited', 'nutrio' );
+		return __( 'invited', 'merodiet' );
 	}
 ```
 
@@ -1886,32 +1886,32 @@ Add the small helper:
 Change:
 
 ```php
-			\Nutrio\RestApi\ClientsController::class     => array(
-				\Nutrio\Repositories\ClientRepository::class,
-				\Nutrio\Clients\ClientInviteService::class,
-				\Nutrio\Repositories\LogEntryRepository::class,
-				\Nutrio\Repositories\MeasurementRepository::class,
-				\Nutrio\Clients\ComplianceCalculator::class,
+			\MeroDiet\RestApi\ClientsController::class     => array(
+				\MeroDiet\Repositories\ClientRepository::class,
+				\MeroDiet\Clients\ClientInviteService::class,
+				\MeroDiet\Repositories\LogEntryRepository::class,
+				\MeroDiet\Repositories\MeasurementRepository::class,
+				\MeroDiet\Clients\ComplianceCalculator::class,
 			),
 ```
 
 to:
 
 ```php
-			\Nutrio\RestApi\ClientsController::class     => array(
-				\Nutrio\Repositories\ClientRepository::class,
-				\Nutrio\Clients\ClientInviteService::class,
-				\Nutrio\Repositories\LogEntryRepository::class,
-				\Nutrio\Repositories\MeasurementRepository::class,
-				\Nutrio\Clients\ComplianceCalculator::class,
-				\Nutrio\Email\Mailer::class,
+			\MeroDiet\RestApi\ClientsController::class     => array(
+				\MeroDiet\Repositories\ClientRepository::class,
+				\MeroDiet\Clients\ClientInviteService::class,
+				\MeroDiet\Repositories\LogEntryRepository::class,
+				\MeroDiet\Repositories\MeasurementRepository::class,
+				\MeroDiet\Clients\ComplianceCalculator::class,
+				\MeroDiet\Email\Mailer::class,
 			),
 ```
 
 - [ ] **Step 5: Run test to verify it passes**
 
 Run: `vendor/bin/phpunit tests/Unit/RestApi/ClientsControllerCreateTest.php`
-Expected: PASS (all existing tests + the new one — the three existing tests in this file each construct `new ClientsController(...)` directly and need a sixth argument added; pass `$this->createMock( \Nutrio\Email\Mailer::class )` for each, since they don't assert on it).
+Expected: PASS (all existing tests + the new one — the three existing tests in this file each construct `new ClientsController(...)` directly and need a sixth argument added; pass `$this->createMock( \MeroDiet\Email\Mailer::class )` for each, since they don't assert on it).
 
 - [ ] **Step 6: Run the full suite**
 
@@ -1943,24 +1943,24 @@ git commit -m "feat: email the practitioner when they add a new client"
 ```php
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\RestApi;
+namespace MeroDiet\Tests\Unit\RestApi;
 
 use Brain\Monkey\Functions;
-use Nutrio\Clients\PortalRewrite;
-use Nutrio\Email\Mailer;
-use Nutrio\Nutrition\FoodCache;
-use Nutrio\Nutrition\PlanNutrientResolver;
-use Nutrio\Nutrition\RecipeNutrientResolver;
-use Nutrio\Repositories\ClientRepository;
-use Nutrio\Repositories\PlanRepository;
-use Nutrio\Repositories\RecipeRepository;
-use Nutrio\RestApi\PlansController;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Clients\PortalRewrite;
+use MeroDiet\Email\Mailer;
+use MeroDiet\Nutrition\FoodCache;
+use MeroDiet\Nutrition\PlanNutrientResolver;
+use MeroDiet\Nutrition\RecipeNutrientResolver;
+use MeroDiet\Repositories\ClientRepository;
+use MeroDiet\Repositories\PlanRepository;
+use MeroDiet\Repositories\RecipeRepository;
+use MeroDiet\RestApi\PlansController;
+use MeroDiet\Tests\TestCase;
 use WP_REST_Request;
 
 final class PlansControllerAssignTest extends TestCase {
@@ -2029,7 +2029,7 @@ Expected: FAIL — `Too few arguments to function ...PlansController::__construc
 
 - [ ] **Step 3: Modify `PlansController`**
 
-Add `use Nutrio\Clients\PortalRewrite;` and `use Nutrio\Email\Mailer;` to the imports. Add `Mailer $mailer` as a seventh constructor parameter:
+Add `use MeroDiet\Clients\PortalRewrite;` and `use MeroDiet\Email\Mailer;` to the imports. Add `Mailer $mailer` as a seventh constructor parameter:
 
 ```php
 	public function __construct(
@@ -2062,17 +2062,17 @@ In `assign_plan()`, right after `$this->plans->assign( $id, $client_id, $snapsho
 
 - [ ] **Step 4: Update `config/app.php`**
 
-Change the `PlansController::class` entry to append `\Nutrio\Email\Mailer::class`:
+Change the `PlansController::class` entry to append `\MeroDiet\Email\Mailer::class`:
 
 ```php
-			\Nutrio\RestApi\PlansController::class       => array(
-				\Nutrio\Repositories\PlanRepository::class,
-				\Nutrio\Nutrition\PlanNutrientResolver::class,
-				\Nutrio\Repositories\ClientRepository::class,
-				\Nutrio\Nutrition\FoodCache::class,
-				\Nutrio\Repositories\RecipeRepository::class,
-				\Nutrio\Nutrition\RecipeNutrientResolver::class,
-				\Nutrio\Email\Mailer::class,
+			\MeroDiet\RestApi\PlansController::class       => array(
+				\MeroDiet\Repositories\PlanRepository::class,
+				\MeroDiet\Nutrition\PlanNutrientResolver::class,
+				\MeroDiet\Repositories\ClientRepository::class,
+				\MeroDiet\Nutrition\FoodCache::class,
+				\MeroDiet\Repositories\RecipeRepository::class,
+				\MeroDiet\Nutrition\RecipeNutrientResolver::class,
+				\MeroDiet\Email\Mailer::class,
 			),
 ```
 
@@ -2113,19 +2113,19 @@ git commit -m "feat: email the client when a plan is assigned to them"
 ```php
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Email;
+namespace MeroDiet\Tests\Unit\Email;
 
 use Brain\Monkey\Functions;
-use Nutrio\Email\DigestMailer;
-use Nutrio\Email\Mailer;
-use Nutrio\Repositories\ClientRepository;
-use Nutrio\Repositories\LogEntryRepository;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Email\DigestMailer;
+use MeroDiet\Email\Mailer;
+use MeroDiet\Repositories\ClientRepository;
+use MeroDiet\Repositories\LogEntryRepository;
+use MeroDiet\Tests\TestCase;
 
 final class DigestMailerTest extends TestCase {
 
@@ -2197,7 +2197,7 @@ final class DigestMailerTest extends TestCase {
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `vendor/bin/phpunit tests/Unit/Email/DigestMailerTest.php`
-Expected: FAIL — `Class "Nutrio\Email\DigestMailer" not found`.
+Expected: FAIL — `Class "MeroDiet\Email\DigestMailer" not found`.
 
 - [ ] **Step 3: Write the implementation**
 
@@ -2206,15 +2206,15 @@ Expected: FAIL — `Class "Nutrio\Email\DigestMailer" not found`.
 /**
  * Builds and sends the daily per-practitioner client-activity digest.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Email;
+namespace MeroDiet\Email;
 
-use Nutrio\Repositories\ClientRepository;
-use Nutrio\Repositories\LogEntryRepository;
+use MeroDiet\Repositories\ClientRepository;
+use MeroDiet\Repositories\LogEntryRepository;
 
 /**
  * Hooked to DigestScheduler::CRON_HOOK (see AppServiceProvider::boot()).
@@ -2279,8 +2279,8 @@ final class DigestMailer {
 				esc_html( (string) ( $client['first_name'] ?? '' ) ),
 				esc_html( (string) ( $client['last_name'] ?? '' ) ),
 				count( $todays_logs ) > 0
-					? esc_html__( 'Logged today', 'nutrio' )
-					: esc_html__( 'No activity', 'nutrio' )
+					? esc_html__( 'Logged today', 'merodiet' )
+					: esc_html__( 'No activity', 'merodiet' )
 			);
 		}
 
@@ -2296,7 +2296,7 @@ Expected: PASS (2 tests).
 
 - [ ] **Step 5: Wire the cron hook — modify `AppServiceProvider`**
 
-Add `use Nutrio\Email\DigestMailer;`, `use Nutrio\Email\DigestScheduler;`, `use Nutrio\Repositories\ClientRepository;` (already imported), `use Nutrio\Repositories\LogEntryRepository;` to the imports. In `register()`, add:
+Add `use MeroDiet\Email\DigestMailer;`, `use MeroDiet\Email\DigestScheduler;`, `use MeroDiet\Repositories\ClientRepository;` (already imported), `use MeroDiet\Repositories\LogEntryRepository;` to the imports. In `register()`, add:
 
 ```php
 		$container->add( DigestMailer::class )
@@ -2326,7 +2326,7 @@ Add a `boot()` method (this provider had none before):
 
 - [ ] **Step 6: Modify `Activation`**
 
-Add `use Nutrio\Email\DigestScheduler;` and, at the end of `activate()`:
+Add `use MeroDiet\Email\DigestScheduler;` and, at the end of `activate()`:
 
 ```php
 		DigestScheduler::reschedule();
@@ -2339,14 +2339,14 @@ Add `use Nutrio\Email\DigestScheduler;` and, at the end of `activate()`:
 /**
  * Plugin deactivation.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio;
+namespace MeroDiet;
 
-use Nutrio\Email\DigestScheduler;
+use MeroDiet\Email\DigestScheduler;
 
 /**
  * Deactivation is reversible housekeeping only (flush rewrite rules,
@@ -2496,24 +2496,24 @@ export default function EmailTemplateEditor( {
 			</PanelHead>
 			<PanelBody>
 				<form onSubmit={ handleSave } className={ styles.form }>
-					<div className="nutrio-field">
-						<label htmlFor={ `nutrio-email-subject-${ template.type }` }>
-							{ __( 'Subject', 'nutrio' ) }
+					<div className="merodiet-field">
+						<label htmlFor={ `merodiet-email-subject-${ template.type }` }>
+							{ __( 'Subject', 'merodiet' ) }
 						</label>
 						<input
-							id={ `nutrio-email-subject-${ template.type }` }
+							id={ `merodiet-email-subject-${ template.type }` }
 							type="text"
 							value={ subject }
 							onChange={ ( event ) => setSubject( event.target.value ) }
 							required
 						/>
 					</div>
-					<div className="nutrio-field">
-						<label htmlFor={ `nutrio-email-body-${ template.type }` }>
-							{ __( 'Body', 'nutrio' ) }
+					<div className="merodiet-field">
+						<label htmlFor={ `merodiet-email-body-${ template.type }` }>
+							{ __( 'Body', 'merodiet' ) }
 						</label>
 						<textarea
-							id={ `nutrio-email-body-${ template.type }` }
+							id={ `merodiet-email-body-${ template.type }` }
 							ref={ bodyRef }
 							rows={ 6 }
 							value={ body }
@@ -2535,7 +2535,7 @@ export default function EmailTemplateEditor( {
 						) ) }
 					</div>
 					<Button variant="primary" type="submit" disabled={ isSaving }>
-						{ __( 'Save', 'nutrio' ) }
+						{ __( 'Save', 'merodiet' ) }
 					</Button>
 				</form>
 			</PanelBody>
@@ -2622,11 +2622,11 @@ interface EmailSettingsTabProps {
 // registry only sends machine keys (see EmailTemplateRegistry) and
 // this is the one place that turns them into copy a practitioner reads.
 const TYPE_LABELS: Record< string, string > = {
-	client_invite: __( 'Client invite', 'nutrio' ),
-	client_password_reset: __( 'Client password reset', 'nutrio' ),
-	client_plan_assigned: __( 'Plan assigned', 'nutrio' ),
-	practitioner_client_added: __( 'New client added', 'nutrio' ),
-	practitioner_daily_digest: __( 'Daily client activity digest', 'nutrio' ),
+	client_invite: __( 'Client invite', 'merodiet' ),
+	client_password_reset: __( 'Client password reset', 'merodiet' ),
+	client_plan_assigned: __( 'Plan assigned', 'merodiet' ),
+	practitioner_client_added: __( 'New client added', 'merodiet' ),
+	practitioner_daily_digest: __( 'Daily client activity digest', 'merodiet' ),
 };
 
 export default function EmailSettingsTab( { audience }: EmailSettingsTabProps ) {
@@ -2635,20 +2635,20 @@ export default function EmailSettingsTab( { audience }: EmailSettingsTabProps ) 
 	const [ isProModalOpen, setProModalOpen ] = useState( false );
 
 	useEffect( () => {
-		apiFetch< EmailTemplate[] >( { path: '/nutrio/v1/settings/email-templates' } ).then(
+		apiFetch< EmailTemplate[] >( { path: '/merodiet/v1/settings/email-templates' } ).then(
 			setTemplates
 		);
 
 		if ( 'practitioner' === audience ) {
 			apiFetch< EmailDigestSettings >( {
-				path: '/nutrio/v1/settings/email-digest',
+				path: '/merodiet/v1/settings/email-digest',
 			} ).then( setDigest );
 		}
 	}, [ audience ] );
 
 	const handleSaveTemplate = async ( type: string, subject: string, body: string ) => {
 		const result = await apiFetch< { type: string; subject: string; body: string } >( {
-			path: `/nutrio/v1/settings/email-templates/${ type }`,
+			path: `/merodiet/v1/settings/email-templates/${ type }`,
 			method: 'PUT',
 			data: { subject, body },
 		} );
@@ -2661,12 +2661,12 @@ export default function EmailSettingsTab( { audience }: EmailSettingsTabProps ) 
 			)
 		);
 
-		await alertDialog( { message: __( 'Email template saved.', 'nutrio' ) } );
+		await alertDialog( { message: __( 'Email template saved.', 'merodiet' ) } );
 	};
 
 	const handleSaveDigest = async ( next: EmailDigestSettings ) => {
 		const result = await apiFetch< EmailDigestSettings >( {
-			path: '/nutrio/v1/settings/email-digest',
+			path: '/merodiet/v1/settings/email-digest',
 			method: 'PUT',
 			data: next,
 		} );
@@ -2674,7 +2674,7 @@ export default function EmailSettingsTab( { audience }: EmailSettingsTabProps ) 
 	};
 
 	if ( null === templates ) {
-		return <p>{ __( 'Loading…', 'nutrio' ) }</p>;
+		return <p>{ __( 'Loading…', 'merodiet' ) }</p>;
 	}
 
 	const visibleTemplates = templates.filter( ( template ) => template.audience === audience );
@@ -2684,7 +2684,7 @@ export default function EmailSettingsTab( { audience }: EmailSettingsTabProps ) 
 			{ 'practitioner' === audience && null !== digest && (
 				<Panel>
 					<PanelHead>
-						<h3>{ __( 'Daily client activity digest', 'nutrio' ) }</h3>
+						<h3>{ __( 'Daily client activity digest', 'merodiet' ) }</h3>
 					</PanelHead>
 					<PanelBody>
 						<label className={ styles.digestRow }>
@@ -2695,10 +2695,10 @@ export default function EmailSettingsTab( { audience }: EmailSettingsTabProps ) 
 									handleSaveDigest( { ...digest, enabled: event.target.checked } )
 								}
 							/>
-							{ __( 'Send me a daily summary of client activity', 'nutrio' ) }
+							{ __( 'Send me a daily summary of client activity', 'merodiet' ) }
 						</label>
 						<label className={ styles.digestRow }>
-							{ __( 'Send at', 'nutrio' ) }
+							{ __( 'Send at', 'merodiet' ) }
 							<input
 								type="time"
 								value={ digest.send_time }
@@ -2729,12 +2729,12 @@ export default function EmailSettingsTab( { audience }: EmailSettingsTabProps ) 
 					<rect x="5" y="11" width="14" height="9" rx="2" fill="currentColor" stroke="none" />
 					<path d="M8 11V8a4 4 0 0 1 8 0v3" />
 				</svg>
-				{ __( 'Custom email styling', 'nutrio' ) }
+				{ __( 'Custom email styling', 'merodiet' ) }
 			</button>
 
 			<ProUpsellModal
 				isOpen={ isProModalOpen }
-				featureName={ __( 'Custom email styling', 'nutrio' ) }
+				featureName={ __( 'Custom email styling', 'merodiet' ) }
 				onClose={ () => setProModalOpen( false ) }
 			/>
 		</>
@@ -2828,7 +2828,7 @@ export default function Settings() {
 
 	useEffect( () => {
 		apiFetch< UsdaKeyState >( {
-			path: '/nutrio/v1/settings/usda-key',
+			path: '/merodiet/v1/settings/usda-key',
 		} ).then( setKeyState );
 	}, [] );
 
@@ -2838,7 +2838,7 @@ export default function Settings() {
 
 		try {
 			const result = await apiFetch< UsdaKeyState >( {
-				path: '/nutrio/v1/settings/usda-key',
+				path: '/merodiet/v1/settings/usda-key',
 				method: 'PUT',
 				data: { api_key: apiKeyInput },
 			} );
@@ -2847,7 +2847,7 @@ export default function Settings() {
 			setIsReplacing( false );
 			setApiKeyInput( '' );
 			await alertDialog( {
-				message: __( 'USDA API key saved.', 'nutrio' ),
+				message: __( 'USDA API key saved.', 'merodiet' ),
 			} );
 		} finally {
 			setIsSaving( false );
@@ -2856,8 +2856,8 @@ export default function Settings() {
 
 	return (
 		<>
-			<div className="nutrio-topbar">
-				<h1>{ __( 'Settings', 'nutrio' ) }</h1>
+			<div className="merodiet-topbar">
+				<h1>{ __( 'Settings', 'merodiet' ) }</h1>
 			</div>
 
 			<div className={ styles.tabs }>
@@ -2867,7 +2867,7 @@ export default function Settings() {
 					}` }
 					onClick={ () => setActiveTab( 'general' ) }
 				>
-					{ __( 'General', 'nutrio' ) }
+					{ __( 'General', 'merodiet' ) }
 				</button>
 				<button
 					className={ `${ styles.tab } ${
@@ -2875,7 +2875,7 @@ export default function Settings() {
 					}` }
 					onClick={ () => setActiveTab( 'practitioner' ) }
 				>
-					{ __( 'Practitioner emails', 'nutrio' ) }
+					{ __( 'Practitioner emails', 'merodiet' ) }
 				</button>
 				<button
 					className={ `${ styles.tab } ${
@@ -2883,25 +2883,25 @@ export default function Settings() {
 					}` }
 					onClick={ () => setActiveTab( 'client' ) }
 				>
-					{ __( 'Client emails', 'nutrio' ) }
+					{ __( 'Client emails', 'merodiet' ) }
 				</button>
 			</div>
 
 			{ 'general' === activeTab && (
 				<Panel>
 					<PanelHead>
-						<h3>{ __( 'USDA FoodData Central', 'nutrio' ) }</h3>
+						<h3>{ __( 'USDA FoodData Central', 'merodiet' ) }</h3>
 					</PanelHead>
 					<PanelBody>
 						<p style={ { color: 'var(--ink-muted)', marginTop: 0 } }>
 							{ __(
-								'Required for recipe and plan building — this key lets Nutrio search and pull nutrient data from the USDA FoodData Central database. Get a free key at api.data.gov/signup.',
-								'nutrio'
+								'Required for recipe and plan building — this key lets MeroDiet search and pull nutrient data from the USDA FoodData Central database. Get a free key at api.data.gov/signup.',
+								'merodiet'
 							) }
 						</p>
 
 						{ null === keyState && (
-							<p>{ __( 'Loading…', 'nutrio' ) }</p>
+							<p>{ __( 'Loading…', 'merodiet' ) }</p>
 						) }
 
 						{ null !== keyState && ! isReplacing && (
@@ -2913,12 +2913,12 @@ export default function Settings() {
 								} }
 							>
 								{ keyState.is_set ? (
-									<span className="nutrio-mono">
+									<span className="merodiet-mono">
 										{ keyState.masked }
 									</span>
 								) : (
 									<span style={ { color: 'var(--ink-muted)' } }>
-										{ __( 'No key set', 'nutrio' ) }
+										{ __( 'No key set', 'merodiet' ) }
 									</span>
 								) }
 								<Button
@@ -2926,8 +2926,8 @@ export default function Settings() {
 									onClick={ () => setIsReplacing( true ) }
 								>
 									{ keyState.is_set
-										? __( 'Replace key', 'nutrio' )
-										: __( 'Add key', 'nutrio' ) }
+										? __( 'Replace key', 'merodiet' )
+										: __( 'Add key', 'merodiet' ) }
 								</Button>
 							</div>
 						) }
@@ -2942,14 +2942,14 @@ export default function Settings() {
 								} }
 							>
 								<div
-									className="nutrio-field"
+									className="merodiet-field"
 									style={ { flex: 1, marginBottom: 0 } }
 								>
-									<label htmlFor="nutrio-usda-key">
-										{ __( 'USDA API key', 'nutrio' ) }
+									<label htmlFor="merodiet-usda-key">
+										{ __( 'USDA API key', 'merodiet' ) }
 									</label>
 									<input
-										id="nutrio-usda-key"
+										id="merodiet-usda-key"
 										type="text"
 										value={ apiKeyInput }
 										onChange={ ( event ) =>
@@ -2963,7 +2963,7 @@ export default function Settings() {
 									type="submit"
 									disabled={ isSaving }
 								>
-									{ __( 'Save', 'nutrio' ) }
+									{ __( 'Save', 'merodiet' ) }
 								</Button>
 								<Button
 									variant="ghost"
@@ -2974,7 +2974,7 @@ export default function Settings() {
 										setApiKeyInput( '' );
 									} }
 								>
-									{ __( 'Cancel', 'nutrio' ) }
+									{ __( 'Cancel', 'merodiet' ) }
 								</Button>
 							</form>
 						) }
@@ -3026,7 +3026,7 @@ Expected: PASS.
 
 Run: `npm run build`
 
-Then, using the Browser pane against the running `nutrio.local` (or `wp-env`) site:
+Then, using the Browser pane against the running `merodiet.local` (or `wp-env`) site:
 1. Open the practitioner admin app, navigate to Settings.
 2. Confirm three tabs render: General, Practitioner emails, Client emails.
 3. General tab: confirm the USDA key section still works exactly as before (unchanged).

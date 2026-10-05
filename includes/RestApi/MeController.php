@@ -2,27 +2,27 @@
 /**
  * Client-portal "my own data" REST endpoints.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\RestApi;
+namespace MeroDiet\RestApi;
 
-use Nutrio\Nutrition\FoodCache;
-use Nutrio\Nutrition\RecipeNutrientResolver;
-use Nutrio\Repositories\ClientRepository;
-use Nutrio\Repositories\LogEntryRepository;
-use Nutrio\Repositories\MeasurementRepository;
-use Nutrio\Repositories\PlanRepository;
-use Nutrio\Repositories\RecipeRepository;
+use MeroDiet\Nutrition\FoodCache;
+use MeroDiet\Nutrition\RecipeNutrientResolver;
+use MeroDiet\Repositories\ClientRepository;
+use MeroDiet\Repositories\LogEntryRepository;
+use MeroDiet\Repositories\MeasurementRepository;
+use MeroDiet\Repositories\PlanRepository;
+use MeroDiet\Repositories\RecipeRepository;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
 
 /**
- * Every route here requires 'view_own_nutrio_plan' and resolves the
+ * Every route here requires 'view_own_merodiet_plan' and resolves the
  * caller's own client_id via AbstractClientController — see that
  * class's docblock for why there's no separate per-request ownership
  * check the way practitioner-owned resources need one.
@@ -30,7 +30,7 @@ use WP_REST_Server;
 final class MeController extends AbstractClientController {
 
 	/**
-	 * Route base — registers under nutrio/v1/me.
+	 * Route base — registers under merodiet/v1/me.
 	 *
 	 * @var string
 	 */
@@ -75,7 +75,7 @@ final class MeController extends AbstractClientController {
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( $this, 'get_plan' ),
 			),
-			required_capability: 'view_own_nutrio_plan'
+			required_capability: 'view_own_merodiet_plan'
 		);
 
 		$this->register_route(
@@ -84,7 +84,7 @@ final class MeController extends AbstractClientController {
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( $this, 'get_next_plan' ),
 			),
-			required_capability: 'view_own_nutrio_plan'
+			required_capability: 'view_own_merodiet_plan'
 		);
 
 		$this->register_route(
@@ -103,7 +103,7 @@ final class MeController extends AbstractClientController {
 					),
 				),
 			),
-			required_capability: 'view_own_nutrio_plan'
+			required_capability: 'view_own_merodiet_plan'
 		);
 
 		$this->register_route(
@@ -113,7 +113,7 @@ final class MeController extends AbstractClientController {
 				'callback' => array( $this, 'create_log' ),
 				'args'     => self::log_write_args(),
 			),
-			required_capability: 'view_own_nutrio_plan'
+			required_capability: 'view_own_merodiet_plan'
 		);
 
 		$this->register_route(
@@ -132,7 +132,7 @@ final class MeController extends AbstractClientController {
 					),
 				),
 			),
-			required_capability: 'view_own_nutrio_plan'
+			required_capability: 'view_own_merodiet_plan'
 		);
 
 		$this->register_route(
@@ -142,7 +142,7 @@ final class MeController extends AbstractClientController {
 				'callback' => array( $this, 'create_measurement' ),
 				'args'     => self::measurement_write_args(),
 			),
-			required_capability: 'view_own_nutrio_plan'
+			required_capability: 'view_own_merodiet_plan'
 		);
 
 		$this->register_route(
@@ -151,7 +151,7 @@ final class MeController extends AbstractClientController {
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( $this, 'get_profile' ),
 			),
-			required_capability: 'view_own_nutrio_plan'
+			required_capability: 'view_own_merodiet_plan'
 		);
 
 		$this->register_route(
@@ -161,7 +161,7 @@ final class MeController extends AbstractClientController {
 				'callback' => array( $this, 'update_profile' ),
 				'args'     => self::profile_write_args(),
 			),
-			required_capability: 'view_own_nutrio_plan'
+			required_capability: 'view_own_merodiet_plan'
 		);
 
 		$this->register_route(
@@ -170,7 +170,7 @@ final class MeController extends AbstractClientController {
 				'methods'  => WP_REST_Server::CREATABLE,
 				'callback' => array( $this, 'upload_avatar' ),
 			),
-			required_capability: 'view_own_nutrio_plan'
+			required_capability: 'view_own_merodiet_plan'
 		);
 
 		$this->register_route(
@@ -193,7 +193,7 @@ final class MeController extends AbstractClientController {
 					),
 				),
 			),
-			required_capability: 'view_own_nutrio_plan'
+			required_capability: 'view_own_merodiet_plan'
 		);
 	}
 
@@ -425,7 +425,7 @@ final class MeController extends AbstractClientController {
 		$files = $request->get_file_params();
 
 		if ( empty( $files['avatar'] ) ) {
-			return $this->error( 'nutrio_missing_file', __( 'No image file was uploaded.', 'nutrio' ), 400 );
+			return $this->error( 'merodiet_missing_file', __( 'No image file was uploaded.', 'merodiet' ), 400 );
 		}
 
 		if ( ! function_exists( 'media_handle_upload' ) ) {
@@ -437,7 +437,7 @@ final class MeController extends AbstractClientController {
 		$allowed_types = array( 'image/jpeg', 'image/png', 'image/webp' );
 
 		if ( ! in_array( $files['avatar']['type'], $allowed_types, true ) ) {
-			return $this->error( 'nutrio_invalid_file_type', __( 'Please upload a JPEG, PNG, or WebP image.', 'nutrio' ), 400 );
+			return $this->error( 'merodiet_invalid_file_type', __( 'Please upload a JPEG, PNG, or WebP image.', 'merodiet' ), 400 );
 		}
 
 		$attachment_id = media_handle_upload( 'avatar', 0 );
@@ -475,15 +475,15 @@ final class MeController extends AbstractClientController {
 		$current_user = wp_get_current_user();
 
 		if ( ! wp_check_password( $current_password, $current_user->user_pass, $current_user->ID ) ) {
-			return $this->error( 'nutrio_password_incorrect', __( 'Your current password is incorrect.', 'nutrio' ), 400 );
+			return $this->error( 'merodiet_password_incorrect', __( 'Your current password is incorrect.', 'merodiet' ), 400 );
 		}
 
 		if ( strlen( $new_password ) < 8 ) {
-			return $this->error( 'nutrio_password_too_short', __( 'Your new password must be at least 8 characters.', 'nutrio' ), 400 );
+			return $this->error( 'merodiet_password_too_short', __( 'Your new password must be at least 8 characters.', 'merodiet' ), 400 );
 		}
 
 		if ( $new_password !== $confirm_password ) {
-			return $this->error( 'nutrio_password_mismatch', __( 'The two passwords you entered do not match.', 'nutrio' ), 400 );
+			return $this->error( 'merodiet_password_mismatch', __( 'The two passwords you entered do not match.', 'merodiet' ), 400 );
 		}
 
 		wp_set_password( $new_password, $current_user->ID );

@@ -2,7 +2,7 @@
 
 ## Context
 
-Recipes just shipped. Plans is the next screen per `JOURNEY.md`/the original roadmap — the other half of "build and assign nutrition." The backend is already almost entirely built: `nutrio_plans` / `nutrio_plan_days` / `nutrio_plan_items` migrations, `PlanRepository`, `PlanNutrientResolver`, and a full `PlansController` (list/create/get/update/delete/assign, ownership checks, 409 on editing an assigned plan). What's missing is the frontend, plus one real backend gap described below.
+Recipes just shipped. Plans is the next screen per `JOURNEY.md`/the original roadmap — the other half of "build and assign nutrition." The backend is already almost entirely built: `merodiet_plans` / `merodiet_plan_days` / `merodiet_plan_items` migrations, `PlanRepository`, `PlanNutrientResolver`, and a full `PlansController` (list/create/get/update/delete/assign, ownership checks, 409 on editing an assigned plan). What's missing is the frontend, plus one real backend gap described below.
 
 A plan is a **draft** (freely editable, nutrient totals always computed live) until it's **assigned** to a client, at which point `assigned_at` is set and `nutrient_snapshot` is frozen — an assigned plan must keep rendering the values the practitioner actually reviewed and the client actually received, even if the underlying USDA cache is later corrected. `client_id` is nullable and, notably, **not settable during create/update** — only the dedicated `POST /plans/{id}/assign` endpoint sets it. A plan is client-agnostic until that one explicit action.
 

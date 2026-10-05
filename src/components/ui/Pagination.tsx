@@ -46,12 +46,12 @@ export default function Pagination( {
 			<div className={ styles.controls }>
 				{ perPage !== undefined && onPerPageChange && (
 					<div className={ styles.perPage }>
-						<label htmlFor="nutrio-per-page">
-							{ __( 'Per page', 'nutrio' ) }
+						<label htmlFor="merodiet-per-page">
+							{ __( 'Per page', 'merodiet' ) }
 						</label>
-						<div className="nutrio-field">
+						<div className="merodiet-field">
 							<select
-								id="nutrio-per-page"
+								id="merodiet-per-page"
 								value={ perPage }
 								onChange={ ( event ) =>
 									onPerPageChange(
@@ -74,12 +74,12 @@ export default function Pagination( {
 					onClick={ () => onPageChange( page - 1 ) }
 					disabled={ page <= 1 }
 				>
-					{ __( 'Previous', 'nutrio' ) }
+					{ __( 'Previous', 'merodiet' ) }
 				</button>
 				<span className={ styles.status }>
 					{ sprintf(
 						/* translators: 1: current page number, 2: total number of pages */
-						__( 'Page %1$d of %2$d', 'nutrio' ),
+						__( 'Page %1$d of %2$d', 'merodiet' ),
 						page,
 						totalPages
 					) }
@@ -89,7 +89,7 @@ export default function Pagination( {
 					onClick={ () => onPageChange( page + 1 ) }
 					disabled={ page >= totalPages }
 				>
-					{ __( 'Next', 'nutrio' ) }
+					{ __( 'Next', 'merodiet' ) }
 				</button>
 			</div>
 		</div>
@@ -98,7 +98,7 @@ export default function Pagination( {
 
 function rangeText( page: number, perPage: number, total: number ): string {
 	if ( total === 0 ) {
-		return __( 'No results', 'nutrio' );
+		return __( 'No results', 'merodiet' );
 	}
 
 	const start = ( page - 1 ) * perPage + 1;
@@ -106,7 +106,7 @@ function rangeText( page: number, perPage: number, total: number ): string {
 
 	return sprintf(
 		/* translators: 1: first row number shown, 2: last row number shown, 3: total row count */
-		__( 'Showing %1$d–%2$d of %3$d', 'nutrio' ),
+		__( 'Showing %1$d–%2$d of %3$d', 'merodiet' ),
 		start,
 		end,
 		total

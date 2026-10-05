@@ -1,6 +1,6 @@
 export type WeightUnit = 'kg' | 'lb';
 
-const UNIT_STORAGE_KEY = 'nutrio-client-portal-weight-unit';
+const UNIT_STORAGE_KEY = 'merodiet-client-portal-weight-unit';
 
 // Shared between MeasurementsTab (where the unit is chosen) and any other
 // client-portal screen that displays a weight (e.g. the Dashboard tab) —

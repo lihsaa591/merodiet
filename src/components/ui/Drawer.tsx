@@ -34,7 +34,7 @@ export default function Drawer( {
 				}`.trim() }
 				role="button"
 				tabIndex={ -1 }
-				aria-label={ __( 'Close', 'nutrio' ) }
+				aria-label={ __( 'Close', 'merodiet' ) }
 				onClick={ handleClose }
 				onKeyDown={ ( event ) => {
 					if ( 'Escape' === event.key || 'Enter' === event.key ) {
@@ -52,7 +52,7 @@ export default function Drawer( {
 					<button
 						className={ styles.drawerClose }
 						onClick={ handleClose }
-						aria-label={ __( 'Close', 'nutrio' ) }
+						aria-label={ __( 'Close', 'merodiet' ) }
 					>
 						<svg
 							viewBox="0 0 24 24"

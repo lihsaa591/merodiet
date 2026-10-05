@@ -12,9 +12,9 @@ interface LogHistoryListProps {
 }
 
 export const STATUS_LABELS: Record< LogEntry[ 'status' ], string > = {
-	eaten: __( 'Eaten', 'nutrio' ),
-	substituted: __( 'Substituted', 'nutrio' ),
-	skipped: __( 'Skipped', 'nutrio' ),
+	eaten: __( 'Eaten', 'merodiet' ),
+	substituted: __( 'Substituted', 'merodiet' ),
+	skipped: __( 'Skipped', 'merodiet' ),
 };
 
 // A history entry's display label — the plan item it was logged against,
@@ -32,7 +32,7 @@ function entryLabel(
 		return entry.label;
 	}
 
-	return entry.notes ?? __( 'Logged item', 'nutrio' );
+	return entry.notes ?? __( 'Logged item', 'merodiet' );
 }
 
 // Extracted from client-portal/LogTab.tsx's "Recent history" section so
@@ -50,7 +50,7 @@ export default function LogHistoryList( {
 	if ( 0 === pastDates.length ) {
 		return (
 			<p className={ styles.empty }>
-				{ emptyMessage ?? __( 'Nothing logged yet.', 'nutrio' ) }
+				{ emptyMessage ?? __( 'Nothing logged yet.', 'merodiet' ) }
 			</p>
 		);
 	}

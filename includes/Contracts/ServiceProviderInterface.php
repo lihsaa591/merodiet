@@ -2,12 +2,12 @@
 /**
  * Service provider contract.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Contracts;
+namespace MeroDiet\Contracts;
 
 use League\Container\Container;
 

@@ -2,16 +2,16 @@
 /**
  * Computes a client's plan compliance percentage over a date window.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Clients;
+namespace MeroDiet\Clients;
 
 use DateTimeImmutable;
-use Nutrio\Repositories\LogEntryRepository;
-use Nutrio\Repositories\PlanRepository;
+use MeroDiet\Repositories\LogEntryRepository;
+use MeroDiet\Repositories\PlanRepository;
 
 /**
  * "Compliance" here means: of the items scheduled on the client's

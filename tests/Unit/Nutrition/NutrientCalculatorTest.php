@@ -1,14 +1,14 @@
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Nutrition;
+namespace MeroDiet\Tests\Unit\Nutrition;
 
-use Nutrio\Nutrition\NutrientCalculator;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Nutrition\NutrientCalculator;
+use MeroDiet\Tests\TestCase;
 
 /**
  * The credibility-defining test suite — see NutrientCalculator's

@@ -31,7 +31,7 @@ export default function Settings() {
 
 	useEffect( () => {
 		apiFetch< DataRetentionState >( {
-			path: '/nutrio/v1/settings/data-retention',
+			path: '/merodiet/v1/settings/data-retention',
 		} ).then( setRetention );
 	}, [] );
 
@@ -40,18 +40,18 @@ export default function Settings() {
 
 		try {
 			const result = await apiFetch< DataRetentionState >( {
-				path: '/nutrio/v1/settings/data-retention',
+				path: '/merodiet/v1/settings/data-retention',
 				method: 'PUT',
 				data: { delete_on_uninstall: deleteOnUninstall },
 			} );
 
 			setRetention( result );
-			toast.success( __( 'Data setting saved.', 'nutrio' ) );
+			toast.success( __( 'Data setting saved.', 'merodiet' ) );
 		} catch ( error ) {
 			toast.error(
 				errorMessage(
 					error,
-					__( 'Could not save the data setting.', 'nutrio' )
+					__( 'Could not save the data setting.', 'merodiet' )
 				)
 			);
 		} finally {
@@ -61,7 +61,7 @@ export default function Settings() {
 
 	useEffect( () => {
 		apiFetch< UsdaKeyState >( {
-			path: '/nutrio/v1/settings/usda-key',
+			path: '/merodiet/v1/settings/usda-key',
 		} ).then( setKeyState );
 	}, [] );
 
@@ -71,7 +71,7 @@ export default function Settings() {
 
 		try {
 			const result = await apiFetch< UsdaKeyState >( {
-				path: '/nutrio/v1/settings/usda-key',
+				path: '/merodiet/v1/settings/usda-key',
 				method: 'PUT',
 				data: { api_key: apiKeyInput },
 			} );
@@ -79,12 +79,12 @@ export default function Settings() {
 			setKeyState( result );
 			setIsReplacing( false );
 			setApiKeyInput( '' );
-			toast.success( __( 'USDA API key saved.', 'nutrio' ) );
+			toast.success( __( 'USDA API key saved.', 'merodiet' ) );
 		} catch ( error ) {
 			toast.error(
 				errorMessage(
 					error,
-					__( 'Could not save the USDA API key.', 'nutrio' )
+					__( 'Could not save the USDA API key.', 'merodiet' )
 				)
 			);
 		} finally {
@@ -94,8 +94,8 @@ export default function Settings() {
 
 	return (
 		<>
-			<div className="nutrio-topbar">
-				<h1>{ __( 'Settings', 'nutrio' ) }</h1>
+			<div className="merodiet-topbar">
+				<h1>{ __( 'Settings', 'merodiet' ) }</h1>
 			</div>
 
 			<div className={ styles.tabs }>
@@ -105,7 +105,7 @@ export default function Settings() {
 					}` }
 					onClick={ () => setActiveTab( 'general' ) }
 				>
-					{ __( 'General', 'nutrio' ) }
+					{ __( 'General', 'merodiet' ) }
 				</button>
 				<button
 					className={ `${ styles.tab } ${
@@ -113,14 +113,14 @@ export default function Settings() {
 					}` }
 					onClick={ () => setActiveTab( 'email' ) }
 				>
-					{ __( 'Email', 'nutrio' ) }
+					{ __( 'Email', 'merodiet' ) }
 				</button>
 			</div>
 
 			{ 'general' === activeTab && (
 				<Panel>
 					<PanelHead>
-						<h3>{ __( 'USDA FoodData Central', 'nutrio' ) }</h3>
+						<h3>{ __( 'USDA FoodData Central', 'merodiet' ) }</h3>
 					</PanelHead>
 					<PanelBody>
 						<p
@@ -130,13 +130,13 @@ export default function Settings() {
 							} }
 						>
 							{ __(
-								'Required for recipe and plan building — this key lets Nutrio search and pull nutrient data from the USDA FoodData Central database. Get a free key at api.data.gov/signup.',
-								'nutrio'
+								'Required for recipe and plan building — this key lets MeroDiet search and pull nutrient data from the USDA FoodData Central database. Get a free key at api.data.gov/signup.',
+								'merodiet'
 							) }
 						</p>
 
 						{ null === keyState && (
-							<p>{ __( 'Loading…', 'nutrio' ) }</p>
+							<p>{ __( 'Loading…', 'merodiet' ) }</p>
 						) }
 
 						{ null !== keyState && ! isReplacing && (
@@ -148,14 +148,14 @@ export default function Settings() {
 								} }
 							>
 								{ keyState.is_set ? (
-									<span className="nutrio-mono">
+									<span className="merodiet-mono">
 										{ keyState.masked }
 									</span>
 								) : (
 									<span
 										style={ { color: 'var(--ink-muted)' } }
 									>
-										{ __( 'No key set', 'nutrio' ) }
+										{ __( 'No key set', 'merodiet' ) }
 									</span>
 								) }
 								<Button
@@ -163,8 +163,8 @@ export default function Settings() {
 									onClick={ () => setIsReplacing( true ) }
 								>
 									{ keyState.is_set
-										? __( 'Replace key', 'nutrio' )
-										: __( 'Add key', 'nutrio' ) }
+										? __( 'Replace key', 'merodiet' )
+										: __( 'Add key', 'merodiet' ) }
 								</Button>
 							</div>
 						) }
@@ -179,14 +179,14 @@ export default function Settings() {
 								} }
 							>
 								<div
-									className="nutrio-field"
+									className="merodiet-field"
 									style={ { flex: 1, marginBottom: 0 } }
 								>
-									<label htmlFor="nutrio-usda-key">
-										{ __( 'USDA API key', 'nutrio' ) }
+									<label htmlFor="merodiet-usda-key">
+										{ __( 'USDA API key', 'merodiet' ) }
 									</label>
 									<input
-										id="nutrio-usda-key"
+										id="merodiet-usda-key"
 										type="text"
 										value={ apiKeyInput }
 										onChange={ ( event ) =>
@@ -200,7 +200,7 @@ export default function Settings() {
 									type="submit"
 									disabled={ isSaving }
 								>
-									{ __( 'Save', 'nutrio' ) }
+									{ __( 'Save', 'merodiet' ) }
 								</Button>
 								<Button
 									variant="ghost"
@@ -211,7 +211,7 @@ export default function Settings() {
 										setApiKeyInput( '' );
 									} }
 								>
-									{ __( 'Cancel', 'nutrio' ) }
+									{ __( 'Cancel', 'merodiet' ) }
 								</Button>
 							</form>
 						) }
@@ -222,7 +222,7 @@ export default function Settings() {
 			{ 'general' === activeTab && (
 				<Panel>
 					<PanelHead>
-						<h3>{ __( 'Data on uninstall', 'nutrio' ) }</h3>
+						<h3>{ __( 'Data on uninstall', 'merodiet' ) }</h3>
 					</PanelHead>
 					<PanelBody>
 						<p
@@ -232,12 +232,12 @@ export default function Settings() {
 							} }
 						>
 							{ __(
-								'By default your clients, plans, logs and measurements are kept when you delete the plugin. Turn this on to permanently remove all Nutrio data when the plugin is deleted.',
-								'nutrio'
+								'By default your clients, plans, logs and measurements are kept when you delete the plugin. Turn this on to permanently remove all MeroDiet data when the plugin is deleted.',
+								'merodiet'
 							) }
 						</p>
 						<label
-							htmlFor="nutrio-delete-on-uninstall"
+							htmlFor="merodiet-delete-on-uninstall"
 							style={ {
 								display: 'flex',
 								alignItems: 'center',
@@ -245,7 +245,7 @@ export default function Settings() {
 							} }
 						>
 							<input
-								id="nutrio-delete-on-uninstall"
+								id="merodiet-delete-on-uninstall"
 								type="checkbox"
 								checked={ !! retention?.delete_on_uninstall }
 								disabled={
@@ -258,8 +258,8 @@ export default function Settings() {
 								}
 							/>
 							{ __(
-								'Delete all Nutrio data when the plugin is deleted',
-								'nutrio'
+								'Delete all MeroDiet data when the plugin is deleted',
+								'merodiet'
 							) }
 						</label>
 					</PanelBody>

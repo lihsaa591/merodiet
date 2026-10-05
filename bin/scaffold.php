@@ -1,6 +1,6 @@
 <?php
 /**
- * Renames Nutrio into your own plugin: namespace, slug, text domain,
+ * Renames MeroDiet into your own plugin: namespace, slug, text domain,
  * and plugin display name, across the whole codebase.
  *
  * Usage:
@@ -11,7 +11,7 @@
  * diff before committing. Re-run is not idempotent; run it once, on a
  * clean checkout.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
@@ -44,7 +44,7 @@ $root = dirname( __DIR__ );
 
 $constant_prefix = strtoupper( str_replace( '-', '_', $slug ) );
 
-// Token map applied to every matched file. "Nutrio" is ambiguous (it's
+// Token map applied to every matched file. "MeroDiet" is ambiguous (it's
 // both the PHP namespace root AND, in the plugin header's "Plugin Name:"
 // line, the human-readable name) — that one collision is resolved as an
 // explicit extra pass on the main plugin file, below.
@@ -88,9 +88,9 @@ foreach ( $iterator as $file ) {
 
 	$path     = $file->getPathname();
 	$original = file_get_contents( $path );
-	$updated  = strtr( $original, array( 'Nutrio' => $namespace, 'nutrio' => $slug, 'NUTRIO' => $constant_prefix ) );
+	$updated  = strtr( $original, array( 'MeroDiet' => $namespace, 'merodiet' => $slug, 'MERODIET' => $constant_prefix ) );
 
-	if ( str_ends_with( $path, DIRECTORY_SEPARATOR . 'nutrio.php' ) ) {
+	if ( str_ends_with( $path, DIRECTORY_SEPARATOR . 'merodiet.php' ) ) {
 		$updated = str_replace( "Plugin Name:       {$namespace}", "Plugin Name:       {$plugin_name}", $updated );
 	}
 
@@ -104,12 +104,12 @@ foreach ( $iterator as $file ) {
 	}
 }
 
-$main_file_old = $root . '/nutrio.php';
+$main_file_old = $root . '/merodiet.php';
 $main_file_new = $root . "/{$slug}.php";
 
 if ( file_exists( $main_file_old ) ) {
 	if ( $dry_run ) {
-		echo "Would rename: nutrio.php -> {$slug}.php\n";
+		echo "Would rename: merodiet.php -> {$slug}.php\n";
 	} else {
 		rename( $main_file_old, $main_file_new );
 	}

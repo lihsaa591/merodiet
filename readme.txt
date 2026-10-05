@@ -1,5 +1,5 @@
-=== Nutrio – Dietitian Practice Manager ===
-Contributors: lihsaa591
+=== MeroDiet – Dietitian Practice Manager ===
+Contributors: lihsaa
 Tags: dietitian, nutritionist, meal planner, nutrition, client management
 Requires at least: 6.9
 Tested up to: 7.1
@@ -12,7 +12,7 @@ Dietitian and nutritionist practice manager: client records, meal plans, food lo
 
 == Description ==
 
-Nutrio is a practice management tool for dietitians and nutritionists. It lives in your WordPress admin, so you can keep your clients, meal plans and progress notes in one place on your own website, without a separate monthly subscription.
+MeroDiet is a practice management tool for dietitians and nutritionists. It lives in your WordPress admin, so you can keep your clients, meal plans and progress notes in one place on your own website, without a separate monthly subscription.
 
 You build a meal plan, give it to a client, and the client follows it from a simple page on your site. You then see how they are doing.
 
@@ -31,11 +31,11 @@ You build a meal plan, give it to a client, and the client follows it from a sim
 * **Fixed plan totals.** When you give a plan to a client, its totals are saved at that moment. Later changes to the food data will not quietly change a plan the client already has.
 * **Dashboard.** See compliance and recent activity across your clients.
 * **Emails.** Edit the emails sent to clients, and turn on a daily digest of client activity.
-* **Your data, your choice.** Keep or delete all Nutrio data when you delete the plugin, with a setting under Nutrio > Settings.
+* **Your data, your choice.** Keep or delete all MeroDiet data when you delete the plugin, with a setting under MeroDiet > Settings.
 
 = For clients =
 
-* **Their own portal.** Clients sign in at `yoursite.com/client-portal/`, or you can place the portal on any page with the `[nutrio_client_portal]` shortcode.
+* **Their own portal.** Clients sign in at `yoursite.com/client-portal/`, or you can place the portal on any page with the `[merodiet_client_portal]` shortcode.
 * **Easy to use on a phone.** The layout adapts to small screens.
 * **Accessibility.** The interface is tested with automated accessibility checks (axe).
 
@@ -45,44 +45,44 @@ Registered dietitians, nutritionists and nutrition coaches who work with individ
 
 = Good to know =
 
-* You need a free USDA FoodData Central API key. Nutrio guides you to get one in Settings.
-* Nutrio adds two user roles, `practitioner` and `nutrition_client`. All access is limited to these roles.
-* Nutrio is a record-keeping and planning tool. It does not give medical advice.
+* You need a free USDA FoodData Central API key. MeroDiet guides you to get one in Settings.
+* MeroDiet adds two user roles, `practitioner` and `nutrition_client`. All access is limited to these roles.
+* MeroDiet is a record-keeping and planning tool. It does not give medical advice.
 
 = Roadmap =
 
-Nutrio is at an early stage. These features are planned and are not available yet. There are no release dates, and plans can change.
+MeroDiet is at an early stage. These features are planned and are not available yet. There are no release dates, and plans can change.
 
 * **Analytics.** Deeper reports on client progress and compliance over time.
 * **White label.** Use your own practice name and branding in the app, the portal and the emails.
 * **GDPR tools.** Export and erase a client's data on request, to help you meet your privacy duties.
-* **Public REST API.** Documented endpoints so you can connect Nutrio to your own tools.
-* **MCP connector.** Let compatible AI assistants work with your Nutrio data, only when you allow it.
-* And more. Have an idea? Tell us at https://github.com/lihsaa591/nutrio/issues
+* **Public REST API.** Documented endpoints so you can connect MeroDiet to your own tools.
+* **MCP connector.** Let compatible AI assistants work with your MeroDiet data, only when you allow it.
+* And more. Have an idea? Tell us at https://github.com/lihsaa591/merodiet/issues
 
 = Use of 3rd Party Services =
 
-Nutrio has one third-party service, and it is only contacted by a practitioner searching for or loading a food. No client or personal data is sent. Nutrio does not include tracking, advertising or usage telemetry.
+MeroDiet has one third-party service, and it is only contacted by a practitioner searching for or loading a food. No client or personal data is sent. MeroDiet does not include tracking, advertising or usage telemetry.
 
 * **USDA FoodData Central** (food search and nutrient data): [Terms of Use](https://fdc.nal.usda.gov/api-guide.html) | [Privacy Policy](https://www.usda.gov/privacy-policy)
   * Endpoint: https://api.nal.usda.gov/fdc/v1
-  * Data sent: the food search text or food ID being requested, and the API key you enter in Nutrio settings.
+  * Data sent: the food search text or food ID being requested, and the API key you enter in MeroDiet settings.
   * When: only when a food is not already cached locally.
   * You need your own free API key: https://fdc.nal.usda.gov/api-key-signup.html
 
-Emails (client invitations, plan notifications, the daily digest) are sent through your site's own mail setup using `wp_mail()`. Nutrio does not connect to an email service itself, so any SMTP or email plugin you use applies.
+Emails (client invitations, plan notifications, the daily digest) are sent through your site's own mail setup using `wp_mail()`. MeroDiet does not connect to an email service itself, so any SMTP or email plugin you use applies.
 
-Nutrio is not affiliated with or endorsed by the U.S. Department of Agriculture (USDA).
+MeroDiet is not affiliated with or endorsed by the U.S. Department of Agriculture (USDA).
 
 = Data and privacy =
 
-Client records, plans, food logs and measurements are stored in custom tables in your WordPress database. Nothing is sent to the plugin author. Data is kept when you delete the plugin unless you turn on "Delete all Nutrio data when the plugin is deleted" under Nutrio > Settings > General.
+Client records, plans, food logs and measurements are stored in custom tables in your WordPress database. Nothing is sent to the plugin author. Data is kept when you delete the plugin unless you turn on "Delete all MeroDiet data when the plugin is deleted" under MeroDiet > Settings > General.
 
 == Installation ==
 
-1. Upload the `nutrio` folder to `/wp-content/plugins/`, or install it from the Plugins screen.
+1. Upload the `merodiet` folder to `/wp-content/plugins/`, or install it from the Plugins screen.
 2. Activate the plugin.
-3. Open **Nutrio** in the admin menu and enter your USDA FoodData Central API key under Settings.
+3. Open **MeroDiet** in the admin menu and enter your USDA FoodData Central API key under Settings.
 4. Invite your first client.
 
 == Frequently Asked Questions ==
@@ -93,7 +93,7 @@ Yes. A free USDA FoodData Central key is required for food search and nutrient d
 
 = What happens to my data if I uninstall? =
 
-Data is preserved by default. To remove all Nutrio tables, options and roles when the plugin is deleted, turn on "Delete all Nutrio data when the plugin is deleted" under Nutrio > Settings > General first.
+Data is preserved by default. To remove all MeroDiet tables, options and roles when the plugin is deleted, turn on "Delete all MeroDiet data when the plugin is deleted" under MeroDiet > Settings > General first.
 
 = What are the requirements? =
 

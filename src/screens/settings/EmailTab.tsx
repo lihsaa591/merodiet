@@ -28,7 +28,7 @@ export default function EmailTab() {
 					}` }
 					onClick={ () => setActiveAudience( 'practitioner' ) }
 				>
-					{ __( 'Practitioner', 'nutrio' ) }
+					{ __( 'Practitioner', 'merodiet' ) }
 				</button>
 				<button
 					className={ `${ styles.subTab } ${
@@ -36,7 +36,7 @@ export default function EmailTab() {
 					}` }
 					onClick={ () => setActiveAudience( 'client' ) }
 				>
-					{ __( 'Client', 'nutrio' ) }
+					{ __( 'Client', 'merodiet' ) }
 				</button>
 			</div>
 

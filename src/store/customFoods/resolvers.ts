@@ -29,7 +29,7 @@ interface ThunkArgs {
 export function getCustomFoods() {
 	return async ( { dispatch }: ThunkArgs ) => {
 		const response: PaginatedResponse< CustomFood > = await apiFetch( {
-			path: '/nutrio/v1/custom-foods?per_page=100',
+			path: '/merodiet/v1/custom-foods?per_page=100',
 		} );
 
 		dispatch.receiveCustomFoods(
@@ -52,7 +52,7 @@ export function getCustomFoodsPage(
 			...filters,
 		} );
 		const response: PaginatedResponse< CustomFood > = await apiFetch( {
-			path: `/nutrio/v1/custom-foods?${ params.toString() }`,
+			path: `/merodiet/v1/custom-foods?${ params.toString() }`,
 		} );
 
 		dispatch.receiveCustomFoodsPage(

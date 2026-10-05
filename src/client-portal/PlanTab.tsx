@@ -82,7 +82,7 @@ export default function PlanTab() {
 	const [ isNutritionExpanded, setIsNutritionExpanded ] = useState( false );
 
 	useEffect( () => {
-		apiFetch< Plan | null >( { path: '/nutrio/v1/me/plan' } ).then(
+		apiFetch< Plan | null >( { path: '/merodiet/v1/me/plan' } ).then(
 			( data ) => {
 				setPlan( data );
 
@@ -125,8 +125,8 @@ export default function PlanTab() {
 
 	return (
 		<>
-			<div className="nutrio-topbar">
-				<h1>{ __( 'My Plan', 'nutrio' ) }</h1>
+			<div className="merodiet-topbar">
+				<h1>{ __( 'My Plan', 'merodiet' ) }</h1>
 			</div>
 			<Panel>
 				<PanelBody>
@@ -136,7 +136,7 @@ export default function PlanTab() {
 						<p className={ styles.empty }>
 							{ __(
 								'No plan assigned yet — check back once your practitioner assigns one.',
-								'nutrio'
+								'merodiet'
 							) }
 						</p>
 					) }
@@ -170,7 +170,7 @@ export default function PlanTab() {
 												)
 											}
 										>
-											{ __( 'Week', 'nutrio' ) }{ ' ' }
+											{ __( 'Week', 'merodiet' ) }{ ' ' }
 											{ weekIndex + 1 }
 											<span
 												className={ styles.weekTabDate }
@@ -202,7 +202,7 @@ export default function PlanTab() {
 											setActiveDayOffset( day.day_offset )
 										}
 									>
-										{ __( 'Day', 'nutrio' ) }{ ' ' }
+										{ __( 'Day', 'merodiet' ) }{ ' ' }
 										{ day.day_offset + 1 }
 										<span className={ styles.dayTabDate }>
 											{ formatShortDate(
@@ -216,7 +216,7 @@ export default function PlanTab() {
 											<span
 												className={ styles.todayBadge }
 											>
-												{ __( 'Today', 'nutrio' ) }
+												{ __( 'Today', 'merodiet' ) }
 											</span>
 										) }
 									</button>
@@ -227,7 +227,7 @@ export default function PlanTab() {
 								<p className={ styles.empty }>
 									{ __(
 										'Nothing planned for this day.',
-										'nutrio'
+										'merodiet'
 									) }
 								</p>
 							) }
@@ -264,7 +264,7 @@ export default function PlanTab() {
 																item.recipe_name ??
 																__(
 																	'Item',
-																	'nutrio'
+																	'merodiet'
 																) }
 														</div>
 														{ itemQuantityLabel(
@@ -306,7 +306,7 @@ export default function PlanTab() {
 							{ activeDay && activeDay.items.length > 0 && (
 								<div className={ styles.totals }>
 									<h3 className={ styles.totalsTitle }>
-										{ __( 'Day total', 'nutrio' ) }
+										{ __( 'Day total', 'merodiet' ) }
 									</h3>
 									<div className={ styles.nutrientGrid }>
 										<div className={ styles.nutrientTile }>
@@ -321,7 +321,7 @@ export default function PlanTab() {
 											<div
 												className={ styles.nutrientLbl }
 											>
-												{ __( 'Kcal', 'nutrio' ) }
+												{ __( 'Kcal', 'merodiet' ) }
 											</div>
 										</div>
 										<div className={ styles.nutrientTile }>
@@ -335,7 +335,7 @@ export default function PlanTab() {
 											<div
 												className={ styles.nutrientLbl }
 											>
-												{ __( 'Protein', 'nutrio' ) }
+												{ __( 'Protein', 'merodiet' ) }
 											</div>
 										</div>
 										<div className={ styles.nutrientTile }>
@@ -349,7 +349,7 @@ export default function PlanTab() {
 											<div
 												className={ styles.nutrientLbl }
 											>
-												{ __( 'Carbs', 'nutrio' ) }
+												{ __( 'Carbs', 'merodiet' ) }
 											</div>
 										</div>
 										<div className={ styles.nutrientTile }>
@@ -363,7 +363,7 @@ export default function PlanTab() {
 											<div
 												className={ styles.nutrientLbl }
 											>
-												{ __( 'Fat', 'nutrio' ) }
+												{ __( 'Fat', 'merodiet' ) }
 											</div>
 										</div>
 									</div>
@@ -385,11 +385,11 @@ export default function PlanTab() {
 												{ isNutritionExpanded
 													? __(
 															'Hide full nutrition',
-															'nutrio'
+															'merodiet'
 													  )
 													: __(
 															'Show full nutrition',
-															'nutrio'
+															'merodiet'
 													  ) }
 												<svg
 													className={ `${

@@ -74,10 +74,10 @@ jobs:
       - run: npm run build
       - name: Package release zip
         run: |
-          mkdir -p dist/nutrio
-          rsync -a --exclude-from=.distignore ./ dist/nutrio/
-          cd dist && zip -r nutrio.zip nutrio
+          mkdir -p dist/merodiet
+          rsync -a --exclude-from=.distignore ./ dist/merodiet/
+          cd dist && zip -r merodiet.zip merodiet
       - uses: actions/upload-artifact@v7
         with:
-          name: nutrio
-          path: dist/nutrio.zip
+          name: merodiet
+          path: dist/merodiet.zip

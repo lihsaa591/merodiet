@@ -2,14 +2,14 @@
 /**
  * Plan nutrient total orchestration.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Nutrition;
+namespace MeroDiet\Nutrition;
 
-use Nutrio\Repositories\PlanRepository;
+use MeroDiet\Repositories\PlanRepository;
 
 /**
  * Computes a plan's nutrient totals per day — {day_offset: {nutrient_id:

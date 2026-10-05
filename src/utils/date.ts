@@ -135,13 +135,13 @@ function formatWithPhpFormat( date: Date, format: string ): string {
 }
 
 // Formats a `YYYY-MM-DD` date string per this site's own Settings → General
-// → Date Format (window.nutrioAdmin.dateFormat) — falling back to WP core's
+// → Date Format (window.merodietAdmin.dateFormat) — falling back to WP core's
 // own default preset if that isn't available (e.g. in a test environment).
 export function formatDate( dateStr: string ): string {
 	// Parsed as UTC midnight so the displayed date never shifts a day
 	// depending on the viewer's own timezone offset.
 	const date = new Date( `${ dateStr }T00:00:00Z` );
-	const format = window.nutrioAdmin?.dateFormat ?? DEFAULT_DATE_FORMAT;
+	const format = window.merodietAdmin?.dateFormat ?? DEFAULT_DATE_FORMAT;
 
 	return formatWithPhpFormat( date, format );
 }
@@ -158,8 +158,8 @@ export function formatDate( dateStr: string ): string {
 // below read back exactly the numbers that were in the string.
 export function formatDateTime( dateTimeStr: string ): string {
 	const date = new Date( `${ dateTimeStr.replace( ' ', 'T' ) }Z` );
-	const dateFormat = window.nutrioAdmin?.dateFormat ?? DEFAULT_DATE_FORMAT;
-	const timeFormat = window.nutrioAdmin?.timeFormat ?? DEFAULT_TIME_FORMAT;
+	const dateFormat = window.merodietAdmin?.dateFormat ?? DEFAULT_DATE_FORMAT;
+	const timeFormat = window.merodietAdmin?.timeFormat ?? DEFAULT_TIME_FORMAT;
 
 	return `${ formatWithPhpFormat( date, dateFormat ) } ${ formatWithPhpFormat(
 		date,

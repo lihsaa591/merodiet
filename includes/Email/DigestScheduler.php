@@ -2,12 +2,12 @@
 /**
  * Schedules (or clears) the daily practitioner digest's WP-Cron event.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Email;
+namespace MeroDiet\Email;
 
 use DateTimeImmutable;
 
@@ -23,21 +23,21 @@ use DateTimeImmutable;
  */
 final class DigestScheduler {
 
-	public const CRON_HOOK = 'nutrio_daily_digest';
+	public const CRON_HOOK = 'merodiet_daily_digest';
 
 	/**
-	 * Called whenever nutrio_digest_enabled/nutrio_digest_time is
+	 * Called whenever merodiet_digest_enabled/merodiet_digest_time is
 	 * saved (SettingsController::update_email_digest()), and once from
 	 * Activation::activate().
 	 */
 	public static function reschedule(): void {
 		wp_clear_scheduled_hook( self::CRON_HOOK );
 
-		if ( ! (bool) get_option( 'nutrio_digest_enabled', false ) ) {
+		if ( ! (bool) get_option( 'merodiet_digest_enabled', false ) ) {
 			return;
 		}
 
-		$time = (string) get_option( 'nutrio_digest_time', '20:00' );
+		$time = (string) get_option( 'merodiet_digest_time', '20:00' );
 		$now  = new DateTimeImmutable( 'now', wp_timezone() );
 
 		$target = DateTimeImmutable::createFromFormat(

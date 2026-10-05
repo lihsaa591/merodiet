@@ -5,7 +5,7 @@ test( 'client portal log tab has no axe violations', async ( {
 	clientPage,
 }, testInfo ) => {
 	await clientPage.goto( '/client-portal/?view=log' );
-	await expect( clientPage.locator( '.nutrio-topbar h1' ) ).toBeVisible();
+	await expect( clientPage.locator( '.merodiet-topbar h1' ) ).toBeVisible();
 
 	await scanForA11yViolations( clientPage, 'portal-log', testInfo );
 } );

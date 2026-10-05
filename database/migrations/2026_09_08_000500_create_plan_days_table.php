@@ -7,12 +7,12 @@
  * it has a concrete start_date pinned down. Resolve the actual calendar
  * date as `plan.start_date + day_offset days`.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-use Nutrio\Database\Migration;
+use MeroDiet\Database\Migration;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -26,7 +26,7 @@ return new class() extends Migration {
 	 * Create the plan_days table.
 	 */
 	public function up(): void {
-		$table           = $this->table( 'nutrio_plan_days' );
+		$table           = $this->table( 'merodiet_plan_days' );
 		$charset_collate = $this->wpdb->get_charset_collate();
 
 		$this->delta(
@@ -45,7 +45,7 @@ return new class() extends Migration {
 	 * Drop the plan_days table.
 	 */
 	public function down(): void {
-		$table = $this->table( 'nutrio_plan_days' );
+		$table = $this->table( 'merodiet_plan_days' );
 		$this->wpdb->query( "DROP TABLE IF EXISTS {$table}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input.
 	}
 };

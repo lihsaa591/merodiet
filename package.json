@@ -1,12 +1,12 @@
 {
-	"name": "nutrio",
+	"name": "merodiet",
 	"version": "0.1.0",
 	"description": "Practice management for registered dietitians and nutritionists — meal planning, client compliance tracking, and USDA-backed nutrient calculations.",
 	"license": "GPL-2.0-or-later",
 	"private": true,
 	"scripts": {
 		"build": "wp-scripts build",
-		"make-pot": "npm run build && wp i18n make-pot . languages/nutrio.pot --slug=nutrio --domain=nutrio --include=nutrio.php,uninstall.php,includes,config,bootstrap,build --exclude=vendor,node_modules,tests,dist --skip-audit",
+		"make-pot": "npm run build && wp i18n make-pot . languages/merodiet.pot --slug=merodiet --domain=merodiet --include=merodiet.php,uninstall.php,includes,config,bootstrap,build --exclude=vendor,node_modules,tests,dist --skip-audit",
 		"start": "wp-scripts start --hot",
 		"lint:js": "wp-scripts lint-js",
 		"check-types": "tsc --noEmit",

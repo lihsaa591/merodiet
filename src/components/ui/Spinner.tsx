@@ -33,7 +33,7 @@ export default function Spinner( {
 			role="status"
 		>
 			<span className={ styles.visuallyHidden }>
-				{ label ?? __( 'Loading…', 'nutrio' ) }
+				{ label ?? __( 'Loading…', 'merodiet' ) }
 			</span>
 		</span>
 	);

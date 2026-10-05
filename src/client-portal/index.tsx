@@ -5,7 +5,7 @@ import '../styles/base.css';
 import App from './App';
 import { nonceMiddleware } from './nonceMiddleware';
 
-const settings = window.nutrioClientPortal ?? {};
+const settings = window.merodietClientPortal ?? {};
 
 // Point api-fetch at this site's REST root and authenticate as the logged-in user.
 if ( settings.restUrl ) {
@@ -18,7 +18,7 @@ if ( settings.restNonce ) {
 
 domReady( () => {
 	const el = document.getElementById(
-		settings.mountId ?? 'nutrio-client-portal-app'
+		settings.mountId ?? 'merodiet-client-portal-app'
 	);
 
 	if ( el ) {

@@ -2,12 +2,12 @@
 /**
  * REST API controller base.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\RestApi;
+namespace MeroDiet\RestApi;
 
 use WP_Error;
 use WP_REST_Request;
@@ -28,7 +28,7 @@ abstract class AbstractController {
 	 *
 	 * @var string
 	 */
-	protected string $namespace = 'nutrio/v1';
+	protected string $namespace = 'merodiet/v1';
 
 	/**
 	 * Route base, e.g. "items" -> registered at {namespace}/items.
@@ -89,10 +89,10 @@ abstract class AbstractController {
 		}
 
 		return new WP_Error(
-			'nutrio_rest_forbidden',
+			'merodiet_rest_forbidden',
 			sprintf(
 				/* translators: %s: required WordPress capability */
-				__( 'You do not have the "%s" capability required for this request.', 'nutrio' ),
+				__( 'You do not have the "%s" capability required for this request.', 'merodiet' ),
 				$capability
 			),
 			array( 'status' => rest_authorization_required_code() )

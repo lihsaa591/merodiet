@@ -1,8 +1,8 @@
-# Nutrio
+# MeroDiet
 
 Practice management for registered dietitians and nutritionists — meal planning, client compliance tracking, and USDA-backed nutrient calculations.
 
-Every specialised competitor (Practice Better, Healthie, Nutrium) is a paid, standalone cloud SaaS. Nutrio is self-hosted, at a fraction of their monthly cost, with the same core workflow: a practitioner builds an individualized meal plan, a client logs what they actually ate, and both sides see accurate, USDA-sourced nutrition numbers throughout.
+Every specialised competitor (Practice Better, Healthie, Nutrium) is a paid, standalone cloud SaaS. MeroDiet is self-hosted, at a fraction of their monthly cost, with the same core workflow: a practitioner builds an individualized meal plan, a client logs what they actually ate, and both sides see accurate, USDA-sourced nutrition numbers throughout.
 
 ## What it does
 
@@ -28,13 +28,13 @@ npm run build      # or: npm start, for watch mode
 ```
 
 To use `npm start`'s hot reload, add this to the WordPress install's
-`wp-config.php` (before `NUTRIO_DEVELOPMENT` is otherwise defined —
+`wp-config.php` (before `MERODIET_DEVELOPMENT` is otherwise defined —
 i.e. before the line that loads plugins) — it defaults to `false`,
 regardless of `WP_DEBUG`, so the plugin never tries to load its JS
 from a dev server that isn't running:
 
 ```php
-define( 'NUTRIO_DEVELOPMENT', true );
+define( 'MERODIET_DEVELOPMENT', true );
 ```
 
 Then point `wp-env` (or a local WordPress install) at this directory as a plugin:
@@ -51,7 +51,7 @@ screens (see `tests/e2e/`). It is run locally only, not in CI — see
 `docs/superpowers/specs/2026-09-26-accessibility-testing-design.md`
 for the full design and what's deliberately out of scope for this
 first pass. This wp-env instance is dedicated to automated testing;
-NUTRIO_DEVELOPMENT is forced off here so the plugin loads from the
+MERODIET_DEVELOPMENT is forced off here so the plugin loads from the
 built files rather than a phantom dev server. Day-to-day interactive
 development with hot reload happens against a separate WordPress
 install. Open `playwright-report/index.html` after a local run for

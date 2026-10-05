@@ -43,7 +43,7 @@ export default function ConfirmDialogHost() {
 								style={ { justifyContent: 'center' } }
 							>
 								{ dialog.confirmLabel ??
-									__( 'Confirm', 'nutrio' ) }
+									__( 'Confirm', 'merodiet' ) }
 							</Button>
 							<Button
 								variant="ghost"
@@ -51,7 +51,7 @@ export default function ConfirmDialogHost() {
 								style={ { justifyContent: 'center' } }
 							>
 								{ dialog.cancelLabel ??
-									__( 'Cancel', 'nutrio' ) }
+									__( 'Cancel', 'merodiet' ) }
 							</Button>
 						</>
 					) : (
@@ -60,7 +60,7 @@ export default function ConfirmDialogHost() {
 							onClick={ () => close( true ) }
 							style={ { justifyContent: 'center' } }
 						>
-							{ dialog.okLabel ?? __( 'OK', 'nutrio' ) }
+							{ dialog.okLabel ?? __( 'OK', 'merodiet' ) }
 						</Button>
 					) }
 				</div>

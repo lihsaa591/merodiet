@@ -2,15 +2,15 @@
 /**
  * Custom (hand-entered) food REST endpoints.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\RestApi;
+namespace MeroDiet\RestApi;
 
-use Nutrio\Nutrition\CustomFoodNutrientMap;
-use Nutrio\Repositories\CustomFoodRepository;
+use MeroDiet\Nutrition\CustomFoodNutrientMap;
+use MeroDiet\Repositories\CustomFoodRepository;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -20,14 +20,14 @@ use WP_REST_Server;
  * CRUD over a practitioner's own custom foods — the manual-entry
  * counterpart to FoodsController's USDA search/resolve, for
  * ingredients not in USDA's database (a client's specific branded
- * product, a homemade blend). Reuses the 'manage_nutrio_foods'
+ * product, a homemade blend). Reuses the 'manage_merodiet_foods'
  * capability FoodsController already gates on, since this is the same
  * domain.
  */
 final class CustomFoodsController extends AbstractPractitionerController {
 
 	/**
-	 * Route base — registers under nutrio/v1/custom-foods.
+	 * Route base — registers under merodiet/v1/custom-foods.
 	 *
 	 * @var string
 	 */
@@ -61,7 +61,7 @@ final class CustomFoodsController extends AbstractPractitionerController {
 					self::filter_route_args( self::LIST_FILTERS )
 				),
 			),
-			required_capability: 'manage_nutrio_foods'
+			required_capability: 'manage_merodiet_foods'
 		);
 
 		$this->register_route(
@@ -71,7 +71,7 @@ final class CustomFoodsController extends AbstractPractitionerController {
 				'callback' => array( $this, 'create_food' ),
 				'args'     => self::food_write_args( require_name: true ),
 			),
-			required_capability: 'manage_nutrio_foods'
+			required_capability: 'manage_merodiet_foods'
 		);
 
 		$this->register_route(
@@ -81,7 +81,7 @@ final class CustomFoodsController extends AbstractPractitionerController {
 				'callback' => array( $this, 'update_food' ),
 				'args'     => self::food_write_args( require_name: false ),
 			),
-			required_capability: 'manage_nutrio_foods'
+			required_capability: 'manage_merodiet_foods'
 		);
 
 		$this->register_route(
@@ -90,7 +90,7 @@ final class CustomFoodsController extends AbstractPractitionerController {
 				'methods'  => WP_REST_Server::DELETABLE,
 				'callback' => array( $this, 'delete_food' ),
 			),
-			required_capability: 'manage_nutrio_foods'
+			required_capability: 'manage_merodiet_foods'
 		);
 	}
 
@@ -178,8 +178,8 @@ final class CustomFoodsController extends AbstractPractitionerController {
 
 		if ( $this->foods->is_used_in_a_recipe( $id ) ) {
 			return $this->error(
-				'nutrio_food_in_use',
-				__( 'This food is used in at least one recipe and cannot be deleted. Remove it from every recipe first.', 'nutrio' ),
+				'merodiet_food_in_use',
+				__( 'This food is used in at least one recipe and cannot be deleted. Remove it from every recipe first.', 'merodiet' ),
 				409
 			);
 		}

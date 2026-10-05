@@ -3,7 +3,7 @@
 }
 
 /*
- * Full-screen takeover: Nutrio hides the normal wp-admin chrome (side menu,
+ * Full-screen takeover: MeroDiet hides the normal wp-admin chrome (side menu,
  * toolbar, footer) and covers the viewport itself, rather than sitting
  * inside it like an ordinary plugin settings page. Scoped to this page's
  * own body class so nothing else in wp-admin is affected; enqueue_style()
@@ -11,26 +11,26 @@
  * unscoped selectors below are safe, but the body class is kept as a
  * second, explicit guard.
  */
-body.toplevel_page_nutrio #wpadminbar,
-body.toplevel_page_nutrio #adminmenumain,
-body.toplevel_page_nutrio #wpfooter,
-body.toplevel_page_nutrio #screen-meta-links,
-body.toplevel_page_nutrio .notice,
-body.toplevel_page_nutrio .update-nag {
+body.toplevel_page_merodiet #wpadminbar,
+body.toplevel_page_merodiet #adminmenumain,
+body.toplevel_page_merodiet #wpfooter,
+body.toplevel_page_merodiet #screen-meta-links,
+body.toplevel_page_merodiet .notice,
+body.toplevel_page_merodiet .update-nag {
 	display: none !important;
 }
-body.toplevel_page_nutrio html,
-body.toplevel_page_nutrio {
+body.toplevel_page_merodiet html,
+body.toplevel_page_merodiet {
 	background: var(--paper);
 }
-body.toplevel_page_nutrio #wpcontent,
-body.toplevel_page_nutrio #wpbody,
-body.toplevel_page_nutrio #wpbody-content {
+body.toplevel_page_merodiet #wpcontent,
+body.toplevel_page_merodiet #wpbody,
+body.toplevel_page_merodiet #wpbody-content {
 	margin: 0 !important;
 	padding: 0 !important;
 }
 
-.nutrio-admin-app {
+.merodiet-admin-app {
 	font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 	font-size: 14px;
 	line-height: 1.5;
@@ -42,13 +42,13 @@ body.toplevel_page_nutrio #wpbody-content {
 	overflow: auto;
 }
 
-.nutrio-admin-app h1,
-.nutrio-admin-app h2,
-.nutrio-admin-app h3,
-.nutrio-admin-app h4 {
+.merodiet-admin-app h1,
+.merodiet-admin-app h2,
+.merodiet-admin-app h3,
+.merodiet-admin-app h4 {
 	/* Explicit, not inherited: wp-admin's own core CSS has its own (theme-
 	   unaware) heading color rule, which beats plain inheritance from
-	   .nutrio-admin-app regardless of specificity -- this was invisible
+	   .merodiet-admin-app regardless of specificity -- this was invisible
 	   text in dark mode until fixed. */
 	color: var(--ink);
 	font-family: 'Public Sans', sans-serif;
@@ -57,11 +57,11 @@ body.toplevel_page_nutrio #wpbody-content {
 	letter-spacing: -0.01em;
 }
 
-/* Same base treatment as .nutrio-admin-app, but for the client-portal
+/* Same base treatment as .merodiet-admin-app, but for the client-portal
    front-end page: no fixed/inset overlay (this IS the whole page, not
    a takeover of wp-admin chrome), otherwise identical typography and
    color so both apps read as the same product. */
-.nutrio-client-portal-app {
+.merodiet-client-portal-app {
 	font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 	font-size: 14px;
 	line-height: 1.5;
@@ -70,10 +70,10 @@ body.toplevel_page_nutrio #wpbody-content {
 	min-height: 100vh;
 }
 
-.nutrio-client-portal-app h1,
-.nutrio-client-portal-app h2,
-.nutrio-client-portal-app h3,
-.nutrio-client-portal-app h4 {
+.merodiet-client-portal-app h1,
+.merodiet-client-portal-app h2,
+.merodiet-client-portal-app h3,
+.merodiet-client-portal-app h4 {
 	color: var(--ink);
 	font-family: 'Public Sans', sans-serif;
 	font-weight: 700;
@@ -82,31 +82,31 @@ body.toplevel_page_nutrio #wpbody-content {
 
 /* Zero-specificity reset: a module class like .sectionTitle { margin: … }
    must be able to win, which it can't against a class + element selector. */
-:where(.nutrio-client-portal-app) :is(h1, h2, h3, h4) {
+:where(.merodiet-client-portal-app) :is(h1, h2, h3, h4) {
 	margin: 0;
 }
 
-.nutrio-mono {
+.merodiet-mono {
 	font-family: 'IBM Plex Mono', ui-monospace, monospace;
 	font-variant-numeric: tabular-nums;
 }
 
 /* ---------- Shell ---------- */
-.nutrio-shell {
+.merodiet-shell {
 	display: grid;
 	grid-template-columns: 232px 1fr;
 	min-height: 100vh;
 }
 
-.nutrio-rail {
+.merodiet-rail {
 	background: var(--paper-dim);
 	border-right: 1px solid var(--line);
 	padding: 20px 14px;
 	display: flex;
 	flex-direction: column;
 	gap: 22px;
-	/* Stays put while .nutrio-view's content scrolls — sticks within the
-	   nearest scrolling ancestor (.nutrio-admin-app's own scroll on the
+	/* Stays put while .merodiet-view's content scrolls — sticks within the
+	   nearest scrolling ancestor (.merodiet-admin-app's own scroll on the
 	   admin side, the document on the client-portal side). overflow-y
 	   lets the rail scroll its own nav internally on the rare screen
 	   where it's taller than the viewport, instead of getting clipped. */
@@ -116,7 +116,7 @@ body.toplevel_page_nutrio #wpbody-content {
 	overflow-y: auto;
 }
 
-.nutrio-wp-back {
+.merodiet-wp-back {
 	display: flex;
 	align-items: center;
 	gap: 7px;
@@ -127,22 +127,22 @@ body.toplevel_page_nutrio #wpbody-content {
 	padding: 0 6px;
 	margin-bottom: 4px;
 }
-.nutrio-wp-back:hover {
+.merodiet-wp-back:hover {
 	color: var(--ink-muted);
 }
-.nutrio-wp-back svg {
+.merodiet-wp-back svg {
 	width: 14px;
 	height: 14px;
 	flex-shrink: 0;
 }
 
-.nutrio-brand {
+.merodiet-brand {
 	display: flex;
 	align-items: center;
 	gap: 4px;
 	padding: 0 6px;
 }
-.nutrio-brand-mark {
+.merodiet-brand-mark {
 	/* The leaf artwork isn't square (~1.26:1) — height + width:auto lets
 	   it size naturally instead of being letterboxed inside a square
 	   box, which was the real cause of the apparent gap next to the
@@ -151,18 +151,18 @@ body.toplevel_page_nutrio #wpbody-content {
 	width: auto;
 	flex-shrink: 0;
 }
-.nutrio-brand-name {
+.merodiet-brand-name {
 	font-weight: 700;
 	font-size: 16px;
 	letter-spacing: -0.01em;
 }
 
-.nutrio-nav-group {
+.merodiet-nav-group {
 	display: flex;
 	flex-direction: column;
 	gap: 2px;
 }
-.nutrio-nav-item {
+.merodiet-nav-item {
 	display: flex;
 	align-items: center;
 	gap: 10px;
@@ -178,35 +178,35 @@ body.toplevel_page_nutrio #wpbody-content {
 	font-family: inherit;
 	cursor: pointer;
 }
-.nutrio-nav-item:hover {
+.merodiet-nav-item:hover {
 	background: var(--surface-raised);
 	color: var(--ink);
 }
-.nutrio-nav-item.is-active {
+.merodiet-nav-item.is-active {
 	background: var(--sage-wash);
 	color: var(--sage-deep);
 	font-weight: 600;
 }
-.nutrio-nav-item svg {
+.merodiet-nav-item svg {
 	width: 17px;
 	height: 17px;
 	flex-shrink: 0;
 	opacity: 0.85;
 }
-.nutrio-nav-item.is-active svg {
+.merodiet-nav-item.is-active svg {
 	opacity: 1;
 }
-.nutrio-nav-item-pro {
+.merodiet-nav-item-pro {
 	color: var(--ink-faint);
 }
-.nutrio-nav-item-pro .nutrio-pro-lock {
+.merodiet-nav-item-pro .merodiet-pro-lock {
 	width: 13px;
 	height: 13px;
 	margin-left: auto;
 	opacity: 0.7;
 }
 
-.nutrio-rail-foot {
+.merodiet-rail-foot {
 	margin-top: auto;
 	display: flex;
 	align-items: center;
@@ -218,7 +218,7 @@ body.toplevel_page_nutrio #wpbody-content {
 }
 /* Makes only the avatar+name portion of the rail-foot clickable, as a
    real sibling button to ThemeToggle (a button can't nest inside one). */
-.nutrio-rail-foot-profile-btn {
+.merodiet-rail-foot-profile-btn {
 	display: flex;
 	align-items: center;
 	gap: 9px;
@@ -232,11 +232,11 @@ body.toplevel_page_nutrio #wpbody-content {
 	font: inherit;
 	color: inherit;
 }
-.nutrio-rail-foot-name {
+.merodiet-rail-foot-name {
 	font-size: 12.5px;
 	font-weight: 600;
 }
-.nutrio-rail-foot-role {
+.merodiet-rail-foot-role {
 	font-size: 11px;
 	color: var(--ink-faint);
 }
@@ -244,7 +244,7 @@ body.toplevel_page_nutrio #wpbody-content {
    pre-computed initials string from PHP, not the Avatar component's
    first/last-name + client-id contract, so it gets its own small style
    rather than misusing that component's props. */
-.nutrio-user-avatar {
+.merodiet-user-avatar {
 	width: 26px;
 	height: 26px;
 	border-radius: 50%;
@@ -259,35 +259,35 @@ body.toplevel_page_nutrio #wpbody-content {
 	object-fit: cover;
 }
 
-.nutrio-main {
+.merodiet-main {
 	display: flex;
 	flex-direction: column;
 	min-width: 0;
 }
-.nutrio-topbar {
+.merodiet-topbar {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	/* No horizontal padding: the topbar sits inside .nutrio-view, which
+	/* No horizontal padding: the topbar sits inside .merodiet-view, which
 	   already provides the side gutter -- adding one here too would push
 	   the title/button in further than the panel/table below it. */
 	padding: 14px 0;
 	margin-bottom: 20px;
 	border-bottom: 1px solid var(--line);
 }
-.nutrio-topbar h1 {
+.merodiet-topbar h1 {
 	font-size: 21px;
 }
-.nutrio-topbar-sub {
+.merodiet-topbar-sub {
 	font-size: 12.5px;
 	color: var(--ink-muted);
 	margin-top: 2px;
 }
-.nutrio-view {
+.merodiet-view {
 	padding: 26px 28px 40px;
 }
 
-.nutrio-theme-toggle {
+.merodiet-theme-toggle {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -300,20 +300,20 @@ body.toplevel_page_nutrio #wpbody-content {
 	flex-shrink: 0;
 	cursor: pointer;
 }
-.nutrio-theme-toggle:hover {
+.merodiet-theme-toggle:hover {
 	color: var(--ink);
 	border-color: var(--line-strong);
 }
-.nutrio-theme-toggle svg {
+.merodiet-theme-toggle svg {
 	width: 15px;
 	height: 15px;
 }
 
 /* ---------- Responsive ---------- */
-.nutrio-mobile-menu-btn {
+.merodiet-mobile-menu-btn {
 	display: none;
 }
-.nutrio-rail-scrim {
+.merodiet-rail-scrim {
 	position: fixed;
 	inset: 0;
 	background: rgba(20, 18, 24, 0.4);
@@ -322,16 +322,16 @@ body.toplevel_page_nutrio #wpbody-content {
 	pointer-events: none;
 	transition: opacity 0.2s ease;
 }
-.nutrio-rail-scrim.is-open {
+.merodiet-rail-scrim.is-open {
 	opacity: 1;
 	pointer-events: auto;
 }
 
 @media (max-width: 900px) {
-	.nutrio-shell {
+	.merodiet-shell {
 		grid-template-columns: 1fr;
 	}
-	.nutrio-mobile-menu-btn {
+	.merodiet-mobile-menu-btn {
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -347,11 +347,11 @@ body.toplevel_page_nutrio #wpbody-content {
 		color: var(--ink);
 		cursor: pointer;
 	}
-	.nutrio-mobile-menu-btn svg {
+	.merodiet-mobile-menu-btn svg {
 		width: 16px;
 		height: 16px;
 	}
-	.nutrio-rail {
+	.merodiet-rail {
 		position: fixed;
 		top: 0;
 		left: 0;
@@ -365,23 +365,23 @@ body.toplevel_page_nutrio #wpbody-content {
 		transform: translateX(-100%);
 		transition: transform 0.2s ease;
 	}
-	.nutrio-rail.is-open {
+	.merodiet-rail.is-open {
 		transform: translateX(0);
 	}
 	/* Clears vertical space above the topbar for the fixed hamburger button,
 	   instead of the old approach of padding the topbar itself sideways —
 	   that pushed the whole title+actions row right instead of just moving
 	   it down, wasting width the action buttons need on a narrow screen. */
-	.nutrio-view {
+	.merodiet-view {
 		padding-top: 70px;
 	}
 }
 
 @media (max-width: 560px) {
-	.nutrio-view {
+	.merodiet-view {
 		padding: 70px 16px 32px;
 	}
-	.nutrio-topbar {
+	.merodiet-topbar {
 		flex-direction: column;
 		align-items: flex-start;
 		padding: 14px 0;
@@ -390,79 +390,79 @@ body.toplevel_page_nutrio #wpbody-content {
 	/* Every screen's topbar is title-wrapper first, action-buttons-wrapper
 	   last (see DESIGN.md) — let the actions wrap onto their own line(s)
 	   instead of overflowing the viewport. */
-	.nutrio-topbar > *:last-child {
+	.merodiet-topbar > *:last-child {
 		width: 100%;
 		flex-wrap: wrap;
 	}
 }
 
 /* ---------- Pro-lock icon (shared across Button and Sidebar's nav item) ---------- */
-.nutrio-pro-lock {
+.merodiet-pro-lock {
 	width: 13px;
 	height: 13px;
 	opacity: 0.7;
 }
 
 /* ---------- KPI row (used directly by the Dashboard screen) ---------- */
-.nutrio-kpi-row {
+.merodiet-kpi-row {
 	display: grid;
 	grid-template-columns: repeat(4, 1fr);
 	gap: 14px;
 	margin-bottom: 22px;
 }
-.nutrio-kpi {
+.merodiet-kpi {
 	background: var(--surface);
 	border: 1px solid var(--line);
 	border-radius: var(--radius);
 	padding: 16px 18px;
 }
-.nutrio-kpi-label {
+.merodiet-kpi-label {
 	font-size: 11.5px;
 	color: var(--ink-muted);
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
 }
-.nutrio-kpi-value {
+.merodiet-kpi-value {
 	font-size: 28px;
 	font-weight: 700;
 	margin-top: 6px;
 	letter-spacing: -0.01em;
 }
-.nutrio-kpi-delta {
+.merodiet-kpi-delta {
 	font-size: 12px;
 	margin-top: 4px;
 	display: flex;
 	align-items: center;
 	gap: 4px;
 }
-.nutrio-kpi-delta.is-up {
+.merodiet-kpi-delta.is-up {
 	color: var(--success);
 }
-.nutrio-kpi-delta.is-warn {
+.merodiet-kpi-delta.is-warn {
 	color: var(--warning);
 }
 
 @media (max-width: 900px) {
-	.nutrio-kpi-row {
+	.merodiet-kpi-row {
 		grid-template-columns: repeat(2, 1fr);
 	}
 }
 @media (max-width: 560px) {
-	.nutrio-kpi-row {
+	.merodiet-kpi-row {
 		grid-template-columns: 1fr;
 	}
 }
 
 /* ---------- Table (used directly by the Clients screen) ---------- */
-.nutrio-table-wrap {
+.merodiet-table-wrap {
 	overflow-x: auto;
 }
-.nutrio-table {
+.merodiet-table {
 	width: 100%;
 	border-collapse: collapse;
 	font-size: 13px;
 }
-.nutrio-table th {
+.merodiet-table th {
 	text-align: left;
 	font-size: 12.5px;
 	color: var(--ink-muted);
@@ -471,27 +471,27 @@ body.toplevel_page_nutrio #wpbody-content {
 	border-bottom: 1px solid var(--line-strong);
 	white-space: nowrap;
 }
-.nutrio-table td {
+.merodiet-table td {
 	padding: 12px 14px;
 	border-bottom: 1px solid var(--line);
 	vertical-align: middle;
 }
-.nutrio-table tr:last-child td {
+.merodiet-table tr:last-child td {
 	border-bottom: none;
 }
-.nutrio-table tbody tr:hover {
+.merodiet-table tbody tr:hover {
 	background: var(--paper-dim);
 }
-.nutrio-table tbody tr.nutrio-row-clickable {
+.merodiet-table tbody tr.merodiet-row-clickable {
 	cursor: pointer;
 }
-.nutrio-cell-name {
+.merodiet-cell-name {
 	display: flex;
 	align-items: center;
 	gap: 10px;
 	font-weight: 600;
 }
-.nutrio-row-actions {
+.merodiet-row-actions {
 	display: flex;
 	gap: 4px;
 	justify-content: flex-end;
@@ -505,28 +505,28 @@ body.toplevel_page_nutrio #wpbody-content {
    touch device has no hover state, so these would otherwise be invisible
    and unreachable there entirely. */
 @media (hover: hover) {
-	.nutrio-row-actions {
+	.merodiet-row-actions {
 		opacity: 0;
 	}
-	.nutrio-table tr:hover .nutrio-row-actions {
+	.merodiet-table tr:hover .merodiet-row-actions {
 		opacity: 1;
 	}
 }
 
 /* ---------- Form fields (used directly by ClientForm) ---------- */
-.nutrio-field {
+.merodiet-field {
 	display: flex;
 	flex-direction: column;
 	gap: 6px;
 }
-.nutrio-field label {
+.merodiet-field label {
 	font-size: 12px;
 	font-weight: 600;
 	color: var(--ink-muted);
 }
-.nutrio-field input,
-.nutrio-field textarea,
-.nutrio-field select {
+.merodiet-field input,
+.merodiet-field textarea,
+.merodiet-field select {
 	font-family: inherit;
 	font-size: 13.5px;
 	padding: 9px 11px;
@@ -535,9 +535,9 @@ body.toplevel_page_nutrio #wpbody-content {
 	background: var(--surface);
 	color: var(--ink);
 }
-.nutrio-field input:focus,
-.nutrio-field textarea:focus,
-.nutrio-field select:focus {
+.merodiet-field input:focus,
+.merodiet-field textarea:focus,
+.merodiet-field select:focus {
 	outline: 2px solid var(--sage);
 	outline-offset: 1px;
 	border-color: var(--sage);
@@ -545,7 +545,7 @@ body.toplevel_page_nutrio #wpbody-content {
 /* A <select> ignores most of the box styling above until the browser's own
    chrome is switched off — appearance:none, plus a drawn-in chevron since
    that also removes the native dropdown arrow. */
-.nutrio-field select {
+.merodiet-field select {
 	appearance: none;
 	-webkit-appearance: none;
 	padding-right: 32px;
@@ -555,25 +555,25 @@ body.toplevel_page_nutrio #wpbody-content {
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236d6d74' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
 }
 @media (prefers-color-scheme: dark) {
-	:root:not([data-theme='light']) .nutrio-field select {
+	:root:not([data-theme='light']) .merodiet-field select {
 		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a39daf' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
 	}
 }
-:root[data-theme='dark'] .nutrio-field select {
+:root[data-theme='dark'] .merodiet-field select {
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a39daf' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
 }
-.nutrio-field-row {
+.merodiet-field-row {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 	gap: 12px;
 }
-.nutrio-field-hint {
+.merodiet-field-hint {
 	font-size: 11.5px;
 	color: var(--ink-faint);
 }
 
 @media (max-width: 560px) {
-	.nutrio-field-row {
+	.merodiet-field-row {
 		grid-template-columns: 1fr;
 	}
 }

@@ -30,7 +30,7 @@ interface ThunkArgs {
 export function getRecipes() {
 	return async ( { dispatch }: ThunkArgs ) => {
 		const response: PaginatedResponse< Recipe > = await apiFetch( {
-			path: '/nutrio/v1/recipes?per_page=100',
+			path: '/merodiet/v1/recipes?per_page=100',
 		} );
 
 		dispatch.receiveRecipes(
@@ -53,7 +53,7 @@ export function getRecipesPage(
 			...filters,
 		} );
 		const response: PaginatedResponse< Recipe > = await apiFetch( {
-			path: `/nutrio/v1/recipes?${ params.toString() }`,
+			path: `/merodiet/v1/recipes?${ params.toString() }`,
 		} );
 
 		dispatch.receiveRecipesPage(
@@ -70,7 +70,7 @@ export function getRecipesPage(
 export function getRecipe( id: number ) {
 	return async ( { dispatch }: ThunkArgs ) => {
 		const recipe: Recipe = await apiFetch( {
-			path: `/nutrio/v1/recipes/${ id }`,
+			path: `/merodiet/v1/recipes/${ id }`,
 		} );
 
 		dispatch.receiveRecipe( recipe );

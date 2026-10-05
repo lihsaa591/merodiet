@@ -2,7 +2,7 @@
 
 ## Context
 
-Nutrio currently sends exactly two emails, both client-facing, both unbranded
+MeroDiet currently sends exactly two emails, both client-facing, both unbranded
 WordPress-core copy routed through `retrieve_password()`/`retrieve_password_message`:
 the initial client invite (`ClientInviteService`) and the genuine
 forgot-password flow (`PortalPage`). No practitioner-facing email exists at
@@ -34,13 +34,13 @@ is optional, not required.
 
 ## Storage — one option per email type
 
-**Decision: per-type options (`nutrio_email_{type}`, e.g.
-`nutrio_email_client_invite`), each `autoload = false`** — not a single
+**Decision: per-type options (`merodiet_email_{type}`, e.g.
+`merodiet_email_client_invite`), each `autoload = false`** — not a single
 option holding all five as one array.
 
 This mirrors WooCommerce's approach (`woocommerce_{email_id}_settings`,
 one option per email type) rather than a single shared blob, specifically
-for future scalability: Nutrio's own boilerplate plan includes an add-on
+for future scalability: MeroDiet's own boilerplate plan includes an add-on
 loader (`addons/*`) as a planned extensibility point. If a future add-on
 ever registers its own email type, per-type options mean it can
 `add_option()` its own row without any core code change and without a
@@ -107,7 +107,7 @@ replace — it's intentionally not exposed as configurable today.
    produce two different branded emails depending on which of our own
    call sites triggered it — no change to core's own behavior for a
    practitioner or admin's own password reset (that path never sets the
-   flag, and the filter's existing `has_cap( 'view_own_nutrio_plan' )`
+   flag, and the filter's existing `has_cap( 'view_own_merodiet_plan' )`
    guard already excludes non-clients entirely).
 2. **`client_password_reset`** — the same filter, when the flag is *not*
    set (the genuine "Forgot your password?" path) — same as today, just
@@ -134,24 +134,24 @@ simplification, called out here so it isn't accidentally treated as an
 oversight later.
 
 **Storage:** two more small, non-autoloaded options —
-`nutrio_digest_enabled` (bool, default `false` — opt-in, not sent until a
-practitioner turns it on) and `nutrio_digest_time` (string `HH:MM`,
+`merodiet_digest_enabled` (bool, default `false` — opt-in, not sent until a
+practitioner turns it on) and `merodiet_digest_time` (string `HH:MM`,
 default `'20:00'`).
 
 **`includes/Email/DigestScheduler.php`** — `reschedule(): void`, called
-whenever `nutrio_digest_time` or `nutrio_digest_enabled` is saved (from
+whenever `merodiet_digest_time` or `merodiet_digest_enabled` is saved (from
 the new `PUT /settings/email-digest` route) and once from
-`Activation::activate()`. Clears any existing `nutrio_daily_digest` cron
+`Activation::activate()`. Clears any existing `merodiet_daily_digest` cron
 hook (`wp_clear_scheduled_hook`), and if enabled, computes the next
 occurrence of the configured time (today if it hasn't passed yet in the
 site's timezone, else tomorrow) and calls
-`wp_schedule_event( $timestamp, 'daily', 'nutrio_daily_digest' )`.
+`wp_schedule_event( $timestamp, 'daily', 'merodiet_daily_digest' )`.
 `Deactivation::deactivate()` gets one added line,
-`wp_clear_scheduled_hook( 'nutrio_daily_digest' )` — its own docblock
+`wp_clear_scheduled_hook( 'merodiet_daily_digest' )` — its own docblock
 already anticipated exactly this ("clear scheduled events").
 
-**`includes/Email/DigestMailer.php`** — hooked to `nutrio_daily_digest`.
-For every user with the `manage_nutrio_clients` capability (i.e. every
+**`includes/Email/DigestMailer.php`** — hooked to `merodiet_daily_digest`.
+For every user with the `manage_merodiet_clients` capability (i.e. every
 practitioner): fetch their clients via `ClientRepository::all_for_practitioner()`
 — an existing paginated method (`page`/`per_page`/`filters`), so this
 loops pages until a short page confirms there are no more, rather than a
@@ -169,14 +169,14 @@ entirely for a practitioner with zero clients (no empty digest noise).
 
 ## New capability
 
-`manage_nutrio_settings` added to `RoleRegistrar::PRACTITIONER_CAPS`. This
+`manage_merodiet_settings` added to `RoleRegistrar::PRACTITIONER_CAPS`. This
 already gets synced to the `practitioner` role and to `administrator` for
 existing installs automatically — `DatabaseServiceProvider` calls
 `RoleRegistrar::register()` as part of its own migration catch-up, so no
 separate upgrade routine is needed. The existing `/settings/usda-key`
-routes stay on `manage_nutrio_foods` (out of scope — not touching working
+routes stay on `manage_merodiet_foods` (out of scope — not touching working
 code for this feature), but every new route below uses
-`manage_nutrio_settings`.
+`manage_merodiet_settings`.
 
 ## REST API (new routes on the existing `SettingsController`)
 
