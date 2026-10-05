@@ -5,7 +5,7 @@
 	gap: 8px;
 	margin-bottom: 28px;
 }
-.form :global(.nutrio-field) {
+.form :global(.merodiet-field) {
 	width: 100%;
 }
 .form textarea {

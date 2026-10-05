@@ -1,14 +1,14 @@
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Database;
+namespace MeroDiet\Tests\Unit\Database;
 
-use Nutrio\Database\QueryFilters;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Database\QueryFilters;
+use MeroDiet\Tests\TestCase;
 
 final class QueryFiltersTest extends TestCase {
 

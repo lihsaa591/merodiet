@@ -56,11 +56,11 @@ export default function RecipeLibrary( {
 
 	return (
 		<>
-			<div className="nutrio-topbar">
-				<h1>{ __( 'Recipe builder', 'nutrio' ) }</h1>
+			<div className="merodiet-topbar">
+				<h1>{ __( 'Recipe builder', 'merodiet' ) }</h1>
 				<Button variant="primary" onClick={ onAdd }>
 					<PlusIcon />
-					{ __( 'New recipe', 'nutrio' ) }
+					{ __( 'New recipe', 'merodiet' ) }
 				</Button>
 			</div>
 
@@ -68,24 +68,24 @@ export default function RecipeLibrary( {
 				<ListFilters
 					search={ search }
 					onSearchChange={ onSearchChange }
-					searchPlaceholder={ __( 'Search recipes…', 'nutrio' ) }
+					searchPlaceholder={ __( 'Search recipes…', 'merodiet' ) }
 				/>
 			) }
 
 			<Panel>
-				<PanelBody className="nutrio-table-wrap">
-					{ isLoading && <p>{ __( 'Loading…', 'nutrio' ) }</p> }
+				<PanelBody className="merodiet-table-wrap">
+					{ isLoading && <p>{ __( 'Loading…', 'merodiet' ) }</p> }
 
 					{ ! isLoading && recipes.length === 0 && (
 						<p>
 							{ isFiltering
 								? __(
 										'No recipes match your search.',
-										'nutrio'
+										'merodiet'
 								  )
 								: __(
 										'No recipes yet. Add your first recipe to start building your library.',
-										'nutrio'
+										'merodiet'
 								  ) }
 						</p>
 					) }
@@ -103,13 +103,16 @@ export default function RecipeLibrary( {
 								>
 									{ sprintf(
 										/* translators: %d: number of recipes selected */
-										__( 'Delete selected (%d)', 'nutrio' ),
+										__(
+											'Delete selected (%d)',
+											'merodiet'
+										),
 										bulk.count
 									) }
 								</Button>
 							</BulkActionBar>
 
-							<table className="nutrio-table">
+							<table className="merodiet-table">
 								<thead>
 									<tr>
 										<th>
@@ -125,16 +128,21 @@ export default function RecipeLibrary( {
 												onChange={ bulk.toggleAll }
 												aria-label={ __(
 													'Select all recipes',
-													'nutrio'
+													'merodiet'
 												) }
 											/>
 										</th>
-										<th>{ __( 'Name', 'nutrio' ) }</th>
-										<th>{ __( 'Servings', 'nutrio' ) }</th>
+										<th>{ __( 'Name', 'merodiet' ) }</th>
 										<th>
-											{ __( 'Kcal / serving', 'nutrio' ) }
+											{ __( 'Servings', 'merodiet' ) }
 										</th>
-										<th>{ __( 'Updated', 'nutrio' ) }</th>
+										<th>
+											{ __(
+												'Kcal / serving',
+												'merodiet'
+											) }
+										</th>
+										<th>{ __( 'Updated', 'merodiet' ) }</th>
 										<th></th>
 									</tr>
 								</thead>
@@ -161,7 +169,7 @@ export default function RecipeLibrary( {
 															/* translators: %s: recipe name */
 															__(
 																'Select %s',
-																'nutrio'
+																'merodiet'
 															),
 															recipe.name
 														) }
@@ -175,7 +183,7 @@ export default function RecipeLibrary( {
 													{ recipe.name }
 												</td>
 												<td>{ recipe.servings }</td>
-												<td className="nutrio-mono">
+												<td className="merodiet-mono">
 													{ formatAmount(
 														summary.kcal,
 														''
@@ -187,11 +195,11 @@ export default function RecipeLibrary( {
 													) }
 												</td>
 												<td>
-													<div className="nutrio-row-actions">
+													<div className="merodiet-row-actions">
 														<IconButton
 															label={ __(
 																'Edit recipe',
-																'nutrio'
+																'merodiet'
 															) }
 															onClick={ () =>
 																onEdit(
@@ -204,7 +212,7 @@ export default function RecipeLibrary( {
 														<IconButton
 															label={ __(
 																'Remove recipe',
-																'nutrio'
+																'merodiet'
 															) }
 															onClick={ () =>
 																onDelete(

@@ -2,12 +2,12 @@
 /**
  * Curated nutrient set for hand-entered custom foods.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Nutrition;
+namespace MeroDiet\Nutrition;
 
 /**
  * USDA foods can carry 50+ nutrients per record (see

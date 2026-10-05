@@ -2,15 +2,15 @@
 /**
  * Admin UI service provider.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Providers;
+namespace MeroDiet\Providers;
 
 use League\Container\Container;
-use Nutrio\Admin\AdminPage;
+use MeroDiet\Admin\AdminPage;
 
 /**
  * Builds one AdminPage per entry in config('admin.pages') — add a page

@@ -3,7 +3,9 @@ import { test, expect } from '../fixtures/client-portal';
 test.describe( 'portal log tab', () => {
 	test.beforeEach( async ( { clientPage } ) => {
 		await clientPage.goto( '/client-portal/?view=log' );
-		await expect( clientPage.locator( '.nutrio-topbar h1' ) ).toBeVisible();
+		await expect(
+			clientPage.locator( '.merodiet-topbar h1' )
+		).toBeVisible();
 	} );
 
 	test( 'shows the kcal summary and updates it when an item is marked eaten', async ( {

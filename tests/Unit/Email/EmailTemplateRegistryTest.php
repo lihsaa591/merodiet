@@ -1,14 +1,14 @@
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Email;
+namespace MeroDiet\Tests\Unit\Email;
 
-use Nutrio\Email\EmailTemplateRegistry;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Email\EmailTemplateRegistry;
+use MeroDiet\Tests\TestCase;
 
 final class EmailTemplateRegistryTest extends TestCase {
 

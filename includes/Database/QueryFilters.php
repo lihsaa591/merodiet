@@ -2,12 +2,12 @@
 /**
  * Shared WHERE-clause builders for a repository's filterable list query.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Database;
+namespace MeroDiet\Database;
 
 /**
  * Every practitioner-owned list (clients, recipes, plans, custom foods)

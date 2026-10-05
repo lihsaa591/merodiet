@@ -26,7 +26,7 @@ export default function MeasurementHistoryList( {
 		return (
 			<p className={ styles.empty }>
 				{ emptyMessage ??
-					__( 'No measurements logged yet.', 'nutrio' ) }
+					__( 'No measurements logged yet.', 'merodiet' ) }
 			</p>
 		);
 	}

@@ -15,12 +15,12 @@
  * allergy validator can do case-insensitive substring matching against
  * it without needing a normalized allergen table yet.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-use Nutrio\Database\Migration;
+use MeroDiet\Database\Migration;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -34,7 +34,7 @@ return new class() extends Migration {
 	 * Create the clients table.
 	 */
 	public function up(): void {
-		$table           = $this->table( 'nutrio_clients' );
+		$table           = $this->table( 'merodiet_clients' );
 		$charset_collate = $this->wpdb->get_charset_collate();
 
 		$this->delta(
@@ -64,7 +64,7 @@ return new class() extends Migration {
 	 * Drop the clients table.
 	 */
 	public function down(): void {
-		$table = $this->table( 'nutrio_clients' );
+		$table = $this->table( 'merodiet_clients' );
 		$this->wpdb->query( "DROP TABLE IF EXISTS {$table}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input.
 	}
 };

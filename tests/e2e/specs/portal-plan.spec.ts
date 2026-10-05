@@ -6,7 +6,9 @@ test.describe( 'portal plan and dashboard', () => {
 		clientPage,
 	} ) => {
 		await clientPage.goto( '/client-portal/?view=plan' );
-		await expect( clientPage.locator( '.nutrio-topbar h1' ) ).toBeVisible();
+		await expect(
+			clientPage.locator( '.merodiet-topbar h1' )
+		).toBeVisible();
 
 		// Seeded recipe: 300 g across 2 servings, 1 serving planned.
 		await expect( clientPage.getByText( '1 srv · 150 g' ) ).toBeVisible();
@@ -23,7 +25,7 @@ test.describe( 'portal plan and dashboard', () => {
 		clientPage,
 	} ) => {
 		await clientPage.goto( '/client-portal/?view=dashboard' );
-		await expect( clientPage.locator( '.nutrio-rail' ) ).toBeVisible();
+		await expect( clientPage.locator( '.merodiet-rail' ) ).toBeVisible();
 		await ensureTodaysItemsEaten( clientPage );
 		await clientPage.reload();
 

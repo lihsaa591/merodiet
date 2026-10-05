@@ -2,21 +2,21 @@
 /**
  * USDA FoodData Central service provider.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Providers;
+namespace MeroDiet\Providers;
 
 use League\Container\Container;
-use Nutrio\Nutrition\FoodCache;
-use Nutrio\Nutrition\FoodDataClient;
-use Nutrio\Nutrition\FoodDataService;
+use MeroDiet\Nutrition\FoodCache;
+use MeroDiet\Nutrition\FoodDataClient;
+use MeroDiet\Nutrition\FoodDataService;
 
 /**
  * Binds the food-data stack. The API key is a site option
- * (`nutrio_usda_api_key`) rather than a config-file constant — it's
+ * (`merodiet_usda_api_key`) rather than a config-file constant — it's
  * per-installation and practitioner-supplied (a future settings screen
  * writes it), not something that belongs in version-controlled config.
  */
@@ -36,7 +36,7 @@ final class FoodDataServiceProvider extends AbstractServiceProvider {
 				$config = $container->get( 'config' );
 
 				return new FoodDataClient(
-					(string) get_option( 'nutrio_usda_api_key', '' ),
+					(string) get_option( 'merodiet_usda_api_key', '' ),
 					(string) ( $config['fooddata']['base_url'] ?? 'https://api.nal.usda.gov/fdc/v1' ),
 					(int) ( $config['fooddata']['timeout'] ?? 10 )
 				);

@@ -2,41 +2,41 @@
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Nutrio – Dietitian Practice Manager 0.1.0\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/nutrio\n"
+"Project-Id-Version: MeroDiet – Dietitian Practice Manager 0.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/merodiet\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-04T07:09:29+00:00\n"
+"POT-Creation-Date: 2026-10-05T16:38:04+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
-"X-Domain: nutrio\n"
+"X-Domain: merodiet\n"
 
 #. Plugin Name of the plugin
-#: nutrio.php
-msgid "Nutrio – Dietitian Practice Manager"
+#: merodiet.php
+msgid "MeroDiet – Dietitian Practice Manager"
 msgstr ""
 
 #. Plugin URI of the plugin
-#: nutrio.php
-msgid "https://github.com/lihsaa591/nutrio"
+#: merodiet.php
+msgid "https://github.com/lihsaa591/merodiet"
 msgstr ""
 
 #. Description of the plugin
-#: nutrio.php
+#: merodiet.php
 msgid "Dietitian and nutritionist practice manager: client records, meal plans, food logs and USDA nutrition data in one dashboard."
 msgstr ""
 
 #. Author of the plugin
-#: nutrio.php
+#: merodiet.php
 msgid "Aashil"
 msgstr ""
 
 #: config/app.php:94
 #: config/app.php:95
-msgid "Nutrio"
+msgid "MeroDiet"
 msgstr ""
 
 #: includes/Clients/ClientInviteService.php:76
@@ -301,8 +301,8 @@ msgstr ""
 msgid "Send time must be in HH:MM (24-hour) format."
 msgstr ""
 
-#: nutrio.php:58
-msgid "Nutrio: run \"composer install\" before activating this plugin."
+#: merodiet.php:58
+msgid "MeroDiet: run \"composer install\" before activating this plugin."
 msgstr ""
 
 #: build/admin.js:1
@@ -344,7 +344,7 @@ msgstr ""
 #. translators: %s: the locked feature's name
 #: build/admin.js:2
 #, js-format
-msgid "%s is part of Nutrio Pro. Upgrade to unlock it for your practice."
+msgid "%s is part of MeroDiet Pro. Upgrade to unlock it for your practice."
 msgstr ""
 
 #: build/admin.js:2
@@ -1819,7 +1819,7 @@ msgid "USDA FoodData Central"
 msgstr ""
 
 #: build/admin.js:31
-msgid "Required for recipe and plan building — this key lets Nutrio search and pull nutrient data from the USDA FoodData Central database. Get a free key at api.data.gov/signup."
+msgid "Required for recipe and plan building — this key lets MeroDiet search and pull nutrient data from the USDA FoodData Central database. Get a free key at api.data.gov/signup."
 msgstr ""
 
 #: build/admin.js:31
@@ -1851,7 +1851,7 @@ msgid "Data on uninstall"
 msgstr ""
 
 #: build/admin.js:31
-msgid "By default your clients, plans, logs and measurements are kept when you delete the plugin. Turn this on to permanently remove all Nutrio data when the plugin is deleted."
+msgid "By default your clients, plans, logs and measurements are kept when you delete the plugin. Turn this on to permanently remove all MeroDiet data when the plugin is deleted."
 msgstr ""
 
 #: build/admin.js:31
@@ -1863,7 +1863,7 @@ msgid "Could not save the data setting."
 msgstr ""
 
 #: build/admin.js:31
-msgid "Delete all Nutrio data when the plugin is deleted"
+msgid "Delete all MeroDiet data when the plugin is deleted"
 msgstr ""
 
 #: build/admin.js:31

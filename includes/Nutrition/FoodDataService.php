@@ -2,12 +2,12 @@
 /**
  * Food data orchestration: cache-first resolution against USDA.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Nutrition;
+namespace MeroDiet\Nutrition;
 
 use WP_Error;
 
@@ -90,8 +90,8 @@ class FoodDataService {
 
 		if ( null === $normalized ) {
 			return new WP_Error(
-				'nutrio_fooddata_unnormalizable',
-				__( 'This food cannot be reliably converted to a per-100g nutrient profile — for example, its serving size is not gram-based, or USDA did not report identifiable nutrient values for it.', 'nutrio' )
+				'merodiet_fooddata_unnormalizable',
+				__( 'This food cannot be reliably converted to a per-100g nutrient profile — for example, its serving size is not gram-based, or USDA did not report identifiable nutrient values for it.', 'merodiet' )
 			);
 		}
 

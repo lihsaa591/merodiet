@@ -1,13 +1,13 @@
 <?php
 /**
- * The "From" name/address Nutrio's emails are sent with.
+ * The "From" name/address MeroDiet's emails are sent with.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Email;
+namespace MeroDiet\Email;
 
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
 use PHPMailer\PHPMailer\PHPMailer;
@@ -16,12 +16,12 @@ use PHPMailer\PHPMailer\PHPMailer;
  * One site-wide setting shared by every email type (practitioner and
  * client alike), stored as a single non-autoloaded option. Empty means
  * "leave WordPress's own default alone". It is applied only to emails
- * Nutrio sends — never through the global wp_mail_from filters, which
+ * MeroDiet sends — never through the global wp_mail_from filters, which
  * would also rewrite other plugins' mail.
  */
 final class EmailSender {
 
-	private const OPTION = 'nutrio_email_sender';
+	private const OPTION = 'merodiet_email_sender';
 
 	/**
 	 * The saved override. Either field may be empty.

@@ -93,10 +93,10 @@ export default function CustomFoods() {
 	const handleSubmit = async ( data: CustomFoodInput ) => {
 		if ( editingFood ) {
 			await updateCustomFood( editingFood.id, data );
-			toast.success( __( 'Custom food updated.', 'nutrio' ) );
+			toast.success( __( 'Custom food updated.', 'merodiet' ) );
 		} else {
 			await createCustomFood( data );
-			toast.success( __( 'Custom food added.', 'nutrio' ) );
+			toast.success( __( 'Custom food added.', 'merodiet' ) );
 		}
 		closeDrawer();
 	};
@@ -105,9 +105,9 @@ export default function CustomFoods() {
 		const confirmed = await confirmDialog( {
 			message: __(
 				'Remove this custom food? This cannot be undone.',
-				'nutrio'
+				'merodiet'
 			),
-			confirmLabel: __( 'Remove', 'nutrio' ),
+			confirmLabel: __( 'Remove', 'merodiet' ),
 			destructive: true,
 		} );
 
@@ -117,13 +117,13 @@ export default function CustomFoods() {
 
 		try {
 			await deleteCustomFood( food.id );
-			toast.success( __( 'Custom food removed.', 'nutrio' ) );
+			toast.success( __( 'Custom food removed.', 'merodiet' ) );
 		} catch ( error ) {
 			// Most likely here: 409, this food is still used in a recipe.
 			toast.error(
 				errorMessage(
 					error,
-					__( 'Something went wrong removing this food.', 'nutrio' )
+					__( 'Something went wrong removing this food.', 'merodiet' )
 				)
 			);
 		}
@@ -135,11 +135,11 @@ export default function CustomFoods() {
 				/* translators: %d: number of custom foods being removed */
 				__(
 					'Remove %d selected custom food(s)? This cannot be undone.',
-					'nutrio'
+					'merodiet'
 				),
 				bulk.count
 			),
-			confirmLabel: __( 'Remove', 'nutrio' ),
+			confirmLabel: __( 'Remove', 'merodiet' ),
 			destructive: true,
 		} );
 
@@ -163,7 +163,7 @@ export default function CustomFoods() {
 						'%d custom food removed.',
 						'%d custom foods removed.',
 						count,
-						'nutrio'
+						'merodiet'
 					),
 					count
 				),
@@ -172,7 +172,7 @@ export default function CustomFoods() {
 					/* translators: %d: number of custom foods that could not be removed */
 					__(
 						"%d couldn't be removed because they're still used in a recipe.",
-						'nutrio'
+						'merodiet'
 					),
 					count
 				),
@@ -186,15 +186,15 @@ export default function CustomFoods() {
 		toast.info(
 			__(
 				"Import is coming soon — you'll be able to bulk-import custom foods (e.g. from a CSV).",
-				'nutrio'
+				'merodiet'
 			)
 		);
 	};
 
 	return (
 		<>
-			<div className="nutrio-topbar">
-				<h1>{ __( 'Custom foods', 'nutrio' ) }</h1>
+			<div className="merodiet-topbar">
+				<h1>{ __( 'Custom foods', 'merodiet' ) }</h1>
 				<div
 					style={ {
 						display: 'flex',
@@ -209,7 +209,7 @@ export default function CustomFoods() {
 							style={ { opacity: 0.65 } }
 						>
 							<ImportIcon />
-							{ __( 'Import food data', 'nutrio' ) }
+							{ __( 'Import food data', 'merodiet' ) }
 						</Button>
 						<span
 							style={ {
@@ -227,12 +227,12 @@ export default function CustomFoods() {
 								pointerEvents: 'none',
 							} }
 						>
-							{ __( 'Soon', 'nutrio' ) }
+							{ __( 'Soon', 'merodiet' ) }
 						</span>
 					</div>
 					<Button variant="primary" onClick={ openAdd }>
 						<PlusIcon />
-						{ __( 'Add custom food', 'nutrio' ) }
+						{ __( 'Add custom food', 'merodiet' ) }
 					</Button>
 				</div>
 			</div>
@@ -241,22 +241,25 @@ export default function CustomFoods() {
 				<ListFilters
 					search={ filters.search }
 					onSearchChange={ ( value ) => setFilter( 'search', value ) }
-					searchPlaceholder={ __( 'Search custom foods…', 'nutrio' ) }
+					searchPlaceholder={ __(
+						'Search custom foods…',
+						'merodiet'
+					) }
 				/>
 			) }
 
 			<Panel>
-				<PanelBody className="nutrio-table-wrap">
-					{ isLoading && <p>{ __( 'Loading…', 'nutrio' ) }</p> }
+				<PanelBody className="merodiet-table-wrap">
+					{ isLoading && <p>{ __( 'Loading…', 'merodiet' ) }</p> }
 
 					{ ! isLoading && foods.length === 0 && (
 						<p>
 							{ isFiltering
 								? __(
 										'No custom foods match your search.',
-										'nutrio'
+										'merodiet'
 								  )
-								: __( 'No custom foods yet.', 'nutrio' ) }
+								: __( 'No custom foods yet.', 'merodiet' ) }
 						</p>
 					) }
 
@@ -273,13 +276,16 @@ export default function CustomFoods() {
 								>
 									{ sprintf(
 										/* translators: %d: number of custom foods selected */
-										__( 'Delete selected (%d)', 'nutrio' ),
+										__(
+											'Delete selected (%d)',
+											'merodiet'
+										),
 										bulk.count
 									) }
 								</Button>
 							</BulkActionBar>
 
-							<table className="nutrio-table">
+							<table className="merodiet-table">
 								<thead>
 									<tr>
 										<th>
@@ -295,16 +301,18 @@ export default function CustomFoods() {
 												onChange={ bulk.toggleAll }
 												aria-label={ __(
 													'Select all custom foods',
-													'nutrio'
+													'merodiet'
 												) }
 											/>
 										</th>
-										<th>{ __( 'Name', 'nutrio' ) }</th>
-										<th>{ __( 'Calories', 'nutrio' ) }</th>
-										<th>{ __( 'Protein', 'nutrio' ) }</th>
-										<th>{ __( 'Carbs', 'nutrio' ) }</th>
-										<th>{ __( 'Fat', 'nutrio' ) }</th>
-										<th>{ __( 'Updated', 'nutrio' ) }</th>
+										<th>{ __( 'Name', 'merodiet' ) }</th>
+										<th>
+											{ __( 'Calories', 'merodiet' ) }
+										</th>
+										<th>{ __( 'Protein', 'merodiet' ) }</th>
+										<th>{ __( 'Carbs', 'merodiet' ) }</th>
+										<th>{ __( 'Fat', 'merodiet' ) }</th>
+										<th>{ __( 'Updated', 'merodiet' ) }</th>
 										<th></th>
 									</tr>
 								</thead>
@@ -324,7 +332,7 @@ export default function CustomFoods() {
 														/* translators: %s: custom food name */
 														__(
 															'Select %s',
-															'nutrio'
+															'merodiet'
 														),
 														food.name
 													) }
@@ -333,25 +341,25 @@ export default function CustomFoods() {
 											<td style={ { fontWeight: 600 } }>
 												{ food.name }
 											</td>
-											<td className="nutrio-mono">
+											<td className="merodiet-mono">
 												{ formatAmount(
 													food.calories ?? null,
 													''
 												) }
 											</td>
-											<td className="nutrio-mono">
+											<td className="merodiet-mono">
 												{ formatAmount(
 													food.protein ?? null,
 													'g'
 												) }
 											</td>
-											<td className="nutrio-mono">
+											<td className="merodiet-mono">
 												{ formatAmount(
 													food.carbs ?? null,
 													'g'
 												) }
 											</td>
-											<td className="nutrio-mono">
+											<td className="merodiet-mono">
 												{ formatAmount(
 													food.fat ?? null,
 													'g'
@@ -363,11 +371,11 @@ export default function CustomFoods() {
 												) }
 											</td>
 											<td>
-												<div className="nutrio-row-actions">
+												<div className="merodiet-row-actions">
 													<IconButton
 														label={ __(
 															'Edit custom food',
-															'nutrio'
+															'merodiet'
 														) }
 														onClick={ () =>
 															openEdit( food.id )
@@ -378,7 +386,7 @@ export default function CustomFoods() {
 													<IconButton
 														label={ __(
 															'Remove custom food',
-															'nutrio'
+															'merodiet'
 														) }
 														onClick={ () =>
 															handleDelete( food )
@@ -410,15 +418,15 @@ export default function CustomFoods() {
 				isOpen={ isDrawerOpen }
 				title={
 					editingFood
-						? __( 'Edit custom food', 'nutrio' )
-						: __( 'Add custom food', 'nutrio' )
+						? __( 'Edit custom food', 'merodiet' )
+						: __( 'Add custom food', 'merodiet' )
 				}
 				onClose={ closeDrawer }
 				confirmClose={ async () =>
 					! isFormDirty ||
 					confirmDialog( {
-						message: __( 'Discard unsaved changes?', 'nutrio' ),
-						confirmLabel: __( 'Discard', 'nutrio' ),
+						message: __( 'Discard unsaved changes?', 'merodiet' ),
+						confirmLabel: __( 'Discard', 'merodiet' ),
 						destructive: true,
 					} )
 				}

@@ -13,7 +13,7 @@ test( 'a client reset link works while logged in as someone else', async ( {
 	);
 
 	await adminPage.goto(
-		`/client-portal/?nutrio_action=resetpass&key=${ key }&login=e2e-client`
+		`/client-portal/?merodiet_action=resetpass&key=${ key }&login=e2e-client`
 	);
 
 	await expect(

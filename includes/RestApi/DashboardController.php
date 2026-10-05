@@ -2,17 +2,17 @@
 /**
  * Practitioner dashboard REST endpoint.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\RestApi;
+namespace MeroDiet\RestApi;
 
-use Nutrio\Clients\ComplianceCalculator;
-use Nutrio\Repositories\ClientRepository;
-use Nutrio\Repositories\LogEntryRepository;
-use Nutrio\Repositories\PlanRepository;
+use MeroDiet\Clients\ComplianceCalculator;
+use MeroDiet\Repositories\ClientRepository;
+use MeroDiet\Repositories\LogEntryRepository;
+use MeroDiet\Repositories\PlanRepository;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
@@ -26,7 +26,7 @@ use WP_REST_Server;
 final class DashboardController extends AbstractPractitionerController {
 
 	/**
-	 * Route base — registers under nutrio/v1/dashboard.
+	 * Route base — registers under merodiet/v1/dashboard.
 	 *
 	 * @var string
 	 */
@@ -66,7 +66,7 @@ final class DashboardController extends AbstractPractitionerController {
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( $this, 'get_overview' ),
 			),
-			required_capability: 'manage_nutrio_clients'
+			required_capability: 'manage_merodiet_clients'
 		);
 	}
 

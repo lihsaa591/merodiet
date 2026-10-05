@@ -1,14 +1,14 @@
 <?php
 /**
  * Wraps a rendered email template in one shared HTML skeleton and,
- * for Nutrio's own new triggers, sends it.
+ * for MeroDiet's own new triggers, sends it.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Email;
+namespace MeroDiet\Email;
 
 /**
  * Render_html() (rendered content only, no send) exists separately
@@ -113,7 +113,7 @@ final class Mailer {
 			'<td style="color:#ffffff;font-size:20px;font-weight:700;white-space:nowrap;">%2$s</td>' .
 			'</tr>' .
 			'</table>',
-			esc_url( NUTRIO_URL . 'assets/images/nutrio-leaf-email.png' ),
+			esc_url( MERODIET_URL . 'assets/images/merodiet-logo-email.png' ),
 			esc_html( get_bloginfo( 'name' ) )
 		);
 	}
@@ -126,7 +126,7 @@ final class Mailer {
 	private static function footer_html(): string {
 		return sprintf(
 			/* translators: %s: the site's name */
-			esc_html__( 'Sent by %s. If you weren\'t expecting this email, you can safely ignore it.', 'nutrio' ),
+			esc_html__( 'Sent by %s. If you weren\'t expecting this email, you can safely ignore it.', 'merodiet' ),
 			esc_html( get_bloginfo( 'name' ) )
 		);
 	}

@@ -2,16 +2,16 @@
 /**
  * Meal plan data access.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
 // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Plugin's own custom tables; table names come from $wpdb->prefix and every value is bound via $wpdb->prepare().
 
-namespace Nutrio\Repositories;
+namespace MeroDiet\Repositories;
 
-use Nutrio\Database\QueryFilters;
+use MeroDiet\Database\QueryFilters;
 
 /**
  * A plan's days and items are replaced wholesale on update (delete-all
@@ -39,7 +39,7 @@ class PlanRepository {
 		$now = current_time( 'mysql' );
 
 		$wpdb->insert(
-			$wpdb->prefix . 'nutrio_plans',
+			$wpdb->prefix . 'merodiet_plans',
 			array(
 				'practitioner_user_id' => $practitioner_user_id,
 				'client_id'            => $data['client_id'] ?? null,
@@ -72,7 +72,7 @@ class PlanRepository {
 		global $wpdb;
 
 		$row = $wpdb->get_row(
-			$wpdb->prepare( "SELECT * FROM {$wpdb->prefix}nutrio_plans WHERE id = %d", $id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
+			$wpdb->prepare( "SELECT * FROM {$wpdb->prefix}merodiet_plans WHERE id = %d", $id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
 			ARRAY_A
 		);
 
@@ -92,7 +92,7 @@ class PlanRepository {
 
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM {$wpdb->prefix}nutrio_plans WHERE id = %d AND practitioner_user_id = %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; values are parameterized.
+				"SELECT * FROM {$wpdb->prefix}merodiet_plans WHERE id = %d AND practitioner_user_id = %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; values are parameterized.
 				$id,
 				$practitioner_user_id
 			),
@@ -119,7 +119,7 @@ class PlanRepository {
 
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM {$wpdb->prefix}nutrio_plans WHERE client_id = %d AND status = 'assigned' AND start_date <= %s AND end_date >= %s ORDER BY start_date DESC LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; values are parameterized.
+				"SELECT * FROM {$wpdb->prefix}merodiet_plans WHERE client_id = %d AND status = 'assigned' AND start_date <= %s AND end_date >= %s ORDER BY start_date DESC LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; values are parameterized.
 				$client_id,
 				$date,
 				$date
@@ -144,7 +144,7 @@ class PlanRepository {
 
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM {$wpdb->prefix}nutrio_plans WHERE client_id = %d AND status = 'assigned' AND start_date > %s ORDER BY start_date ASC LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; values are parameterized.
+				"SELECT * FROM {$wpdb->prefix}merodiet_plans WHERE client_id = %d AND status = 'assigned' AND start_date > %s ORDER BY start_date ASC LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; values are parameterized.
 				$client_id,
 				$after_date
 			),
@@ -182,7 +182,7 @@ class PlanRepository {
 		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders -- table name is derived from $wpdb->prefix, not user input; $exclude_clause is one of two fixed literal strings, not user input; every value is bound via prepare()'s own placeholders. phpcs's static count of "%s"/"%d" tokens can't see through the conditional exclude clause.
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM {$wpdb->prefix}nutrio_plans WHERE client_id = %d AND status = 'assigned' AND start_date <= %s AND end_date >= %s{$exclude_clause} ORDER BY start_date ASC LIMIT 1",
+				"SELECT * FROM {$wpdb->prefix}merodiet_plans WHERE client_id = %d AND status = 'assigned' AND start_date <= %s AND end_date >= %s{$exclude_clause} ORDER BY start_date ASC LIMIT 1",
 				...$params
 			),
 			ARRAY_A
@@ -209,7 +209,7 @@ class PlanRepository {
 	public function all_for_practitioner( int $practitioner_user_id, int $page = 1, int $per_page = 10, array $filters = array() ): array {
 		global $wpdb;
 
-		$table = $wpdb->prefix . 'nutrio_plans';
+		$table = $wpdb->prefix . 'merodiet_plans';
 
 		$params = array( $practitioner_user_id );
 
@@ -257,7 +257,7 @@ class PlanRepository {
 
 		$found = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT * FROM {$wpdb->prefix}nutrio_plan_days WHERE plan_id = %d ORDER BY day_offset", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
+				"SELECT * FROM {$wpdb->prefix}merodiet_plan_days WHERE plan_id = %d ORDER BY day_offset", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
 				$plan_id
 			),
 			ARRAY_A
@@ -289,7 +289,7 @@ class PlanRepository {
 		global $wpdb;
 
 		$row = $wpdb->get_row(
-			$wpdb->prepare( "SELECT food_id, recipe_id FROM {$wpdb->prefix}nutrio_plan_items WHERE id = %d", $id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
+			$wpdb->prepare( "SELECT food_id, recipe_id FROM {$wpdb->prefix}merodiet_plan_items WHERE id = %d", $id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
 			ARRAY_A
 		);
 
@@ -315,7 +315,7 @@ class PlanRepository {
 
 		$found = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT * FROM {$wpdb->prefix}nutrio_plan_items WHERE plan_day_id = %d ORDER BY sort_order", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
+				"SELECT * FROM {$wpdb->prefix}merodiet_plan_items WHERE plan_day_id = %d ORDER BY sort_order", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
 				$plan_day_id
 			),
 			ARRAY_A
@@ -354,20 +354,20 @@ class PlanRepository {
 			// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders -- table name is derived from $wpdb->prefix, not user input; $placeholders is a runtime-built "%d,%d,..." string PHPCS can't statically verify, but $wpdb->prepare() with an array as its second argument is the documented-correct pattern for a dynamic IN() clause.
 			$wpdb->query(
 				$wpdb->prepare(
-					"DELETE FROM {$wpdb->prefix}nutrio_plan_items WHERE plan_day_id IN ({$placeholders})",
+					"DELETE FROM {$wpdb->prefix}merodiet_plan_items WHERE plan_day_id IN ({$placeholders})",
 					$existing_day_ids
 				)
 			);
 			// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders
 		}
 
-		$wpdb->delete( $wpdb->prefix . 'nutrio_plan_days', array( 'plan_id' => $plan_id ) );
+		$wpdb->delete( $wpdb->prefix . 'merodiet_plan_days', array( 'plan_id' => $plan_id ) );
 
 		$now = current_time( 'mysql' );
 
 		foreach ( $days as $day ) {
 			$wpdb->insert(
-				$wpdb->prefix . 'nutrio_plan_days',
+				$wpdb->prefix . 'merodiet_plan_days',
 				array(
 					'plan_id'    => $plan_id,
 					'day_offset' => $day['day_offset'],
@@ -379,7 +379,7 @@ class PlanRepository {
 
 			foreach ( array_values( $day['items'] ) as $sort_order => $item ) {
 				$wpdb->insert(
-					$wpdb->prefix . 'nutrio_plan_items',
+					$wpdb->prefix . 'merodiet_plan_items',
 					array(
 						'plan_day_id'    => $plan_day_id,
 						'meal_type'      => $item['meal_type'],
@@ -423,7 +423,7 @@ class PlanRepository {
 
 		$fields['updated_at'] = current_time( 'mysql' );
 
-		$updated = $wpdb->update( $wpdb->prefix . 'nutrio_plans', $fields, array( 'id' => $id ) );
+		$updated = $wpdb->update( $wpdb->prefix . 'merodiet_plans', $fields, array( 'id' => $id ) );
 
 		return false !== $updated;
 	}
@@ -441,7 +441,7 @@ class PlanRepository {
 		global $wpdb;
 
 		$updated = $wpdb->update(
-			$wpdb->prefix . 'nutrio_plans',
+			$wpdb->prefix . 'merodiet_plans',
 			array(
 				'client_id'         => $client_id,
 				'status'            => 'assigned',
@@ -467,7 +467,7 @@ class PlanRepository {
 		global $wpdb;
 
 		$updated = $wpdb->update(
-			$wpdb->prefix . 'nutrio_plans',
+			$wpdb->prefix . 'merodiet_plans',
 			array(
 				'client_id'         => null,
 				'status'            => 'draft',
@@ -491,7 +491,7 @@ class PlanRepository {
 
 		$this->replace_days( $id, array() ); // Deletes all existing days/items, inserts none.
 
-		return false !== $wpdb->delete( $wpdb->prefix . 'nutrio_plans', array( 'id' => $id ) );
+		return false !== $wpdb->delete( $wpdb->prefix . 'merodiet_plans', array( 'id' => $id ) );
 	}
 
 	/**

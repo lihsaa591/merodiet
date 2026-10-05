@@ -51,7 +51,7 @@ function itemLabelsById(
 			labels[ item.id ] =
 				item.food_description ??
 				item.recipe_name ??
-				__( 'Item', 'nutrio' );
+				__( 'Item', 'merodiet' );
 		}
 	}
 
@@ -132,7 +132,7 @@ export default function LogTab() {
 	// there is nothing older left to reveal.
 	const loadHistory = () => {
 		apiFetch< LogEntry[] >( {
-			path: `/nutrio/v1/me/logs?from=${ daysAgo(
+			path: `/merodiet/v1/me/logs?from=${ daysAgo(
 				HISTORY_MAX_DAYS - 1
 			) }&to=${ today }`,
 		} ).then( setHistory, () => setHistory( [] ) );
@@ -146,7 +146,7 @@ export default function LogTab() {
 	const showLessHistory = () => setHistoryRangeDays( HISTORY_PAGE_DAYS );
 
 	useEffect( () => {
-		apiFetch< Plan | null >( { path: '/nutrio/v1/me/plan' } ).then(
+		apiFetch< Plan | null >( { path: '/merodiet/v1/me/plan' } ).then(
 			setPlan,
 			() => setPlan( null )
 		);
@@ -195,11 +195,11 @@ export default function LogTab() {
 
 		try {
 			const entry = await apiFetch< LogEntry >( {
-				path: '/nutrio/v1/me/logs',
+				path: '/merodiet/v1/me/logs',
 				method: 'POST',
 				data: payload,
 			} );
-			doAction( 'nutrio.clientPortal.logCreated', entry );
+			doAction( 'merodiet.clientPortal.logCreated', entry );
 			setLoggedByItem( ( prev ) => ( {
 				...prev,
 				[ item.id ]: {
@@ -207,13 +207,13 @@ export default function LogTab() {
 					notes: notesForEntry || null,
 				},
 			} ) );
-			toast.success( __( 'Logged.', 'nutrio' ) );
+			toast.success( __( 'Logged.', 'merodiet' ) );
 			loadHistory();
 		} catch ( error ) {
 			toast.error(
 				errorMessage(
 					error,
-					__( 'Something went wrong — please try again.', 'nutrio' )
+					__( 'Something went wrong — please try again.', 'merodiet' )
 				)
 			);
 		} finally {
@@ -227,7 +227,7 @@ export default function LogTab() {
 
 		try {
 			const entry = await apiFetch< LogEntry >( {
-				path: '/nutrio/v1/me/logs',
+				path: '/merodiet/v1/me/logs',
 				method: 'POST',
 				data: {
 					log_date: today,
@@ -235,15 +235,15 @@ export default function LogTab() {
 					notes,
 				} as LogEntryInput,
 			} );
-			doAction( 'nutrio.clientPortal.logCreated', entry );
+			doAction( 'merodiet.clientPortal.logCreated', entry );
 			setNotes( '' );
-			toast.success( __( 'Logged.', 'nutrio' ) );
+			toast.success( __( 'Logged.', 'merodiet' ) );
 			loadHistory();
 		} catch ( error ) {
 			toast.error(
 				errorMessage(
 					error,
-					__( 'Something went wrong — please try again.', 'nutrio' )
+					__( 'Something went wrong — please try again.', 'merodiet' )
 				)
 			);
 		} finally {
@@ -310,8 +310,8 @@ export default function LogTab() {
 	}
 	return (
 		<>
-			<div className="nutrio-topbar">
-				<h1>{ __( 'Log', 'nutrio' ) }</h1>
+			<div className="merodiet-topbar">
+				<h1>{ __( 'Log', 'merodiet' ) }</h1>
 			</div>
 			<Panel>
 				<PanelBody>
@@ -321,14 +321,14 @@ export default function LogTab() {
 						<p className={ styles.empty }>
 							{ __(
 								'No plan assigned yet — check back once your practitioner assigns one.',
-								'nutrio'
+								'merodiet'
 							) }
 						</p>
 					) }
 
 					{ plan && 0 === todaysItems.length && (
 						<p className={ styles.empty }>
-							{ __( 'Nothing planned for today.', 'nutrio' ) }
+							{ __( 'Nothing planned for today.', 'merodiet' ) }
 						</p>
 					) }
 
@@ -337,7 +337,10 @@ export default function LogTab() {
 							<p className={ styles.progress }>
 								{ sprintf(
 									/* translators: 1: number of items logged so far today, 2: total items planned for today */
-									__( '%1$d of %2$d logged today', 'nutrio' ),
+									__(
+										'%1$d of %2$d logged today',
+										'merodiet'
+									),
 									loggedCount,
 									todaysItems.length
 								) }
@@ -350,7 +353,7 @@ export default function LogTab() {
 											/* translators: 1: kcal eaten so far today, 2: kcal planned for today */
 											__(
 												'%1$s of %2$s kcal eaten today',
-												'nutrio'
+												'merodiet'
 											),
 											formatAmount( eatenKcal, '' ),
 											formatAmount( plannedKcal, '' )
@@ -360,7 +363,7 @@ export default function LogTab() {
 										<span className={ styles.kcalFootnote }>
 											{ __(
 												'Free-text entries under "Also logged today" have no calorie info, so they are not counted toward this total.',
-												'nutrio'
+												'merodiet'
 											) }
 										</span>
 									) }
@@ -372,7 +375,7 @@ export default function LogTab() {
 													'%d item substituted or skipped, not counted toward this total.',
 													'%d items substituted or skipped, not counted toward this total.',
 													notCountedCount,
-													'nutrio'
+													'merodiet'
 												),
 												notCountedCount
 											) }
@@ -427,7 +430,7 @@ export default function LogTab() {
 																		item.recipe_name ??
 																		__(
 																			'Item',
-																			'nutrio'
+																			'merodiet'
 																		) }
 																</div>
 																{ itemQuantityLabel(
@@ -484,7 +487,7 @@ export default function LogTab() {
 																		>
 																			{ __(
 																				'Mark eaten',
-																				'nutrio'
+																				'merodiet'
 																			) }
 																		</Button>
 																		<Button
@@ -504,7 +507,7 @@ export default function LogTab() {
 																		>
 																			{ __(
 																				'Substituted',
-																				'nutrio'
+																				'merodiet'
 																			) }
 																		</Button>
 																		<Button
@@ -522,7 +525,7 @@ export default function LogTab() {
 																		>
 																			{ __(
 																				'Skip',
-																				'nutrio'
+																				'merodiet'
 																			) }
 																		</Button>
 																	</div>
@@ -552,7 +555,7 @@ export default function LogTab() {
 																	}
 																	placeholder={ __(
 																		'What did you have instead?',
-																		'nutrio'
+																		'merodiet'
 																	) }
 																/>
 																<Button
@@ -574,7 +577,7 @@ export default function LogTab() {
 																>
 																	{ __(
 																		'Save',
-																		'nutrio'
+																		'merodiet'
 																	) }
 																</Button>
 																<Button
@@ -587,7 +590,7 @@ export default function LogTab() {
 																>
 																	{ __(
 																		'Cancel',
-																		'nutrio'
+																		'merodiet'
 																	) }
 																</Button>
 															</div>
@@ -615,7 +618,7 @@ export default function LogTab() {
 					{ adHocToday.length > 0 && (
 						<div className={ styles.adHocToday }>
 							<h3 className={ styles.mealTitle }>
-								{ __( 'Also logged today', 'nutrio' ) }
+								{ __( 'Also logged today', 'merodiet' ) }
 							</h3>
 							<ul className={ styles.itemList }>
 								{ adHocToday.map( ( entry ) => (
@@ -640,19 +643,19 @@ export default function LogTab() {
 					) }
 
 					<form onSubmit={ logAdHoc } className={ styles.adHocForm }>
-						<div className={ `nutrio-field ${ styles.field }` }>
-							<label htmlFor="nutrio-log-notes">
-								{ __( 'Log something else', 'nutrio' ) }
+						<div className={ `merodiet-field ${ styles.field }` }>
+							<label htmlFor="merodiet-log-notes">
+								{ __( 'Log something else', 'merodiet' ) }
 							</label>
 							<textarea
-								id="nutrio-log-notes"
+								id="merodiet-log-notes"
 								value={ notes }
 								onChange={ ( event ) =>
 									setNotes( event.target.value )
 								}
 								placeholder={ __(
 									'What did you eat?',
-									'nutrio'
+									'merodiet'
 								) }
 								required
 							/>
@@ -662,7 +665,7 @@ export default function LogTab() {
 							variant="primary"
 							disabled={ isSubmittingAdHoc }
 						>
-							{ __( 'Log it', 'nutrio' ) }
+							{ __( 'Log it', 'merodiet' ) }
 						</Button>
 					</form>
 				</PanelBody>
@@ -671,7 +674,7 @@ export default function LogTab() {
 			<Panel className={ styles.historyPanel }>
 				<PanelBody>
 					<h3 className={ styles.historyTitle }>
-						{ __( 'Recent history', 'nutrio' ) }
+						{ __( 'Recent history', 'merodiet' ) }
 					</h3>
 
 					{ undefined === history && <HistorySkeleton /> }
@@ -686,7 +689,7 @@ export default function LogTab() {
 											/* translators: %d: number of days the history currently covers */
 											__(
 												'Nothing logged in the last %d days — use Load more to see older entries.',
-												'nutrio'
+												'merodiet'
 											),
 											historyRangeDays
 									  )
@@ -703,7 +706,7 @@ export default function LogTab() {
 									className={ styles.loadMore }
 									onClick={ showLessHistory }
 								>
-									{ __( 'Show less', 'nutrio' ) }
+									{ __( 'Show less', 'merodiet' ) }
 								</button>
 							) }
 							{ hasOlderHistory && (
@@ -712,7 +715,7 @@ export default function LogTab() {
 									className={ styles.loadMore }
 									onClick={ loadMoreHistory }
 								>
-									{ __( 'Load more', 'nutrio' ) }
+									{ __( 'Load more', 'merodiet' ) }
 								</button>
 							) }
 						</div>

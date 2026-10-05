@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import ThemeToggle from './ThemeToggle';
 import type { Section } from './App';
-import nutrioLeaf from './nutrio-leaf.png';
+import merodietLogo from './merodiet-logo.png';
 
 interface PortalSidebarProps {
 	isOpen: boolean;
@@ -13,7 +13,7 @@ interface PortalSidebarProps {
 }
 
 // Deliberately mirrors src/admin/Sidebar.tsx's structure/classes exactly
-// (.nutrio-rail, .nutrio-brand, .nutrio-nav-item, .nutrio-rail-foot, ...)
+// (.merodiet-rail, .merodiet-brand, .merodiet-nav-item, .merodiet-rail-foot, ...)
 // so the client portal reads as the same product as the practitioner
 // admin app, not a visually separate one bolted on beside it.
 export default function PortalSidebar( {
@@ -24,12 +24,14 @@ export default function PortalSidebar( {
 	onOpenProfile,
 	avatarUrl,
 }: PortalSidebarProps ) {
-	const clientName = window.nutrioClientPortal?.clientName ?? '';
-	const logoutUrl = window.nutrioClientPortal?.logoutUrl ?? '#';
+	const clientName = window.merodietClientPortal?.clientName ?? '';
+	const logoutUrl = window.merodietClientPortal?.logoutUrl ?? '#';
 
 	return (
-		<aside className={ `nutrio-rail ${ isOpen ? 'is-open' : '' }`.trim() }>
-			<a className="nutrio-wp-back" href={ logoutUrl }>
+		<aside
+			className={ `merodiet-rail ${ isOpen ? 'is-open' : '' }`.trim() }
+		>
+			<a className="merodiet-wp-back" href={ logoutUrl }>
 				<svg
 					viewBox="0 0 24 24"
 					fill="none"
@@ -38,19 +40,23 @@ export default function PortalSidebar( {
 				>
 					<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
 				</svg>
-				{ __( 'Log out', 'nutrio' ) }
+				{ __( 'Log out', 'merodiet' ) }
 			</a>
 
-			<div className="nutrio-brand">
-				<img className="nutrio-brand-mark" src={ nutrioLeaf } alt="" />
-				<div className="nutrio-brand-name">Nutrio</div>
+			<div className="merodiet-brand">
+				<img
+					className="merodiet-brand-mark"
+					src={ merodietLogo }
+					alt=""
+				/>
+				<div className="merodiet-brand-name">MeroDiet</div>
 			</div>
 
-			<nav className="nutrio-nav-group">
+			<nav className="merodiet-nav-group">
 				{ sections.map( ( section ) => (
 					<button
 						key={ section.id }
-						className={ `nutrio-nav-item ${
+						className={ `merodiet-nav-item ${
 							activeId === section.id ? 'is-active' : ''
 						}`.trim() }
 						onClick={ () => onSelect( section.id ) }
@@ -73,30 +79,30 @@ export default function PortalSidebar( {
 				) ) }
 			</nav>
 
-			<div className="nutrio-rail-foot">
+			<div className="merodiet-rail-foot">
 				<button
 					type="button"
-					className="nutrio-rail-foot-profile-btn"
+					className="merodiet-rail-foot-profile-btn"
 					onClick={ onOpenProfile }
-					aria-label={ __( 'Open profile', 'nutrio' ) }
+					aria-label={ __( 'Open profile', 'merodiet' ) }
 				>
 					{ avatarUrl ? (
 						<img
 							src={ avatarUrl }
 							alt=""
-							className="nutrio-user-avatar"
+							className="merodiet-user-avatar"
 						/>
 					) : (
-						<div className="nutrio-user-avatar">
+						<div className="merodiet-user-avatar">
 							{ initialsFor( clientName ) }
 						</div>
 					) }
 					<div style={ { flex: 1, minWidth: 0 } }>
-						<div className="nutrio-rail-foot-name">
+						<div className="merodiet-rail-foot-name">
 							{ clientName }
 						</div>
-						<div className="nutrio-rail-foot-role">
-							{ __( 'Client', 'nutrio' ) }
+						<div className="merodiet-rail-foot-role">
+							{ __( 'Client', 'merodiet' ) }
 						</div>
 					</div>
 				</button>
@@ -107,7 +113,7 @@ export default function PortalSidebar( {
 }
 
 // The built-in sections' icons — keyed by id, so a future add-on's own
-// section (via the nutrio.clientPortal.sections filter) falls back to
+// section (via the merodiet.clientPortal.sections filter) falls back to
 // the generic circle above rather than rendering nothing.
 const SECTION_ICONS: Record< string, JSX.Element > = {
 	dashboard: (

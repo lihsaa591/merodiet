@@ -14,12 +14,12 @@
  * `client_id` is nullable so a plan can exist as a draft/template
  * before being assigned to anyone.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-use Nutrio\Database\Migration;
+use MeroDiet\Database\Migration;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -33,7 +33,7 @@ return new class() extends Migration {
 	 * Create the plans table.
 	 */
 	public function up(): void {
-		$table           = $this->table( 'nutrio_plans' );
+		$table           = $this->table( 'merodiet_plans' );
 		$charset_collate = $this->wpdb->get_charset_collate();
 
 		$this->delta(
@@ -60,7 +60,7 @@ return new class() extends Migration {
 	 * Drop the plans table.
 	 */
 	public function down(): void {
-		$table = $this->table( 'nutrio_plans' );
+		$table = $this->table( 'merodiet_plans' );
 		$this->wpdb->query( "DROP TABLE IF EXISTS {$table}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input.
 	}
 };

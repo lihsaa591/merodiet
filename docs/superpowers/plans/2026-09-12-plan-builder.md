@@ -37,12 +37,12 @@
 Open `includes/RestApi/PlansController.php`. Add the imports and extend the constructor:
 
 ```php
-use Nutrio\Nutrition\FoodCache;
-use Nutrio\Nutrition\PlanNutrientResolver;
-use Nutrio\Nutrition\RecipeNutrientResolver;
-use Nutrio\Repositories\ClientRepository;
-use Nutrio\Repositories\PlanRepository;
-use Nutrio\Repositories\RecipeRepository;
+use MeroDiet\Nutrition\FoodCache;
+use MeroDiet\Nutrition\PlanNutrientResolver;
+use MeroDiet\Nutrition\RecipeNutrientResolver;
+use MeroDiet\Repositories\ClientRepository;
+use MeroDiet\Repositories\PlanRepository;
+use MeroDiet\Repositories\RecipeRepository;
 ```
 
 ```php
@@ -140,13 +140,13 @@ In the same file, `list_plans`, `create_plan`, `get_plan`, `update_plan`, and `a
 In `config/app.php`, find the `PlansController::class` entry (currently 3 dependencies) and add the 3 new ones, in the same order as the constructor:
 
 ```php
-			\Nutrio\RestApi\PlansController::class   => array(
-				\Nutrio\Repositories\PlanRepository::class,
-				\Nutrio\Nutrition\PlanNutrientResolver::class,
-				\Nutrio\Repositories\ClientRepository::class,
-				\Nutrio\Nutrition\FoodCache::class,
-				\Nutrio\Repositories\RecipeRepository::class,
-				\Nutrio\Nutrition\RecipeNutrientResolver::class,
+			\MeroDiet\RestApi\PlansController::class   => array(
+				\MeroDiet\Repositories\PlanRepository::class,
+				\MeroDiet\Nutrition\PlanNutrientResolver::class,
+				\MeroDiet\Repositories\ClientRepository::class,
+				\MeroDiet\Nutrition\FoodCache::class,
+				\MeroDiet\Repositories\RecipeRepository::class,
+				\MeroDiet\Nutrition\RecipeNutrientResolver::class,
 			),
 ```
 
@@ -155,13 +155,13 @@ In `config/app.php`, find the `PlansController::class` entry (currently 3 depend
 In `tests/Unit/RestApi/ControllerCapabilitiesTest.php`, find this line inside `controller_provider()`:
 
 ```php
-			'PlansController'    => array( PlansController::class, array( PlanRepository::class, PlanNutrientResolver::class, ClientRepository::class ), 'manage_nutrio_plans' ),
+			'PlansController'    => array( PlansController::class, array( PlanRepository::class, PlanNutrientResolver::class, ClientRepository::class ), 'manage_merodiet_plans' ),
 ```
 
 Replace it with:
 
 ```php
-			'PlansController'    => array( PlansController::class, array( PlanRepository::class, PlanNutrientResolver::class, ClientRepository::class, FoodCache::class, RecipeRepository::class, RecipeNutrientResolver::class ), 'manage_nutrio_plans' ),
+			'PlansController'    => array( PlansController::class, array( PlanRepository::class, PlanNutrientResolver::class, ClientRepository::class, FoodCache::class, RecipeRepository::class, RecipeNutrientResolver::class ), 'manage_merodiet_plans' ),
 ```
 
 `FoodCache`, `RecipeRepository`, and `RecipeNutrientResolver` are already imported at the top of this file (used by `RecipesController`'s row) — no new `use` statements needed.
@@ -169,7 +169,7 @@ Replace it with:
 - [ ] **Step 6: Run the existing PHPUnit suite**
 
 Run: `composer test -- --filter ControllerCapabilitiesTest`
-Expected: PASS (this test now builds `PlansController` with 6 mocked dependencies instead of 3 and asserts every route still requires `manage_nutrio_plans`).
+Expected: PASS (this test now builds `PlansController` with 6 mocked dependencies instead of 3 and asserts every route still requires `manage_merodiet_plans`).
 
 Run: `composer test`
 Expected: full suite PASS — nothing else references `PlansController`'s constructor shape or `with_totals`.
@@ -282,7 +282,7 @@ git commit -m "feat: add Plan-related frontend types"
 
 **Interfaces:**
 - Consumes: `Plan`, `PlanInput` from `../../types` (Task 2).
-- Produces: `STORE_NAME = 'nutrio/plans'`; actions `receivePlans(plans: Plan[])`, `receivePlan(plan: Plan)`, `removePlan(id: number)`; thunks `getPlans()`, `getPlan(id: number)`, `createPlan(data: PlanInput): Promise<Plan>`, `updatePlan(id: number, data: Partial<PlanInput>): Promise<Plan>`, `deletePlan(id: number): Promise<void>`, `assignPlan(id: number, clientId: number): Promise<Plan>`; selectors `getPlans(state): Plan[]`, `getPlan(state, id): Plan | null`. This is the exact interface Task 6 (`PlanLibrary`), Task 7 (`PlanBuilder`), Task 8 (`AssignModal`), and Task 9 (`PlanScreen`) are built against.
+- Produces: `STORE_NAME = 'merodiet/plans'`; actions `receivePlans(plans: Plan[])`, `receivePlan(plan: Plan)`, `removePlan(id: number)`; thunks `getPlans()`, `getPlan(id: number)`, `createPlan(data: PlanInput): Promise<Plan>`, `updatePlan(id: number, data: Partial<PlanInput>): Promise<Plan>`, `deletePlan(id: number): Promise<void>`, `assignPlan(id: number, clientId: number): Promise<Plan>`; selectors `getPlans(state): Plan[]`, `getPlan(state, id): Plan | null`. This is the exact interface Task 6 (`PlanLibrary`), Task 7 (`PlanBuilder`), Task 8 (`AssignModal`), and Task 9 (`PlanScreen`) are built against.
 
 - [ ] **Step 1: Write the reducer**
 
@@ -378,7 +378,7 @@ interface ThunkArgs {
 export function createPlan( data: PlanInput ) {
 	return async ( { dispatch }: ThunkArgs ) => {
 		const plan: Plan = await apiFetch( {
-			path: '/nutrio/v1/plans',
+			path: '/merodiet/v1/plans',
 			method: 'POST',
 			data,
 		} );
@@ -392,7 +392,7 @@ export function createPlan( data: PlanInput ) {
 export function updatePlan( id: number, data: Partial< PlanInput > ) {
 	return async ( { dispatch }: ThunkArgs ) => {
 		const plan: Plan = await apiFetch( {
-			path: `/nutrio/v1/plans/${ id }`,
+			path: `/merodiet/v1/plans/${ id }`,
 			method: 'PATCH',
 			data,
 		} );
@@ -406,7 +406,7 @@ export function updatePlan( id: number, data: Partial< PlanInput > ) {
 export function deletePlan( id: number ) {
 	return async ( { dispatch }: ThunkArgs ) => {
 		await apiFetch( {
-			path: `/nutrio/v1/plans/${ id }`,
+			path: `/merodiet/v1/plans/${ id }`,
 			method: 'DELETE',
 		} );
 
@@ -417,7 +417,7 @@ export function deletePlan( id: number ) {
 export function assignPlan( id: number, clientId: number ) {
 	return async ( { dispatch }: ThunkArgs ) => {
 		const plan: Plan = await apiFetch( {
-			path: `/nutrio/v1/plans/${ id }/assign`,
+			path: `/merodiet/v1/plans/${ id }/assign`,
 			method: 'POST',
 			data: { client_id: clientId },
 		} );
@@ -446,7 +446,7 @@ interface ThunkArgs {
 
 export function getPlans() {
 	return async ( { dispatch }: ThunkArgs ) => {
-		const plans: Plan[] = await apiFetch( { path: '/nutrio/v1/plans' } );
+		const plans: Plan[] = await apiFetch( { path: '/merodiet/v1/plans' } );
 
 		dispatch.receivePlans( plans );
 	};
@@ -454,7 +454,7 @@ export function getPlans() {
 
 export function getPlan( id: number ) {
 	return async ( { dispatch }: ThunkArgs ) => {
-		const plan: Plan = await apiFetch( { path: `/nutrio/v1/plans/${ id }` } );
+		const plan: Plan = await apiFetch( { path: `/merodiet/v1/plans/${ id }` } );
 
 		dispatch.receivePlan( plan );
 	};
@@ -493,7 +493,7 @@ import * as actions from './actions';
 import * as selectors from './selectors';
 import * as resolvers from './resolvers';
 
-export const STORE_NAME = 'nutrio/plans';
+export const STORE_NAME = 'merodiet/plans';
 
 export const store = createReduxStore( STORE_NAME, {
 	reducer,
@@ -664,32 +664,32 @@ export default function ItemSearch( { onSelectFood, onSelectRecipe }: ItemSearch
 					className={ `${ styles.tab } ${ tab === 'recipes' ? styles.isActive : '' }`.trim() }
 					onClick={ () => setTab( 'recipes' ) }
 				>
-					{ __( 'My Recipes', 'nutrio' ) }
+					{ __( 'My Recipes', 'merodiet' ) }
 				</button>
 				<button
 					className={ `${ styles.tab } ${ tab === 'foods' ? styles.isActive : '' }`.trim() }
 					onClick={ () => setTab( 'foods' ) }
 				>
-					{ __( 'USDA Foods', 'nutrio' ) }
+					{ __( 'USDA Foods', 'merodiet' ) }
 				</button>
 			</div>
 
 			{ tab === 'recipes' && (
 				<>
-					<div className="nutrio-field" style={ { marginBottom: '12px' } }>
+					<div className="merodiet-field" style={ { marginBottom: '12px' } }>
 						<input
 							type="text"
 							value={ query }
 							onChange={ ( e ) => setQuery( e.target.value ) }
-							placeholder={ __( 'Search your recipes…', 'nutrio' ) }
+							placeholder={ __( 'Search your recipes…', 'merodiet' ) }
 						/>
 					</div>
 
 					{ filteredRecipes.length === 0 && (
 						<p style={ { fontSize: '12.5px', color: 'var(--ink-muted)' } }>
 							{ recipes.length === 0
-								? __( 'No recipes in your library yet.', 'nutrio' )
-								: __( 'No matches.', 'nutrio' ) }
+								? __( 'No recipes in your library yet.', 'merodiet' )
+								: __( 'No matches.', 'merodiet' ) }
 						</p>
 					) }
 
@@ -697,7 +697,7 @@ export default function ItemSearch( { onSelectFood, onSelectRecipe }: ItemSearch
 						<button key={ recipe.id } className={ styles.result } onClick={ () => onSelectRecipe( recipe ) }>
 							<div className={ styles.name }>{ recipe.name }</div>
 							<div className={ styles.meta }>
-								{ __( 'Servings:', 'nutrio' ) } { recipe.servings }
+								{ __( 'Servings:', 'merodiet' ) } { recipe.servings }
 							</div>
 						</button>
 					) ) }
@@ -818,7 +818,7 @@ interface PlanLibraryProps {
 export default function PlanLibrary( { plans, clients, isLoading, onAdd, onEdit, onDelete }: PlanLibraryProps ) {
 	const clientName = ( clientId: number | null ): string => {
 		const client = clients.find( ( c ) => c.id === clientId );
-		return client ? `${ client.first_name } ${ client.last_name }` : __( 'Unassigned', 'nutrio' );
+		return client ? `${ client.first_name } ${ client.last_name }` : __( 'Unassigned', 'merodiet' );
 	};
 
 	const avgDailyKcal = ( plan: Plan ): number | null => {
@@ -828,31 +828,31 @@ export default function PlanLibrary( { plans, clients, isLoading, onAdd, onEdit,
 
 	return (
 		<>
-			<div className="nutrio-topbar">
-				<h1>{ __( 'Meal plans', 'nutrio' ) }</h1>
+			<div className="merodiet-topbar">
+				<h1>{ __( 'Meal plans', 'merodiet' ) }</h1>
 				<Button variant="primary" onClick={ onAdd }>
 					<PlusIcon />
-					{ __( 'New plan', 'nutrio' ) }
+					{ __( 'New plan', 'merodiet' ) }
 				</Button>
 			</div>
 
 			<Panel>
-				<PanelBody className="nutrio-table-wrap">
-					{ isLoading && <p>{ __( 'Loading…', 'nutrio' ) }</p> }
+				<PanelBody className="merodiet-table-wrap">
+					{ isLoading && <p>{ __( 'Loading…', 'merodiet' ) }</p> }
 
 					{ ! isLoading && plans.length === 0 && (
-						<p>{ __( 'No plans yet. Build your first plan to start assigning nutrition to clients.', 'nutrio' ) }</p>
+						<p>{ __( 'No plans yet. Build your first plan to start assigning nutrition to clients.', 'merodiet' ) }</p>
 					) }
 
 					{ ! isLoading && plans.length > 0 && (
-						<table className="nutrio-table">
+						<table className="merodiet-table">
 							<thead>
 								<tr>
-									<th>{ __( 'Title', 'nutrio' ) }</th>
-									<th>{ __( 'Client', 'nutrio' ) }</th>
-									<th>{ __( 'Dates', 'nutrio' ) }</th>
-									<th>{ __( 'Avg. kcal/day', 'nutrio' ) }</th>
-									<th>{ __( 'Status', 'nutrio' ) }</th>
+									<th>{ __( 'Title', 'merodiet' ) }</th>
+									<th>{ __( 'Client', 'merodiet' ) }</th>
+									<th>{ __( 'Dates', 'merodiet' ) }</th>
+									<th>{ __( 'Avg. kcal/day', 'merodiet' ) }</th>
+									<th>{ __( 'Status', 'merodiet' ) }</th>
 									<th></th>
 								</tr>
 							</thead>
@@ -861,19 +861,19 @@ export default function PlanLibrary( { plans, clients, isLoading, onAdd, onEdit,
 									<tr key={ plan.id }>
 										<td style={ { fontWeight: 600 } }>{ plan.title }</td>
 										<td>{ clientName( plan.client_id ) }</td>
-										<td className="nutrio-mono">
+										<td className="merodiet-mono">
 											{ plan.start_date } – { plan.end_date }
 										</td>
-										<td className="nutrio-mono">{ formatAmount( avgDailyKcal( plan ), '' ) }</td>
+										<td className="merodiet-mono">{ formatAmount( avgDailyKcal( plan ), '' ) }</td>
 										<td>
 											<Chip tone={ plan.status === 'assigned' ? 'success' : 'clay' }>{ plan.status }</Chip>
 										</td>
 										<td>
-											<div className="nutrio-row-actions">
-												<IconButton label={ __( 'Open plan', 'nutrio' ) } onClick={ () => onEdit( plan.id ) }>
+											<div className="merodiet-row-actions">
+												<IconButton label={ __( 'Open plan', 'merodiet' ) } onClick={ () => onEdit( plan.id ) }>
 													<EditIcon />
 												</IconButton>
-												<IconButton label={ __( 'Remove plan', 'nutrio' ) } onClick={ () => onDelete( plan ) }>
+												<IconButton label={ __( 'Remove plan', 'merodiet' ) } onClick={ () => onDelete( plan ) }>
 													<TrashIcon />
 												</IconButton>
 											</div>
@@ -959,10 +959,10 @@ import { estimateDayNutrients, formatAmount } from '../../utils/nutrients';
 import type { MealType, Plan, PlanDayInput, PlanInput, PlanItem, PlanItemInput, Recipe, ResolvedFood } from '../../types';
 
 const MEAL_TYPES: { id: MealType; label: string }[] = [
-	{ id: 'breakfast', label: __( 'Breakfast', 'nutrio' ) },
-	{ id: 'lunch', label: __( 'Lunch', 'nutrio' ) },
-	{ id: 'dinner', label: __( 'Dinner', 'nutrio' ) },
-	{ id: 'snack', label: __( 'Snack', 'nutrio' ) },
+	{ id: 'breakfast', label: __( 'Breakfast', 'merodiet' ) },
+	{ id: 'lunch', label: __( 'Lunch', 'merodiet' ) },
+	{ id: 'dinner', label: __( 'Dinner', 'merodiet' ) },
+	{ id: 'snack', label: __( 'Snack', 'merodiet' ) },
 ];
 
 interface DraftItem extends PlanItemInput {
@@ -1004,7 +1004,7 @@ function draftItemFromApiItem( item: PlanItem ): DraftItem {
 		recipe_id: item.recipe_id ?? undefined,
 		quantity_grams: item.quantity_grams ?? undefined,
 		servings: item.servings ?? undefined,
-		label: item.food_description ?? item.recipe_name ?? __( '(unknown item)', 'nutrio' ),
+		label: item.food_description ?? item.recipe_name ?? __( '(unknown item)', 'merodiet' ),
 		nutrients: item.nutrients,
 		recipe_nutrient_totals_per_serving: item.recipe_nutrient_totals_per_serving,
 	};
@@ -1036,7 +1036,7 @@ export default function PlanBuilder( { plan, onSave, onCancel, onAssignClick }: 
 		if (
 			droppedItems.length > 0 &&
 			// eslint-disable-next-line no-alert
-			! window.confirm( __( 'Shortening the date range will remove items already added on the dropped days. Continue?', 'nutrio' ) )
+			! window.confirm( __( 'Shortening the date range will remove items already added on the dropped days. Continue?', 'merodiet' ) )
 		) {
 			return;
 		}
@@ -1208,7 +1208,7 @@ export default function PlanBuilder( { plan, onSave, onCancel, onAssignClick }: 
 
 	const handleCancel = () => {
 		// eslint-disable-next-line no-alert
-		if ( ! isDirty || window.confirm( __( 'Discard unsaved changes?', 'nutrio' ) ) ) {
+		if ( ! isDirty || window.confirm( __( 'Discard unsaved changes?', 'merodiet' ) ) ) {
 			onCancel();
 		}
 	};
@@ -1225,24 +1225,24 @@ export default function PlanBuilder( { plan, onSave, onCancel, onAssignClick }: 
 
 	return (
 		<>
-			<div className="nutrio-topbar">
+			<div className="merodiet-topbar">
 				<div style={ { display: 'flex', alignItems: 'center', gap: '12px' } }>
-					<h1>{ plan ? plan.title : __( 'New plan', 'nutrio' ) }</h1>
+					<h1>{ plan ? plan.title : __( 'New plan', 'merodiet' ) }</h1>
 					{ isDirty && <UnsavedBadge /> }
-					{ isReadOnly && <span style={ { fontSize: '12px', color: 'var(--ink-muted)' } }>{ __( 'Assigned — read only', 'nutrio' ) }</span> }
+					{ isReadOnly && <span style={ { fontSize: '12px', color: 'var(--ink-muted)' } }>{ __( 'Assigned — read only', 'merodiet' ) }</span> }
 				</div>
 				<div style={ { display: 'flex', gap: '10px' } }>
 					<Button variant="ghost" onClick={ handleCancel } disabled={ isSaving }>
-						{ isReadOnly ? __( 'Back', 'nutrio' ) : __( 'Cancel', 'nutrio' ) }
+						{ isReadOnly ? __( 'Back', 'merodiet' ) : __( 'Cancel', 'merodiet' ) }
 					</Button>
 					{ ! isReadOnly && (
 						<Button variant="primary" onClick={ handleSave } disabled={ isSaving || ! title }>
-							{ plan ? __( 'Save changes', 'nutrio' ) : __( 'Create plan', 'nutrio' ) }
+							{ plan ? __( 'Save changes', 'merodiet' ) : __( 'Create plan', 'merodiet' ) }
 						</Button>
 					) }
 					{ ! isReadOnly && plan && (
 						<Button variant="ghost" onClick={ onAssignClick } disabled={ isSaving || isDirty }>
-							{ __( 'Assign to client', 'nutrio' ) }
+							{ __( 'Assign to client', 'merodiet' ) }
 						</Button>
 					) }
 				</div>
@@ -1252,30 +1252,30 @@ export default function PlanBuilder( { plan, onSave, onCancel, onAssignClick }: 
 				<Panel>
 					<PanelBody>
 						<div className={ styles.nameRow } style={ { marginBottom: '16px' } }>
-							<div className="nutrio-field">
-								<label htmlFor="nutrio-plan-title">{ __( 'Plan title', 'nutrio' ) }</label>
+							<div className="merodiet-field">
+								<label htmlFor="merodiet-plan-title">{ __( 'Plan title', 'merodiet' ) }</label>
 								<input
-									id="nutrio-plan-title"
+									id="merodiet-plan-title"
 									type="text"
 									value={ title }
 									onChange={ ( e ) => setTitle( e.target.value ) }
 									disabled={ isReadOnly }
 								/>
 							</div>
-							<div className="nutrio-field">
-								<label htmlFor="nutrio-plan-start">{ __( 'Start date', 'nutrio' ) }</label>
+							<div className="merodiet-field">
+								<label htmlFor="merodiet-plan-start">{ __( 'Start date', 'merodiet' ) }</label>
 								<input
-									id="nutrio-plan-start"
+									id="merodiet-plan-start"
 									type="date"
 									value={ startDate }
 									onChange={ ( e ) => applyDateRange( e.target.value, endDate ) }
 									disabled={ isReadOnly }
 								/>
 							</div>
-							<div className="nutrio-field">
-								<label htmlFor="nutrio-plan-end">{ __( 'End date', 'nutrio' ) }</label>
+							<div className="merodiet-field">
+								<label htmlFor="merodiet-plan-end">{ __( 'End date', 'merodiet' ) }</label>
 								<input
-									id="nutrio-plan-end"
+									id="merodiet-plan-end"
 									type="date"
 									value={ endDate }
 									onChange={ ( e ) => applyDateRange( startDate, e.target.value ) }
@@ -1291,7 +1291,7 @@ export default function PlanBuilder( { plan, onSave, onCancel, onAssignClick }: 
 									className={ `${ styles.dayTab } ${ day.day_offset === activeDayOffset ? styles.isActive : '' }`.trim() }
 									onClick={ () => setActiveDayOffset( day.day_offset ) }
 								>
-									{ __( 'Day', 'nutrio' ) } { day.day_offset + 1 }
+									{ __( 'Day', 'merodiet' ) } { day.day_offset + 1 }
 									<span className={ styles.dayTabDate }>{ addDays( startDate, day.day_offset ) }</span>
 								</button>
 							) ) }
@@ -1306,14 +1306,14 @@ export default function PlanBuilder( { plan, onSave, onCancel, onAssignClick }: 
 										<h3>{ meal.label }</h3>
 										{ ! isReadOnly && (
 											<button className={ styles.addBtn } onClick={ () => setAddingTo( meal.id ) }>
-												+ { __( 'Add', 'nutrio' ) }
+												+ { __( 'Add', 'merodiet' ) }
 											</button>
 										) }
 									</div>
 
 									{ mealItems.length === 0 && (
 										<p style={ { fontSize: '12px', color: 'var(--ink-faint)', padding: '6px 0' } }>
-											{ __( 'Nothing added yet.', 'nutrio' ) }
+											{ __( 'Nothing added yet.', 'merodiet' ) }
 										</p>
 									) }
 
@@ -1340,11 +1340,11 @@ export default function PlanBuilder( { plan, onSave, onCancel, onAssignClick }: 
 													disabled={ isReadOnly }
 												/>
 											) }
-											<div className="nutrio-mono" style={ { fontSize: '12px', color: 'var(--ink-faint)' } }>
-												{ item.food_id ? __( 'g', 'nutrio' ) : __( 'srv', 'nutrio' ) }
+											<div className="merodiet-mono" style={ { fontSize: '12px', color: 'var(--ink-faint)' } }>
+												{ item.food_id ? __( 'g', 'merodiet' ) : __( 'srv', 'merodiet' ) }
 											</div>
 											{ ! isReadOnly && (
-												<button className={ styles.removeBtn } onClick={ () => removeItem( meal.id, index ) } aria-label={ __( 'Remove item', 'nutrio' ) }>
+												<button className={ styles.removeBtn } onClick={ () => removeItem( meal.id, index ) } aria-label={ __( 'Remove item', 'merodiet' ) }>
 													<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
 														<path d="M18 6 6 18M6 6l12 12" />
 													</svg>
@@ -1357,23 +1357,23 @@ export default function PlanBuilder( { plan, onSave, onCancel, onAssignClick }: 
 						} ) }
 
 						<div style={ { marginTop: '16px' } }>
-							<h3 style={ { fontSize: '14px', fontWeight: 700, marginBottom: '10px' } }>{ __( 'Day totals', 'nutrio' ) }</h3>
+							<h3 style={ { fontSize: '14px', fontWeight: 700, marginBottom: '10px' } }>{ __( 'Day totals', 'merodiet' ) }</h3>
 							<div className={ styles.nutrientGrid }>
 								<div className={ styles.nutrientTile }>
 									<div className={ styles.nutrientVal }>{ formatAmount( summary.kcal, ' kcal' ) }</div>
-									<div className={ styles.nutrientLbl }>{ __( 'Kcal', 'nutrio' ) }</div>
+									<div className={ styles.nutrientLbl }>{ __( 'Kcal', 'merodiet' ) }</div>
 								</div>
 								<div className={ styles.nutrientTile }>
 									<div className={ styles.nutrientVal }>{ formatAmount( summary.protein ) }</div>
-									<div className={ styles.nutrientLbl }>{ __( 'Protein', 'nutrio' ) }</div>
+									<div className={ styles.nutrientLbl }>{ __( 'Protein', 'merodiet' ) }</div>
 								</div>
 								<div className={ styles.nutrientTile }>
 									<div className={ styles.nutrientVal }>{ formatAmount( summary.carbs ) }</div>
-									<div className={ styles.nutrientLbl }>{ __( 'Carbs', 'nutrio' ) }</div>
+									<div className={ styles.nutrientLbl }>{ __( 'Carbs', 'merodiet' ) }</div>
 								</div>
 								<div className={ styles.nutrientTile }>
 									<div className={ styles.nutrientVal }>{ formatAmount( summary.fat ) }</div>
-									<div className={ styles.nutrientLbl }>{ __( 'Fat', 'nutrio' ) }</div>
+									<div className={ styles.nutrientLbl }>{ __( 'Fat', 'merodiet' ) }</div>
 								</div>
 							</div>
 						</div>
@@ -1383,14 +1383,14 @@ export default function PlanBuilder( { plan, onSave, onCancel, onAssignClick }: 
 				{ ! isReadOnly && (
 					<Panel>
 						<PanelHead>
-							<h3>{ addingTo ? __( 'Add to', 'nutrio' ) + ' ' + MEAL_TYPES.find( ( m ) => m.id === addingTo )?.label : __( 'Select a meal slot', 'nutrio' ) }</h3>
+							<h3>{ addingTo ? __( 'Add to', 'merodiet' ) + ' ' + MEAL_TYPES.find( ( m ) => m.id === addingTo )?.label : __( 'Select a meal slot', 'merodiet' ) }</h3>
 						</PanelHead>
 						<PanelBody>
 							{ addingTo ? (
 								<ItemSearch onSelectFood={ addFoodItem } onSelectRecipe={ addRecipeItem } />
 							) : (
 								<p style={ { fontSize: '12.5px', color: 'var(--ink-muted)' } }>
-									{ __( 'Click "+ Add" on a meal above to search for a food or recipe.', 'nutrio' ) }
+									{ __( 'Click "+ Add" on a meal above to search for a food or recipe.', 'merodiet' ) }
 								</p>
 							) }
 						</PanelBody>
@@ -1638,16 +1638,16 @@ export default function AssignModal( { isOpen, plan, clients, onAssign, onClose 
 	return (
 		<div className={ styles.modalScrim } onClick={ ( e ) => e.target === e.currentTarget && onClose() }>
 			<div className={ styles.modal }>
-				<h3>{ __( 'Assign to client', 'nutrio' ) }</h3>
+				<h3>{ __( 'Assign to client', 'merodiet' ) }</h3>
 
-				<div className="nutrio-field" style={ { marginBottom: '14px' } }>
-					<label htmlFor="nutrio-assign-client">{ __( 'Client', 'nutrio' ) }</label>
+				<div className="merodiet-field" style={ { marginBottom: '14px' } }>
+					<label htmlFor="merodiet-assign-client">{ __( 'Client', 'merodiet' ) }</label>
 					<select
-						id="nutrio-assign-client"
+						id="merodiet-assign-client"
 						value={ selectedClientId ?? '' }
 						onChange={ ( e ) => setSelectedClientId( e.target.value ? Number( e.target.value ) : null ) }
 					>
-						<option value="">{ __( 'Select a client…', 'nutrio' ) }</option>
+						<option value="">{ __( 'Select a client…', 'merodiet' ) }</option>
 						{ clients.map( ( client ) => (
 							<option key={ client.id } value={ client.id }>
 								{ client.first_name } { client.last_name }
@@ -1660,7 +1660,7 @@ export default function AssignModal( { isOpen, plan, clients, onAssign, onClose 
 					<p className={ styles.conflictWarning }>
 						{ sprintf(
 							/* translators: %s: comma-separated list of the client's declared allergies found in this plan */
-							__( 'This plan contains an item matching this client’s declared allergies: %s. Assignment is blocked.', 'nutrio' ),
+							__( 'This plan contains an item matching this client’s declared allergies: %s. Assignment is blocked.', 'merodiet' ),
 							conflicts.join( ', ' )
 						) }
 					</p>
@@ -1673,10 +1673,10 @@ export default function AssignModal( { isOpen, plan, clients, onAssign, onClose 
 						disabled={ ! selectedClientId || conflicts.length > 0 || isAssigning }
 						style={ { justifyContent: 'center' } }
 					>
-						{ __( 'Assign', 'nutrio' ) }
+						{ __( 'Assign', 'merodiet' ) }
 					</Button>
 					<Button variant="ghost" onClick={ onClose } disabled={ isAssigning } style={ { justifyContent: 'center' } }>
-						{ __( 'Cancel', 'nutrio' ) }
+						{ __( 'Cancel', 'merodiet' ) }
 					</Button>
 				</div>
 			</div>
@@ -1821,7 +1821,7 @@ export default function PlanScreen() {
 
 	const handleDelete = ( plan: Plan ) => {
 		// eslint-disable-next-line no-alert
-		if ( window.confirm( __( 'Remove this plan? This cannot be undone.', 'nutrio' ) ) ) {
+		if ( window.confirm( __( 'Remove this plan? This cannot be undone.', 'merodiet' ) ) ) {
 			deletePlan( plan.id );
 		}
 	};

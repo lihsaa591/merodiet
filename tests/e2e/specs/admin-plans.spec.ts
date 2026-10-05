@@ -3,7 +3,7 @@ import { test, expect } from '../fixtures/admin-session';
 test( 'plans list names the assigned client and links to their detail page', async ( {
 	adminPage,
 } ) => {
-	await adminPage.goto( '/wp-admin/admin.php?page=nutrio&view=plans' );
+	await adminPage.goto( '/wp-admin/admin.php?page=merodiet&view=plans' );
 	await adminPage.waitForLoadState( 'networkidle' );
 
 	const row = adminPage.getByRole( 'row', { name: /E2E Seed Plan/ } );

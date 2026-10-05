@@ -2,15 +2,15 @@
 /**
  * Main plugin class.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio;
+namespace MeroDiet;
 
 use League\Container\Container;
-use Nutrio\Contracts\ServiceProviderInterface;
+use MeroDiet\Contracts\ServiceProviderInterface;
 
 /**
  * Owns the DI container and the two-phase provider boot sequence:
@@ -113,11 +113,11 @@ final class Plugin {
 		$this->booted = true;
 
 		/**
-		 * Fires once Nutrio and all of its registered providers have booted.
+		 * Fires once MeroDiet and all of its registered providers have booted.
 		 *
 		 * @param Plugin $plugin The booted plugin instance.
 		 */
-		do_action( 'nutrio_booted', $this );
+		do_action( 'merodiet_booted', $this );
 	}
 
 	/**

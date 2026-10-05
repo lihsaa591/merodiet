@@ -19,32 +19,32 @@ const EXTRA_NUTRIENTS: Record<
 > = {
 	1258: {
 		key: 'saturatedFat',
-		label: __( 'Saturated fat', 'nutrio' ),
+		label: __( 'Saturated fat', 'merodiet' ),
 		unit: 'g',
 	},
-	1079: { key: 'fiber', label: __( 'Fiber', 'nutrio' ), unit: 'g' },
-	2000: { key: 'sugar', label: __( 'Sugar', 'nutrio' ), unit: 'g' },
-	1093: { key: 'sodium', label: __( 'Sodium', 'nutrio' ), unit: 'mg' },
+	1079: { key: 'fiber', label: __( 'Fiber', 'merodiet' ), unit: 'g' },
+	2000: { key: 'sugar', label: __( 'Sugar', 'merodiet' ), unit: 'g' },
+	1093: { key: 'sodium', label: __( 'Sodium', 'merodiet' ), unit: 'mg' },
 	1253: {
 		key: 'cholesterol',
-		label: __( 'Cholesterol', 'nutrio' ),
+		label: __( 'Cholesterol', 'merodiet' ),
 		unit: 'mg',
 	},
 	1092: {
 		key: 'potassium',
-		label: __( 'Potassium', 'nutrio' ),
+		label: __( 'Potassium', 'merodiet' ),
 		unit: 'mg',
 	},
-	1087: { key: 'calcium', label: __( 'Calcium', 'nutrio' ), unit: 'mg' },
-	1089: { key: 'iron', label: __( 'Iron', 'nutrio' ), unit: 'mg' },
+	1087: { key: 'calcium', label: __( 'Calcium', 'merodiet' ), unit: 'mg' },
+	1089: { key: 'iron', label: __( 'Iron', 'merodiet' ), unit: 'mg' },
 	1162: {
 		key: 'vitaminC',
-		label: __( 'Vitamin C', 'nutrio' ),
+		label: __( 'Vitamin C', 'merodiet' ),
 		unit: 'mg',
 	},
 	1114: {
 		key: 'vitaminD',
-		label: __( 'Vitamin D', 'nutrio' ),
+		label: __( 'Vitamin D', 'merodiet' ),
 		unit: 'mcg',
 	},
 };

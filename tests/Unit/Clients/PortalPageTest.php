@@ -1,19 +1,19 @@
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Clients;
+namespace MeroDiet\Tests\Unit\Clients;
 
 use Brain\Monkey\Functions;
-use Nutrio\Clients\ClientInviteService;
-use Nutrio\Clients\PortalPage;
-use Nutrio\Email\EmailTemplateService;
-use Nutrio\Email\Mailer;
-use Nutrio\Repositories\ClientRepository;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Clients\ClientInviteService;
+use MeroDiet\Clients\PortalPage;
+use MeroDiet\Email\EmailTemplateService;
+use MeroDiet\Email\Mailer;
+use MeroDiet\Repositories\ClientRepository;
+use MeroDiet\Tests\TestCase;
 use WP_User;
 
 final class PortalPageTest extends TestCase {
@@ -26,11 +26,11 @@ final class PortalPageTest extends TestCase {
 		$page    = new PortalPage( $clients, new Mailer( new EmailTemplateService() ) );
 
 		$user = $this->createMock( WP_User::class );
-		$user->method( 'has_cap' )->with( 'view_own_nutrio_plan' )->willReturn( true );
+		$user->method( 'has_cap' )->with( 'view_own_merodiet_plan' )->willReturn( true );
 
 		$result = $page->filter_login_redirect( 'https://example.test/wp-admin/', '', $user );
 
-		self::assertSame( 'https://example.test/?nutrio_portal=1', $result );
+		self::assertSame( 'https://example.test/?merodiet_portal=1', $result );
 	}
 
 	public function test_filter_login_redirect_leaves_a_practitioner_untouched(): void {
@@ -38,7 +38,7 @@ final class PortalPageTest extends TestCase {
 		$page    = new PortalPage( $clients, new Mailer( new EmailTemplateService() ) );
 
 		$user = $this->createMock( WP_User::class );
-		$user->method( 'has_cap' )->with( 'view_own_nutrio_plan' )->willReturn( false );
+		$user->method( 'has_cap' )->with( 'view_own_merodiet_plan' )->willReturn( false );
 
 		$result = $page->filter_login_redirect( 'https://example.test/wp-admin/', '', $user );
 
@@ -56,7 +56,7 @@ final class PortalPageTest extends TestCase {
 	 */
 	public function test_current_user_is_a_linked_client_ignores_a_url_supplied_client_id_and_uses_only_the_session_identity(): void {
 		$user = $this->createMock( WP_User::class );
-		$user->method( 'has_cap' )->with( 'view_own_nutrio_plan' )->willReturn( true );
+		$user->method( 'has_cap' )->with( 'view_own_merodiet_plan' )->willReturn( true );
 		$user->ID = 42;
 
 		$clients = $this->createMock( ClientRepository::class );
@@ -80,7 +80,7 @@ final class PortalPageTest extends TestCase {
 
 	public function test_current_user_is_a_linked_client_is_false_when_the_user_has_the_capability_but_no_linked_client_row(): void {
 		$user = $this->createMock( WP_User::class );
-		$user->method( 'has_cap' )->with( 'view_own_nutrio_plan' )->willReturn( true );
+		$user->method( 'has_cap' )->with( 'view_own_merodiet_plan' )->willReturn( true );
 		$user->ID = 42;
 
 		$clients = $this->createMock( ClientRepository::class );
@@ -92,7 +92,7 @@ final class PortalPageTest extends TestCase {
 	}
 
 	/**
-	 * [nutrio_client_portal] must never show a login form to a visitor
+	 * [merodiet_client_portal] must never show a login form to a visitor
 	 * who's already a logged-in, linked client — they'd have nothing to
 	 * log in for. It links to the dedicated portal page instead.
 	 */
@@ -101,7 +101,7 @@ final class PortalPageTest extends TestCase {
 		Functions\when( 'is_user_logged_in' )->justReturn( true );
 
 		$user = $this->createMock( WP_User::class );
-		$user->method( 'has_cap' )->with( 'view_own_nutrio_plan' )->willReturn( true );
+		$user->method( 'has_cap' )->with( 'view_own_merodiet_plan' )->willReturn( true );
 		$user->ID = 42;
 		Functions\when( 'wp_get_current_user' )->justReturn( $user );
 
@@ -111,7 +111,7 @@ final class PortalPageTest extends TestCase {
 		$page   = new PortalPage( $clients, new Mailer( new EmailTemplateService() ) );
 		$output = $page->render_shortcode();
 
-		self::assertStringContainsString( 'https://example.test/?nutrio_portal=1', $output );
+		self::assertStringContainsString( 'https://example.test/?merodiet_portal=1', $output );
 		self::assertStringNotContainsString( '<form', $output );
 	}
 
@@ -133,11 +133,11 @@ final class PortalPageTest extends TestCase {
 		self::assertStringContainsString( '<form', $output );
 		self::assertStringContainsString( 'name="redirect_to"', $output );
 		self::assertStringContainsString( 'https://example.test/clients/', $output );
-		self::assertStringContainsString( 'action="https://example.test/?nutrio_portal=1"', $output );
+		self::assertStringContainsString( 'action="https://example.test/?merodiet_portal=1"', $output );
 
-		// The toggle calls window.nutrioTogglePortalTheme(), which is only
+		// The toggle calls window.merodietTogglePortalTheme(), which is only
 		// ever defined on the dedicated page's own <head> — dead here.
-		self::assertStringNotContainsString( 'nutrio-portal-theme-toggle', $output );
+		self::assertStringNotContainsString( 'merodiet-portal-theme-toggle', $output );
 
 		// Defaults to light — there's no toggle or saved localStorage
 		// choice to read here (see render_shortcode()'s own docblock).
@@ -171,14 +171,14 @@ final class PortalPageTest extends TestCase {
 		Functions\when( 'is_user_logged_in' )->justReturn( false );
 		Functions\when( 'remove_query_arg' )->justReturn( 'https://example.test/clients/' );
 
-		$_GET['nutrio_login_error'] = 'invalid_nonce';
+		$_GET['merodiet_login_error'] = 'invalid_nonce';
 
 		$clients = $this->createMock( ClientRepository::class );
 		$page    = new PortalPage( $clients, new Mailer( new EmailTemplateService() ) );
 
 		$output = $page->render_shortcode();
 
-		unset( $_GET['nutrio_login_error'] );
+		unset( $_GET['merodiet_login_error'] );
 
 		self::assertStringContainsString( 'Your session expired', $output );
 	}
@@ -195,7 +195,7 @@ final class PortalPageTest extends TestCase {
 		Functions\when( 'esc_html' )->returnArg( 1 );
 
 		$user = $this->createMock( WP_User::class );
-		$user->method( 'has_cap' )->with( 'view_own_nutrio_plan' )->willReturn( true );
+		$user->method( 'has_cap' )->with( 'view_own_merodiet_plan' )->willReturn( true );
 		$user->ID = 42;
 
 		$clients = $this->createMock( ClientRepository::class );
@@ -235,7 +235,7 @@ final class PortalPageTest extends TestCase {
 		Functions\when( 'esc_html' )->returnArg( 1 );
 
 		$user = $this->createMock( WP_User::class );
-		$user->method( 'has_cap' )->with( 'view_own_nutrio_plan' )->willReturn( true );
+		$user->method( 'has_cap' )->with( 'view_own_merodiet_plan' )->willReturn( true );
 		$user->ID = 42;
 
 		$clients = $this->createMock( ClientRepository::class );
@@ -271,7 +271,7 @@ final class PortalPageTest extends TestCase {
 		Functions\when( 'esc_html' )->returnArg( 1 );
 
 		$user = $this->createMock( WP_User::class );
-		$user->method( 'has_cap' )->with( 'view_own_nutrio_plan' )->willReturn( true );
+		$user->method( 'has_cap' )->with( 'view_own_merodiet_plan' )->willReturn( true );
 		$user->ID = 42;
 
 		$clients = $this->createMock( ClientRepository::class );
@@ -300,7 +300,7 @@ final class PortalPageTest extends TestCase {
 	 */
 	public function test_customize_reset_password_email_and_subject_are_untouched_when_the_user_has_no_linked_client_row(): void {
 		$user = $this->createMock( WP_User::class );
-		$user->method( 'has_cap' )->with( 'view_own_nutrio_plan' )->willReturn( true );
+		$user->method( 'has_cap' )->with( 'view_own_merodiet_plan' )->willReturn( true );
 		$user->ID = 42;
 
 		$clients = $this->createMock( ClientRepository::class );

@@ -12,13 +12,13 @@
 
 ## Global Constraints
 
-- **Pre-ship migration policy (Nutrio-specific, temporary):** since this plugin has not shipped to any external site yet, edit the existing `database/migrations/2026_09_08_000000_create_clients_table.php` migration directly to add the new column — do NOT create a new migration file for it. After editing, the user's own local dev database (which already ran the original migration) needs the equivalent `ALTER TABLE` run once via WP-CLI, since editing the file alone doesn't retroactively re-run it — see Task 1.
-- Every REST route must pass an explicit `required_capability` — for every route in this plan, that's `'view_own_nutrio_plan'` (all routes live on `MeController`, which already enforces this via `AbstractClientController`).
+- **Pre-ship migration policy (MeroDiet-specific, temporary):** since this plugin has not shipped to any external site yet, edit the existing `database/migrations/2026_09_08_000000_create_clients_table.php` migration directly to add the new column — do NOT create a new migration file for it. After editing, the user's own local dev database (which already ran the original migration) needs the equivalent `ALTER TABLE` run once via WP-CLI, since editing the file alone doesn't retroactively re-run it — see Task 1.
+- Every REST route must pass an explicit `required_capability` — for every route in this plan, that's `'view_own_merodiet_plan'` (all routes live on `MeController`, which already enforces this via `AbstractClientController`).
 - No route may accept a client identifier from the request — identity is always resolved via `current_client_id()` (already established pattern).
-- Every user-facing string goes through `__( '...', 'nutrio' )` (PHP) / `__( '...', 'nutrio' )` from `@wordpress/i18n` (JS).
+- Every user-facing string goes through `__( '...', 'merodiet' )` (PHP) / `__( '...', 'merodiet' )` from `@wordpress/i18n` (JS).
 - `composer test`, `vendor/bin/phpcs`, `vendor/bin/phpstan analyse`, `npm run check-types`, `npx wp-scripts lint-js`, `npm run build` must all stay green after every task.
 - Commit style: `feat: ...` subject, trailer EXACTLY `Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>`.
-- Work happens directly in `/Users/aashilbijukshe/nutrio` (no worktree) — this is also the user's live Local-by-Flywheel site's plugin directory (a symlink), so every change here is immediately testable on their actual site once rebuilt.
+- Work happens directly in `/Users/aashilbijukshe/merodiet` (no worktree) — this is also the user's live Local-by-Flywheel site's plugin directory (a symlink), so every change here is immediately testable on their actual site once rebuilt.
 
 ---
 
@@ -29,7 +29,7 @@
 - Modify: `includes/Repositories/ClientRepository.php`
 
 **Interfaces:**
-- Produces: `avatar_id` column on `wp_nutrio_clients`; `ClientRepository::update()` accepts an `avatar_id` key in its `$data` array; `ClientRepository::hydrate()` (private, but its output shape matters) adds `avatar_url: string|null` to every returned client row, computed from `avatar_id` via `wp_get_attachment_url()`.
+- Produces: `avatar_id` column on `wp_merodiet_clients`; `ClientRepository::update()` accepts an `avatar_id` key in its `$data` array; `ClientRepository::hydrate()` (private, but its output shape matters) adds `avatar_url: string|null` to every returned client row, computed from `avatar_id` via `wp_get_attachment_url()`.
 
 - [ ] **Step 1: Edit the migration**
 
@@ -65,12 +65,12 @@ This column needs to exist on the user's already-created local table. Run (adjus
 
 ```bash
 SOCK="/Users/aashilbijukshe/Library/Application Support/Local/run/DSWlm2MkK/mysql/mysqld.sock"
-php -d mysqli.default_socket="$SOCK" -d pdo_mysql.default_socket="$SOCK" $(which wp) db query "ALTER TABLE wp_nutrio_clients ADD COLUMN avatar_id BIGINT UNSIGNED NULL AFTER user_id, ADD KEY avatar_id (avatar_id);" --path=$(find "/Users/aashilbijukshe/Local Sites" -maxdepth 4 -type d -name "public" | head -1)
+php -d mysqli.default_socket="$SOCK" -d pdo_mysql.default_socket="$SOCK" $(which wp) db query "ALTER TABLE wp_merodiet_clients ADD COLUMN avatar_id BIGINT UNSIGNED NULL AFTER user_id, ADD KEY avatar_id (avatar_id);" --path=$(find "/Users/aashilbijukshe/Local Sites" -maxdepth 4 -type d -name "public" | head -1)
 ```
 
 If the socket path or `wp` install path has changed since this was last used, find them fresh: `find "/Users/aashilbijukshe/Library/Application Support/Local/run" -name "mysqld.sock" 2>/dev/null` and `find "/Users/aashilbijukshe/Local Sites" -maxdepth 2 -type d`.
 
-Verify it worked: `wp db query "DESCRIBE wp_nutrio_clients;"` (with the same socket override) should list `avatar_id`.
+Verify it worked: `wp db query "DESCRIBE wp_merodiet_clients;"` (with the same socket override) should list `avatar_id`.
 
 - [ ] **Step 3: Update `ClientRepository`**
 
@@ -118,7 +118,7 @@ EOF
 
 **Interfaces:**
 - Consumes: `ClientRepository::find_for_user()` (existing), `ClientRepository::update()` (Task 1's extended version).
-- Produces: `GET /nutrio/v1/me/profile` (returns the caller's own hydrated client row), `PATCH /nutrio/v1/me/profile` (accepts `first_name`, `last_name`, `email`, `goals`, `dietary_restrictions`, `allergies`).
+- Produces: `GET /merodiet/v1/me/profile` (returns the caller's own hydrated client row), `PATCH /merodiet/v1/me/profile` (accepts `first_name`, `last_name`, `email`, `goals`, `dietary_restrictions`, `allergies`).
 
 - [ ] **Step 1: Read `MeController.php` first**, to see the exact existing route-registration and handler patterns (`get_plan()`, `list_logs()` etc.) this task must match.
 
@@ -131,7 +131,7 @@ $this->register_route(
         'methods'  => WP_REST_Server::READABLE,
         'callback' => array( $this, 'get_profile' ),
     ),
-    required_capability: 'view_own_nutrio_plan'
+    required_capability: 'view_own_merodiet_plan'
 );
 
 $this->register_route(
@@ -141,7 +141,7 @@ $this->register_route(
         'callback' => array( $this, 'update_profile' ),
         'args'     => self::profile_write_args(),
     ),
-    required_capability: 'view_own_nutrio_plan'
+    required_capability: 'view_own_merodiet_plan'
 );
 ```
 
@@ -261,7 +261,7 @@ EOF
 
 **Interfaces:**
 - Consumes: `ClientRepository::update()` (Task 1).
-- Produces: `POST /nutrio/v1/me/profile/avatar` — accepts a single uploaded file under the `avatar` field name, returns the updated client row (with the new `avatar_url`).
+- Produces: `POST /merodiet/v1/me/profile/avatar` — accepts a single uploaded file under the `avatar` field name, returns the updated client row (with the new `avatar_url`).
 
 - [ ] **Step 1: Add the route**, after the profile routes:
 
@@ -272,7 +272,7 @@ $this->register_route(
         'methods'  => WP_REST_Server::CREATABLE,
         'callback' => array( $this, 'upload_avatar' ),
     ),
-    required_capability: 'view_own_nutrio_plan'
+    required_capability: 'view_own_merodiet_plan'
 );
 ```
 
@@ -295,7 +295,7 @@ public function upload_avatar( WP_REST_Request $request ): WP_REST_Response|WP_E
     $files = $request->get_file_params();
 
     if ( empty( $files['avatar'] ) ) {
-        return $this->error( 'nutrio_missing_file', __( 'No image file was uploaded.', 'nutrio' ), 400 );
+        return $this->error( 'merodiet_missing_file', __( 'No image file was uploaded.', 'merodiet' ), 400 );
     }
 
     if ( ! function_exists( 'media_handle_upload' ) ) {
@@ -307,7 +307,7 @@ public function upload_avatar( WP_REST_Request $request ): WP_REST_Response|WP_E
     $allowed_types = array( 'image/jpeg', 'image/png', 'image/webp' );
 
     if ( ! in_array( $files['avatar']['type'], $allowed_types, true ) ) {
-        return $this->error( 'nutrio_invalid_file_type', __( 'Please upload a JPEG, PNG, or WebP image.', 'nutrio' ), 400 );
+        return $this->error( 'merodiet_invalid_file_type', __( 'Please upload a JPEG, PNG, or WebP image.', 'merodiet' ), 400 );
     }
 
     $attachment_id = media_handle_upload( 'avatar', 0 );
@@ -349,7 +349,7 @@ EOF
 - Modify: `includes/RestApi/MeController.php`
 
 **Interfaces:**
-- Produces: `POST /nutrio/v1/me/password` — accepts `new_password`/`confirm_password`, changes the caller's own password, and re-authenticates them (changing your own password via `wp_set_password()` clears your auth cookie).
+- Produces: `POST /merodiet/v1/me/password` — accepts `new_password`/`confirm_password`, changes the caller's own password, and re-authenticates them (changing your own password via `wp_set_password()` clears your auth cookie).
 
 - [ ] **Step 1: Add the route**, after the avatar route:
 
@@ -370,7 +370,7 @@ $this->register_route(
             ),
         ),
     ),
-    required_capability: 'view_own_nutrio_plan'
+    required_capability: 'view_own_merodiet_plan'
 );
 ```
 
@@ -398,11 +398,11 @@ public function change_password( WP_REST_Request $request ): WP_REST_Response|WP
     $confirm_password = (string) $request->get_param( 'confirm_password' );
 
     if ( strlen( $new_password ) < 8 ) {
-        return $this->error( 'nutrio_password_too_short', __( 'Your new password must be at least 8 characters.', 'nutrio' ), 400 );
+        return $this->error( 'merodiet_password_too_short', __( 'Your new password must be at least 8 characters.', 'merodiet' ), 400 );
     }
 
     if ( $new_password !== $confirm_password ) {
-        return $this->error( 'nutrio_password_mismatch', __( 'The two passwords you entered do not match.', 'nutrio' ), 400 );
+        return $this->error( 'merodiet_password_mismatch', __( 'The two passwords you entered do not match.', 'merodiet' ), 400 );
     }
 
     $current_user = wp_get_current_user();
@@ -534,7 +534,7 @@ export default function PasswordChangeModal( {
 
 		try {
 			await apiFetch( {
-				path: '/nutrio/v1/me/password',
+				path: '/merodiet/v1/me/password',
 				method: 'POST',
 				data: {
 					new_password: newPassword,
@@ -551,7 +551,7 @@ export default function PasswordChangeModal( {
 					? error.message
 					: __(
 							'Something went wrong — please try again.',
-							'nutrio'
+							'merodiet'
 					  );
 			setErrorMessage( message );
 		} finally {
@@ -565,17 +565,17 @@ export default function PasswordChangeModal( {
 			onClick={ ( e ) => e.target === e.currentTarget && handleClose() }
 		>
 			<div className={ styles.modal }>
-				<h3>{ __( 'Change Password', 'nutrio' ) }</h3>
+				<h3>{ __( 'Change Password', 'merodiet' ) }</h3>
 				{ isDone ? (
 					<>
 						<p>
 							{ __(
 								'Your password has been changed.',
-								'nutrio'
+								'merodiet'
 							) }
 						</p>
 						<Button variant="primary" onClick={ handleClose }>
-							{ __( 'Done', 'nutrio' ) }
+							{ __( 'Done', 'merodiet' ) }
 						</Button>
 					</>
 				) : (
@@ -583,12 +583,12 @@ export default function PasswordChangeModal( {
 						{ errorMessage && (
 							<p className={ styles.error }>{ errorMessage }</p>
 						) }
-						<div className="nutrio-field">
-							<label htmlFor="nutrio-new-password">
-								{ __( 'New Password', 'nutrio' ) }
+						<div className="merodiet-field">
+							<label htmlFor="merodiet-new-password">
+								{ __( 'New Password', 'merodiet' ) }
 							</label>
 							<input
-								id="nutrio-new-password"
+								id="merodiet-new-password"
 								type="password"
 								value={ newPassword }
 								onChange={ ( event ) =>
@@ -598,12 +598,12 @@ export default function PasswordChangeModal( {
 								minLength={ 8 }
 							/>
 						</div>
-						<div className="nutrio-field">
-							<label htmlFor="nutrio-confirm-password">
-								{ __( 'Confirm New Password', 'nutrio' ) }
+						<div className="merodiet-field">
+							<label htmlFor="merodiet-confirm-password">
+								{ __( 'Confirm New Password', 'merodiet' ) }
 							</label>
 							<input
-								id="nutrio-confirm-password"
+								id="merodiet-confirm-password"
 								type="password"
 								value={ confirmPassword }
 								onChange={ ( event ) =>
@@ -619,7 +619,7 @@ export default function PasswordChangeModal( {
 								variant="primary"
 								disabled={ isSaving }
 							>
-								{ __( 'Save Password', 'nutrio' ) }
+								{ __( 'Save Password', 'merodiet' ) }
 							</Button>
 							<Button
 								type="button"
@@ -627,7 +627,7 @@ export default function PasswordChangeModal( {
 								onClick={ handleClose }
 								disabled={ isSaving }
 							>
-								{ __( 'Cancel', 'nutrio' ) }
+								{ __( 'Cancel', 'merodiet' ) }
 							</Button>
 						</div>
 					</form>
@@ -706,7 +706,7 @@ EOF
 - Consumes: `Client` type (Task 5), `PasswordChangeModal` (Task 6), the existing `Drawer`/`Button` components.
 - Produces: `<ProfileDrawer isOpen={boolean} onClose={() => void} />` — consumed by Task 8.
 
-- [ ] **Step 1: Read `src/screens/clients/ClientForm.tsx` first** — mirror its field-editing pattern (local form state, one `setField` helper, a `.nutrio-field` div per field) for the text fields here, but this form fetches its own data (there's no parent list passing a `client` prop the way the practitioner side has) and saves via `PATCH /me/profile` directly rather than a parent-owned store action.
+- [ ] **Step 1: Read `src/screens/clients/ClientForm.tsx` first** — mirror its field-editing pattern (local form state, one `setField` helper, a `.merodiet-field` div per field) for the text fields here, but this form fetches its own data (there's no parent list passing a `client` prop the way the practitioner side has) and saves via `PATCH /me/profile` directly rather than a parent-owned store action.
 
 - [ ] **Step 2: Create `ProfileDrawer.tsx`**
 
@@ -759,7 +759,7 @@ export default function ProfileDrawer( {
 			return;
 		}
 
-		apiFetch< Client >( { path: '/nutrio/v1/me/profile' } ).then(
+		apiFetch< Client >( { path: '/merodiet/v1/me/profile' } ).then(
 			( data ) => {
 				setClient( data );
 				setValues( {
@@ -791,7 +791,7 @@ export default function ProfileDrawer( {
 
 		try {
 			const updated = await apiFetch< Client >( {
-				path: '/nutrio/v1/me/profile',
+				path: '/merodiet/v1/me/profile',
 				method: 'PATCH',
 				data: {
 					first_name: values.first_name,
@@ -808,7 +808,7 @@ export default function ProfileDrawer( {
 			setClient( updated );
 		} catch {
 			setErrorMessage(
-				__( 'Something went wrong — please try again.', 'nutrio' )
+				__( 'Something went wrong — please try again.', 'merodiet' )
 			);
 		} finally {
 			setIsSaving( false );
@@ -832,7 +832,7 @@ export default function ProfileDrawer( {
 			formData.append( 'avatar', file );
 
 			const updated = await apiFetch< Client >( {
-				path: '/nutrio/v1/me/profile/avatar',
+				path: '/merodiet/v1/me/profile/avatar',
 				method: 'POST',
 				body: formData,
 			} );
@@ -841,7 +841,7 @@ export default function ProfileDrawer( {
 			setErrorMessage(
 				__(
 					'Could not upload that image — please try a JPEG, PNG, or WebP file.',
-					'nutrio'
+					'merodiet'
 				)
 			);
 		} finally {
@@ -854,11 +854,11 @@ export default function ProfileDrawer( {
 		<>
 			<Drawer
 				isOpen={ isOpen }
-				title={ __( 'My Profile', 'nutrio' ) }
+				title={ __( 'My Profile', 'merodiet' ) }
 				onClose={ onClose }
 			>
 				{ ! client ? (
-					<p>{ __( 'Loading…', 'nutrio' ) }</p>
+					<p>{ __( 'Loading…', 'merodiet' ) }</p>
 				) : (
 					<form
 						onSubmit={ handleSubmit }
@@ -883,8 +883,8 @@ export default function ProfileDrawer( {
 							) }
 							<label className={ styles.avatarUpload }>
 								{ isUploadingAvatar
-									? __( 'Uploading…', 'nutrio' )
-									: __( 'Change photo', 'nutrio' ) }
+									? __( 'Uploading…', 'merodiet' )
+									: __( 'Change photo', 'merodiet' ) }
 								<input
 									type="file"
 									accept="image/jpeg,image/png,image/webp"
@@ -895,59 +895,59 @@ export default function ProfileDrawer( {
 							</label>
 						</div>
 
-						<div className="nutrio-field">
-							<label htmlFor="nutrio-profile-first-name">
-								{ __( 'First name', 'nutrio' ) }
+						<div className="merodiet-field">
+							<label htmlFor="merodiet-profile-first-name">
+								{ __( 'First name', 'merodiet' ) }
 							</label>
 							<input
-								id="nutrio-profile-first-name"
+								id="merodiet-profile-first-name"
 								type="text"
 								value={ values.first_name }
 								onChange={ setField( 'first_name' ) }
 								required
 							/>
 						</div>
-						<div className="nutrio-field">
-							<label htmlFor="nutrio-profile-last-name">
-								{ __( 'Last name', 'nutrio' ) }
+						<div className="merodiet-field">
+							<label htmlFor="merodiet-profile-last-name">
+								{ __( 'Last name', 'merodiet' ) }
 							</label>
 							<input
-								id="nutrio-profile-last-name"
+								id="merodiet-profile-last-name"
 								type="text"
 								value={ values.last_name }
 								onChange={ setField( 'last_name' ) }
 								required
 							/>
 						</div>
-						<div className="nutrio-field">
-							<label htmlFor="nutrio-profile-email">
-								{ __( 'Email', 'nutrio' ) }
+						<div className="merodiet-field">
+							<label htmlFor="merodiet-profile-email">
+								{ __( 'Email', 'merodiet' ) }
 							</label>
 							<input
-								id="nutrio-profile-email"
+								id="merodiet-profile-email"
 								type="email"
 								value={ values.email }
 								onChange={ setField( 'email' ) }
 								required
 							/>
 						</div>
-						<div className="nutrio-field">
-							<label htmlFor="nutrio-profile-goals">
-								{ __( 'Goals', 'nutrio' ) }
+						<div className="merodiet-field">
+							<label htmlFor="merodiet-profile-goals">
+								{ __( 'Goals', 'merodiet' ) }
 							</label>
 							<textarea
-								id="nutrio-profile-goals"
+								id="merodiet-profile-goals"
 								rows={ 3 }
 								value={ values.goals }
 								onChange={ setField( 'goals' ) }
 							/>
 						</div>
-						<div className="nutrio-field">
-							<label htmlFor="nutrio-profile-dietary">
-								{ __( 'Dietary restrictions', 'nutrio' ) }
+						<div className="merodiet-field">
+							<label htmlFor="merodiet-profile-dietary">
+								{ __( 'Dietary restrictions', 'merodiet' ) }
 							</label>
 							<textarea
-								id="nutrio-profile-dietary"
+								id="merodiet-profile-dietary"
 								rows={ 2 }
 								value={ values.dietary_restrictions }
 								onChange={ setField(
@@ -955,22 +955,22 @@ export default function ProfileDrawer( {
 								) }
 							/>
 						</div>
-						<div className="nutrio-field">
-							<label htmlFor="nutrio-profile-allergies">
-								{ __( 'Allergies', 'nutrio' ) }
+						<div className="merodiet-field">
+							<label htmlFor="merodiet-profile-allergies">
+								{ __( 'Allergies', 'merodiet' ) }
 							</label>
 							<input
-								id="nutrio-profile-allergies"
+								id="merodiet-profile-allergies"
 								type="text"
 								value={ values.allergies }
 								onChange={ setField( 'allergies' ) }
 								placeholder={ __(
 									'Peanuts, shellfish',
-									'nutrio'
+									'merodiet'
 								) }
 							/>
-							<div className="nutrio-field-hint">
-								{ __( 'Comma-separated', 'nutrio' ) }
+							<div className="merodiet-field-hint">
+								{ __( 'Comma-separated', 'merodiet' ) }
 							</div>
 						</div>
 
@@ -979,7 +979,7 @@ export default function ProfileDrawer( {
 							variant="primary"
 							disabled={ isSaving }
 						>
-							{ __( 'Save changes', 'nutrio' ) }
+							{ __( 'Save changes', 'merodiet' ) }
 						</Button>
 
 						<button
@@ -987,7 +987,7 @@ export default function ProfileDrawer( {
 							className={ styles.passwordLink }
 							onClick={ () => setPasswordModalOpen( true ) }
 						>
-							{ __( 'Change password', 'nutrio' ) }
+							{ __( 'Change password', 'merodiet' ) }
 						</button>
 					</form>
 				) }
@@ -1101,7 +1101,7 @@ Add the import:
 import ProfileDrawer from './ProfileDrawer';
 ```
 
-Pass `onOpenProfile={ () => setProfileOpen( true ) }` as a new prop on the existing `<PortalSidebar ... />` element, and render `<ProfileDrawer isOpen={ isProfileOpen } onClose={ () => setProfileOpen( false ) } />` as a sibling of `<div className="nutrio-shell">` (same level, so the drawer overlays the whole app regardless of which section is active).
+Pass `onOpenProfile={ () => setProfileOpen( true ) }` as a new prop on the existing `<PortalSidebar ... />` element, and render `<ProfileDrawer isOpen={ isProfileOpen } onClose={ () => setProfileOpen( false ) } />` as a sibling of `<div className="merodiet-shell">` (same level, so the drawer overlays the whole app regardless of which section is active).
 
 - [ ] **Step 3: In `PortalSidebar.tsx`**, add the new prop and make the rail-foot clickable:
 
@@ -1110,11 +1110,11 @@ Add to `PortalSidebarProps`:
 onOpenProfile: () => void;
 ```
 
-Change the `nutrio-rail-foot` div from a plain `<div>` to a `<button>` (so it's natively focusable/keyboard-operable, matching this codebase's established preference for real interactive elements over div+role hacks — see the earlier `nutrio-rail-scrim`/`Drawer` scrim fixes in this same project for why):
+Change the `merodiet-rail-foot` div from a plain `<div>` to a `<button>` (so it's natively focusable/keyboard-operable, matching this codebase's established preference for real interactive elements over div+role hacks — see the earlier `merodiet-rail-scrim`/`Drawer` scrim fixes in this same project for why):
 
 ```tsx
-<button className="nutrio-rail-foot" onClick={ onOpenProfile }>
-	<div className="nutrio-user-avatar">
+<button className="merodiet-rail-foot" onClick={ onOpenProfile }>
+	<div className="merodiet-user-avatar">
 		{ /* existing avatar content unchanged */ }
 	</div>
 	{ /* existing name/role div unchanged */ }
@@ -1122,10 +1122,10 @@ Change the `nutrio-rail-foot` div from a plain `<div>` to a `<button>` (so it's 
 </button>
 ```
 
-Note: `ThemeToggle` is itself a `<button>` — a `<button>` nested inside another `<button>` is invalid HTML. Move `ThemeToggle` OUTSIDE the new rail-foot button instead, as a sibling immediately after it, and wrap both in a small flex container so they still sit on one row visually. Read the current `nutrio-rail-foot` CSS in `src/styles/base.css` (`display: flex; align-items: center; gap: 9px; padding: 8px 10px; ...`) — replicate that exact layout on a new wrapping div, put `className="nutrio-rail-foot"` on that wrapper (unchanged, so admin's identical CSS still applies), and make the avatar+name portion inside it a `<button>` with its own reset styling (no border/background, inherit layout) so only that portion is clickable while `ThemeToggle` stays a separate, adjacent button:
+Note: `ThemeToggle` is itself a `<button>` — a `<button>` nested inside another `<button>` is invalid HTML. Move `ThemeToggle` OUTSIDE the new rail-foot button instead, as a sibling immediately after it, and wrap both in a small flex container so they still sit on one row visually. Read the current `merodiet-rail-foot` CSS in `src/styles/base.css` (`display: flex; align-items: center; gap: 9px; padding: 8px 10px; ...`) — replicate that exact layout on a new wrapping div, put `className="merodiet-rail-foot"` on that wrapper (unchanged, so admin's identical CSS still applies), and make the avatar+name portion inside it a `<button>` with its own reset styling (no border/background, inherit layout) so only that portion is clickable while `ThemeToggle` stays a separate, adjacent button:
 
 ```tsx
-<div className="nutrio-rail-foot">
+<div className="merodiet-rail-foot">
 	<button
 		type="button"
 		onClick={ onOpenProfile }
@@ -1142,13 +1142,13 @@ Note: `ThemeToggle` is itself a `<button>` — a `<button>` nested inside anothe
 			textAlign: 'left',
 		} }
 	>
-		<div className="nutrio-user-avatar">
+		<div className="merodiet-user-avatar">
 			{ initialsFor( clientName ) }
 		</div>
 		<div style={ { flex: 1, minWidth: 0 } }>
-			<div className="nutrio-rail-foot-name">{ clientName }</div>
-			<div className="nutrio-rail-foot-role">
-				{ __( 'Client', 'nutrio' ) }
+			<div className="merodiet-rail-foot-name">{ clientName }</div>
+			<div className="merodiet-rail-foot-role">
+				{ __( 'Client', 'merodiet' ) }
 			</div>
 		</div>
 	</button>
@@ -1156,7 +1156,7 @@ Note: `ThemeToggle` is itself a `<button>` — a `<button>` nested inside anothe
 </div>
 ```
 
-This replaces the existing `<div className="nutrio-rail-foot">...</div>` block entirely (the one already there from the earlier sidebar-conversion task) — same visual result, but the avatar+name portion is now a real button.
+This replaces the existing `<div className="merodiet-rail-foot">...</div>` block entirely (the one already there from the earlier sidebar-conversion task) — same visual result, but the avatar+name portion is now a real button.
 
 - [ ] **Step 4: Verify**
 

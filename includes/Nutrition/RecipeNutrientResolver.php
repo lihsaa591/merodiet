@@ -2,14 +2,14 @@
 /**
  * Recipe nutrient total orchestration.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Nutrition;
+namespace MeroDiet\Nutrition;
 
-use Nutrio\Repositories\RecipeRepository;
+use MeroDiet\Repositories\RecipeRepository;
 
 /**
  * Bridges a recipe's stored ingredient list (food_id + quantity_grams

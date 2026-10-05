@@ -3,17 +3,17 @@
  * Verifies the "capability check is opt-out, not opt-in" safety
  * property described in AbstractController's docblock.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\RestApi;
+namespace MeroDiet\Tests\Unit\RestApi;
 
 use Brain\Monkey\Functions;
 use WP_Error;
-use Nutrio\RestApi\AbstractController;
-use Nutrio\Tests\TestCase;
+use MeroDiet\RestApi\AbstractController;
+use MeroDiet\Tests\TestCase;
 
 final class AbstractControllerTest extends TestCase {
 

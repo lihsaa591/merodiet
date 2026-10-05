@@ -2,7 +2,7 @@ import { __ } from '@wordpress/i18n';
 import ProUpsellModal from '../components/ui/ProUpsellModal';
 import { useState } from '@wordpress/element';
 import type { ReactNode } from 'react';
-import nutrioLeaf from './nutrio-leaf.png';
+import merodietLogo from './merodiet-logo.png';
 
 interface NavItem {
 	id: string;
@@ -13,7 +13,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
 	{
 		id: 'dashboard',
-		label: __( 'Dashboard', 'nutrio' ),
+		label: __( 'Dashboard', 'merodiet' ),
 		icon: (
 			<>
 				<rect x="3" y="3" width="8" height="8" rx="1.5" />
@@ -25,7 +25,7 @@ const NAV_ITEMS: NavItem[] = [
 	},
 	{
 		id: 'clients',
-		label: __( 'Clients', 'nutrio' ),
+		label: __( 'Clients', 'merodiet' ),
 		icon: (
 			<>
 				<circle cx="9" cy="8" r="3.2" />
@@ -37,14 +37,14 @@ const NAV_ITEMS: NavItem[] = [
 	},
 	{
 		id: 'recipes',
-		label: __( 'Recipes', 'nutrio' ),
+		label: __( 'Recipes', 'merodiet' ),
 		icon: (
 			<path d="M5 3v6a3 3 0 0 0 3 3v9M8 3v6M11 3v6M17 3c-2 1-2.5 3-2.5 5.5S17 13 17 13v9" />
 		),
 	},
 	{
 		id: 'plans',
-		label: __( 'Plans', 'nutrio' ),
+		label: __( 'Plans', 'merodiet' ),
 		icon: (
 			<>
 				<rect x="3.5" y="4" width="17" height="16" rx="2" />
@@ -55,14 +55,14 @@ const NAV_ITEMS: NavItem[] = [
 	},
 	{
 		id: 'foods',
-		label: __( 'Food database', 'nutrio' ),
+		label: __( 'Food database', 'merodiet' ),
 		icon: (
 			<path d="M12 3c-3.5 3-5 6-5 9a5 5 0 0 0 10 0c0-3-1.5-6-5-9ZM12 8v9" />
 		),
 	},
 	{
 		id: 'settings',
-		label: __( 'Settings', 'nutrio' ),
+		label: __( 'Settings', 'merodiet' ),
 		icon: (
 			<>
 				<circle cx="12" cy="12" r="3" />
@@ -88,11 +88,13 @@ export default function Sidebar( {
 	return (
 		<>
 			<aside
-				className={ `nutrio-rail ${ isOpen ? 'is-open' : '' }`.trim() }
+				className={ `merodiet-rail ${
+					isOpen ? 'is-open' : ''
+				}`.trim() }
 			>
 				<a
-					className="nutrio-wp-back"
-					href={ window.nutrioAdmin?.adminUrl ?? '#' }
+					className="merodiet-wp-back"
+					href={ window.merodietAdmin?.adminUrl ?? '#' }
 				>
 					<svg
 						viewBox="0 0 24 24"
@@ -102,23 +104,23 @@ export default function Sidebar( {
 					>
 						<path d="M19 12H5M11 18l-6-6 6-6" />
 					</svg>
-					{ __( 'Back to WordPress', 'nutrio' ) }
+					{ __( 'Back to WordPress', 'merodiet' ) }
 				</a>
 
-				<div className="nutrio-brand">
+				<div className="merodiet-brand">
 					<img
-						className="nutrio-brand-mark"
-						src={ nutrioLeaf }
+						className="merodiet-brand-mark"
+						src={ merodietLogo }
 						alt=""
 					/>
-					<div className="nutrio-brand-name">Nutrio</div>
+					<div className="merodiet-brand-name">MeroDiet</div>
 				</div>
 
-				<nav className="nutrio-nav-group">
+				<nav className="merodiet-nav-group">
 					{ NAV_ITEMS.map( ( item ) => (
 						<button
 							key={ item.id }
-							className={ `nutrio-nav-item ${
+							className={ `merodiet-nav-item ${
 								activeView === item.id ? 'is-active' : ''
 							}`.trim() }
 							onClick={ () => onSelect( item.id ) }
@@ -135,7 +137,7 @@ export default function Sidebar( {
 						</button>
 					) ) }
 					<button
-						className="nutrio-nav-item nutrio-nav-item-pro"
+						className="merodiet-nav-item merodiet-nav-item-pro"
 						onClick={ () => setProModalOpen( true ) }
 					>
 						<svg
@@ -146,9 +148,9 @@ export default function Sidebar( {
 						>
 							<path d="M4 19V9M12 19V4M20 19v-6" />
 						</svg>
-						{ __( 'Analytics', 'nutrio' ) }
+						{ __( 'Analytics', 'merodiet' ) }
 						<svg
-							className="nutrio-pro-lock"
+							className="merodiet-pro-lock"
 							viewBox="0 0 24 24"
 							fill="none"
 							stroke="currentColor"
@@ -173,7 +175,7 @@ export default function Sidebar( {
 
 			<ProUpsellModal
 				isOpen={ isProModalOpen }
-				featureName={ __( 'Analytics', 'nutrio' ) }
+				featureName={ __( 'Analytics', 'merodiet' ) }
 				onClose={ () => setProModalOpen( false ) }
 			/>
 		</>
@@ -202,23 +204,23 @@ function RailFoot() {
 	};
 
 	return (
-		<div className="nutrio-rail-foot">
-			<div className="nutrio-user-avatar">
-				{ window.nutrioAdmin?.currentUserInitials ?? 'U' }
+		<div className="merodiet-rail-foot">
+			<div className="merodiet-user-avatar">
+				{ window.merodietAdmin?.currentUserInitials ?? 'U' }
 			</div>
 			<div style={ { flex: 1, minWidth: 0 } }>
-				<div className="nutrio-rail-foot-name">
-					{ window.nutrioAdmin?.currentUserName ?? '' }
+				<div className="merodiet-rail-foot-name">
+					{ window.merodietAdmin?.currentUserName ?? '' }
 				</div>
-				<div className="nutrio-rail-foot-role">
-					{ __( 'Practitioner', 'nutrio' ) }
+				<div className="merodiet-rail-foot-role">
+					{ __( 'Practitioner', 'merodiet' ) }
 				</div>
 			</div>
 			<button
-				className="nutrio-theme-toggle"
+				className="merodiet-theme-toggle"
 				onClick={ toggleTheme }
-				aria-label={ __( 'Toggle dark mode', 'nutrio' ) }
-				title={ __( 'Toggle dark mode', 'nutrio' ) }
+				aria-label={ __( 'Toggle dark mode', 'merodiet' ) }
+				title={ __( 'Toggle dark mode', 'merodiet' ) }
 			>
 				{ theme === 'dark' ? <MoonIcon /> : <SunIcon /> }
 			</button>

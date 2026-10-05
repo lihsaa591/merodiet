@@ -2,17 +2,17 @@
 /**
  * Practice-level settings REST endpoints.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\RestApi;
+namespace MeroDiet\RestApi;
 
-use Nutrio\Email\DigestScheduler;
-use Nutrio\Email\EmailSender;
-use Nutrio\Email\EmailTemplateRegistry;
-use Nutrio\Email\EmailTemplateService;
+use MeroDiet\Email\DigestScheduler;
+use MeroDiet\Email\EmailSender;
+use MeroDiet\Email\EmailTemplateRegistry;
+use MeroDiet\Email\EmailTemplateService;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -31,7 +31,7 @@ use WP_REST_Server;
 final class SettingsController extends AbstractController {
 
 	/**
-	 * Route base — registers under nutrio/v1/settings.
+	 * Route base — registers under merodiet/v1/settings.
 	 *
 	 * @var string
 	 */
@@ -54,7 +54,7 @@ final class SettingsController extends AbstractController {
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( $this, 'get_usda_key' ),
 			),
-			required_capability: 'manage_nutrio_foods'
+			required_capability: 'manage_merodiet_foods'
 		);
 
 		$this->register_route(
@@ -70,7 +70,7 @@ final class SettingsController extends AbstractController {
 					),
 				),
 			),
-			required_capability: 'manage_nutrio_foods'
+			required_capability: 'manage_merodiet_foods'
 		);
 
 		$this->register_route(
@@ -79,7 +79,7 @@ final class SettingsController extends AbstractController {
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( $this, 'get_email_templates' ),
 			),
-			required_capability: 'manage_nutrio_settings'
+			required_capability: 'manage_merodiet_settings'
 		);
 
 		$this->register_route(
@@ -98,7 +98,7 @@ final class SettingsController extends AbstractController {
 					),
 				),
 			),
-			required_capability: 'manage_nutrio_settings'
+			required_capability: 'manage_merodiet_settings'
 		);
 
 		$this->register_route(
@@ -113,7 +113,7 @@ final class SettingsController extends AbstractController {
 					),
 				),
 			),
-			required_capability: 'manage_nutrio_settings'
+			required_capability: 'manage_merodiet_settings'
 		);
 
 		$this->register_route(
@@ -122,7 +122,7 @@ final class SettingsController extends AbstractController {
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( $this, 'get_email_sender' ),
 			),
-			required_capability: 'manage_nutrio_settings'
+			required_capability: 'manage_merodiet_settings'
 		);
 
 		$this->register_route(
@@ -141,7 +141,7 @@ final class SettingsController extends AbstractController {
 					),
 				),
 			),
-			required_capability: 'manage_nutrio_settings'
+			required_capability: 'manage_merodiet_settings'
 		);
 
 		$this->register_route(
@@ -150,7 +150,7 @@ final class SettingsController extends AbstractController {
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( $this, 'get_email_digest' ),
 			),
-			required_capability: 'manage_nutrio_settings'
+			required_capability: 'manage_merodiet_settings'
 		);
 
 		$this->register_route(
@@ -169,7 +169,7 @@ final class SettingsController extends AbstractController {
 					),
 				),
 			),
-			required_capability: 'manage_nutrio_settings'
+			required_capability: 'manage_merodiet_settings'
 		);
 
 		$this->register_route(
@@ -178,7 +178,7 @@ final class SettingsController extends AbstractController {
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( $this, 'get_data_retention' ),
 			),
-			required_capability: 'manage_nutrio_settings'
+			required_capability: 'manage_merodiet_settings'
 		);
 
 		$this->register_route(
@@ -193,16 +193,16 @@ final class SettingsController extends AbstractController {
 					),
 				),
 			),
-			required_capability: 'manage_nutrio_settings'
+			required_capability: 'manage_merodiet_settings'
 		);
 	}
 
 	/**
 	 * GET /settings/data-retention — whether deleting the plugin also
-	 * deletes all Nutrio data (read by uninstall.php).
+	 * deletes all MeroDiet data (read by uninstall.php).
 	 */
 	public function get_data_retention(): WP_REST_Response {
-		return $this->success( array( 'delete_on_uninstall' => '1' === get_option( 'nutrio_delete_data_on_uninstall' ) ) );
+		return $this->success( array( 'delete_on_uninstall' => '1' === get_option( 'merodiet_delete_data_on_uninstall' ) ) );
 	}
 
 	/**
@@ -215,7 +215,7 @@ final class SettingsController extends AbstractController {
 	public function update_data_retention( WP_REST_Request $request ): WP_REST_Response {
 		$delete = (bool) $request->get_param( 'delete_on_uninstall' );
 
-		self::save_option_no_autoload( 'nutrio_delete_data_on_uninstall', $delete ? '1' : '0' );
+		self::save_option_no_autoload( 'merodiet_delete_data_on_uninstall', $delete ? '1' : '0' );
 
 		return $this->success( array( 'delete_on_uninstall' => $delete ) );
 	}
@@ -225,7 +225,7 @@ final class SettingsController extends AbstractController {
 	 * and a masked preview if so.
 	 */
 	public function get_usda_key(): WP_REST_Response {
-		return $this->success( self::describe( (string) get_option( 'nutrio_usda_api_key', '' ) ) );
+		return $this->success( self::describe( (string) get_option( 'merodiet_usda_api_key', '' ) ) );
 	}
 
 	/**
@@ -236,7 +236,7 @@ final class SettingsController extends AbstractController {
 	public function update_usda_key( WP_REST_Request $request ): WP_REST_Response {
 		$api_key = (string) $request->get_param( 'api_key' );
 
-		update_option( 'nutrio_usda_api_key', $api_key );
+		update_option( 'merodiet_usda_api_key', $api_key );
 
 		return $this->success( self::describe( $api_key ) );
 	}
@@ -274,7 +274,7 @@ final class SettingsController extends AbstractController {
 		$type = (string) $request->get_param( 'type' );
 
 		if ( ! EmailTemplateRegistry::is_known_type( $type ) ) {
-			return $this->error( 'nutrio_unknown_email_type', __( 'Unknown email template.', 'nutrio' ), 404 );
+			return $this->error( 'merodiet_unknown_email_type', __( 'Unknown email template.', 'merodiet' ), 404 );
 		}
 
 		$this->templates->save(
@@ -305,7 +305,7 @@ final class SettingsController extends AbstractController {
 		$type = (string) $request->get_param( 'type' );
 
 		if ( ! EmailTemplateRegistry::is_known_type( $type ) ) {
-			return $this->error( 'nutrio_unknown_email_type', __( 'Unknown email template.', 'nutrio' ), 404 );
+			return $this->error( 'merodiet_unknown_email_type', __( 'Unknown email template.', 'merodiet' ), 404 );
 		}
 
 		$this->templates->set_enabled( $type, (bool) $request->get_param( 'enabled' ) );
@@ -332,7 +332,7 @@ final class SettingsController extends AbstractController {
 
 	/**
 	 * PUT /settings/email-sender — save the From name/address shared by
-	 * every Nutrio email. Either may be empty to fall back to WordPress's default.
+	 * every MeroDiet email. Either may be empty to fall back to WordPress's default.
 	 *
 	 * @param WP_REST_Request $request The current request.
 	 */
@@ -341,7 +341,7 @@ final class SettingsController extends AbstractController {
 		$from_address = trim( (string) $request->get_param( 'from_address' ) );
 
 		if ( ! EmailSender::is_valid_address( $from_address ) ) {
-			return $this->error( 'nutrio_invalid_from_address', __( 'Enter a valid email address.', 'nutrio' ), 400 );
+			return $this->error( 'merodiet_invalid_from_address', __( 'Enter a valid email address.', 'merodiet' ), 400 );
 		}
 
 		EmailSender::save( $from_name, $from_address );
@@ -365,8 +365,8 @@ final class SettingsController extends AbstractController {
 	public function get_email_digest(): WP_REST_Response {
 		return $this->success(
 			array(
-				'enabled'   => (bool) get_option( 'nutrio_digest_enabled', false ),
-				'send_time' => (string) get_option( 'nutrio_digest_time', '20:00' ),
+				'enabled'   => (bool) get_option( 'merodiet_digest_enabled', false ),
+				'send_time' => (string) get_option( 'merodiet_digest_time', '20:00' ),
 			)
 		);
 	}
@@ -380,18 +380,18 @@ final class SettingsController extends AbstractController {
 		$send_time = (string) $request->get_param( 'send_time' );
 
 		if ( 1 !== preg_match( '/^([01]\d|2[0-3]):[0-5]\d$/', $send_time ) ) {
-			return $this->error( 'nutrio_invalid_time', __( 'Send time must be in HH:MM (24-hour) format.', 'nutrio' ), 400 );
+			return $this->error( 'merodiet_invalid_time', __( 'Send time must be in HH:MM (24-hour) format.', 'merodiet' ), 400 );
 		}
 
-		self::save_option_no_autoload( 'nutrio_digest_enabled', (bool) $request->get_param( 'enabled' ) );
-		self::save_option_no_autoload( 'nutrio_digest_time', $send_time );
+		self::save_option_no_autoload( 'merodiet_digest_enabled', (bool) $request->get_param( 'enabled' ) );
+		self::save_option_no_autoload( 'merodiet_digest_time', $send_time );
 
 		DigestScheduler::reschedule();
 
 		return $this->success(
 			array(
-				'enabled'   => (bool) get_option( 'nutrio_digest_enabled', false ),
-				'send_time' => (string) get_option( 'nutrio_digest_time', '20:00' ),
+				'enabled'   => (bool) get_option( 'merodiet_digest_enabled', false ),
+				'send_time' => (string) get_option( 'merodiet_digest_time', '20:00' ),
 			)
 		);
 	}

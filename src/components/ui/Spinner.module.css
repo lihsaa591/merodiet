@@ -5,7 +5,7 @@
 	border-radius: 50%;
 	border: 2px solid var(--line-strong);
 	border-top-color: var(--sage);
-	animation: nutrio-spin 0.7s linear infinite;
+	animation: merodiet-spin 0.7s linear infinite;
 	flex-shrink: 0;
 }
 .sm {
@@ -30,7 +30,7 @@
 	border: 0;
 }
 
-@keyframes nutrio-spin {
+@keyframes merodiet-spin {
 	to {
 		transform: rotate(360deg);
 	}

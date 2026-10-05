@@ -103,7 +103,7 @@ export default function ClientForm( {
 			toast.error(
 				errorMessage(
 					error,
-					__( 'Could not save this client.', 'nutrio' )
+					__( 'Could not save this client.', 'merodiet' )
 				)
 			);
 		} finally {
@@ -115,8 +115,8 @@ export default function ClientForm( {
 		if (
 			! isDirty ||
 			( await confirmDialog( {
-				message: __( 'Discard unsaved changes?', 'nutrio' ),
-				confirmLabel: __( 'Discard', 'nutrio' ),
+				message: __( 'Discard unsaved changes?', 'merodiet' ),
+				confirmLabel: __( 'Discard', 'merodiet' ),
 				destructive: true,
 			} ) )
 		) {
@@ -153,103 +153,103 @@ export default function ClientForm( {
 						{ client.avatar_url
 							? __(
 									'Uploaded by the client from their portal.',
-									'nutrio'
+									'merodiet'
 							  )
 							: __(
 									'No photo yet — set by the client from their portal.',
-									'nutrio'
+									'merodiet'
 							  ) }
 					</span>
 				</div>
 			) }
-			<div className="nutrio-field">
-				<label htmlFor="nutrio-first-name">
-					{ __( 'First name', 'nutrio' ) }
+			<div className="merodiet-field">
+				<label htmlFor="merodiet-first-name">
+					{ __( 'First name', 'merodiet' ) }
 					<RequiredMark />
 				</label>
 				<input
-					id="nutrio-first-name"
+					id="merodiet-first-name"
 					type="text"
 					value={ values.first_name }
 					onChange={ setField( 'first_name' ) }
 					required
 				/>
 			</div>
-			<div className="nutrio-field">
-				<label htmlFor="nutrio-last-name">
-					{ __( 'Last name', 'nutrio' ) }
+			<div className="merodiet-field">
+				<label htmlFor="merodiet-last-name">
+					{ __( 'Last name', 'merodiet' ) }
 					<RequiredMark />
 				</label>
 				<input
-					id="nutrio-last-name"
+					id="merodiet-last-name"
 					type="text"
 					value={ values.last_name }
 					onChange={ setField( 'last_name' ) }
 					required
 				/>
 			</div>
-			<div className="nutrio-field">
-				<label htmlFor="nutrio-email">
-					{ __( 'Email', 'nutrio' ) }
+			<div className="merodiet-field">
+				<label htmlFor="merodiet-email">
+					{ __( 'Email', 'merodiet' ) }
 					<RequiredMark />
 				</label>
 				<input
-					id="nutrio-email"
+					id="merodiet-email"
 					type="email"
 					value={ values.email }
 					onChange={ setField( 'email' ) }
 					required
 				/>
 			</div>
-			<div className="nutrio-field">
-				<label htmlFor="nutrio-allergies">
-					{ __( 'Allergies', 'nutrio' ) }
+			<div className="merodiet-field">
+				<label htmlFor="merodiet-allergies">
+					{ __( 'Allergies', 'merodiet' ) }
 				</label>
 				<input
-					id="nutrio-allergies"
+					id="merodiet-allergies"
 					type="text"
 					value={ values.allergies }
 					onChange={ setField( 'allergies' ) }
-					placeholder={ __( 'Peanuts, shellfish', 'nutrio' ) }
+					placeholder={ __( 'Peanuts, shellfish', 'merodiet' ) }
 				/>
-				<div className="nutrio-field-hint">
-					{ __( 'Comma-separated', 'nutrio' ) }
+				<div className="merodiet-field-hint">
+					{ __( 'Comma-separated', 'merodiet' ) }
 				</div>
 			</div>
-			<div className="nutrio-field">
-				<label htmlFor="nutrio-dietary-restrictions">
-					{ __( 'Dietary restrictions', 'nutrio' ) }
+			<div className="merodiet-field">
+				<label htmlFor="merodiet-dietary-restrictions">
+					{ __( 'Dietary restrictions', 'merodiet' ) }
 				</label>
 				<textarea
-					id="nutrio-dietary-restrictions"
+					id="merodiet-dietary-restrictions"
 					rows={ 2 }
 					value={ values.dietary_restrictions }
 					onChange={ setField( 'dietary_restrictions' ) }
 					placeholder={ __(
 						'Vegetarian, low-sodium, halal…',
-						'nutrio'
+						'merodiet'
 					) }
 				/>
 			</div>
-			<div className="nutrio-field">
-				<label htmlFor="nutrio-goals">
-					{ __( 'Goals', 'nutrio' ) }
+			<div className="merodiet-field">
+				<label htmlFor="merodiet-goals">
+					{ __( 'Goals', 'merodiet' ) }
 				</label>
 				<textarea
-					id="nutrio-goals"
+					id="merodiet-goals"
 					rows={ 3 }
 					value={ values.goals }
 					onChange={ setField( 'goals' ) }
 					placeholder={ __(
 						'Weight management, improve energy levels…',
-						'nutrio'
+						'merodiet'
 					) }
 				/>
 			</div>
 
 			{ ! client && (
 				<label
-					htmlFor="nutrio-send-invite"
+					htmlFor="merodiet-send-invite"
 					style={ {
 						display: 'flex',
 						alignItems: 'center',
@@ -257,19 +257,19 @@ export default function ClientForm( {
 					} }
 				>
 					<input
-						id="nutrio-send-invite"
+						id="merodiet-send-invite"
 						type="checkbox"
 						checked={ sendInvite }
 						onChange={ ( event ) =>
 							setSendInvite( event.target.checked )
 						}
 					/>
-					{ __( 'Send portal invite now', 'nutrio' ) }
+					{ __( 'Send portal invite now', 'merodiet' ) }
 					<Tooltip content={ SEND_INVITE_HELP_TEXT }>
 						<InfoIcon
 							label={ __(
 								'What does sending the invite now do?',
-								'nutrio'
+								'merodiet'
 							) }
 						/>
 					</Tooltip>
@@ -286,8 +286,8 @@ export default function ClientForm( {
 					style={ { flex: 1, justifyContent: 'center' } }
 				>
 					{ client
-						? __( 'Save changes', 'nutrio' )
-						: __( 'Add client', 'nutrio' ) }
+						? __( 'Save changes', 'merodiet' )
+						: __( 'Add client', 'merodiet' ) }
 				</Button>
 				<Button
 					variant="ghost"
@@ -295,7 +295,7 @@ export default function ClientForm( {
 					onClick={ handleCancel }
 					disabled={ isSaving }
 				>
-					{ __( 'Cancel', 'nutrio' ) }
+					{ __( 'Cancel', 'merodiet' ) }
 				</Button>
 			</div>
 		</form>

@@ -2,16 +2,16 @@
 /**
  * Recipe data access.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
 // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Plugin's own custom tables; table names come from $wpdb->prefix and every value is bound via $wpdb->prepare().
 
-namespace Nutrio\Repositories;
+namespace MeroDiet\Repositories;
 
-use Nutrio\Database\QueryFilters;
+use MeroDiet\Database\QueryFilters;
 
 /**
  * A recipe's items are replaced wholesale on update (delete-all then
@@ -38,7 +38,7 @@ class RecipeRepository {
 		$now = current_time( 'mysql' );
 
 		$wpdb->insert(
-			$wpdb->prefix . 'nutrio_recipes',
+			$wpdb->prefix . 'merodiet_recipes',
 			array(
 				'practitioner_user_id' => $practitioner_user_id,
 				'name'                 => $data['name'],
@@ -69,7 +69,7 @@ class RecipeRepository {
 		global $wpdb;
 
 		$row = $wpdb->get_row(
-			$wpdb->prepare( "SELECT * FROM {$wpdb->prefix}nutrio_recipes WHERE id = %d", $id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
+			$wpdb->prepare( "SELECT * FROM {$wpdb->prefix}merodiet_recipes WHERE id = %d", $id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
 			ARRAY_A
 		);
 
@@ -89,7 +89,7 @@ class RecipeRepository {
 
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM {$wpdb->prefix}nutrio_recipes WHERE id = %d AND practitioner_user_id = %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; values are parameterized.
+				"SELECT * FROM {$wpdb->prefix}merodiet_recipes WHERE id = %d AND practitioner_user_id = %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; values are parameterized.
 				$id,
 				$practitioner_user_id
 			),
@@ -116,7 +116,7 @@ class RecipeRepository {
 	public function all_for_practitioner( int $practitioner_user_id, int $page = 1, int $per_page = 10, array $filters = array() ): array {
 		global $wpdb;
 
-		$table = $wpdb->prefix . 'nutrio_recipes';
+		$table = $wpdb->prefix . 'merodiet_recipes';
 
 		$params = array( $practitioner_user_id );
 
@@ -163,7 +163,7 @@ class RecipeRepository {
 
 		$found = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT * FROM {$wpdb->prefix}nutrio_recipe_items WHERE recipe_id = %d ORDER BY sort_order", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
+				"SELECT * FROM {$wpdb->prefix}merodiet_recipe_items WHERE recipe_id = %d ORDER BY sort_order", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
 				$recipe_id
 			),
 			ARRAY_A
@@ -191,13 +191,13 @@ class RecipeRepository {
 	public function replace_items( int $recipe_id, array $items ): void {
 		global $wpdb;
 
-		$wpdb->delete( $wpdb->prefix . 'nutrio_recipe_items', array( 'recipe_id' => $recipe_id ) );
+		$wpdb->delete( $wpdb->prefix . 'merodiet_recipe_items', array( 'recipe_id' => $recipe_id ) );
 
 		$now = current_time( 'mysql' );
 
 		foreach ( array_values( $items ) as $sort_order => $item ) {
 			$wpdb->insert(
-				$wpdb->prefix . 'nutrio_recipe_items',
+				$wpdb->prefix . 'merodiet_recipe_items',
 				array(
 					'recipe_id'      => $recipe_id,
 					'food_id'        => $item['food_id'],
@@ -237,7 +237,7 @@ class RecipeRepository {
 
 		$fields['updated_at'] = current_time( 'mysql' );
 
-		$updated = $wpdb->update( $wpdb->prefix . 'nutrio_recipes', $fields, array( 'id' => $id ) );
+		$updated = $wpdb->update( $wpdb->prefix . 'merodiet_recipes', $fields, array( 'id' => $id ) );
 
 		return false !== $updated;
 	}
@@ -250,9 +250,9 @@ class RecipeRepository {
 	public function delete( int $id ): bool {
 		global $wpdb;
 
-		$wpdb->delete( $wpdb->prefix . 'nutrio_recipe_items', array( 'recipe_id' => $id ) );
+		$wpdb->delete( $wpdb->prefix . 'merodiet_recipe_items', array( 'recipe_id' => $id ) );
 
-		return false !== $wpdb->delete( $wpdb->prefix . 'nutrio_recipes', array( 'id' => $id ) );
+		return false !== $wpdb->delete( $wpdb->prefix . 'merodiet_recipes', array( 'id' => $id ) );
 	}
 
 	/**

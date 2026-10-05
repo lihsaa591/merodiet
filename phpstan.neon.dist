@@ -6,7 +6,7 @@ parameters:
         - includes
         - bootstrap
         - config
-        - nutrio.php
+        - merodiet.php
         - uninstall.php
     excludePaths:
         - includes/Examples/* # Demo code, replaced per-project.
@@ -14,7 +14,7 @@ parameters:
         - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
     ignoreErrors:
         -
-            # NUTRIO_DEVELOPMENT's literal `false` default (nutrio.php) is
+            # MERODIET_DEVELOPMENT's literal `false` default (merodiet.php) is
             # intentionally overridable from a site's own wp-config.php,
             # which PHPStan cannot see into — every "always false"/"always
             # true" PHPStan reports against it is only true for this
@@ -22,7 +22,7 @@ parameters:
             # in via wp-config.php.
             message: '#(Left side of && is always false|Ternary operator condition is always false)#'
             paths:
-                - nutrio.php
+                - merodiet.php
                 - includes/Helper/Assets.php
 
 includes:

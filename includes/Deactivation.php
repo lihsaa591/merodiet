@@ -2,14 +2,14 @@
 /**
  * Plugin deactivation.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio;
+namespace MeroDiet;
 
-use Nutrio\Email\DigestScheduler;
+use MeroDiet\Email\DigestScheduler;
 
 /**
  * Deactivation is reversible housekeeping only (flush rewrite rules,

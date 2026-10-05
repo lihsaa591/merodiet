@@ -1,16 +1,16 @@
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\RestApi;
+namespace MeroDiet\Tests\Unit\RestApi;
 
 use Brain\Monkey\Functions;
-use Nutrio\Repositories\ClientRepository;
-use Nutrio\RestApi\AbstractClientController;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Repositories\ClientRepository;
+use MeroDiet\RestApi\AbstractClientController;
+use MeroDiet\Tests\TestCase;
 use WP_Error;
 
 final class AbstractClientControllerTest extends TestCase {

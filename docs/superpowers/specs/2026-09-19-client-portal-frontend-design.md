@@ -6,27 +6,27 @@ Give a client (role `nutrition_client`) a branded, front-end (not wp-admin) Reac
 
 ## Why not wp-admin
 
-A `nutrition_client` user has only the `read` and `view_own_nutrio_plan` capabilities (see `RoleRegistrar::CLIENT_CAPS`) — no `manage_options`-adjacent capability at all. Routing them into `/wp-admin/` would show a near-empty, broken-looking dashboard with none of the menu items a real admin sees. A dedicated front-end surface, outside wp-admin entirely, is the only option that looks intentional.
+A `nutrition_client` user has only the `read` and `view_own_merodiet_plan` capabilities (see `RoleRegistrar::CLIENT_CAPS`) — no `manage_options`-adjacent capability at all. Routing them into `/wp-admin/` would show a near-empty, broken-looking dashboard with none of the menu items a real admin sees. A dedicated front-end surface, outside wp-admin entirely, is the only option that looks intentional.
 
 ## URL & routing (permalink-structure-agnostic)
 
 WordPress sites vary in permalink structure — Plain (`?p=123`), Post name, Day/name, or a fully custom structure — and a rewrite rule alone does nothing under Plain, since the rewrite engine isn't engaged at all in that mode. To work under every structure:
 
-- Register a public query var, `nutrio_portal`, on `init` via `add_filter( 'query_vars', ... )`.
-- Register a pretty rewrite rule, `^client-portal/?$` → `index.php?nutrio_portal=1`, via `add_rewrite_rule()` on `init` (flushed on activation, matching the existing `Activation::activate()` pattern) — this only ever matters when pretty permalinks are active; it's additive, never load-bearing.
-- Hook `template_redirect` and check `get_query_var( 'nutrio_portal' )` directly — this fires regardless of which permalink structure produced the request, so Plain-permalink sites reaching `/?nutrio_portal=1` work identically to pretty-permalink sites reaching `/client-portal/`.
-- A `PortalPage::url(): string` helper builds the correct form for the current site: `home_url( '/client-portal/' )` when `get_option( 'permalink_structure' )` is non-empty, else `home_url( '/?nutrio_portal=1' )` — used everywhere else in the codebase that needs to link to the portal (e.g. a future "view portal" link on the practitioner's client-detail screen).
+- Register a public query var, `merodiet_portal`, on `init` via `add_filter( 'query_vars', ... )`.
+- Register a pretty rewrite rule, `^client-portal/?$` → `index.php?merodiet_portal=1`, via `add_rewrite_rule()` on `init` (flushed on activation, matching the existing `Activation::activate()` pattern) — this only ever matters when pretty permalinks are active; it's additive, never load-bearing.
+- Hook `template_redirect` and check `get_query_var( 'merodiet_portal' )` directly — this fires regardless of which permalink structure produced the request, so Plain-permalink sites reaching `/?merodiet_portal=1` work identically to pretty-permalink sites reaching `/client-portal/`.
+- A `PortalPage::url(): string` helper builds the correct form for the current site: `home_url( '/client-portal/' )` when `get_option( 'permalink_structure' )` is non-empty, else `home_url( '/?merodiet_portal=1' )` — used everywhere else in the codebase that needs to link to the portal (e.g. a future "view portal" link on the practitioner's client-detail screen).
 
 On `template_redirect`, `PortalPage`:
 - Logged out → renders a minimal branded login form (WP's own `wp_signon()` handles the POST; no custom auth code).
 - Logged in as `nutrition_client` → renders the bare HTML shell + mount div (see below) and `exit`s, short-circuiting the rest of WordPress's template hierarchy — this is a full-page takeover, not a theme template, matching how the wp-admin mount point already works for the practitioner side.
 - Logged in as anything else (practitioner, admin) → redirects to `/wp-admin/` — this URL isn't for them.
-- `login_redirect` filter: after a successful login, if the authenticating user has the `view_own_nutrio_plan` capability, redirect to `PortalPage::url()` instead of the default `/wp-admin/` redirect.
+- `login_redirect` filter: after a successful login, if the authenticating user has the `view_own_merodiet_plan` capability, redirect to `PortalPage::url()` instead of the default `/wp-admin/` redirect.
 
 ## Frontend architecture
 
 - New webpack entry `client-portal` → `src/client-portal/index.tsx`, added to `webpack.config.js`'s `entry` map alongside the existing `admin` entry — same build pipeline, same `@wordpress/scripts` config, just a second bundle.
-- `index.tsx` mirrors `src/admin/index.tsx`'s existing bootstrap: mount into the shell's div, read `window.nutrioClientPortal` (a new, separate localized-data global — deliberately not reusing `window.nutrioAdmin`, since this is a different user/security context with a much smaller, client-safe data surface: no `restNonce`-adjacent secrets beyond what a client's own session already implies).
+- `index.tsx` mirrors `src/admin/index.tsx`'s existing bootstrap: mount into the shell's div, read `window.merodietClientPortal` (a new, separate localized-data global — deliberately not reusing `window.merodietAdmin`, since this is a different user/security context with a much smaller, client-safe data surface: no `restNonce`-adjacent secrets beyond what a client's own session already implies).
 - `App.tsx`: tab state (`'plan' | 'log' | 'measurements'`), renders a simple top nav + the active tab's screen component. No React Router — matches the "single mount, view state" pattern already used by the practitioner admin app's `App.tsx`.
 - Three screen components: `PlanTab.tsx`, `LogTab.tsx`, `MeasurementsTab.tsx`, each fetching via `@wordpress/api-fetch` against the `/me/*` routes — same client library already used throughout the practitioner side, so no new dependency.
 
@@ -48,22 +48,22 @@ On `template_redirect`, `PortalPage`:
 
 ## Extensibility
 
-**PHP side** (mirrors the existing `do_action`/`apply_filters` convention, e.g. `nutrio_client_before_create`):
-- `apply_filters( 'nutrio_client_portal_bootstrap_data', array $data, WP_User $client_user ): array` — filters the localized `window.nutrioClientPortal` payload before it's output, so an add-on can inject extra config data for its own JS-side section.
-- `do_action( 'nutrio_client_portal_render', WP_User $client_user )` — fires right before the mount div is output, letting an add-on `wp_enqueue_script()` its own bundle on this exact page load.
+**PHP side** (mirrors the existing `do_action`/`apply_filters` convention, e.g. `merodiet_client_before_create`):
+- `apply_filters( 'merodiet_client_portal_bootstrap_data', array $data, WP_User $client_user ): array` — filters the localized `window.merodietClientPortal` payload before it's output, so an add-on can inject extra config data for its own JS-side section.
+- `do_action( 'merodiet_client_portal_render', WP_User $client_user )` — fires right before the mount div is output, letting an add-on `wp_enqueue_script()` its own bundle on this exact page load.
 
 **JS side** (new — via `@wordpress/hooks`, the same library WordPress core/Gutenberg uses, already a transitive dependency of `@wordpress/element`/`@wordpress/data`, so no new package):
-- `applyFilters( 'nutrio.clientPortal.sections', defaultSections )` in `App.tsx` — `defaultSections` is the built-in `[{id:'plan',...}, {id:'log',...}, {id:'measurements',...}]` array; an add-on's own bundle (enqueued via the PHP action above) calls `addFilter( 'nutrio.clientPortal.sections', 'my-addon/extra-tab', (sections) => [...sections, {id:'my-tab', label:..., component: MyComponent}] )` before `App.tsx` reads the filtered list, giving genuine "a plugin can add a new tab" extensibility without needing PHP to describe a React component.
-- `doAction( 'nutrio.clientPortal.mounted' )` once on initial render, and `doAction( 'nutrio.clientPortal.logCreated', entry )` / `doAction( 'nutrio.clientPortal.measurementCreated', entry )` after each successful POST — lets an add-on react to portal events (e.g. a future analytics or notification add-on) without patching core screen components.
+- `applyFilters( 'merodiet.clientPortal.sections', defaultSections )` in `App.tsx` — `defaultSections` is the built-in `[{id:'plan',...}, {id:'log',...}, {id:'measurements',...}]` array; an add-on's own bundle (enqueued via the PHP action above) calls `addFilter( 'merodiet.clientPortal.sections', 'my-addon/extra-tab', (sections) => [...sections, {id:'my-tab', label:..., component: MyComponent}] )` before `App.tsx` reads the filtered list, giving genuine "a plugin can add a new tab" extensibility without needing PHP to describe a React component.
+- `doAction( 'merodiet.clientPortal.mounted' )` once on initial render, and `doAction( 'merodiet.clientPortal.logCreated', entry )` / `doAction( 'merodiet.clientPortal.measurementCreated', entry )` after each successful POST — lets an add-on react to portal events (e.g. a future analytics or notification add-on) without patching core screen components.
 
 ## i18n
 
-Every user-facing string goes through `__( '...', 'nutrio' )` from `@wordpress/i18n`, identical to the practitioner admin app. `AdminPage`'s existing `wp_set_script_translations()` call pattern is replicated for the new `client-portal` script handle, pointing at the same `languages/` directory Nutrio already uses — one translation catalog covers both apps, since they share the same textdomain.
+Every user-facing string goes through `__( '...', 'merodiet' )` from `@wordpress/i18n`, identical to the practitioner admin app. `AdminPage`'s existing `wp_set_script_translations()` call pattern is replicated for the new `client-portal` script handle, pointing at the same `languages/` directory MeroDiet already uses — one translation catalog covers both apps, since they share the same textdomain.
 
 ## Data flow & security
 
 - `PortalPage`'s logged-in branch only ever localizes data for `get_current_user_id()`'s own linked client row (via `ClientRepository::find_for_user()`, already built) — never accepts a client identifier from the URL or query string. Same "server-resolved identity, never trusted input" posture as the `/me/*` REST layer it calls into.
-- All `/me/*` calls from the React app carry the browser's existing WP auth cookie + a REST nonce localized into `window.nutrioClientPortal.restNonce`, exactly like the practitioner side's `window.nutrioAdmin.restNonce` — no new auth mechanism.
+- All `/me/*` calls from the React app carry the browser's existing WP auth cookie + a REST nonce localized into `window.merodietClientPortal.restNonce`, exactly like the practitioner side's `window.merodietAdmin.restNonce` — no new auth mechanism.
 
 ## Non-goals (this pass)
 

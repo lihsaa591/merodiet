@@ -5,12 +5,12 @@
  * `servings` is the denominator recipe_items' totals get divided by to
  * produce a per-serving nutrient profile — see NutrientCalculator.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-use Nutrio\Database\Migration;
+use MeroDiet\Database\Migration;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -24,7 +24,7 @@ return new class() extends Migration {
 	 * Create the recipes table.
 	 */
 	public function up(): void {
-		$table           = $this->table( 'nutrio_recipes' );
+		$table           = $this->table( 'merodiet_recipes' );
 		$charset_collate = $this->wpdb->get_charset_collate();
 
 		$this->delta(
@@ -46,7 +46,7 @@ return new class() extends Migration {
 	 * Drop the recipes table.
 	 */
 	public function down(): void {
-		$table = $this->table( 'nutrio_recipes' );
+		$table = $this->table( 'merodiet_recipes' );
 		$this->wpdb->query( "DROP TABLE IF EXISTS {$table}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input.
 	}
 };

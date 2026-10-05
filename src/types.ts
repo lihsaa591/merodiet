@@ -259,7 +259,7 @@ export interface FoodSearchResponse {
 
 declare global {
 	interface Window {
-		nutrioAdmin?: {
+		merodietAdmin?: {
 			restUrl?: string;
 			restNonce?: string;
 			mountId?: string;
@@ -275,7 +275,7 @@ declare global {
 			/** URL of the leaf mark used in the email header. */
 			emailLogoUrl?: string;
 		};
-		nutrioClientPortal?: {
+		merodietClientPortal?: {
 			restUrl?: string;
 			restNonce?: string;
 			mountId?: string;
@@ -295,7 +295,7 @@ export interface EmailTemplate {
 	tags: Record< string, string >;
 }
 
-/** The From name/address shared by every Nutrio email. Empty = WordPress's default. */
+/** The From name/address shared by every MeroDiet email. Empty = WordPress's default. */
 export interface EmailSenderSettings {
 	from_name: string;
 	from_address: string;

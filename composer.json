@@ -1,9 +1,9 @@
 {
-	"name": "nutrio/nutrio",
+	"name": "merodiet/merodiet",
 	"description": "Practice management for registered dietitians and nutritionists — meal planning, client compliance tracking, and USDA-backed nutrient calculations.",
 	"type": "wordpress-plugin",
 	"license": "GPL-2.0-or-later",
-	"homepage": "https://github.com/lihsaa591/nutrio",
+	"homepage": "https://github.com/lihsaa591/merodiet",
 	"keywords": [
 		"dietitian",
 		"nutritionist",
@@ -17,8 +17,8 @@
 		"php"
 	],
 	"support": {
-		"issues": "https://github.com/lihsaa591/nutrio/issues",
-		"source": "https://github.com/lihsaa591/nutrio"
+		"issues": "https://github.com/lihsaa591/merodiet/issues",
+		"source": "https://github.com/lihsaa591/merodiet"
 	},
 	"minimum-stability": "stable",
 	"prefer-stable": true,
@@ -44,12 +44,12 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"Nutrio\\": "includes/"
+			"MeroDiet\\": "includes/"
 		}
 	},
 	"autoload-dev": {
 		"psr-4": {
-			"Nutrio\\Tests\\": "tests/"
+			"MeroDiet\\Tests\\": "tests/"
 		}
 	},
 	"scripts": {

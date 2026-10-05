@@ -2,14 +2,14 @@
 /**
  * Abstract base migration.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Database;
+namespace MeroDiet\Database;
 
-use Nutrio\Contracts\MigrationInterface;
+use MeroDiet\Contracts\MigrationInterface;
 
 /**
  * Convenience base class: gives subclasses the global $wpdb and the

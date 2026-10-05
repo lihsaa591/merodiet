@@ -14,7 +14,7 @@ export const test = base.extend< { clientPage: Page } >( {
 		await page.fill( '#user_pass', CLIENT_PASSWORD );
 		await page.click( '#wp-submit' );
 
-		const rail = page.locator( '.nutrio-rail' );
+		const rail = page.locator( '.merodiet-rail' );
 
 		try {
 			// A CI runner's first cold page load (full SPA bundle fetch +
@@ -24,7 +24,7 @@ export const test = base.extend< { clientPage: Page } >( {
 			await rail.waitFor( { timeout: 30000 } );
 		} catch {
 			throw new Error(
-				'Client-portal login fixture failed: the sidebar (.nutrio-rail) never appeared after submitting the login form. ' +
+				'Client-portal login fixture failed: the sidebar (.merodiet-rail) never appeared after submitting the login form. ' +
 					'Check that global-setup.ts has seeded the "e2e-client" user (see tests/e2e/global-setup.ts) and that wp-env is running.'
 			);
 		}

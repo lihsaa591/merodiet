@@ -1,13 +1,13 @@
 <?php
 /**
- * The fixed catalog of every email Nutrio sends.
+ * The fixed catalog of every email MeroDiet sends.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Email;
+namespace MeroDiet\Email;
 
 /**
  * Deliberately static (same pattern as RoleRegistrar/PortalRewrite) —

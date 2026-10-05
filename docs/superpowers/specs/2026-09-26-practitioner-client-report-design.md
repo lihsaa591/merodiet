@@ -2,7 +2,7 @@
 
 ## Context
 
-Nutrio's admin roster (`src/screens/clients/ClientRoster.tsx`) currently only
+MeroDiet's admin roster (`src/screens/clients/ClientRoster.tsx`) currently only
 lets a practitioner edit a client's name, email, goals, allergies, and
 dietary restrictions. There is no way to see a client's assigned plan,
 logged compliance (eaten/skipped/substituted), or measurement history from
@@ -160,7 +160,7 @@ top-to-bottom:
    7-day window. If `plan` is null, renders "No active plan assigned" with
    a link to assign one (reuses the existing `AssignModal`). Otherwise
    shows the plan's title/dates and the percent as a KPI tile, matching the
-   client-portal Dashboard's `.nutrio-kpi` tile styling for visual
+   client-portal Dashboard's `.merodiet-kpi` tile styling for visual
    consistency between the two apps (an existing project convention).
 3. **Recent log history**: fetches `/clients/{id}/logs`, grouped by date,
    rendered with the same eaten/substituted/skipped visual treatment and

@@ -1,15 +1,15 @@
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Clients;
+namespace MeroDiet\Tests\Unit\Clients;
 
 use Brain\Monkey\Functions;
-use Nutrio\Clients\PortalRewrite;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Clients\PortalRewrite;
+use MeroDiet\Tests\TestCase;
 
 final class PortalRewriteTest extends TestCase {
 
@@ -24,10 +24,10 @@ final class PortalRewriteTest extends TestCase {
 		Functions\when( 'get_option' )->justReturn( '' );
 		Functions\when( 'home_url' )->alias( static fn( string $path ) => 'https://example.test' . $path );
 
-		self::assertSame( 'https://example.test/?nutrio_portal=1', PortalRewrite::url() );
+		self::assertSame( 'https://example.test/?merodiet_portal=1', PortalRewrite::url() );
 	}
 
 	public function test_query_var_constant_matches_the_registered_var(): void {
-		self::assertSame( 'nutrio_portal', PortalRewrite::QUERY_VAR );
+		self::assertSame( 'merodiet_portal', PortalRewrite::QUERY_VAR );
 	}
 }

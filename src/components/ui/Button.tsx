@@ -46,7 +46,7 @@ export default function Button( {
 function ProLockIcon() {
 	return (
 		<svg
-			className="nutrio-pro-lock"
+			className="merodiet-pro-lock"
 			viewBox="0 0 24 24"
 			fill="none"
 			stroke="currentColor"

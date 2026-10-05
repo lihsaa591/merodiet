@@ -26,7 +26,7 @@ function DashboardSkeleton() {
 		<div>
 			<div className={ styles.kpiRow }>
 				{ [ 0, 1, 2 ].map( ( index ) => (
-					<div key={ index } className="nutrio-kpi">
+					<div key={ index } className="merodiet-kpi">
 						<Skeleton width="70px" height="11px" />
 						<div style={ { marginTop: '8px' } }>
 							<Skeleton width="60px" height="26px" />
@@ -60,13 +60,13 @@ export default function DashboardTab() {
 	const unit = readStoredWeightUnit();
 
 	useEffect( () => {
-		apiFetch< Plan | null >( { path: '/nutrio/v1/me/plan' } ).then(
+		apiFetch< Plan | null >( { path: '/merodiet/v1/me/plan' } ).then(
 			setPlan,
 			() => setPlan( null )
 		);
 
 		apiFetch< LogEntry[] >( {
-			path: `/nutrio/v1/me/logs?from=${ today }&to=${ today }`,
+			path: `/merodiet/v1/me/logs?from=${ today }&to=${ today }`,
 		} ).then( setTodayLogs, () => setTodayLogs( [] ) );
 
 		// A 60-day window is more than enough to find the latest weigh-in
@@ -75,7 +75,7 @@ export default function DashboardTab() {
 		const sixtyDaysAgo = new Date();
 		sixtyDaysAgo.setDate( sixtyDaysAgo.getDate() - 59 );
 		apiFetch< Measurement[] >( {
-			path: `/nutrio/v1/me/measurements?from=${ sixtyDaysAgo
+			path: `/merodiet/v1/me/measurements?from=${ sixtyDaysAgo
 				.toISOString()
 				.slice( 0, 10 ) }&to=${ today }`,
 		} ).then( setMeasurements, () => setMeasurements( [] ) );
@@ -130,12 +130,12 @@ export default function DashboardTab() {
 
 	return (
 		<>
-			<div className="nutrio-topbar">
+			<div className="merodiet-topbar">
 				<div>
 					<h1>
 						{ greeting() } { greetingEmoji() }
 					</h1>
-					<div className="nutrio-topbar-sub">
+					<div className="merodiet-topbar-sub">
 						{ new Date().toLocaleDateString( undefined, {
 							weekday: 'long',
 							month: 'long',
@@ -150,40 +150,40 @@ export default function DashboardTab() {
 			{ ! isLoading && (
 				<>
 					<div className={ styles.kpiRow }>
-						<div className="nutrio-kpi">
-							<div className="nutrio-kpi-label">
-								{ __( 'Logged today', 'nutrio' ) }
+						<div className="merodiet-kpi">
+							<div className="merodiet-kpi-label">
+								{ __( 'Logged today', 'merodiet' ) }
 							</div>
-							<div className="nutrio-kpi-value">
+							<div className="merodiet-kpi-value">
 								{ todaysItems.length > 0
 									? `${ loggedCount }/${ todaysItems.length }`
 									: '—' }
 							</div>
 						</div>
-						<div className="nutrio-kpi">
-							<div className="nutrio-kpi-label">
-								{ __( 'Kcal eaten', 'nutrio' ) }
+						<div className="merodiet-kpi">
+							<div className="merodiet-kpi-label">
+								{ __( 'Kcal eaten', 'merodiet' ) }
 							</div>
-							<div className="nutrio-kpi-value">
+							<div className="merodiet-kpi-value">
 								{ null !== eatenKcal || null !== plannedKcal
 									? formatAmount( eatenKcal ?? 0, '' )
 									: '—' }
 							</div>
 							{ null !== plannedKcal && (
-								<div className="nutrio-kpi-delta">
+								<div className="merodiet-kpi-delta">
 									{ sprintf(
 										/* translators: %s: total kcal planned for today */
-										__( 'of %s planned', 'nutrio' ),
+										__( 'of %s planned', 'merodiet' ),
 										formatAmount( plannedKcal, '' )
 									) }
 								</div>
 							) }
 						</div>
-						<div className="nutrio-kpi">
-							<div className="nutrio-kpi-label">
-								{ __( 'Current weight', 'nutrio' ) }
+						<div className="merodiet-kpi">
+							<div className="merodiet-kpi-label">
+								{ __( 'Current weight', 'merodiet' ) }
 							</div>
-							<div className="nutrio-kpi-value">
+							<div className="merodiet-kpi-value">
 								{ latestWeight
 									? `${ gramsToDisplay(
 											latestWeight.weight_grams,
@@ -192,10 +192,10 @@ export default function DashboardTab() {
 									: '—' }
 							</div>
 							{ null !== weightDelta && 0 !== weightDelta && (
-								<div className="nutrio-kpi-delta">
+								<div className="merodiet-kpi-delta">
 									{ weightDelta > 0 ? '↑' : '↓' }{ ' ' }
 									{ Math.abs( weightDelta ) } { unit }{ ' ' }
-									{ __( 'since last', 'nutrio' ) }
+									{ __( 'since last', 'merodiet' ) }
 								</div>
 							) }
 						</div>
@@ -204,14 +204,14 @@ export default function DashboardTab() {
 					<Panel>
 						<PanelBody>
 							<h3 className={ styles.sectionTitle }>
-								{ __( "Today's plan", 'nutrio' ) }
+								{ __( "Today's plan", 'merodiet' ) }
 							</h3>
 
 							{ null === plan && (
 								<p className={ styles.empty }>
 									{ __(
 										'No plan assigned yet — check back once your practitioner assigns one.',
-										'nutrio'
+										'merodiet'
 									) }
 								</p>
 							) }
@@ -220,7 +220,7 @@ export default function DashboardTab() {
 								<p className={ styles.empty }>
 									{ __(
 										'Nothing planned for today.',
-										'nutrio'
+										'merodiet'
 									) }
 								</p>
 							) }
@@ -257,7 +257,7 @@ export default function DashboardTab() {
 																item.recipe_name ??
 																__(
 																	'Item',
-																	'nutrio'
+																	'merodiet'
 																) }
 														</div>
 														{ itemQuantityLabel(

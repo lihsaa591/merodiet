@@ -54,7 +54,7 @@ interface ThunkArgs {
 export function createRecipe( data: RecipeInput ) {
 	return async ( { dispatch }: ThunkArgs ) => {
 		const recipe: Recipe = await apiFetch( {
-			path: '/nutrio/v1/recipes',
+			path: '/merodiet/v1/recipes',
 			method: 'POST',
 			data,
 		} );
@@ -70,7 +70,7 @@ export function createRecipe( data: RecipeInput ) {
 export function updateRecipe( id: number, data: Partial< RecipeInput > ) {
 	return async ( { dispatch }: ThunkArgs ) => {
 		const recipe: Recipe = await apiFetch( {
-			path: `/nutrio/v1/recipes/${ id }`,
+			path: `/merodiet/v1/recipes/${ id }`,
 			method: 'PATCH',
 			data,
 		} );
@@ -84,7 +84,7 @@ export function updateRecipe( id: number, data: Partial< RecipeInput > ) {
 export function deleteRecipe( id: number ) {
 	return async ( { dispatch }: ThunkArgs ) => {
 		await apiFetch( {
-			path: `/nutrio/v1/recipes/${ id }`,
+			path: `/merodiet/v1/recipes/${ id }`,
 			method: 'DELETE',
 		} );
 

@@ -45,15 +45,15 @@ If `QueryFiltersTest.php` exists, read it and add the new test method into it. I
 ```php
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Database;
+namespace MeroDiet\Tests\Unit\Database;
 
-use Nutrio\Database\QueryFilters;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Database\QueryFilters;
+use MeroDiet\Tests\TestCase;
 
 final class QueryFiltersTest extends TestCase {
 
@@ -104,7 +104,7 @@ final class QueryFiltersTest extends TestCase {
 - [ ] **Step 3: Run the test to verify it fails**
 
 Run: `composer test -- --filter QueryFiltersTest`
-Expected: FAIL — `Call to undefined method Nutrio\Database\QueryFilters::date_range_clause()`.
+Expected: FAIL — `Call to undefined method MeroDiet\Database\QueryFilters::date_range_clause()`.
 
 - [ ] **Step 4: Implement `date_range_clause()`**
 
@@ -174,7 +174,7 @@ Add both methods to `includes/Repositories/ClientRepository.php`, near `find_for
 		global $wpdb;
 
 		$row = $wpdb->get_row(
-			$wpdb->prepare( "SELECT * FROM {$wpdb->prefix}nutrio_clients WHERE user_id = %d", $user_id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
+			$wpdb->prepare( "SELECT * FROM {$wpdb->prefix}merodiet_clients WHERE user_id = %d", $user_id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
 			ARRAY_A
 		);
 
@@ -192,7 +192,7 @@ Add both methods to `includes/Repositories/ClientRepository.php`, near `find_for
 		global $wpdb;
 
 		$wpdb->update(
-			$wpdb->prefix . 'nutrio_clients',
+			$wpdb->prefix . 'merodiet_clients',
 			array(
 				'user_id'    => $user_id,
 				'updated_at' => current_time( 'mysql' ),
@@ -237,14 +237,14 @@ EOF
 /**
  * Client compliance-log data access.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Repositories;
+namespace MeroDiet\Repositories;
 
-use Nutrio\Database\QueryFilters;
+use MeroDiet\Database\QueryFilters;
 
 /**
  * Every read/write method here takes the client's own internal ID —
@@ -268,7 +268,7 @@ class LogEntryRepository {
 		global $wpdb;
 
 		$wpdb->insert(
-			$wpdb->prefix . 'nutrio_log_entries',
+			$wpdb->prefix . 'merodiet_log_entries',
 			array(
 				'client_id'      => $client_id,
 				'plan_item_id'   => $data['plan_item_id'] ?? null,
@@ -287,7 +287,7 @@ class LogEntryRepository {
 		$id = (int) $wpdb->insert_id;
 
 		// Fires after a client logs a compliance entry.
-		do_action( 'nutrio_log_entry_created', $id, $data, $client_id );
+		do_action( 'merodiet_log_entry_created', $id, $data, $client_id );
 
 		return $id;
 	}
@@ -304,7 +304,7 @@ class LogEntryRepository {
 	public function all_for_client( int $client_id, array $filters = array() ): array {
 		global $wpdb;
 
-		$table  = $wpdb->prefix . 'nutrio_log_entries';
+		$table  = $wpdb->prefix . 'merodiet_log_entries';
 		$params = array( $client_id );
 
 		$where = QueryFilters::combine(
@@ -339,7 +339,7 @@ class LogEntryRepository {
 		global $wpdb;
 
 		$row = $wpdb->get_row(
-			$wpdb->prepare( "SELECT * FROM {$wpdb->prefix}nutrio_log_entries WHERE id = %d", $id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
+			$wpdb->prepare( "SELECT * FROM {$wpdb->prefix}merodiet_log_entries WHERE id = %d", $id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
 			ARRAY_A
 		);
 
@@ -407,14 +407,14 @@ EOF
 /**
  * Client body-measurement data access.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Repositories;
+namespace MeroDiet\Repositories;
 
-use Nutrio\Database\QueryFilters;
+use MeroDiet\Database\QueryFilters;
 
 /**
  * Same client-scoping posture as LogEntryRepository — every method
@@ -435,7 +435,7 @@ class MeasurementRepository {
 		global $wpdb;
 
 		$wpdb->insert(
-			$wpdb->prefix . 'nutrio_measurements',
+			$wpdb->prefix . 'merodiet_measurements',
 			array(
 				'client_id'    => $client_id,
 				'measured_at'  => $data['measured_at'],
@@ -449,7 +449,7 @@ class MeasurementRepository {
 		$id = (int) $wpdb->insert_id;
 
 		// Fires after a client logs a measurement.
-		do_action( 'nutrio_measurement_created', $id, $data, $client_id );
+		do_action( 'merodiet_measurement_created', $id, $data, $client_id );
 
 		return $id;
 	}
@@ -466,7 +466,7 @@ class MeasurementRepository {
 	public function all_for_client( int $client_id, array $filters = array() ): array {
 		global $wpdb;
 
-		$table  = $wpdb->prefix . 'nutrio_measurements';
+		$table  = $wpdb->prefix . 'merodiet_measurements';
 		$params = array( $client_id );
 
 		$where = QueryFilters::combine(
@@ -501,7 +501,7 @@ class MeasurementRepository {
 		global $wpdb;
 
 		$row = $wpdb->get_row(
-			$wpdb->prepare( "SELECT * FROM {$wpdb->prefix}nutrio_measurements WHERE id = %d", $id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
+			$wpdb->prepare( "SELECT * FROM {$wpdb->prefix}merodiet_measurements WHERE id = %d", $id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
 			ARRAY_A
 		);
 
@@ -565,17 +565,17 @@ EOF
 ```php
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\RestApi;
+namespace MeroDiet\Tests\Unit\RestApi;
 
 use Brain\Monkey\Functions;
-use Nutrio\Repositories\ClientRepository;
-use Nutrio\RestApi\AbstractClientController;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Repositories\ClientRepository;
+use MeroDiet\RestApi\AbstractClientController;
+use MeroDiet\Tests\TestCase;
 use WP_Error;
 
 final class AbstractClientControllerTest extends TestCase {
@@ -624,7 +624,7 @@ final class AbstractClientControllerTest extends TestCase {
 - [ ] **Step 2: Run the test to verify it fails**
 
 Run: `composer test -- --filter AbstractClientControllerTest`
-Expected: FAIL — class `Nutrio\RestApi\AbstractClientController` not found.
+Expected: FAIL — class `MeroDiet\RestApi\AbstractClientController` not found.
 
 - [ ] **Step 3: Implement `AbstractClientController`**
 
@@ -633,14 +633,14 @@ Expected: FAIL — class `Nutrio\RestApi\AbstractClientController` not found.
 /**
  * REST base for client-portal, self-service resources.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\RestApi;
+namespace MeroDiet\RestApi;
 
-use Nutrio\Repositories\ClientRepository;
+use MeroDiet\Repositories\ClientRepository;
 use WP_Error;
 
 /**
@@ -662,7 +662,7 @@ abstract class AbstractClientController extends AbstractController {
 	 *
 	 * @var string
 	 */
-	protected string $namespace = 'nutrio/v1';
+	protected string $namespace = 'merodiet/v1';
 
 	/**
 	 * The repository used to resolve the logged-in user to their own
@@ -682,7 +682,7 @@ abstract class AbstractClientController extends AbstractController {
 		$client = $this->client_repository()->find_for_user( get_current_user_id() );
 
 		if ( null === $client ) {
-			return $this->error( 'nutrio_not_found', __( 'No client record is linked to this account.', 'nutrio' ), 404 );
+			return $this->error( 'merodiet_not_found', __( 'No client record is linked to this account.', 'merodiet' ), 404 );
 		}
 
 		return (int) $client['id'];
@@ -729,17 +729,17 @@ EOF
 ```php
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Clients;
+namespace MeroDiet\Tests\Unit\Clients;
 
 use Brain\Monkey\Functions;
-use Nutrio\Clients\ClientInviteService;
-use Nutrio\Repositories\ClientRepository;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Clients\ClientInviteService;
+use MeroDiet\Repositories\ClientRepository;
+use MeroDiet\Tests\TestCase;
 use WP_Error;
 
 final class ClientInviteServiceTest extends TestCase {
@@ -811,7 +811,7 @@ final class ClientInviteServiceTest extends TestCase {
 - [ ] **Step 2: Run the tests to verify they fail**
 
 Run: `composer test -- --filter ClientInviteServiceTest`
-Expected: FAIL — class `Nutrio\Clients\ClientInviteService` not found.
+Expected: FAIL — class `MeroDiet\Clients\ClientInviteService` not found.
 
 - [ ] **Step 3: Implement `ClientInviteService`**
 
@@ -820,14 +820,14 @@ Expected: FAIL — class `Nutrio\Clients\ClientInviteService` not found.
 /**
  * Provisions a client's portal login and sends the invite.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Clients;
+namespace MeroDiet\Clients;
 
-use Nutrio\Repositories\ClientRepository;
+use MeroDiet\Repositories\ClientRepository;
 use WP_Error;
 
 /**
@@ -857,7 +857,7 @@ final class ClientInviteService {
 		$client = $this->clients->find( $client_id );
 
 		if ( null === $client ) {
-			return new WP_Error( 'nutrio_not_found', __( 'Client not found.', 'nutrio' ), array( 'status' => 404 ) );
+			return new WP_Error( 'merodiet_not_found', __( 'Client not found.', 'merodiet' ), array( 'status' => 404 ) );
 		}
 
 		if ( null !== $client['user_id'] ) {
@@ -876,8 +876,8 @@ final class ClientInviteService {
 
 		if ( false !== $existing ) {
 			return new WP_Error(
-				'nutrio_email_in_use',
-				__( 'A WordPress account with this email already exists. Link or resolve it manually before inviting this client.', 'nutrio' ),
+				'merodiet_email_in_use',
+				__( 'A WordPress account with this email already exists. Link or resolve it manually before inviting this client.', 'merodiet' ),
 				array( 'status' => 409 )
 			);
 		}
@@ -902,7 +902,7 @@ final class ClientInviteService {
 		retrieve_password( false !== $user ? $user->user_login : $login );
 
 		// Fires after a client is invited to the portal.
-		do_action( 'nutrio_client_invited', $client_id, $user_id );
+		do_action( 'merodiet_client_invited', $client_id, $user_id );
 
 		return true;
 	}
@@ -948,13 +948,13 @@ EOF
 In `tests/Unit/RestApi/ControllerCapabilitiesTest.php`, change:
 
 ```php
-			'ClientsController' => array( ClientsController::class, array( ClientRepository::class ), 'manage_nutrio_clients' ),
+			'ClientsController' => array( ClientsController::class, array( ClientRepository::class ), 'manage_merodiet_clients' ),
 ```
 
 to:
 
 ```php
-			'ClientsController' => array( ClientsController::class, array( ClientRepository::class, \Nutrio\Clients\ClientInviteService::class ), 'manage_nutrio_clients' ),
+			'ClientsController' => array( ClientsController::class, array( ClientRepository::class, \MeroDiet\Clients\ClientInviteService::class ), 'manage_merodiet_clients' ),
 ```
 
 - [ ] **Step 2: Run the test to verify it fails**
@@ -966,7 +966,7 @@ Expected: FAIL — `ClientsController`'s constructor doesn't accept a second arg
 
 In `includes/RestApi/ClientsController.php`:
 
-1. Add the import: `use Nutrio\Clients\ClientInviteService;`
+1. Add the import: `use MeroDiet\Clients\ClientInviteService;`
 2. Change the constructor to:
 
 ```php
@@ -985,7 +985,7 @@ In `includes/RestApi/ClientsController.php`:
 				'methods'  => WP_REST_Server::CREATABLE,
 				'callback' => array( $this, 'invite_client' ),
 			),
-			required_capability: 'manage_nutrio_clients'
+			required_capability: 'manage_merodiet_clients'
 		);
 ```
 
@@ -1022,7 +1022,7 @@ In `includes/RestApi/ClientsController.php`:
 In `config/app.php`, change the `ClientsController` entry to:
 
 ```php
-			\Nutrio\RestApi\ClientsController::class     => array( \Nutrio\Repositories\ClientRepository::class, \Nutrio\Clients\ClientInviteService::class ),
+			\MeroDiet\RestApi\ClientsController::class     => array( \MeroDiet\Repositories\ClientRepository::class, \MeroDiet\Clients\ClientInviteService::class ),
 ```
 
 - [ ] **Step 5: Run the tests to verify they pass**
@@ -1080,7 +1080,7 @@ Add to `includes/Repositories/PlanRepository.php`, near `find_for_practitioner()
 
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM {$wpdb->prefix}nutrio_plans WHERE client_id = %d AND status = 'assigned' AND start_date <= %s AND end_date >= %s ORDER BY start_date DESC LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; values are parameterized.
+				"SELECT * FROM {$wpdb->prefix}merodiet_plans WHERE client_id = %d AND status = 'assigned' AND start_date <= %s AND end_date >= %s ORDER BY start_date DESC LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; values are parameterized.
 				$client_id,
 				$date,
 				$date
@@ -1130,27 +1130,27 @@ EOF
 
 - [ ] **Step 1: Update `ControllerCapabilitiesTest`'s provider (fails until Step 3 lands)**
 
-Add this entry to `controller_provider()` in `tests/Unit/RestApi/ControllerCapabilitiesTest.php`, and add `use Nutrio\RestApi\MeController;` plus the other new `use` statements at the top:
+Add this entry to `controller_provider()` in `tests/Unit/RestApi/ControllerCapabilitiesTest.php`, and add `use MeroDiet\RestApi\MeController;` plus the other new `use` statements at the top:
 
 ```php
 			'MeController' => array(
 				MeController::class,
 				array(
-					\Nutrio\Repositories\PlanRepository::class,
-					\Nutrio\Repositories\LogEntryRepository::class,
-					\Nutrio\Repositories\MeasurementRepository::class,
-					\Nutrio\Repositories\ClientRepository::class,
-					\Nutrio\Nutrition\FoodCache::class,
-					\Nutrio\Repositories\RecipeRepository::class,
+					\MeroDiet\Repositories\PlanRepository::class,
+					\MeroDiet\Repositories\LogEntryRepository::class,
+					\MeroDiet\Repositories\MeasurementRepository::class,
+					\MeroDiet\Repositories\ClientRepository::class,
+					\MeroDiet\Nutrition\FoodCache::class,
+					\MeroDiet\Repositories\RecipeRepository::class,
 				),
-				'view_own_nutrio_plan',
+				'view_own_merodiet_plan',
 			),
 ```
 
 - [ ] **Step 2: Run the test to verify it fails**
 
 Run: `composer test -- --filter ControllerCapabilitiesTest`
-Expected: FAIL — class `Nutrio\RestApi\MeController` not found.
+Expected: FAIL — class `MeroDiet\RestApi\MeController` not found.
 
 - [ ] **Step 3: Implement `MeController`**
 
@@ -1159,26 +1159,26 @@ Expected: FAIL — class `Nutrio\RestApi\MeController` not found.
 /**
  * Client-portal "my own data" REST endpoints.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\RestApi;
+namespace MeroDiet\RestApi;
 
-use Nutrio\Nutrition\FoodCache;
-use Nutrio\Repositories\ClientRepository;
-use Nutrio\Repositories\LogEntryRepository;
-use Nutrio\Repositories\MeasurementRepository;
-use Nutrio\Repositories\PlanRepository;
-use Nutrio\Repositories\RecipeRepository;
+use MeroDiet\Nutrition\FoodCache;
+use MeroDiet\Repositories\ClientRepository;
+use MeroDiet\Repositories\LogEntryRepository;
+use MeroDiet\Repositories\MeasurementRepository;
+use MeroDiet\Repositories\PlanRepository;
+use MeroDiet\Repositories\RecipeRepository;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
 
 /**
- * Every route here requires 'view_own_nutrio_plan' and resolves the
+ * Every route here requires 'view_own_merodiet_plan' and resolves the
  * caller's own client_id via AbstractClientController — see that
  * class's docblock for why there's no separate per-request ownership
  * check the way practitioner-owned resources need one.
@@ -1186,7 +1186,7 @@ use WP_REST_Server;
 final class MeController extends AbstractClientController {
 
 	/**
-	 * Route base — registers under nutrio/v1/me.
+	 * Route base — registers under merodiet/v1/me.
 	 *
 	 * @var string
 	 */
@@ -1227,7 +1227,7 @@ final class MeController extends AbstractClientController {
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( $this, 'get_plan' ),
 			),
-			required_capability: 'view_own_nutrio_plan'
+			required_capability: 'view_own_merodiet_plan'
 		);
 
 		$this->register_route(
@@ -1240,7 +1240,7 @@ final class MeController extends AbstractClientController {
 					'to'   => array( 'type' => 'string' ),
 				),
 			),
-			required_capability: 'view_own_nutrio_plan'
+			required_capability: 'view_own_merodiet_plan'
 		);
 
 		$this->register_route(
@@ -1250,7 +1250,7 @@ final class MeController extends AbstractClientController {
 				'callback' => array( $this, 'create_log' ),
 				'args'     => self::log_write_args(),
 			),
-			required_capability: 'view_own_nutrio_plan'
+			required_capability: 'view_own_merodiet_plan'
 		);
 
 		$this->register_route(
@@ -1263,7 +1263,7 @@ final class MeController extends AbstractClientController {
 					'to'   => array( 'type' => 'string' ),
 				),
 			),
-			required_capability: 'view_own_nutrio_plan'
+			required_capability: 'view_own_merodiet_plan'
 		);
 
 		$this->register_route(
@@ -1273,7 +1273,7 @@ final class MeController extends AbstractClientController {
 				'callback' => array( $this, 'create_measurement' ),
 				'args'     => self::measurement_write_args(),
 			),
-			required_capability: 'view_own_nutrio_plan'
+			required_capability: 'view_own_merodiet_plan'
 		);
 	}
 
@@ -1499,20 +1499,20 @@ final class MeController extends AbstractClientController {
 Add this entry to the `'controllers'` array in `config/app.php`, alongside the existing ones:
 
 ```php
-			\Nutrio\RestApi\MeController::class          => array(
-				\Nutrio\Repositories\PlanRepository::class,
-				\Nutrio\Repositories\LogEntryRepository::class,
-				\Nutrio\Repositories\MeasurementRepository::class,
-				\Nutrio\Repositories\ClientRepository::class,
-				\Nutrio\Nutrition\FoodCache::class,
-				\Nutrio\Repositories\RecipeRepository::class,
+			\MeroDiet\RestApi\MeController::class          => array(
+				\MeroDiet\Repositories\PlanRepository::class,
+				\MeroDiet\Repositories\LogEntryRepository::class,
+				\MeroDiet\Repositories\MeasurementRepository::class,
+				\MeroDiet\Repositories\ClientRepository::class,
+				\MeroDiet\Nutrition\FoodCache::class,
+				\MeroDiet\Repositories\RecipeRepository::class,
 			),
 ```
 
 - [ ] **Step 5: Run the tests to verify they pass**
 
 Run: `composer test -- --filter ControllerCapabilitiesTest`
-Expected: PASS — `MeController`'s routes are all gated by `view_own_nutrio_plan`.
+Expected: PASS — `MeController`'s routes are all gated by `view_own_merodiet_plan`.
 
 - [ ] **Step 6: Verify with phpcs, phpstan, and the full suite**
 

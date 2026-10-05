@@ -27,7 +27,7 @@ export function getPlansPage(
 			...filters,
 		} );
 		const response: PaginatedResponse< Plan > = await apiFetch( {
-			path: `/nutrio/v1/plans?${ params.toString() }`,
+			path: `/merodiet/v1/plans?${ params.toString() }`,
 		} );
 
 		dispatch.receivePlansPage(
@@ -44,7 +44,7 @@ export function getPlansPage(
 export function getPlan( id: number ) {
 	return async ( { dispatch }: ThunkArgs ) => {
 		const plan: Plan = await apiFetch( {
-			path: `/nutrio/v1/plans/${ id }`,
+			path: `/merodiet/v1/plans/${ id }`,
 		} );
 
 		dispatch.receivePlan( plan );

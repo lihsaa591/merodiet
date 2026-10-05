@@ -1,16 +1,16 @@
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\RestApi;
+namespace MeroDiet\Tests\Unit\RestApi;
 
 use Brain\Monkey\Functions;
-use Nutrio\Email\EmailTemplateService;
-use Nutrio\RestApi\SettingsController;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Email\EmailTemplateService;
+use MeroDiet\RestApi\SettingsController;
+use MeroDiet\Tests\TestCase;
 use WP_REST_Request;
 
 final class SettingsControllerTest extends TestCase {
@@ -186,7 +186,7 @@ final class SettingsControllerTest extends TestCase {
 		$controller = new SettingsController( new EmailTemplateService() );
 		$response   = $controller->update_data_retention( $request );
 
-		self::assertSame( array( 'nutrio_delete_data_on_uninstall', '1' ), $stored );
+		self::assertSame( array( 'merodiet_delete_data_on_uninstall', '1' ), $stored );
 		self::assertTrue( $response->get_data()['delete_on_uninstall'] );
 	}
 

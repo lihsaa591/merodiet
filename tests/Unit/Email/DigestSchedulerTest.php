@@ -1,16 +1,16 @@
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Email;
+namespace MeroDiet\Tests\Unit\Email;
 
 use Brain\Monkey\Functions;
 use DateTimeZone;
-use Nutrio\Email\DigestScheduler;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Email\DigestScheduler;
+use MeroDiet\Tests\TestCase;
 
 final class DigestSchedulerTest extends TestCase {
 
@@ -35,10 +35,10 @@ final class DigestSchedulerTest extends TestCase {
 		Functions\when( 'wp_timezone' )->justReturn( new DateTimeZone( 'UTC' ) );
 		Functions\when( 'get_option' )->alias(
 			static function ( string $name, $default = false ) {
-				if ( 'nutrio_digest_enabled' === $name ) {
+				if ( 'merodiet_digest_enabled' === $name ) {
 					return true;
 				}
-				if ( 'nutrio_digest_time' === $name ) {
+				if ( 'merodiet_digest_time' === $name ) {
 					return '00:01'; // Almost certainly already passed "today" in any real run.
 				}
 				return $default;

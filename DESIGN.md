@@ -1,10 +1,10 @@
-# DESIGN.md — Nutrio Admin Dashboard
+# DESIGN.md — MeroDiet Admin Dashboard
 
 **Status: LOCKED** — confirmed with the user across iterative review.
 
 ## Identity
 
-Nutrio is a practice-management tool for registered dietitians/nutritionists — client roster, USDA-backed recipe/nutrient data, meal-plan building. The visual identity is calm and clinical without being cold: a muted indigo/periwinkle accent with a matching pale lavender wash against a neutral white/gray base, flat bordered surfaces (no drop shadows), one quiet sans-serif typeface throughout.
+MeroDiet is a practice-management tool for registered dietitians/nutritionists — client roster, USDA-backed recipe/nutrient data, meal-plan building. The visual identity is calm and clinical without being cold: a muted indigo/periwinkle accent with a matching pale lavender wash against a neutral white/gray base, flat bordered surfaces (no drop shadows), one quiet sans-serif typeface throughout.
 
 **Pins (do not re-litigate without explicit user request):**
 - Accent hue: muted indigo/periwinkle (`--sage`) — deliberately kept out of the green/teal family to avoid any resemblance to AllCoach's (a sibling product) brand identity, which would read as a conflict of interest; landed here after trying several directions (terracotta, olive/khaki, zesty orange, steel-blue, muted mauve) and finding this one calmest and most distinct
@@ -38,7 +38,7 @@ All pairs verified to hold WCAG AA text contrast in both themes (body ≥4.5:1, 
 
 Theme is switched via `data-theme="light"|"dark"` on the root element (explicit toggle in the sidebar), falling back to `prefers-color-scheme` when no explicit choice has been made yet.
 
-**Known cascade gotcha (fixed, keep in mind):** never rely on inheritance alone for heading color. wp-admin's own core CSS has a direct (theme-unaware) rule for `h1`, and a direct rule always beats plain inheritance regardless of specificity — this caused invisible page titles in dark mode until `.nutrio-admin-app h1/h2/h3/h4` was given an explicit `color: var(--ink)`.
+**Known cascade gotcha (fixed, keep in mind):** never rely on inheritance alone for heading color. wp-admin's own core CSS has a direct (theme-unaware) rule for `h1`, and a direct rule always beats plain inheritance regardless of specificity — this caused invisible page titles in dark mode until `.merodiet-admin-app h1/h2/h3/h4` was given an explicit `color: var(--ink)`.
 
 ## Typography
 
@@ -79,15 +79,15 @@ This covers the admin surfaces. The client-portal frontend (clients log meals, v
 
 ## Full-screen takeover — implementation note
 
-The app hides the standard wp-admin chrome (`#wpadminbar`, `#adminmenumain`, `#wpfooter`, notices) via CSS scoped to `body.toplevel_page_nutrio`, and the app root becomes `position: fixed; inset: 0` to cover the full viewport. This was decided early in the design process but not actually wired up until later — noting it here so the gap doesn't reappear if the shell is ever rebuilt.
+The app hides the standard wp-admin chrome (`#wpadminbar`, `#adminmenumain`, `#wpfooter`, notices) via CSS scoped to `body.toplevel_page_merodiet`, and the app root becomes `position: fixed; inset: 0` to cover the full viewport. This was decided early in the design process but not actually wired up until later — noting it here so the gap doesn't reappear if the shell is ever rebuilt.
 
-## NUTRIO_DEVELOPMENT constant
+## MERODIET_DEVELOPMENT constant
 
-Defined in `nutrio.php`, defaulting to `WP_DEBUG`'s value but independently overridable in `wp-config.php`. Used in `Assets::enqueue_style()` to bust the CSS cache on every load during development (`wp-scripts start` rewrites the built CSS file in place without changing `NUTRIO_VERSION`, so the browser would otherwise keep serving a stale cached copy across saves) — production keeps the stable `NUTRIO_VERSION` string. Also localized to JS as `nutrioAdmin.isDevelopment` to gate the dev-only auto-reload watcher (see DEVELOPMENT.md).
+Defined in `merodiet.php`, defaulting to `WP_DEBUG`'s value but independently overridable in `wp-config.php`. Used in `Assets::enqueue_style()` to bust the CSS cache on every load during development (`wp-scripts start` rewrites the built CSS file in place without changing `MERODIET_VERSION`, so the browser would otherwise keep serving a stale cached copy across saves) — production keeps the stable `MERODIET_VERSION` string. Also localized to JS as `merodietAdmin.isDevelopment` to gate the dev-only auto-reload watcher (see DEVELOPMENT.md).
 
 ## CSS architecture
 
-Two global stylesheets (`src/styles/tokens.css` for the color tokens above, `src/styles/base.css` for shell/layout/page-level patterns like the KPI row, table, and form fields that are used directly by screens rather than through a shared component), plus **CSS Modules** for the actual reusable component set (`Button`, `Panel`, `Chip`, `Avatar`, `Drawer`, `IconButton`, `ProUpsellModal`) — each component has a colocated `ComponentName.module.css`, imported as `styles` and referenced as `styles.xxx`. Class names still carry a `nutrio-` prefix in the compiled output (via a custom `localIdentName` in `webpack.config.js`) for readability in devtools, on top of the automatic collision-proof scoping CSS Modules provides. No SCSS, no Tailwind, no external UI framework — see DEVELOPMENT.md for the reasoning.
+Two global stylesheets (`src/styles/tokens.css` for the color tokens above, `src/styles/base.css` for shell/layout/page-level patterns like the KPI row, table, and form fields that are used directly by screens rather than through a shared component), plus **CSS Modules** for the actual reusable component set (`Button`, `Panel`, `Chip`, `Avatar`, `Drawer`, `IconButton`, `ProUpsellModal`) — each component has a colocated `ComponentName.module.css`, imported as `styles` and referenced as `styles.xxx`. Class names still carry a `merodiet-` prefix in the compiled output (via a custom `localIdentName` in `webpack.config.js`) for readability in devtools, on top of the automatic collision-proof scoping CSS Modules provides. No SCSS, no Tailwind, no external UI framework — see DEVELOPMENT.md for the reasoning.
 
 ## Accessibility requirements
 

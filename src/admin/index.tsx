@@ -8,7 +8,7 @@ import '../store/plans';
 import '../store/customFoods';
 import App from './App';
 
-const settings = window.nutrioAdmin ?? {};
+const settings = window.merodietAdmin ?? {};
 
 // Point api-fetch at this site's REST root and authenticate as the logged-in user.
 if ( settings.restUrl ) {
@@ -20,7 +20,7 @@ if ( settings.restNonce ) {
 
 domReady( () => {
 	const el = document.getElementById(
-		settings.mountId ?? 'nutrio-admin-app'
+		settings.mountId ?? 'merodiet-admin-app'
 	);
 
 	if ( el ) {

@@ -1,35 +1,35 @@
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\RestApi;
+namespace MeroDiet\Tests\Unit\RestApi;
 
 use Brain\Monkey\Functions;
-use Nutrio\Clients\ClientInviteService;
-use Nutrio\Clients\ComplianceCalculator;
-use Nutrio\Email\Mailer;
-use Nutrio\Nutrition\FoodCache;
-use Nutrio\Nutrition\FoodDataService;
-use Nutrio\Nutrition\PlanNutrientResolver;
-use Nutrio\Nutrition\RecipeNutrientResolver;
-use Nutrio\Repositories\ClientRepository;
-use Nutrio\Repositories\LogEntryRepository;
-use Nutrio\Repositories\MeasurementRepository;
-use Nutrio\Repositories\PlanRepository;
-use Nutrio\Repositories\RecipeRepository;
-use Nutrio\RestApi\ClientsController;
-use Nutrio\RestApi\FoodsController;
-use Nutrio\RestApi\MeController;
-use Nutrio\RestApi\PlansController;
-use Nutrio\RestApi\RecipesController;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Clients\ClientInviteService;
+use MeroDiet\Clients\ComplianceCalculator;
+use MeroDiet\Email\Mailer;
+use MeroDiet\Nutrition\FoodCache;
+use MeroDiet\Nutrition\FoodDataService;
+use MeroDiet\Nutrition\PlanNutrientResolver;
+use MeroDiet\Nutrition\RecipeNutrientResolver;
+use MeroDiet\Repositories\ClientRepository;
+use MeroDiet\Repositories\LogEntryRepository;
+use MeroDiet\Repositories\MeasurementRepository;
+use MeroDiet\Repositories\PlanRepository;
+use MeroDiet\Repositories\RecipeRepository;
+use MeroDiet\RestApi\ClientsController;
+use MeroDiet\RestApi\FoodsController;
+use MeroDiet\RestApi\MeController;
+use MeroDiet\RestApi\PlansController;
+use MeroDiet\RestApi\RecipesController;
+use MeroDiet\Tests\TestCase;
 
 /**
- * Every Nutrio REST route must be gated by its own resource-specific
- * capability (manage_nutrio_clients, manage_nutrio_recipes, etc.) —
+ * Every MeroDiet REST route must be gated by its own resource-specific
+ * capability (manage_merodiet_clients, manage_merodiet_recipes, etc.) —
  * NOT the framework default of 'manage_options'. A route that silently
  * falls back to the default would mean only a WordPress Administrator
  * could ever use it, defeating the entire point of the 'practitioner'
@@ -49,18 +49,18 @@ final class ControllerCapabilitiesTest extends TestCase {
 				ClientsController::class,
 				array(
 					ClientRepository::class,
-					\Nutrio\Clients\ClientInviteService::class,
+					\MeroDiet\Clients\ClientInviteService::class,
 					LogEntryRepository::class,
 					MeasurementRepository::class,
 					ComplianceCalculator::class,
 					Mailer::class,
-					\Nutrio\Clients\LogEntryLabelResolver::class,
+					\MeroDiet\Clients\LogEntryLabelResolver::class,
 				),
-				'manage_nutrio_clients',
+				'manage_merodiet_clients',
 			),
-			'RecipesController'  => array( RecipesController::class, array( RecipeRepository::class, RecipeNutrientResolver::class, FoodCache::class ), 'manage_nutrio_recipes' ),
-			'FoodsController'    => array( FoodsController::class, array( FoodDataService::class ), 'manage_nutrio_foods' ),
-			'PlansController'    => array( PlansController::class, array( PlanRepository::class, PlanNutrientResolver::class, ClientRepository::class, FoodCache::class, RecipeRepository::class, RecipeNutrientResolver::class, Mailer::class ), 'manage_nutrio_plans' ),
+			'RecipesController'  => array( RecipesController::class, array( RecipeRepository::class, RecipeNutrientResolver::class, FoodCache::class ), 'manage_merodiet_recipes' ),
+			'FoodsController'    => array( FoodsController::class, array( FoodDataService::class ), 'manage_merodiet_foods' ),
+			'PlansController'    => array( PlansController::class, array( PlanRepository::class, PlanNutrientResolver::class, ClientRepository::class, FoodCache::class, RecipeRepository::class, RecipeNutrientResolver::class, Mailer::class ), 'manage_merodiet_plans' ),
 			'MeController'       => array(
 				MeController::class,
 				array(
@@ -72,7 +72,7 @@ final class ControllerCapabilitiesTest extends TestCase {
 					RecipeRepository::class,
 					RecipeNutrientResolver::class,
 				),
-				'view_own_nutrio_plan',
+				'view_own_merodiet_plan',
 			),
 		);
 	}
@@ -151,21 +151,21 @@ final class ControllerCapabilitiesTest extends TestCase {
 
 		if ( ComplianceCalculator::class === $class ) {
 			return new ComplianceCalculator(
-				$this->createMock( \Nutrio\Repositories\PlanRepository::class ),
+				$this->createMock( \MeroDiet\Repositories\PlanRepository::class ),
 				$this->createMock( LogEntryRepository::class )
 			);
 		}
 
-		if ( \Nutrio\Clients\LogEntryLabelResolver::class === $class ) {
-			return new \Nutrio\Clients\LogEntryLabelResolver(
-				$this->createMock( \Nutrio\Repositories\PlanRepository::class ),
-				$this->createMock( \Nutrio\Nutrition\FoodCache::class ),
-				$this->createMock( \Nutrio\Repositories\RecipeRepository::class )
+		if ( \MeroDiet\Clients\LogEntryLabelResolver::class === $class ) {
+			return new \MeroDiet\Clients\LogEntryLabelResolver(
+				$this->createMock( \MeroDiet\Repositories\PlanRepository::class ),
+				$this->createMock( \MeroDiet\Nutrition\FoodCache::class ),
+				$this->createMock( \MeroDiet\Repositories\RecipeRepository::class )
 			);
 		}
 
 		if ( Mailer::class === $class ) {
-			return new Mailer( new \Nutrio\Email\EmailTemplateService() );
+			return new Mailer( new \MeroDiet\Email\EmailTemplateService() );
 		}
 
 		return $this->createMock( $class );

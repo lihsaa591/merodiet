@@ -5,7 +5,7 @@
  * Plain PHP array, no magic. Add a provider, a REST controller, or an
  * admin page here and nothing else needs to change.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
@@ -23,14 +23,14 @@ return array(
 	 * Plugin::run().
 	 */
 	'providers' => array(
-		\Nutrio\Providers\AppServiceProvider::class,
-		\Nutrio\Providers\DatabaseServiceProvider::class,
-		\Nutrio\Providers\FoodDataServiceProvider::class,
-		\Nutrio\Providers\RecipeServiceProvider::class,
-		\Nutrio\Providers\PlanServiceProvider::class,
-		\Nutrio\Providers\RestApiServiceProvider::class,
-		\Nutrio\Providers\AdminServiceProvider::class,
-		\Nutrio\Providers\PortalServiceProvider::class,
+		\MeroDiet\Providers\AppServiceProvider::class,
+		\MeroDiet\Providers\DatabaseServiceProvider::class,
+		\MeroDiet\Providers\FoodDataServiceProvider::class,
+		\MeroDiet\Providers\RecipeServiceProvider::class,
+		\MeroDiet\Providers\PlanServiceProvider::class,
+		\MeroDiet\Providers\RestApiServiceProvider::class,
+		\MeroDiet\Providers\AdminServiceProvider::class,
+		\MeroDiet\Providers\PortalServiceProvider::class,
 	),
 
 	/*
@@ -40,46 +40,46 @@ return array(
 	 */
 	'rest'      => array(
 		'controllers' => array(
-			\Nutrio\RestApi\ClientsController::class     => array(
-				\Nutrio\Repositories\ClientRepository::class,
-				\Nutrio\Clients\ClientInviteService::class,
-				\Nutrio\Repositories\LogEntryRepository::class,
-				\Nutrio\Repositories\MeasurementRepository::class,
-				\Nutrio\Clients\ComplianceCalculator::class,
-				\Nutrio\Email\Mailer::class,
-				\Nutrio\Clients\LogEntryLabelResolver::class,
+			\MeroDiet\RestApi\ClientsController::class     => array(
+				\MeroDiet\Repositories\ClientRepository::class,
+				\MeroDiet\Clients\ClientInviteService::class,
+				\MeroDiet\Repositories\LogEntryRepository::class,
+				\MeroDiet\Repositories\MeasurementRepository::class,
+				\MeroDiet\Clients\ComplianceCalculator::class,
+				\MeroDiet\Email\Mailer::class,
+				\MeroDiet\Clients\LogEntryLabelResolver::class,
 			),
-			\Nutrio\RestApi\FoodsController::class       => array( \Nutrio\Nutrition\FoodDataService::class ),
-			\Nutrio\RestApi\CustomFoodsController::class => array( \Nutrio\Repositories\CustomFoodRepository::class ),
-			\Nutrio\RestApi\RecipesController::class     => array(
-				\Nutrio\Repositories\RecipeRepository::class,
-				\Nutrio\Nutrition\RecipeNutrientResolver::class,
-				\Nutrio\Nutrition\FoodCache::class,
+			\MeroDiet\RestApi\FoodsController::class       => array( \MeroDiet\Nutrition\FoodDataService::class ),
+			\MeroDiet\RestApi\CustomFoodsController::class => array( \MeroDiet\Repositories\CustomFoodRepository::class ),
+			\MeroDiet\RestApi\RecipesController::class     => array(
+				\MeroDiet\Repositories\RecipeRepository::class,
+				\MeroDiet\Nutrition\RecipeNutrientResolver::class,
+				\MeroDiet\Nutrition\FoodCache::class,
 			),
-			\Nutrio\RestApi\PlansController::class       => array(
-				\Nutrio\Repositories\PlanRepository::class,
-				\Nutrio\Nutrition\PlanNutrientResolver::class,
-				\Nutrio\Repositories\ClientRepository::class,
-				\Nutrio\Nutrition\FoodCache::class,
-				\Nutrio\Repositories\RecipeRepository::class,
-				\Nutrio\Nutrition\RecipeNutrientResolver::class,
-				\Nutrio\Email\Mailer::class,
+			\MeroDiet\RestApi\PlansController::class       => array(
+				\MeroDiet\Repositories\PlanRepository::class,
+				\MeroDiet\Nutrition\PlanNutrientResolver::class,
+				\MeroDiet\Repositories\ClientRepository::class,
+				\MeroDiet\Nutrition\FoodCache::class,
+				\MeroDiet\Repositories\RecipeRepository::class,
+				\MeroDiet\Nutrition\RecipeNutrientResolver::class,
+				\MeroDiet\Email\Mailer::class,
 			),
-			\Nutrio\RestApi\SettingsController::class    => array( \Nutrio\Email\EmailTemplateService::class ),
-			\Nutrio\RestApi\MeController::class          => array(
-				\Nutrio\Repositories\PlanRepository::class,
-				\Nutrio\Repositories\LogEntryRepository::class,
-				\Nutrio\Repositories\MeasurementRepository::class,
-				\Nutrio\Repositories\ClientRepository::class,
-				\Nutrio\Nutrition\FoodCache::class,
-				\Nutrio\Repositories\RecipeRepository::class,
-				\Nutrio\Nutrition\RecipeNutrientResolver::class,
+			\MeroDiet\RestApi\SettingsController::class    => array( \MeroDiet\Email\EmailTemplateService::class ),
+			\MeroDiet\RestApi\MeController::class          => array(
+				\MeroDiet\Repositories\PlanRepository::class,
+				\MeroDiet\Repositories\LogEntryRepository::class,
+				\MeroDiet\Repositories\MeasurementRepository::class,
+				\MeroDiet\Repositories\ClientRepository::class,
+				\MeroDiet\Nutrition\FoodCache::class,
+				\MeroDiet\Repositories\RecipeRepository::class,
+				\MeroDiet\Nutrition\RecipeNutrientResolver::class,
 			),
-			\Nutrio\RestApi\DashboardController::class   => array(
-				\Nutrio\Repositories\ClientRepository::class,
-				\Nutrio\Repositories\PlanRepository::class,
-				\Nutrio\Clients\ComplianceCalculator::class,
-				\Nutrio\Repositories\LogEntryRepository::class,
+			\MeroDiet\RestApi\DashboardController::class   => array(
+				\MeroDiet\Repositories\ClientRepository::class,
+				\MeroDiet\Repositories\PlanRepository::class,
+				\MeroDiet\Clients\ComplianceCalculator::class,
+				\MeroDiet\Repositories\LogEntryRepository::class,
 			),
 		),
 	),
@@ -91,13 +91,13 @@ return array(
 	'admin'     => array(
 		'pages' => array(
 			array(
-				'page_title'       => __( 'Nutrio', 'nutrio' ),
-				'menu_title'       => __( 'Nutrio', 'nutrio' ),
-				'capability'       => 'manage_nutrio_clients',
-				'menu_slug'        => 'nutrio',
-				'mount_element_id' => 'nutrio-admin-app',
+				'page_title'       => __( 'MeroDiet', 'merodiet' ),
+				'menu_title'       => __( 'MeroDiet', 'merodiet' ),
+				'capability'       => 'manage_merodiet_clients',
+				'menu_slug'        => 'merodiet',
+				'mount_element_id' => 'merodiet-admin-app',
 				'script_entry'     => 'admin',
-				'icon'             => NUTRIO_URL . 'assets/images/nutrio-leaf.png',
+				'icon'             => MERODIET_URL . 'assets/images/merodiet-logo.png',
 				'position'         => 30,
 			),
 		),

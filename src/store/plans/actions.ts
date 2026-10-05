@@ -46,7 +46,7 @@ interface ThunkArgs {
 export function createPlan( data: PlanInput ) {
 	return async ( { dispatch }: ThunkArgs ) => {
 		const plan: Plan = await apiFetch( {
-			path: '/nutrio/v1/plans',
+			path: '/merodiet/v1/plans',
 			method: 'POST',
 			data,
 		} );
@@ -65,7 +65,7 @@ export function createPlan( data: PlanInput ) {
 export function updatePlan( id: number, data: Partial< PlanInput > ) {
 	return async ( { dispatch }: ThunkArgs ) => {
 		const plan: Plan = await apiFetch( {
-			path: `/nutrio/v1/plans/${ id }`,
+			path: `/merodiet/v1/plans/${ id }`,
 			method: 'PATCH',
 			data,
 		} );
@@ -79,7 +79,7 @@ export function updatePlan( id: number, data: Partial< PlanInput > ) {
 export function deletePlan( id: number ) {
 	return async ( { dispatch }: ThunkArgs ) => {
 		await apiFetch( {
-			path: `/nutrio/v1/plans/${ id }`,
+			path: `/merodiet/v1/plans/${ id }`,
 			method: 'DELETE',
 		} );
 
@@ -90,7 +90,7 @@ export function deletePlan( id: number ) {
 export function assignPlan( id: number, clientId: number ) {
 	return async ( { dispatch }: ThunkArgs ) => {
 		const plan: Plan = await apiFetch( {
-			path: `/nutrio/v1/plans/${ id }/assign`,
+			path: `/merodiet/v1/plans/${ id }/assign`,
 			method: 'POST',
 			data: { client_id: clientId },
 		} );
@@ -104,7 +104,7 @@ export function assignPlan( id: number, clientId: number ) {
 export function unassignPlan( id: number ) {
 	return async ( { dispatch }: ThunkArgs ) => {
 		const plan: Plan = await apiFetch( {
-			path: `/nutrio/v1/plans/${ id }/unassign`,
+			path: `/merodiet/v1/plans/${ id }/unassign`,
 			method: 'POST',
 		} );
 

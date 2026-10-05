@@ -16,27 +16,27 @@ interface NutrientFieldDef {
 // Same curated set (and order) as CustomFoodNutrientMap on the backend,
 // grouped for the form the way a nutrition label groups them.
 const MACROS: NutrientFieldDef[] = [
-	{ key: 'calories', label: __( 'Calories', 'nutrio' ), unit: 'kcal' },
-	{ key: 'protein', label: __( 'Protein', 'nutrio' ), unit: 'g' },
-	{ key: 'carbs', label: __( 'Carbohydrates', 'nutrio' ), unit: 'g' },
-	{ key: 'fat', label: __( 'Fat', 'nutrio' ), unit: 'g' },
+	{ key: 'calories', label: __( 'Calories', 'merodiet' ), unit: 'kcal' },
+	{ key: 'protein', label: __( 'Protein', 'merodiet' ), unit: 'g' },
+	{ key: 'carbs', label: __( 'Carbohydrates', 'merodiet' ), unit: 'g' },
+	{ key: 'fat', label: __( 'Fat', 'merodiet' ), unit: 'g' },
 	{
 		key: 'saturated_fat',
-		label: __( 'Saturated fat', 'nutrio' ),
+		label: __( 'Saturated fat', 'merodiet' ),
 		unit: 'g',
 	},
-	{ key: 'fiber', label: __( 'Fiber', 'nutrio' ), unit: 'g' },
-	{ key: 'sugar', label: __( 'Sugar', 'nutrio' ), unit: 'g' },
-	{ key: 'sodium', label: __( 'Sodium', 'nutrio' ), unit: 'mg' },
+	{ key: 'fiber', label: __( 'Fiber', 'merodiet' ), unit: 'g' },
+	{ key: 'sugar', label: __( 'Sugar', 'merodiet' ), unit: 'g' },
+	{ key: 'sodium', label: __( 'Sodium', 'merodiet' ), unit: 'mg' },
 ];
 
 const VITAMINS_MINERALS: NutrientFieldDef[] = [
-	{ key: 'cholesterol', label: __( 'Cholesterol', 'nutrio' ), unit: 'mg' },
-	{ key: 'potassium', label: __( 'Potassium', 'nutrio' ), unit: 'mg' },
-	{ key: 'calcium', label: __( 'Calcium', 'nutrio' ), unit: 'mg' },
-	{ key: 'iron', label: __( 'Iron', 'nutrio' ), unit: 'mg' },
-	{ key: 'vitamin_c', label: __( 'Vitamin C', 'nutrio' ), unit: 'mg' },
-	{ key: 'vitamin_d', label: __( 'Vitamin D', 'nutrio' ), unit: 'mcg' },
+	{ key: 'cholesterol', label: __( 'Cholesterol', 'merodiet' ), unit: 'mg' },
+	{ key: 'potassium', label: __( 'Potassium', 'merodiet' ), unit: 'mg' },
+	{ key: 'calcium', label: __( 'Calcium', 'merodiet' ), unit: 'mg' },
+	{ key: 'iron', label: __( 'Iron', 'merodiet' ), unit: 'mg' },
+	{ key: 'vitamin_c', label: __( 'Vitamin C', 'merodiet' ), unit: 'mg' },
+	{ key: 'vitamin_d', label: __( 'Vitamin D', 'merodiet' ), unit: 'mcg' },
 ];
 
 type FormValues = { name: string } & Record< string, string >;
@@ -107,7 +107,7 @@ export default function CustomFoodForm( {
 			toast.error(
 				errorMessage(
 					error,
-					__( 'Something went wrong saving this food.', 'nutrio' )
+					__( 'Something went wrong saving this food.', 'merodiet' )
 				)
 			);
 		} finally {
@@ -119,8 +119,8 @@ export default function CustomFoodForm( {
 		if (
 			! isDirty ||
 			( await confirmDialog( {
-				message: __( 'Discard unsaved changes?', 'nutrio' ),
-				confirmLabel: __( 'Discard', 'nutrio' ),
+				message: __( 'Discard unsaved changes?', 'merodiet' ),
+				confirmLabel: __( 'Discard', 'merodiet' ),
 				destructive: true,
 			} ) )
 		) {
@@ -133,9 +133,9 @@ export default function CustomFoodForm( {
 			onSubmit={ handleSubmit }
 			style={ { display: 'flex', flexDirection: 'column', gap: '16px' } }
 		>
-			<div className="nutrio-field">
-				<label htmlFor="nutrio-food-name">
-					{ __( 'Food name', 'nutrio' ) }
+			<div className="merodiet-field">
+				<label htmlFor="merodiet-food-name">
+					{ __( 'Food name', 'merodiet' ) }
 					<span
 						style={ { color: 'var(--critical)' } }
 						aria-hidden="true"
@@ -144,13 +144,13 @@ export default function CustomFoodForm( {
 					</span>
 				</label>
 				<input
-					id="nutrio-food-name"
+					id="merodiet-food-name"
 					type="text"
 					value={ values.name }
 					onChange={ setField( 'name' ) }
 					placeholder={ __(
 						"Client's branded protein shake",
-						'nutrio'
+						'merodiet'
 					) }
 					required
 				/>
@@ -158,7 +158,7 @@ export default function CustomFoodForm( {
 
 			<div>
 				<h4 style={ { margin: '0 0 8px' } }>
-					{ __( 'Macros (per 100g)', 'nutrio' ) }
+					{ __( 'Macros (per 100g)', 'merodiet' ) }
 				</h4>
 				<NutrientGrid
 					fields={ MACROS }
@@ -169,7 +169,7 @@ export default function CustomFoodForm( {
 
 			<div>
 				<h4 style={ { margin: '0 0 8px' } }>
-					{ __( 'Vitamins & minerals (per 100g)', 'nutrio' ) }
+					{ __( 'Vitamins & minerals (per 100g)', 'merodiet' ) }
 				</h4>
 				<NutrientGrid
 					fields={ VITAMINS_MINERALS }
@@ -188,8 +188,8 @@ export default function CustomFoodForm( {
 					style={ { flex: 1, justifyContent: 'center' } }
 				>
 					{ food
-						? __( 'Save changes', 'nutrio' )
-						: __( 'Add custom food', 'nutrio' ) }
+						? __( 'Save changes', 'merodiet' )
+						: __( 'Add custom food', 'merodiet' ) }
 				</Button>
 				<Button
 					variant="ghost"
@@ -197,7 +197,7 @@ export default function CustomFoodForm( {
 					onClick={ handleCancel }
 					disabled={ isSaving }
 				>
-					{ __( 'Cancel', 'nutrio' ) }
+					{ __( 'Cancel', 'merodiet' ) }
 				</Button>
 			</div>
 		</form>
@@ -222,15 +222,15 @@ function NutrientGrid( { fields, values, setField }: NutrientGridProps ) {
 			} }
 		>
 			{ fields.map( ( { key, label, unit } ) => (
-				<div className="nutrio-field" key={ key }>
-					<label htmlFor={ `nutrio-food-${ key }` }>
+				<div className="merodiet-field" key={ key }>
+					<label htmlFor={ `merodiet-food-${ key }` }>
 						{ label }{ ' ' }
 						<span style={ { color: 'var(--ink-faint)' } }>
 							({ unit })
 						</span>
 					</label>
 					<input
-						id={ `nutrio-food-${ key }` }
+						id={ `merodiet-food-${ key }` }
 						type="number"
 						step="any"
 						min="0"

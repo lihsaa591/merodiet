@@ -2,16 +2,16 @@
 /**
  * Database / migrations service provider.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Providers;
+namespace MeroDiet\Providers;
 
 use League\Container\Container;
-use Nutrio\Database\Migrator;
-use Nutrio\Roles\RoleRegistrar;
+use MeroDiet\Database\Migrator;
+use MeroDiet\Roles\RoleRegistrar;
 
 /**
  * Binds the Migrator and, as a safety net for the "updated the plugin
@@ -32,8 +32,8 @@ final class DatabaseServiceProvider extends AbstractServiceProvider {
 		$container->add(
 			Migrator::class,
 			static fn () => new Migrator(
-				NUTRIO_PATH . 'database/migrations',
-				'nutrio_applied_migrations'
+				MERODIET_PATH . 'database/migrations',
+				'merodiet_applied_migrations'
 			)
 		)->setShared( true );
 	}
@@ -48,9 +48,9 @@ final class DatabaseServiceProvider extends AbstractServiceProvider {
 		add_action(
 			'admin_init',
 			static function () use ( $container ) {
-				$stored_version = get_option( 'nutrio_db_version' );
+				$stored_version = get_option( 'merodiet_db_version' );
 
-				if ( NUTRIO_VERSION === $stored_version ) {
+				if ( MERODIET_VERSION === $stored_version ) {
 					return;
 				}
 
@@ -64,7 +64,7 @@ final class DatabaseServiceProvider extends AbstractServiceProvider {
 
 				RoleRegistrar::register();
 
-				update_option( 'nutrio_db_version', NUTRIO_VERSION );
+				update_option( 'merodiet_db_version', MERODIET_VERSION );
 			}
 		);
 	}

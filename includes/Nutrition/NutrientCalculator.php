@@ -2,16 +2,16 @@
 /**
  * The nutrient aggregation engine.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Nutrition;
+namespace MeroDiet\Nutrition;
 
 /**
  * Pure, WordPress-free, deterministic. This is the credibility core of
- * the whole product — a clinically-trained buyer will judge Nutrio
+ * the whole product — a clinically-trained buyer will judge MeroDiet
  * entirely on whether these numbers are right, so every design choice
  * here favours correctness and auditability over convenience.
  *

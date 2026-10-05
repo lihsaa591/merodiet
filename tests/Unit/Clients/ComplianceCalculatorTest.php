@@ -1,16 +1,16 @@
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Clients;
+namespace MeroDiet\Tests\Unit\Clients;
 
-use Nutrio\Clients\ComplianceCalculator;
-use Nutrio\Repositories\LogEntryRepository;
-use Nutrio\Repositories\PlanRepository;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Clients\ComplianceCalculator;
+use MeroDiet\Repositories\LogEntryRepository;
+use MeroDiet\Repositories\PlanRepository;
+use MeroDiet\Tests\TestCase;
 
 final class ComplianceCalculatorTest extends TestCase {
 

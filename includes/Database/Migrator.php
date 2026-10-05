@@ -2,14 +2,14 @@
 /**
  * Migration runner.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Database;
+namespace MeroDiet\Database;
 
-use Nutrio\Contracts\MigrationInterface;
+use MeroDiet\Contracts\MigrationInterface;
 
 /**
  * Discovers migration files, runs the ones not yet applied, and can
@@ -22,7 +22,7 @@ use Nutrio\Contracts\MigrationInterface;
  * an instance implementing MigrationInterface, or an anonymous class:
  *
  *     <?php
- *     use Nutrio\Database\Migration;
+ *     use MeroDiet\Database\Migration;
  *
  *     return new class() extends Migration {
  *         public function up(): void {

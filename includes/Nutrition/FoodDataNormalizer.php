@@ -2,17 +2,17 @@
 /**
  * USDA FoodData Central response normalizer.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Nutrition;
+namespace MeroDiet\Nutrition;
 
 /**
  * Turns a raw FoodData Central `/food/{fdcId}` response into the flat,
  * per-100g, always-in-the-same-shape structure every other part of
- * Nutrio deals with. Deliberately pure — no WordPress functions, no
+ * MeroDiet deals with. Deliberately pure — no WordPress functions, no
  * HTTP — so every quirk below is unit-testable with plain fixtures.
  *
  * USDA's API has several quirks that would silently corrupt every
