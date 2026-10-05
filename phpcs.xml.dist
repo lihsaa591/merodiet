@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<ruleset name="Nutrio">
-	<description>WPCS rules for Nutrio and plugins scaffolded from it.</description>
+<ruleset name="MeroDiet">
+	<description>WPCS rules for MeroDiet and plugins scaffolded from it.</description>
 
 	<file>.</file>
 	<exclude-pattern>/vendor/*</exclude-pattern>
@@ -33,9 +33,9 @@
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<properties>
 			<property name="prefixes" type="array">
-				<element value="nutrio"/>
-				<element value="Nutrio"/>
-				<element value="NUTRIO"/>
+				<element value="merodiet"/>
+				<element value="MeroDiet"/>
+				<element value="MERODIET"/>
 			</property>
 		</properties>
 	</rule>

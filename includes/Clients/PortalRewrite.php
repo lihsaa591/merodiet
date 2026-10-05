@@ -2,12 +2,12 @@
 /**
  * Permalink-structure-agnostic routing for the client portal.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Clients;
+namespace MeroDiet\Clients;
 
 /**
  * A rewrite rule alone does nothing under WordPress's "Plain" permalink
@@ -27,7 +27,7 @@ final class PortalRewrite {
 	 * this route, regardless of which permalink structure produced the
 	 * request.
 	 */
-	public const QUERY_VAR = 'nutrio_portal';
+	public const QUERY_VAR = 'merodiet_portal';
 
 	/**
 	 * Register the query var and, when relevant, the pretty rewrite

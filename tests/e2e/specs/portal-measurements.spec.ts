@@ -3,7 +3,9 @@ import { test, expect } from '../fixtures/client-portal';
 test.describe( 'portal measurements tab', () => {
 	test.beforeEach( async ( { clientPage } ) => {
 		await clientPage.goto( '/client-portal/?view=measurements' );
-		await expect( clientPage.locator( '.nutrio-topbar h1' ) ).toBeVisible();
+		await expect(
+			clientPage.locator( '.merodiet-topbar h1' )
+		).toBeVisible();
 	} );
 
 	test( 'lists the seeded weigh-in and offers no Load more when nothing is older', async ( {
@@ -23,7 +25,7 @@ test.describe( 'portal measurements tab', () => {
 	test( 'logging a weight confirms with a toast', async ( {
 		clientPage,
 	} ) => {
-		await clientPage.fill( '#nutrio-weight-input', '74.5' );
+		await clientPage.fill( '#merodiet-weight-input', '74.5' );
 		await clientPage.getByRole( 'button', { name: 'Log weight' } ).click();
 
 		await expect(

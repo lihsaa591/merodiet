@@ -2,12 +2,12 @@
 /**
  * A merge-tag value that must render as raw HTML, never escaped.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Email;
+namespace MeroDiet\Email;
 
 /**
  * Wraps a pre-built, trusted HTML fragment (currently only

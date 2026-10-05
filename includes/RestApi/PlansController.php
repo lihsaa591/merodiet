@@ -2,21 +2,21 @@
 /**
  * Meal plan REST endpoints.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\RestApi;
+namespace MeroDiet\RestApi;
 
-use Nutrio\Clients\PortalRewrite;
-use Nutrio\Email\Mailer;
-use Nutrio\Nutrition\FoodCache;
-use Nutrio\Nutrition\PlanNutrientResolver;
-use Nutrio\Nutrition\RecipeNutrientResolver;
-use Nutrio\Repositories\ClientRepository;
-use Nutrio\Repositories\PlanRepository;
-use Nutrio\Repositories\RecipeRepository;
+use MeroDiet\Clients\PortalRewrite;
+use MeroDiet\Email\Mailer;
+use MeroDiet\Nutrition\FoodCache;
+use MeroDiet\Nutrition\PlanNutrientResolver;
+use MeroDiet\Nutrition\RecipeNutrientResolver;
+use MeroDiet\Repositories\ClientRepository;
+use MeroDiet\Repositories\PlanRepository;
+use MeroDiet\Repositories\RecipeRepository;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -42,7 +42,7 @@ use WP_REST_Server;
 final class PlansController extends AbstractPractitionerController {
 
 	/**
-	 * Route base — registers under nutrio/v1/plans.
+	 * Route base — registers under merodiet/v1/plans.
 	 *
 	 * @var string
 	 */
@@ -90,7 +90,7 @@ final class PlansController extends AbstractPractitionerController {
 					self::filter_route_args( self::LIST_FILTERS )
 				),
 			),
-			required_capability: 'manage_nutrio_plans'
+			required_capability: 'manage_merodiet_plans'
 		);
 
 		$this->register_route(
@@ -100,7 +100,7 @@ final class PlansController extends AbstractPractitionerController {
 				'callback' => array( $this, 'create_plan' ),
 				'args'     => self::plan_write_args( require_all: true ),
 			),
-			required_capability: 'manage_nutrio_plans'
+			required_capability: 'manage_merodiet_plans'
 		);
 
 		$this->register_route(
@@ -109,7 +109,7 @@ final class PlansController extends AbstractPractitionerController {
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( $this, 'get_plan' ),
 			),
-			required_capability: 'manage_nutrio_plans'
+			required_capability: 'manage_merodiet_plans'
 		);
 
 		$this->register_route(
@@ -119,7 +119,7 @@ final class PlansController extends AbstractPractitionerController {
 				'callback' => array( $this, 'update_plan' ),
 				'args'     => self::plan_write_args( require_all: false ),
 			),
-			required_capability: 'manage_nutrio_plans'
+			required_capability: 'manage_merodiet_plans'
 		);
 
 		$this->register_route(
@@ -128,7 +128,7 @@ final class PlansController extends AbstractPractitionerController {
 				'methods'  => WP_REST_Server::DELETABLE,
 				'callback' => array( $this, 'delete_plan' ),
 			),
-			required_capability: 'manage_nutrio_plans'
+			required_capability: 'manage_merodiet_plans'
 		);
 
 		$this->register_route(
@@ -143,7 +143,7 @@ final class PlansController extends AbstractPractitionerController {
 					),
 				),
 			),
-			required_capability: 'manage_nutrio_plans'
+			required_capability: 'manage_merodiet_plans'
 		);
 
 		$this->register_route(
@@ -152,7 +152,7 @@ final class PlansController extends AbstractPractitionerController {
 				'methods'  => WP_REST_Server::CREATABLE,
 				'callback' => array( $this, 'unassign_plan' ),
 			),
-			required_capability: 'manage_nutrio_plans'
+			required_capability: 'manage_merodiet_plans'
 		);
 	}
 
@@ -259,7 +259,7 @@ final class PlansController extends AbstractPractitionerController {
 		}
 
 		if ( 'assigned' === $plan['status'] ) {
-			return $this->error( 'nutrio_plan_already_assigned', __( 'An assigned plan cannot be edited.', 'nutrio' ), 409 );
+			return $this->error( 'merodiet_plan_already_assigned', __( 'An assigned plan cannot be edited.', 'merodiet' ), 409 );
 		}
 
 		$data = array();
@@ -298,7 +298,7 @@ final class PlansController extends AbstractPractitionerController {
 		}
 
 		if ( 'assigned' === $plan['status'] ) {
-			return $this->error( 'nutrio_plan_already_assigned', __( 'An assigned plan cannot be deleted.', 'nutrio' ), 409 );
+			return $this->error( 'merodiet_plan_already_assigned', __( 'An assigned plan cannot be deleted.', 'merodiet' ), 409 );
 		}
 
 		$this->plans->delete( $id );
@@ -326,24 +326,24 @@ final class PlansController extends AbstractPractitionerController {
 		}
 
 		if ( 'assigned' === $plan['status'] ) {
-			return $this->error( 'nutrio_plan_already_assigned', __( 'This plan has already been assigned.', 'nutrio' ), 409 );
+			return $this->error( 'merodiet_plan_already_assigned', __( 'This plan has already been assigned.', 'merodiet' ), 409 );
 		}
 
 		$client_id = (int) $request->get_param( 'client_id' );
 		$client    = $this->clients->find_for_practitioner( $client_id, $practitioner );
 
 		if ( null === $client ) {
-			return $this->error( 'nutrio_not_found', __( 'Client not found.', 'nutrio' ), 404 );
+			return $this->error( 'merodiet_not_found', __( 'Client not found.', 'merodiet' ), 404 );
 		}
 
 		$overlapping = $this->plans->find_overlapping_assigned_plan( $client_id, $plan['start_date'], $plan['end_date'] );
 
 		if ( null !== $overlapping ) {
 			return $this->error(
-				'nutrio_plan_overlap',
+				'merodiet_plan_overlap',
 				sprintf(
 					/* translators: 1: the already-assigned plan's title, 2: its end date */
-					__( 'This client already has an active plan ("%1$s", through %2$s). Unassign it before assigning another for an overlapping date range.', 'nutrio' ),
+					__( 'This client already has an active plan ("%1$s", through %2$s). Unassign it before assigning another for an overlapping date range.', 'merodiet' ),
 					$overlapping['title'],
 					$overlapping['end_date']
 				),
@@ -395,7 +395,7 @@ final class PlansController extends AbstractPractitionerController {
 		}
 
 		if ( 'assigned' !== $plan['status'] ) {
-			return $this->error( 'nutrio_plan_not_assigned', __( 'This plan is not currently assigned.', 'nutrio' ), 409 );
+			return $this->error( 'merodiet_plan_not_assigned', __( 'This plan is not currently assigned.', 'merodiet' ), 409 );
 		}
 
 		$this->plans->unassign( $id );

@@ -19,21 +19,21 @@ export interface Section {
 
 // The built-in sections — 'dashboard' first makes it the default landing
 // tab (sectionFromLocation() below falls back to sections[0]). A future
-// add-on's own bundle (enqueued via the PHP `nutrio_client_portal_render`
+// add-on's own bundle (enqueued via the PHP `merodiet_client_portal_render`
 // action) can append, remove, or reorder entries here via the
-// `nutrio.clientPortal.sections` filter below — the JS-side counterpart
-// to the PHP `nutrio_client_portal_bootstrap_data` filter.
+// `merodiet.clientPortal.sections` filter below — the JS-side counterpart
+// to the PHP `merodiet_client_portal_bootstrap_data` filter.
 const DEFAULT_SECTIONS: Section[] = [
 	{
 		id: 'dashboard',
-		label: __( 'Dashboard', 'nutrio' ),
+		label: __( 'Dashboard', 'merodiet' ),
 		component: DashboardTab,
 	},
-	{ id: 'plan', label: __( 'My Plan', 'nutrio' ), component: PlanTab },
-	{ id: 'log', label: __( 'Log', 'nutrio' ), component: LogTab },
+	{ id: 'plan', label: __( 'My Plan', 'merodiet' ), component: PlanTab },
+	{ id: 'log', label: __( 'Log', 'merodiet' ), component: LogTab },
 	{
 		id: 'measurements',
-		label: __( 'Measurements', 'nutrio' ),
+		label: __( 'Measurements', 'merodiet' ),
 		component: MeasurementsTab,
 	},
 ];
@@ -52,7 +52,7 @@ function sectionFromLocation( sections: Section[] ): string {
 
 export default function App() {
 	const sections: Section[] = applyFilters(
-		'nutrio.clientPortal.sections',
+		'merodiet.clientPortal.sections',
 		DEFAULT_SECTIONS
 	) as Section[];
 
@@ -64,13 +64,13 @@ export default function App() {
 	const [ client, setClient ] = useState< Client | null >( null );
 	const active = sections.find( ( section ) => section.id === activeId );
 
-	doAction( 'nutrio.clientPortal.mounted' );
+	doAction( 'merodiet.clientPortal.mounted' );
 
 	// Fetched once here (rather than inside ProfileDrawer) so the
 	// sidebar's avatar can reflect the same client record without a
 	// second, duplicate request.
 	useEffect( () => {
-		apiFetch< Client >( { path: '/nutrio/v1/me/profile' } )
+		apiFetch< Client >( { path: '/merodiet/v1/me/profile' } )
 			.then( setClient )
 			.catch( () => {} );
 	}, [] );
@@ -86,7 +86,7 @@ export default function App() {
 
 	useEffect( () => {
 		if ( active ) {
-			document.title = `${ active.label } — Nutrio`;
+			document.title = `${ active.label } — MeroDiet`;
 		}
 	}, [ active ] );
 
@@ -100,12 +100,12 @@ export default function App() {
 	};
 
 	return (
-		<div className="nutrio-client-portal-app">
+		<div className="merodiet-client-portal-app">
 			<ToastHost />
 			<button
-				className="nutrio-mobile-menu-btn"
+				className="merodiet-mobile-menu-btn"
 				onClick={ () => setSidebarOpen( ( open ) => ! open ) }
-				aria-label={ __( 'Open menu', 'nutrio' ) }
+				aria-label={ __( 'Open menu', 'merodiet' ) }
 			>
 				<svg
 					viewBox="0 0 24 24"
@@ -117,12 +117,12 @@ export default function App() {
 				</svg>
 			</button>
 			<div
-				className={ `nutrio-rail-scrim ${
+				className={ `merodiet-rail-scrim ${
 					isSidebarOpen ? 'is-open' : ''
 				}`.trim() }
 				role="button"
 				tabIndex={ -1 }
-				aria-label={ __( 'Close menu', 'nutrio' ) }
+				aria-label={ __( 'Close menu', 'merodiet' ) }
 				onClick={ () => setSidebarOpen( false ) }
 				onKeyDown={ ( event ) => {
 					if ( 'Escape' === event.key || 'Enter' === event.key ) {
@@ -131,7 +131,7 @@ export default function App() {
 				} }
 			/>
 
-			<div className="nutrio-shell">
+			<div className="merodiet-shell">
 				<PortalSidebar
 					isOpen={ isSidebarOpen }
 					sections={ sections }
@@ -141,8 +141,8 @@ export default function App() {
 					avatarUrl={ client?.avatar_url ?? null }
 				/>
 
-				<div className="nutrio-main">
-					<div className="nutrio-view">
+				<div className="merodiet-main">
+					<div className="merodiet-view">
 						{ active ? <active.component /> : null }
 					</div>
 				</div>

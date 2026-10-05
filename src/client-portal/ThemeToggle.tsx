@@ -1,7 +1,7 @@
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-const STORAGE_KEY = 'nutrio-theme';
+const STORAGE_KEY = 'merodiet-theme';
 
 type Theme = 'light' | 'dark';
 
@@ -43,10 +43,10 @@ export default function ThemeToggle() {
 	return (
 		<button
 			type="button"
-			className="nutrio-theme-toggle"
+			className="merodiet-theme-toggle"
 			onClick={ toggleTheme }
-			aria-label={ __( 'Toggle dark mode', 'nutrio' ) }
-			title={ __( 'Toggle dark mode', 'nutrio' ) }
+			aria-label={ __( 'Toggle dark mode', 'merodiet' ) }
+			title={ __( 'Toggle dark mode', 'merodiet' ) }
 		>
 			{ 'dark' === theme ? <MoonIcon /> : <SunIcon /> }
 		</button>

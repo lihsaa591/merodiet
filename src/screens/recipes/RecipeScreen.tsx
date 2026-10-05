@@ -86,10 +86,10 @@ export default function RecipeScreen() {
 	const handleSave = async ( data: RecipeInput ) => {
 		if ( editingRecipe ) {
 			await updateRecipe( editingRecipe.id, data );
-			toast.success( __( 'Recipe saved.', 'nutrio' ) );
+			toast.success( __( 'Recipe saved.', 'merodiet' ) );
 		} else {
 			const created = await createRecipe( data );
-			toast.success( __( 'Recipe created.', 'nutrio' ) );
+			toast.success( __( 'Recipe created.', 'merodiet' ) );
 			setIdParam( String( created.id ) );
 			return;
 		}
@@ -100,9 +100,9 @@ export default function RecipeScreen() {
 		const confirmed = await confirmDialog( {
 			message: __(
 				'Remove this recipe? This cannot be undone.',
-				'nutrio'
+				'merodiet'
 			),
-			confirmLabel: __( 'Remove', 'nutrio' ),
+			confirmLabel: __( 'Remove', 'merodiet' ),
 			destructive: true,
 		} );
 		if ( ! confirmed ) {
@@ -111,12 +111,12 @@ export default function RecipeScreen() {
 
 		try {
 			await deleteRecipe( recipe.id );
-			toast.success( __( 'Recipe removed.', 'nutrio' ) );
+			toast.success( __( 'Recipe removed.', 'merodiet' ) );
 		} catch ( error ) {
 			toast.error(
 				errorMessage(
 					error,
-					__( 'Could not remove this recipe.', 'nutrio' )
+					__( 'Could not remove this recipe.', 'merodiet' )
 				)
 			);
 		}
@@ -128,11 +128,11 @@ export default function RecipeScreen() {
 				/* translators: %d: number of recipes being removed */
 				__(
 					'Remove %d selected recipe(s)? This cannot be undone.',
-					'nutrio'
+					'merodiet'
 				),
 				selected.length
 			),
-			confirmLabel: __( 'Remove', 'nutrio' ),
+			confirmLabel: __( 'Remove', 'merodiet' ),
 			destructive: true,
 		} );
 		if ( confirmed ) {
@@ -147,11 +147,11 @@ export default function RecipeScreen() {
 							'%d recipe removed.',
 							'%d recipes removed.',
 							count,
-							'nutrio'
+							'merodiet'
 						),
 						count
 					),
-				failure: __( 'Some recipes could not be removed.', 'nutrio' ),
+				failure: __( 'Some recipes could not be removed.', 'merodiet' ),
 			} );
 		}
 	};
@@ -161,7 +161,7 @@ export default function RecipeScreen() {
 			isEditingRecipeLoading ||
 			( editingId !== null && ! editingRecipe )
 		) {
-			return <p>{ __( 'Loading…', 'nutrio' ) }</p>;
+			return <p>{ __( 'Loading…', 'merodiet' ) }</p>;
 		}
 
 		return (

@@ -1,13 +1,13 @@
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Clients;
+namespace MeroDiet\Tests\Unit\Clients;
 
-use Nutrio\Clients\ClientInviteService;
+use MeroDiet\Clients\ClientInviteService;
 use ReflectionProperty;
 
 /**

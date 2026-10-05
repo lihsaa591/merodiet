@@ -2,16 +2,16 @@
 /**
  * Client roster data access.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
 // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Plugin's own custom tables; table names come from $wpdb->prefix and every value is bound via $wpdb->prepare().
 
-namespace Nutrio\Repositories;
+namespace MeroDiet\Repositories;
 
-use Nutrio\Database\QueryFilters;
+use MeroDiet\Database\QueryFilters;
 
 /**
  * Every read method here takes the requesting practitioner's user ID
@@ -34,12 +34,12 @@ class ClientRepository {
 		global $wpdb;
 
 		// Lets an add-on (e.g. a pro client-cap limit) adjust or reject data before insert.
-		$data = apply_filters( 'nutrio_client_before_create', $data, $practitioner_user_id );
+		$data = apply_filters( 'merodiet_client_before_create', $data, $practitioner_user_id );
 
 		$now = current_time( 'mysql' );
 
 		$wpdb->insert(
-			$wpdb->prefix . 'nutrio_clients',
+			$wpdb->prefix . 'merodiet_clients',
 			array(
 				'practitioner_user_id' => $practitioner_user_id,
 				'first_name'           => $data['first_name'],
@@ -57,7 +57,7 @@ class ClientRepository {
 		$id = (int) $wpdb->insert_id;
 
 		// Fires after a client is created.
-		do_action( 'nutrio_client_created', $id, $data, $practitioner_user_id );
+		do_action( 'merodiet_client_created', $id, $data, $practitioner_user_id );
 
 		return $id;
 	}
@@ -76,7 +76,7 @@ class ClientRepository {
 		global $wpdb;
 
 		$row = $wpdb->get_row(
-			$wpdb->prepare( "SELECT * FROM {$wpdb->prefix}nutrio_clients WHERE id = %d", $id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
+			$wpdb->prepare( "SELECT * FROM {$wpdb->prefix}merodiet_clients WHERE id = %d", $id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
 			ARRAY_A
 		);
 
@@ -100,7 +100,7 @@ class ClientRepository {
 
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM {$wpdb->prefix}nutrio_clients WHERE id = %d AND practitioner_user_id = %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; values are parameterized.
+				"SELECT * FROM {$wpdb->prefix}merodiet_clients WHERE id = %d AND practitioner_user_id = %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; values are parameterized.
 				$id,
 				$practitioner_user_id
 			),
@@ -126,7 +126,7 @@ class ClientRepository {
 		global $wpdb;
 
 		$row = $wpdb->get_row(
-			$wpdb->prepare( "SELECT * FROM {$wpdb->prefix}nutrio_clients WHERE user_id = %d", $user_id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
+			$wpdb->prepare( "SELECT * FROM {$wpdb->prefix}merodiet_clients WHERE user_id = %d", $user_id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
 			ARRAY_A
 		);
 
@@ -144,7 +144,7 @@ class ClientRepository {
 		global $wpdb;
 
 		$wpdb->update(
-			$wpdb->prefix . 'nutrio_clients',
+			$wpdb->prefix . 'merodiet_clients',
 			array(
 				'user_id'    => $user_id,
 				'updated_at' => current_time( 'mysql' ),
@@ -171,7 +171,7 @@ class ClientRepository {
 	public function all_for_practitioner( int $practitioner_user_id, int $page = 1, int $per_page = 10, array $filters = array() ): array {
 		global $wpdb;
 
-		$table = $wpdb->prefix . 'nutrio_clients';
+		$table = $wpdb->prefix . 'merodiet_clients';
 
 		$params = array( $practitioner_user_id );
 
@@ -234,11 +234,11 @@ class ClientRepository {
 
 		$fields['updated_at'] = current_time( 'mysql' );
 
-		$updated = $wpdb->update( $wpdb->prefix . 'nutrio_clients', $fields, array( 'id' => $id ) );
+		$updated = $wpdb->update( $wpdb->prefix . 'merodiet_clients', $fields, array( 'id' => $id ) );
 
 		if ( false !== $updated ) {
 			// Fires after a client is updated.
-			do_action( 'nutrio_client_updated', $id, $fields );
+			do_action( 'merodiet_client_updated', $id, $fields );
 		}
 
 		return false !== $updated;
@@ -253,12 +253,12 @@ class ClientRepository {
 		global $wpdb;
 
 		// Fires before delete, while the row still exists — an add-on may want to archive it.
-		do_action( 'nutrio_client_before_delete', $id );
+		do_action( 'merodiet_client_before_delete', $id );
 
-		$deleted = false !== $wpdb->delete( $wpdb->prefix . 'nutrio_clients', array( 'id' => $id ) );
+		$deleted = false !== $wpdb->delete( $wpdb->prefix . 'merodiet_clients', array( 'id' => $id ) );
 
 		if ( $deleted ) {
-			do_action( 'nutrio_client_deleted', $id );
+			do_action( 'merodiet_client_deleted', $id );
 		}
 
 		return $deleted;

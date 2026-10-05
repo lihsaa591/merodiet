@@ -2,16 +2,16 @@
 /**
  * Client body-measurement data access.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
 // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Plugin's own custom tables; table names come from $wpdb->prefix and every value is bound via $wpdb->prepare().
 
-namespace Nutrio\Repositories;
+namespace MeroDiet\Repositories;
 
-use Nutrio\Database\QueryFilters;
+use MeroDiet\Database\QueryFilters;
 use WP_Error;
 
 /**
@@ -33,7 +33,7 @@ class MeasurementRepository {
 		global $wpdb;
 
 		$inserted = $wpdb->insert(
-			$wpdb->prefix . 'nutrio_measurements',
+			$wpdb->prefix . 'merodiet_measurements',
 			array(
 				'client_id'    => $client_id,
 				'measured_at'  => $data['measured_at'],
@@ -45,13 +45,13 @@ class MeasurementRepository {
 		);
 
 		if ( false === $inserted ) {
-			return new WP_Error( 'nutrio_db_error', __( 'Could not save the entry.', 'nutrio' ), array( 'status' => 500 ) );
+			return new WP_Error( 'merodiet_db_error', __( 'Could not save the entry.', 'merodiet' ), array( 'status' => 500 ) );
 		}
 
 		$id = (int) $wpdb->insert_id;
 
 		// Fires after a client logs a measurement.
-		do_action( 'nutrio_measurement_created', $id, $data, $client_id );
+		do_action( 'merodiet_measurement_created', $id, $data, $client_id );
 
 		return $id;
 	}
@@ -68,7 +68,7 @@ class MeasurementRepository {
 	public function all_for_client( int $client_id, array $filters = array() ): array {
 		global $wpdb;
 
-		$table  = $wpdb->prefix . 'nutrio_measurements';
+		$table  = $wpdb->prefix . 'merodiet_measurements';
 		$params = array( $client_id );
 
 		$where = QueryFilters::combine(
@@ -103,7 +103,7 @@ class MeasurementRepository {
 		global $wpdb;
 
 		$row = $wpdb->get_row(
-			$wpdb->prepare( "SELECT * FROM {$wpdb->prefix}nutrio_measurements WHERE id = %d", $id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
+			$wpdb->prepare( "SELECT * FROM {$wpdb->prefix}merodiet_measurements WHERE id = %d", $id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
 			ARRAY_A
 		);
 

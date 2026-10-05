@@ -2,12 +2,12 @@
 /**
  * Migration contract.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Contracts;
+namespace MeroDiet\Contracts;
 
 /**
  * A single, reversible database change.

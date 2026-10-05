@@ -2,17 +2,17 @@
 /**
  * Client-portal service provider.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Providers;
+namespace MeroDiet\Providers;
 
 use League\Container\Container;
-use Nutrio\Clients\PortalPage;
-use Nutrio\Clients\PortalRewrite;
-use Nutrio\Repositories\ClientRepository;
+use MeroDiet\Clients\PortalPage;
+use MeroDiet\Clients\PortalRewrite;
+use MeroDiet\Repositories\ClientRepository;
 
 /**
  * Wires the client portal's rewrite registration, request handling, and
@@ -35,7 +35,7 @@ final class PortalServiceProvider extends AbstractServiceProvider {
 		$container->add( PortalPage::class )
 			->setShared( true )
 			->addArgument( ClientRepository::class )
-			->addArgument( \Nutrio\Email\Mailer::class );
+			->addArgument( \MeroDiet\Email\Mailer::class );
 	}
 
 	/**
@@ -55,23 +55,23 @@ final class PortalServiceProvider extends AbstractServiceProvider {
 				 * @var PortalPage $page
 				 */
 				$page = $container->get( PortalPage::class );
-				add_shortcode( 'nutrio_client_portal', array( $page, 'render_shortcode' ) );
+				add_shortcode( 'merodiet_client_portal', array( $page, 'render_shortcode' ) );
 			}
 		);
 
-		// A site that already had Nutrio active before this feature shipped
+		// A site that already had MeroDiet active before this feature shipped
 		// won't otherwise get the rewrite rule onto disk until someone
 		// resaves Settings -> Permalinks. Catch it up once, the same way
 		// DatabaseServiceProvider catches up pending migrations.
 		add_action(
 			'admin_init',
 			static function () {
-				if ( '1' === get_option( 'nutrio_portal_rewrite_flushed' ) ) {
+				if ( '1' === get_option( 'merodiet_portal_rewrite_flushed' ) ) {
 					return;
 				}
 
 				flush_rewrite_rules();
-				update_option( 'nutrio_portal_rewrite_flushed', '1' );
+				update_option( 'merodiet_portal_rewrite_flushed', '1' );
 			}
 		);
 

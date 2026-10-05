@@ -61,8 +61,8 @@ export default function App() {
 			window.history.pushState( { view: activeView }, '', revertUrl );
 
 			const discard = await confirmDialog( {
-				message: __( 'Discard unsaved changes?', 'nutrio' ),
-				confirmLabel: __( 'Discard', 'nutrio' ),
+				message: __( 'Discard unsaved changes?', 'merodiet' ),
+				confirmLabel: __( 'Discard', 'merodiet' ),
 				destructive: true,
 			} );
 
@@ -97,8 +97,8 @@ export default function App() {
 	const selectView = async ( id: string ) => {
 		if ( hasUnsavedChanges() ) {
 			const discard = await confirmDialog( {
-				message: __( 'Discard unsaved changes?', 'nutrio' ),
-				confirmLabel: __( 'Discard', 'nutrio' ),
+				message: __( 'Discard unsaved changes?', 'merodiet' ),
+				confirmLabel: __( 'Discard', 'merodiet' ),
 				destructive: true,
 			} );
 			if ( ! discard ) {
@@ -132,11 +132,11 @@ export default function App() {
 	};
 
 	return (
-		<div className="nutrio-admin-app">
+		<div className="merodiet-admin-app">
 			<button
-				className="nutrio-mobile-menu-btn"
+				className="merodiet-mobile-menu-btn"
 				onClick={ () => setSidebarOpen( ( open ) => ! open ) }
-				aria-label={ __( 'Open menu', 'nutrio' ) }
+				aria-label={ __( 'Open menu', 'merodiet' ) }
 			>
 				<svg
 					viewBox="0 0 24 24"
@@ -148,12 +148,12 @@ export default function App() {
 				</svg>
 			</button>
 			<div
-				className={ `nutrio-rail-scrim ${
+				className={ `merodiet-rail-scrim ${
 					isSidebarOpen ? 'is-open' : ''
 				}`.trim() }
 				role="button"
 				tabIndex={ -1 }
-				aria-label={ __( 'Close menu', 'nutrio' ) }
+				aria-label={ __( 'Close menu', 'merodiet' ) }
 				onClick={ () => setSidebarOpen( false ) }
 				onKeyDown={ ( event ) => {
 					if ( 'Escape' === event.key || 'Enter' === event.key ) {
@@ -162,15 +162,15 @@ export default function App() {
 				} }
 			/>
 
-			<div className="nutrio-shell">
+			<div className="merodiet-shell">
 				<Sidebar
 					isOpen={ isSidebarOpen }
 					activeView={ activeView }
 					onSelect={ selectView }
 				/>
 
-				<div className="nutrio-main">
-					<div className="nutrio-view">{ view.render() }</div>
+				<div className="merodiet-main">
+					<div className="merodiet-view">{ view.render() }</div>
 				</div>
 			</div>
 			<ConfirmDialogHost />

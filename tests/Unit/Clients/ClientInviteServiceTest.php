@@ -1,16 +1,16 @@
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Clients;
+namespace MeroDiet\Tests\Unit\Clients;
 
 use Brain\Monkey\Functions;
-use Nutrio\Clients\ClientInviteService;
-use Nutrio\Repositories\ClientRepository;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Clients\ClientInviteService;
+use MeroDiet\Repositories\ClientRepository;
+use MeroDiet\Tests\TestCase;
 use WP_Error;
 
 final class ClientInviteServiceTest extends TestCase {

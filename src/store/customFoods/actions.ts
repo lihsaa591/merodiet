@@ -59,7 +59,7 @@ interface ThunkArgs {
 export function createCustomFood( data: CustomFoodInput ) {
 	return async ( { dispatch }: ThunkArgs ) => {
 		const food: CustomFood = await apiFetch( {
-			path: '/nutrio/v1/custom-foods',
+			path: '/merodiet/v1/custom-foods',
 			method: 'POST',
 			data,
 		} );
@@ -78,7 +78,7 @@ export function updateCustomFood(
 ) {
 	return async ( { dispatch }: ThunkArgs ) => {
 		const food: CustomFood = await apiFetch( {
-			path: `/nutrio/v1/custom-foods/${ id }`,
+			path: `/merodiet/v1/custom-foods/${ id }`,
 			method: 'PATCH',
 			data,
 		} );
@@ -92,7 +92,7 @@ export function updateCustomFood(
 export function deleteCustomFood( id: number ) {
 	return async ( { dispatch }: ThunkArgs ) => {
 		await apiFetch( {
-			path: `/nutrio/v1/custom-foods/${ id }`,
+			path: `/merodiet/v1/custom-foods/${ id }`,
 			method: 'DELETE',
 		} );
 

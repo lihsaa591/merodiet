@@ -1,19 +1,19 @@
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Email;
+namespace MeroDiet\Tests\Unit\Email;
 
 use Brain\Monkey\Functions;
-use Nutrio\Email\DigestMailer;
-use Nutrio\Email\EmailTemplateService;
-use Nutrio\Email\Mailer;
-use Nutrio\Repositories\ClientRepository;
-use Nutrio\Repositories\LogEntryRepository;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Email\DigestMailer;
+use MeroDiet\Email\EmailTemplateService;
+use MeroDiet\Email\Mailer;
+use MeroDiet\Repositories\ClientRepository;
+use MeroDiet\Repositories\LogEntryRepository;
+use MeroDiet\Tests\TestCase;
 
 final class DigestMailerTest extends TestCase {
 

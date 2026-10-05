@@ -2,14 +2,14 @@
 /**
  * REST base for client-portal, self-service resources.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\RestApi;
+namespace MeroDiet\RestApi;
 
-use Nutrio\Repositories\ClientRepository;
+use MeroDiet\Repositories\ClientRepository;
 use WP_Error;
 
 /**
@@ -31,7 +31,7 @@ abstract class AbstractClientController extends AbstractController {
 	 *
 	 * @var string
 	 */
-	protected string $namespace = 'nutrio/v1';
+	protected string $namespace = 'merodiet/v1';
 
 	/**
 	 * The repository used to resolve the logged-in user to their own
@@ -51,7 +51,7 @@ abstract class AbstractClientController extends AbstractController {
 		$client = $this->client_repository()->find_for_user( get_current_user_id() );
 
 		if ( null === $client ) {
-			return $this->error( 'nutrio_not_found', __( 'No client record is linked to this account.', 'nutrio' ), 404 );
+			return $this->error( 'merodiet_not_found', __( 'No client record is linked to this account.', 'merodiet' ), 404 );
 		}
 
 		return (int) $client['id'];

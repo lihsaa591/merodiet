@@ -1,17 +1,17 @@
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Email;
+namespace MeroDiet\Tests\Unit\Email;
 
 use Brain\Monkey\Functions;
 use InvalidArgumentException;
-use Nutrio\Email\EmailTemplateService;
-use Nutrio\Email\RawHtml;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Email\EmailTemplateService;
+use MeroDiet\Email\RawHtml;
+use MeroDiet\Tests\TestCase;
 
 final class EmailTemplateServiceTest extends TestCase {
 

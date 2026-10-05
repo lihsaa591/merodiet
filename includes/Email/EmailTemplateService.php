@@ -1,18 +1,18 @@
 <?php
 /**
- * Per-type storage and merge-tag rendering for Nutrio's emails.
+ * Per-type storage and merge-tag rendering for MeroDiet's emails.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Email;
+namespace MeroDiet\Email;
 
 use InvalidArgumentException;
 
 /**
- * Each type is its own WordPress option (nutrio_email_{type}), not one
+ * Each type is its own WordPress option (merodiet_email_{type}), not one
  * shared array — see the design spec's "Storage" section for why
  * (WooCommerce precedent, future add-on extensibility). Callers never
  * see that storage layout: every public method here is keyed by type.
@@ -25,7 +25,7 @@ final class EmailTemplateService {
 	 * only client_plan_assigned and practitioner_client_added actually
 	 * check it before sending (client_invite/client_password_reset are
 	 * triggered by WordPress core itself and always send; the daily
-	 * digest's on/off state lives in its own nutrio_digest_enabled
+	 * digest's on/off state lives in its own merodiet_digest_enabled
 	 * option instead, since it gates whether the cron event is even
 	 * scheduled, not just whether an email goes out when it fires).
 	 *
@@ -170,6 +170,6 @@ final class EmailTemplateService {
 	 * @param string $type A known type.
 	 */
 	private static function option_name( string $type ): string {
-		return "nutrio_email_{$type}";
+		return "merodiet_email_{$type}";
 	}
 }

@@ -28,10 +28,10 @@ import type {
 } from '../../types';
 
 const MEAL_TYPES: { id: MealType; label: string }[] = [
-	{ id: 'breakfast', label: __( 'Breakfast', 'nutrio' ) },
-	{ id: 'lunch', label: __( 'Lunch', 'nutrio' ) },
-	{ id: 'dinner', label: __( 'Dinner', 'nutrio' ) },
-	{ id: 'snack', label: __( 'Snack', 'nutrio' ) },
+	{ id: 'breakfast', label: __( 'Breakfast', 'merodiet' ) },
+	{ id: 'lunch', label: __( 'Lunch', 'merodiet' ) },
+	{ id: 'dinner', label: __( 'Dinner', 'merodiet' ) },
+	{ id: 'snack', label: __( 'Snack', 'merodiet' ) },
 ];
 
 interface DraftItem extends PlanItemInput {
@@ -85,7 +85,7 @@ function draftItemFromApiItem( item: PlanItem ): DraftItem {
 		label:
 			item.food_description ??
 			item.recipe_name ??
-			__( '(unknown item)', 'nutrio' ),
+			__( '(unknown item)', 'merodiet' ),
 		nutrients: item.nutrients,
 		recipe_nutrient_totals_per_serving:
 			item.recipe_nutrient_totals_per_serving,
@@ -141,7 +141,7 @@ export default function PlanBuilder( {
 			toast.error(
 				__(
 					'Plans can’t span more than 90 days — for a longer program, build one plan per stretch and duplicate between them.',
-					'nutrio'
+					'merodiet'
 				)
 			);
 			return;
@@ -156,9 +156,9 @@ export default function PlanBuilder( {
 			! ( await confirmDialog( {
 				message: __(
 					'Shortening the date range will remove items already added on the dropped days. Continue?',
-					'nutrio'
+					'merodiet'
 				),
-				confirmLabel: __( 'Continue', 'nutrio' ),
+				confirmLabel: __( 'Continue', 'merodiet' ),
 				destructive: true,
 			} ) )
 		) {
@@ -379,9 +379,9 @@ export default function PlanBuilder( {
 			! ( await confirmDialog( {
 				message: __(
 					'This replaces any meals already on the selected day(s) with today’s meals. Continue?',
-					'nutrio'
+					'merodiet'
 				),
-				confirmLabel: __( 'Continue', 'nutrio' ),
+				confirmLabel: __( 'Continue', 'merodiet' ),
 				destructive: true,
 			} ) )
 		) {
@@ -430,7 +430,7 @@ export default function PlanBuilder( {
 			toast.error(
 				errorMessage(
 					error,
-					__( 'Could not save this plan.', 'nutrio' )
+					__( 'Could not save this plan.', 'merodiet' )
 				)
 			);
 		} finally {
@@ -442,8 +442,8 @@ export default function PlanBuilder( {
 		if (
 			! isDirty ||
 			( await confirmDialog( {
-				message: __( 'Discard unsaved changes?', 'nutrio' ),
-				confirmLabel: __( 'Discard', 'nutrio' ),
+				message: __( 'Discard unsaved changes?', 'merodiet' ),
+				confirmLabel: __( 'Discard', 'merodiet' ),
 				destructive: true,
 			} ) )
 		) {
@@ -483,7 +483,7 @@ export default function PlanBuilder( {
 
 	return (
 		<>
-			<div className="nutrio-topbar">
+			<div className="merodiet-topbar">
 				<div
 					style={ {
 						display: 'flex',
@@ -491,7 +491,9 @@ export default function PlanBuilder( {
 						gap: '12px',
 					} }
 				>
-					<h1>{ plan ? plan.title : __( 'New plan', 'nutrio' ) }</h1>
+					<h1>
+						{ plan ? plan.title : __( 'New plan', 'merodiet' ) }
+					</h1>
 					{ isDirty && <UnsavedBadge /> }
 					{ isReadOnly && (
 						<span
@@ -500,7 +502,7 @@ export default function PlanBuilder( {
 								color: 'var(--ink-muted)',
 							} }
 						>
-							{ __( 'Assigned — read only', 'nutrio' ) }
+							{ __( 'Assigned — read only', 'merodiet' ) }
 						</span>
 					) }
 				</div>
@@ -511,8 +513,8 @@ export default function PlanBuilder( {
 						disabled={ isSaving }
 					>
 						{ isReadOnly
-							? __( 'Back', 'nutrio' )
-							: __( 'Cancel', 'nutrio' ) }
+							? __( 'Back', 'merodiet' )
+							: __( 'Cancel', 'merodiet' ) }
 					</Button>
 					{ ! isReadOnly && (
 						<Button
@@ -521,8 +523,8 @@ export default function PlanBuilder( {
 							disabled={ isSaving || ! title }
 						>
 							{ plan
-								? __( 'Save changes', 'nutrio' )
-								: __( 'Create plan', 'nutrio' ) }
+								? __( 'Save changes', 'merodiet' )
+								: __( 'Create plan', 'merodiet' ) }
 						</Button>
 					) }
 					{ ! isReadOnly && plan && (
@@ -531,17 +533,17 @@ export default function PlanBuilder( {
 							onClick={ onAssignClick }
 							disabled={ isSaving || isDirty }
 						>
-							{ __( 'Assign to client', 'nutrio' ) }
+							{ __( 'Assign to client', 'merodiet' ) }
 						</Button>
 					) }
 					{ isReadOnly && (
 						<Button variant="ghost" onClick={ onUnassignClick }>
-							{ __( 'Unassign', 'nutrio' ) }
+							{ __( 'Unassign', 'merodiet' ) }
 						</Button>
 					) }
 					{ isReadOnly && (
 						<Button variant="primary" onClick={ onDuplicateClick }>
-							{ __( 'Duplicate as new plan', 'nutrio' ) }
+							{ __( 'Duplicate as new plan', 'merodiet' ) }
 						</Button>
 					) }
 				</div>
@@ -554,12 +556,12 @@ export default function PlanBuilder( {
 							className={ styles.nameRow }
 							style={ { marginBottom: '16px' } }
 						>
-							<div className="nutrio-field">
-								<label htmlFor="nutrio-plan-title">
-									{ __( 'Plan title', 'nutrio' ) }
+							<div className="merodiet-field">
+								<label htmlFor="merodiet-plan-title">
+									{ __( 'Plan title', 'merodiet' ) }
 								</label>
 								<input
-									id="nutrio-plan-title"
+									id="merodiet-plan-title"
 									type="text"
 									value={ title }
 									onChange={ ( e ) =>
@@ -568,12 +570,12 @@ export default function PlanBuilder( {
 									disabled={ isReadOnly }
 								/>
 							</div>
-							<div className="nutrio-field">
-								<label htmlFor="nutrio-plan-start">
-									{ __( 'Start date', 'nutrio' ) }
+							<div className="merodiet-field">
+								<label htmlFor="merodiet-plan-start">
+									{ __( 'Start date', 'merodiet' ) }
 								</label>
 								<input
-									id="nutrio-plan-start"
+									id="merodiet-plan-start"
 									type="date"
 									value={ startDate }
 									onChange={ ( e ) =>
@@ -585,12 +587,12 @@ export default function PlanBuilder( {
 									disabled={ isReadOnly }
 								/>
 							</div>
-							<div className="nutrio-field">
-								<label htmlFor="nutrio-plan-end">
-									{ __( 'End date', 'nutrio' ) }
+							<div className="merodiet-field">
+								<label htmlFor="merodiet-plan-end">
+									{ __( 'End date', 'merodiet' ) }
 								</label>
 								<input
-									id="nutrio-plan-end"
+									id="merodiet-plan-end"
 									type="date"
 									value={ endDate }
 									onChange={ ( e ) =>
@@ -621,7 +623,7 @@ export default function PlanBuilder( {
 												)
 											}
 										>
-											{ __( 'Week', 'nutrio' ) }{ ' ' }
+											{ __( 'Week', 'merodiet' ) }{ ' ' }
 											{ weekIndex + 1 }
 											<span
 												className={ styles.weekTabDate }
@@ -654,7 +656,7 @@ export default function PlanBuilder( {
 											setActiveDayOffset( day.day_offset )
 										}
 									>
-										{ __( 'Day', 'nutrio' ) }{ ' ' }
+										{ __( 'Day', 'merodiet' ) }{ ' ' }
 										{ day.day_offset + 1 }
 										<span className={ styles.dayTabDate }>
 											{ formatShortDate(
@@ -674,7 +676,7 @@ export default function PlanBuilder( {
 										className={ styles.copyTrigger }
 										aria-label={ __(
 											'Repeat this day on other days',
-											'nutrio'
+											'merodiet'
 										) }
 										onClick={ () =>
 											setCopyPanelOpen(
@@ -683,7 +685,7 @@ export default function PlanBuilder( {
 										}
 									>
 										<CopyIcon />
-										{ __( 'Repeat day', 'nutrio' ) }
+										{ __( 'Repeat day', 'merodiet' ) }
 									</button>
 
 									{ isCopyPanelOpen && (
@@ -702,7 +704,7 @@ export default function PlanBuilder( {
 														/* translators: %d: the day number (1-based) currently being copied */
 														__(
 															'Repeat Day %d on…',
-															'nutrio'
+															'merodiet'
 														),
 														activeDayOffset + 1
 													) }
@@ -736,7 +738,7 @@ export default function PlanBuilder( {
 													>
 														{ __(
 															'All',
-															'nutrio'
+															'merodiet'
 														) }
 													</button>
 													<button
@@ -748,7 +750,7 @@ export default function PlanBuilder( {
 													>
 														{ __(
 															'Clear',
-															'nutrio'
+															'merodiet'
 														) }
 													</button>
 												</div>
@@ -787,7 +789,7 @@ export default function PlanBuilder( {
 														>
 															{ __(
 																'Day',
-																'nutrio'
+																'merodiet'
 															) }{ ' ' }
 															{ day.day_offset +
 																1 }
@@ -811,7 +813,7 @@ export default function PlanBuilder( {
 															'%d day selected',
 															'%d days selected',
 															copyTargets.size,
-															'nutrio'
+															'merodiet'
 														),
 														copyTargets.size
 													) }
@@ -835,7 +837,7 @@ export default function PlanBuilder( {
 													>
 														{ __(
 															'Cancel',
-															'nutrio'
+															'merodiet'
 														) }
 													</Button>
 													<Button
@@ -850,7 +852,7 @@ export default function PlanBuilder( {
 													>
 														{ __(
 															'Repeat',
-															'nutrio'
+															'merodiet'
 														) }
 													</Button>
 												</div>
@@ -880,7 +882,7 @@ export default function PlanBuilder( {
 													setAddingTo( meal.id )
 												}
 											>
-												+ { __( 'Add', 'nutrio' ) }
+												+ { __( 'Add', 'merodiet' ) }
 											</button>
 										) }
 									</div>
@@ -895,7 +897,7 @@ export default function PlanBuilder( {
 										>
 											{ __(
 												'Nothing added yet.',
-												'nutrio'
+												'merodiet'
 											) }
 										</p>
 									) }
@@ -949,15 +951,15 @@ export default function PlanBuilder( {
 												/>
 											) }
 											<div
-												className="nutrio-mono"
+												className="merodiet-mono"
 												style={ {
 													fontSize: '12px',
 													color: 'var(--ink-faint)',
 												} }
 											>
 												{ item.food_id
-													? __( 'g', 'nutrio' )
-													: __( 'srv', 'nutrio' ) }
+													? __( 'g', 'merodiet' )
+													: __( 'srv', 'merodiet' ) }
 											</div>
 											{ ! isReadOnly && (
 												<button
@@ -972,7 +974,7 @@ export default function PlanBuilder( {
 													}
 													aria-label={ __(
 														'Remove item',
-														'nutrio'
+														'merodiet'
 													) }
 												>
 													<svg
@@ -999,7 +1001,7 @@ export default function PlanBuilder( {
 									marginBottom: '10px',
 								} }
 							>
-								{ __( 'Day totals', 'nutrio' ) }
+								{ __( 'Day totals', 'merodiet' ) }
 							</h3>
 							<div className={ styles.nutrientGrid }>
 								<div className={ styles.nutrientTile }>
@@ -1010,7 +1012,7 @@ export default function PlanBuilder( {
 										) }
 									</div>
 									<div className={ styles.nutrientLbl }>
-										{ __( 'Kcal', 'nutrio' ) }
+										{ __( 'Kcal', 'merodiet' ) }
 									</div>
 								</div>
 								<div className={ styles.nutrientTile }>
@@ -1018,7 +1020,7 @@ export default function PlanBuilder( {
 										{ formatAmount( summary.protein ) }
 									</div>
 									<div className={ styles.nutrientLbl }>
-										{ __( 'Protein', 'nutrio' ) }
+										{ __( 'Protein', 'merodiet' ) }
 									</div>
 								</div>
 								<div className={ styles.nutrientTile }>
@@ -1026,7 +1028,7 @@ export default function PlanBuilder( {
 										{ formatAmount( summary.carbs ) }
 									</div>
 									<div className={ styles.nutrientLbl }>
-										{ __( 'Carbs', 'nutrio' ) }
+										{ __( 'Carbs', 'merodiet' ) }
 									</div>
 								</div>
 								<div className={ styles.nutrientTile }>
@@ -1034,7 +1036,7 @@ export default function PlanBuilder( {
 										{ formatAmount( summary.fat ) }
 									</div>
 									<div className={ styles.nutrientLbl }>
-										{ __( 'Fat', 'nutrio' ) }
+										{ __( 'Fat', 'merodiet' ) }
 									</div>
 								</div>
 							</div>
@@ -1074,12 +1076,12 @@ export default function PlanBuilder( {
 						<PanelHead>
 							<h3>
 								{ addingTo
-									? __( 'Add to', 'nutrio' ) +
+									? __( 'Add to', 'merodiet' ) +
 									  ' ' +
 									  MEAL_TYPES.find(
 											( m ) => m.id === addingTo
 									  )?.label
-									: __( 'Select a meal slot', 'nutrio' ) }
+									: __( 'Select a meal slot', 'merodiet' ) }
 							</h3>
 						</PanelHead>
 						<PanelBody>
@@ -1097,7 +1099,7 @@ export default function PlanBuilder( {
 								>
 									{ __(
 										'Click "+ Add" on a meal above to search for a food or recipe.',
-										'nutrio'
+										'merodiet'
 									) }
 								</p>
 							) }

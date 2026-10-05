@@ -2,15 +2,15 @@
 /**
  * Custom role registration.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Roles;
+namespace MeroDiet\Roles;
 
 /**
- * Registers the two roles Nutrio introduces. Idempotent and safe to
+ * Registers the two roles MeroDiet introduces. Idempotent and safe to
  * call on every activation (not just the first): if a role already
  * exists, its capability set is still synced to what's defined here,
  * so a future release adding a new capability doesn't silently skip
@@ -27,11 +27,11 @@ final class RoleRegistrar {
 	 */
 	private const PRACTITIONER_CAPS = array(
 		'read',
-		'manage_nutrio_clients',
-		'manage_nutrio_recipes',
-		'manage_nutrio_plans',
-		'manage_nutrio_foods',
-		'manage_nutrio_settings',
+		'manage_merodiet_clients',
+		'manage_merodiet_recipes',
+		'manage_merodiet_plans',
+		'manage_merodiet_foods',
+		'manage_merodiet_settings',
 	);
 
 	/**
@@ -44,7 +44,7 @@ final class RoleRegistrar {
 	 */
 	private const CLIENT_CAPS = array(
 		'read',
-		'view_own_nutrio_plan',
+		'view_own_merodiet_plan',
 	);
 
 	/**
@@ -58,7 +58,7 @@ final class RoleRegistrar {
 		self::sync_role( 'practitioner', 'Practitioner', self::PRACTITIONER_CAPS );
 		self::sync_role( 'nutrition_client', 'Nutrition Client', self::CLIENT_CAPS );
 
-		// Site admins can always manage Nutrio, same as any other plugin's capabilities.
+		// Site admins can always manage MeroDiet, same as any other plugin's capabilities.
 		$administrator = get_role( 'administrator' );
 
 		if ( null !== $administrator ) {

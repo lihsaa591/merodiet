@@ -1,23 +1,23 @@
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\RestApi;
+namespace MeroDiet\Tests\Unit\RestApi;
 
 use Brain\Monkey\Functions;
-use Nutrio\Clients\ClientInviteService;
-use Nutrio\Clients\ComplianceCalculator;
-use Nutrio\Email\EmailTemplateService;
-use Nutrio\Email\Mailer;
-use Nutrio\Repositories\ClientRepository;
-use Nutrio\Repositories\LogEntryRepository;
-use Nutrio\Repositories\MeasurementRepository;
-use Nutrio\Repositories\PlanRepository;
-use Nutrio\RestApi\ClientsController;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Clients\ClientInviteService;
+use MeroDiet\Clients\ComplianceCalculator;
+use MeroDiet\Email\EmailTemplateService;
+use MeroDiet\Email\Mailer;
+use MeroDiet\Repositories\ClientRepository;
+use MeroDiet\Repositories\LogEntryRepository;
+use MeroDiet\Repositories\MeasurementRepository;
+use MeroDiet\Repositories\PlanRepository;
+use MeroDiet\RestApi\ClientsController;
+use MeroDiet\Tests\TestCase;
 use WP_REST_Request;
 
 /**
@@ -70,10 +70,10 @@ final class ClientsControllerCreateTest extends TestCase {
 				$this->createMock( LogEntryRepository::class )
 			),
 			new Mailer( new EmailTemplateService() ),
-			new \Nutrio\Clients\LogEntryLabelResolver(
-				$this->createMock( \Nutrio\Repositories\PlanRepository::class ),
-				$this->createMock( \Nutrio\Nutrition\FoodCache::class ),
-				$this->createMock( \Nutrio\Repositories\RecipeRepository::class )
+			new \MeroDiet\Clients\LogEntryLabelResolver(
+				$this->createMock( \MeroDiet\Repositories\PlanRepository::class ),
+				$this->createMock( \MeroDiet\Nutrition\FoodCache::class ),
+				$this->createMock( \MeroDiet\Repositories\RecipeRepository::class )
 			)
 		);
 	}
@@ -190,10 +190,10 @@ final class ClientsControllerCreateTest extends TestCase {
 				$this->createMock( LogEntryRepository::class )
 			),
 			new Mailer( new EmailTemplateService() ),
-			new \Nutrio\Clients\LogEntryLabelResolver(
-				$this->createMock( \Nutrio\Repositories\PlanRepository::class ),
-				$this->createMock( \Nutrio\Nutrition\FoodCache::class ),
-				$this->createMock( \Nutrio\Repositories\RecipeRepository::class )
+			new \MeroDiet\Clients\LogEntryLabelResolver(
+				$this->createMock( \MeroDiet\Repositories\PlanRepository::class ),
+				$this->createMock( \MeroDiet\Nutrition\FoodCache::class ),
+				$this->createMock( \MeroDiet\Repositories\RecipeRepository::class )
 			)
 		);
 

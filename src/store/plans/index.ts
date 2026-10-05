@@ -4,7 +4,7 @@ import * as actions from './actions';
 import * as selectors from './selectors';
 import * as resolvers from './resolvers';
 
-export const STORE_NAME = 'nutrio/plans';
+export const STORE_NAME = 'merodiet/plans';
 
 export const store = createReduxStore( STORE_NAME, {
 	reducer,

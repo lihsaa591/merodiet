@@ -23,21 +23,21 @@ export interface FormatAction {
 export const BASIC_FORMAT_ACTIONS: FormatAction[] = [
 	{
 		id: 'bold',
-		label: __( 'Bold', 'nutrio' ),
+		label: __( 'Bold', 'merodiet' ),
 		command: 'bold',
 		glyph: 'B',
 		glyphClassName: styles.glyphBold,
 	},
 	{
 		id: 'italic',
-		label: __( 'Italic', 'nutrio' ),
+		label: __( 'Italic', 'merodiet' ),
 		command: 'italic',
 		glyph: 'I',
 		glyphClassName: styles.glyphItalic,
 	},
 	{
 		id: 'underline',
-		label: __( 'Underline', 'nutrio' ),
+		label: __( 'Underline', 'merodiet' ),
 		command: 'underline',
 		glyph: 'U',
 		glyphClassName: styles.glyphUnderline,
@@ -86,8 +86,8 @@ export default function EmailBodyEditor( {
 	// or the caret jumps) from "the value changed from outside".
 	const lastEmitted = useRef< string | null >( null );
 
-	const siteName = window.nutrioAdmin?.siteName ?? '';
-	const logoUrl = window.nutrioAdmin?.emailLogoUrl;
+	const siteName = window.merodietAdmin?.siteName ?? '';
+	const logoUrl = window.merodietAdmin?.emailLogoUrl;
 
 	// Push the value into the editable DOM on mount/mode switch/external
 	// change only.
@@ -232,18 +232,18 @@ export default function EmailBodyEditor( {
 		);
 	};
 
-	const labelId = `nutrio-email-body-label-${ id }`;
+	const labelId = `merodiet-email-body-label-${ id }`;
 
 	return (
 		<div className={ styles.editor }>
 			<div className={ styles.header }>
 				<span id={ labelId } className={ styles.label }>
-					{ __( 'Body', 'nutrio' ) }
+					{ __( 'Body', 'merodiet' ) }
 				</span>
 				<div
 					className={ styles.modeSwitch }
 					role="group"
-					aria-label={ __( 'Editor mode', 'nutrio' ) }
+					aria-label={ __( 'Editor mode', 'merodiet' ) }
 				>
 					{ ( [ 'visual', 'code' ] as Mode[] ).map( ( option ) => (
 						<button
@@ -256,8 +256,8 @@ export default function EmailBodyEditor( {
 							onClick={ () => switchMode( option ) }
 						>
 							{ 'visual' === option
-								? __( 'Visual', 'nutrio' )
-								: __( 'Code', 'nutrio' ) }
+								? __( 'Visual', 'merodiet' )
+								: __( 'Code', 'merodiet' ) }
 						</button>
 					) ) }
 				</div>
@@ -273,7 +273,7 @@ export default function EmailBodyEditor( {
 								left: toolbar.left,
 							} }
 							role="toolbar"
-							aria-label={ __( 'Text formatting', 'nutrio' ) }
+							aria-label={ __( 'Text formatting', 'merodiet' ) }
 							// Keep the text selection when clicking a button.
 							onMouseDown={ ( event ) => event.preventDefault() }
 						>
@@ -327,7 +327,7 @@ export default function EmailBodyEditor( {
 								/* translators: %s: the site's name */
 								__(
 									"Sent by %s. If you weren't expecting this email, you can safely ignore it.",
-									'nutrio'
+									'merodiet'
 								),
 								siteName
 							) }
@@ -336,7 +336,7 @@ export default function EmailBodyEditor( {
 				</div>
 			) : (
 				<textarea
-					id={ `nutrio-email-body-${ id }` }
+					id={ `merodiet-email-body-${ id }` }
 					ref={ textareaRef }
 					className={ styles.code }
 					rows={ 10 }

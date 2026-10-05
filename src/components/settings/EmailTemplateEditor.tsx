@@ -47,7 +47,7 @@ export default function EmailTemplateEditor( {
 		event.preventDefault();
 
 		if ( subject === template.subject && body === template.body ) {
-			toast.info( __( 'No changes to save.', 'nutrio' ) );
+			toast.info( __( 'No changes to save.', 'merodiet' ) );
 			return;
 		}
 
@@ -107,7 +107,7 @@ export default function EmailTemplateEditor( {
 							checked={ template.enabled }
 							disabled={ isToggling }
 							onChange={ handleToggle }
-							label={ __( 'Enabled', 'nutrio' ) }
+							label={ __( 'Enabled', 'merodiet' ) }
 						/>
 					</span>
 				) }
@@ -116,14 +116,14 @@ export default function EmailTemplateEditor( {
 				<PanelBody className={ styles.panelBody }>
 					<form onSubmit={ handleSave } className={ styles.form }>
 						{ extraFields }
-						<div className="nutrio-field">
+						<div className="merodiet-field">
 							<label
-								htmlFor={ `nutrio-email-subject-${ template.type }` }
+								htmlFor={ `merodiet-email-subject-${ template.type }` }
 							>
-								{ __( 'Subject', 'nutrio' ) }
+								{ __( 'Subject', 'merodiet' ) }
 							</label>
 							<input
-								id={ `nutrio-email-subject-${ template.type }` }
+								id={ `merodiet-email-subject-${ template.type }` }
 								type="text"
 								value={ subject }
 								onChange={ ( event ) =>
@@ -144,7 +144,7 @@ export default function EmailTemplateEditor( {
 							disabled={ isSaving || '' === body.trim() }
 							className={ styles.saveButton }
 						>
-							{ __( 'Save', 'nutrio' ) }
+							{ __( 'Save', 'merodiet' ) }
 						</Button>
 					</form>
 				</PanelBody>

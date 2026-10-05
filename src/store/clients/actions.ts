@@ -55,7 +55,7 @@ interface ThunkArgs {
 export function createClient( data: ClientInput ) {
 	return async ( { dispatch }: ThunkArgs ) => {
 		const client: Client = await apiFetch( {
-			path: '/nutrio/v1/clients',
+			path: '/merodiet/v1/clients',
 			method: 'POST',
 			data,
 		} );
@@ -74,7 +74,7 @@ export function createClient( data: ClientInput ) {
 export function updateClient( id: number, data: Partial< ClientInput > ) {
 	return async ( { dispatch }: ThunkArgs ) => {
 		const client: Client = await apiFetch( {
-			path: `/nutrio/v1/clients/${ id }`,
+			path: `/merodiet/v1/clients/${ id }`,
 			method: 'PATCH',
 			data,
 		} );
@@ -88,7 +88,7 @@ export function updateClient( id: number, data: Partial< ClientInput > ) {
 export function inviteClient( id: number ) {
 	return async ( { dispatch }: ThunkArgs ) => {
 		const client: Client = await apiFetch( {
-			path: `/nutrio/v1/clients/${ id }/invite`,
+			path: `/merodiet/v1/clients/${ id }/invite`,
 			method: 'POST',
 		} );
 
@@ -101,7 +101,7 @@ export function inviteClient( id: number ) {
 export function deleteClient( id: number ) {
 	return async ( { dispatch }: ThunkArgs ) => {
 		await apiFetch( {
-			path: `/nutrio/v1/clients/${ id }`,
+			path: `/merodiet/v1/clients/${ id }`,
 			method: 'DELETE',
 		} );
 

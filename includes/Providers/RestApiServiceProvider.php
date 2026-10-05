@@ -2,12 +2,12 @@
 /**
  * REST API service provider.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Providers;
+namespace MeroDiet\Providers;
 
 use League\Container\Container;
 use ReflectionClass;

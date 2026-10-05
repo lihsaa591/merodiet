@@ -11,8 +11,8 @@ import type { Page } from '@playwright/test';
 export async function ensureTodaysItemsEaten( page: Page ): Promise< void > {
 	await page.evaluate( async () => {
 		const nonce = (
-			window as unknown as { nutrioClientPortal: { restNonce: string } }
-		 ).nutrioClientPortal.restNonce;
+			window as unknown as { merodietClientPortal: { restNonce: string } }
+		 ).merodietClientPortal.restNonce;
 		const headers = {
 			'X-WP-Nonce': nonce,
 			'Content-Type': 'application/json',
@@ -20,11 +20,11 @@ export async function ensureTodaysItemsEaten( page: Page ): Promise< void > {
 		const today = new Date().toISOString().slice( 0, 10 );
 
 		const plan = await (
-			await fetch( '/wp-json/nutrio/v1/me/plan', { headers } )
+			await fetch( '/wp-json/merodiet/v1/me/plan', { headers } )
 		).json();
 		const logs = await (
 			await fetch(
-				`/wp-json/nutrio/v1/me/logs?from=${ today }&to=${ today }`,
+				`/wp-json/merodiet/v1/me/logs?from=${ today }&to=${ today }`,
 				{ headers }
 			)
 		).json();
@@ -48,7 +48,7 @@ export async function ensureTodaysItemsEaten( page: Page ): Promise< void > {
 				continue;
 			}
 
-			await fetch( '/wp-json/nutrio/v1/me/logs', {
+			await fetch( '/wp-json/merodiet/v1/me/logs', {
 				method: 'POST',
 				headers,
 				body: JSON.stringify( {

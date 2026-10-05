@@ -1,12 +1,12 @@
 <?php
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Clients;
+namespace MeroDiet\Tests\Unit\Clients;
 
-use Nutrio\Clients\LogEntryLabelResolver;
-use Nutrio\Nutrition\FoodCache;
-use Nutrio\Repositories\PlanRepository;
-use Nutrio\Repositories\RecipeRepository;
+use MeroDiet\Clients\LogEntryLabelResolver;
+use MeroDiet\Nutrition\FoodCache;
+use MeroDiet\Repositories\PlanRepository;
+use MeroDiet\Repositories\RecipeRepository;
 use PHPUnit\Framework\TestCase;
 
 final class LogEntryLabelResolverTest extends TestCase {

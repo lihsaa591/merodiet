@@ -1,15 +1,15 @@
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Email;
+namespace MeroDiet\Tests\Unit\Email;
 
 use Brain\Monkey\Functions;
-use Nutrio\Email\EmailSender;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Email\EmailSender;
+use MeroDiet\Tests\TestCase;
 use PHPMailer\PHPMailer\PHPMailer;
 
 final class EmailSenderTest extends TestCase {
@@ -108,7 +108,7 @@ final class EmailSenderTest extends TestCase {
 
 		self::assertSame(
 			array(
-				'nutrio_email_sender',
+				'merodiet_email_sender',
 				array(
 					'from_name'    => 'Ana',
 					'from_address' => 'ana@example.test',

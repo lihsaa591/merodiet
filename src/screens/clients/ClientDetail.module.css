@@ -1,10 +1,10 @@
 /* Edit is a secondary action here (unlike e.g. the roster's "Add
    client", the actual primary CTA of that screen) — override the
-   generic .nutrio-topbar mobile rule that stretches a topbar's last
+   generic .merodiet-topbar mobile rule that stretches a topbar's last
    child to full width, so Edit stays a small, compact button instead
    of an oversized bar disproportionate to its importance. */
 @media (max-width: 900px) {
-	:global(.nutrio-topbar) > *:last-child {
+	:global(.merodiet-topbar) > *:last-child {
 		width: auto !important;
 	}
 }

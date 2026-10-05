@@ -1,23 +1,23 @@
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\RestApi;
+namespace MeroDiet\Tests\Unit\RestApi;
 
 use Brain\Monkey\Functions;
-use Nutrio\Email\EmailTemplateService;
-use Nutrio\Email\Mailer;
-use Nutrio\Nutrition\FoodCache;
-use Nutrio\Nutrition\PlanNutrientResolver;
-use Nutrio\Nutrition\RecipeNutrientResolver;
-use Nutrio\Repositories\ClientRepository;
-use Nutrio\Repositories\PlanRepository;
-use Nutrio\Repositories\RecipeRepository;
-use Nutrio\RestApi\PlansController;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Email\EmailTemplateService;
+use MeroDiet\Email\Mailer;
+use MeroDiet\Nutrition\FoodCache;
+use MeroDiet\Nutrition\PlanNutrientResolver;
+use MeroDiet\Nutrition\RecipeNutrientResolver;
+use MeroDiet\Repositories\ClientRepository;
+use MeroDiet\Repositories\PlanRepository;
+use MeroDiet\Repositories\RecipeRepository;
+use MeroDiet\RestApi\PlansController;
+use MeroDiet\Tests\TestCase;
 use WP_REST_Request;
 
 /**

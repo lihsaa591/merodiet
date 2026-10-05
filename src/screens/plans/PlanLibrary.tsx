@@ -81,14 +81,14 @@ export default function PlanLibrary( {
 	// a fallback (e.g. a plan returned from a create/assign response).
 	const renderClientCell = ( row: Plan ) => {
 		if ( null === row.client_id ) {
-			return __( 'Unassigned', 'nutrio' );
+			return __( 'Unassigned', 'merodiet' );
 		}
 
 		const client =
 			row.client ?? clients.find( ( c ) => c.id === row.client_id );
 
 		if ( ! client ) {
-			return __( 'Unknown client', 'nutrio' );
+			return __( 'Unknown client', 'merodiet' );
 		}
 
 		return (
@@ -125,11 +125,11 @@ export default function PlanLibrary( {
 
 	return (
 		<>
-			<div className="nutrio-topbar">
-				<h1>{ __( 'Meal plans', 'nutrio' ) }</h1>
+			<div className="merodiet-topbar">
+				<h1>{ __( 'Meal plans', 'merodiet' ) }</h1>
 				<Button variant="primary" onClick={ onAdd }>
 					<PlusIcon />
-					{ __( 'New plan', 'nutrio' ) }
+					{ __( 'New plan', 'merodiet' ) }
 				</Button>
 			</div>
 
@@ -137,7 +137,7 @@ export default function PlanLibrary( {
 				<ListFilters
 					search={ search }
 					onSearchChange={ onSearchChange }
-					searchPlaceholder={ __( 'Search plans…', 'nutrio' ) }
+					searchPlaceholder={ __( 'Search plans…', 'merodiet' ) }
 					status={ status }
 					onStatusChange={ onStatusChange }
 					statusOptions={ statusOptions }
@@ -145,16 +145,19 @@ export default function PlanLibrary( {
 			) }
 
 			<Panel>
-				<PanelBody className="nutrio-table-wrap">
-					{ isLoading && <p>{ __( 'Loading…', 'nutrio' ) }</p> }
+				<PanelBody className="merodiet-table-wrap">
+					{ isLoading && <p>{ __( 'Loading…', 'merodiet' ) }</p> }
 
 					{ ! isLoading && plans.length === 0 && (
 						<p>
 							{ isFiltering
-								? __( 'No plans match your search.', 'nutrio' )
+								? __(
+										'No plans match your search.',
+										'merodiet'
+								  )
 								: __(
 										'No plans yet. Build your first plan to start assigning nutrition to clients.',
-										'nutrio'
+										'merodiet'
 								  ) }
 						</p>
 					) }
@@ -174,7 +177,7 @@ export default function PlanLibrary( {
 										/* translators: %d: number of assigned plans selected */
 										__(
 											'Unassign selected (%d)',
-											'nutrio'
+											'merodiet'
 										),
 										selectedAssigned.length
 									) }
@@ -186,13 +189,16 @@ export default function PlanLibrary( {
 								>
 									{ sprintf(
 										/* translators: %d: number of plans selected */
-										__( 'Delete selected (%d)', 'nutrio' ),
+										__(
+											'Delete selected (%d)',
+											'merodiet'
+										),
 										bulk.count
 									) }
 								</Button>
 							</BulkActionBar>
 
-							<table className="nutrio-table">
+							<table className="merodiet-table">
 								<thead>
 									<tr>
 										<th>
@@ -208,17 +214,20 @@ export default function PlanLibrary( {
 												onChange={ bulk.toggleAll }
 												aria-label={ __(
 													'Select all plans',
-													'nutrio'
+													'merodiet'
 												) }
 											/>
 										</th>
-										<th>{ __( 'Title', 'nutrio' ) }</th>
-										<th>{ __( 'Client', 'nutrio' ) }</th>
-										<th>{ __( 'Dates', 'nutrio' ) }</th>
+										<th>{ __( 'Title', 'merodiet' ) }</th>
+										<th>{ __( 'Client', 'merodiet' ) }</th>
+										<th>{ __( 'Dates', 'merodiet' ) }</th>
 										<th>
-											{ __( 'Avg. kcal/day', 'nutrio' ) }
+											{ __(
+												'Avg. kcal/day',
+												'merodiet'
+											) }
 										</th>
-										<th>{ __( 'Status', 'nutrio' ) }</th>
+										<th>{ __( 'Status', 'merodiet' ) }</th>
 										<th></th>
 									</tr>
 								</thead>
@@ -238,7 +247,7 @@ export default function PlanLibrary( {
 														/* translators: %s: plan title */
 														__(
 															'Select %s',
-															'nutrio'
+															'merodiet'
 														),
 														plan.title
 													) }
@@ -268,7 +277,7 @@ export default function PlanLibrary( {
 														>
 															{ __(
 																'Start:',
-																'nutrio'
+																'merodiet'
 															) }
 														</span>
 														<span>
@@ -287,7 +296,7 @@ export default function PlanLibrary( {
 														>
 															{ __(
 																'End:',
-																'nutrio'
+																'merodiet'
 															) }
 														</span>
 														<span>
@@ -298,7 +307,7 @@ export default function PlanLibrary( {
 													</span>
 												</div>
 											</td>
-											<td className="nutrio-mono">
+											<td className="merodiet-mono">
 												{ formatAmount(
 													avgDailyKcal( plan ),
 													''
@@ -317,11 +326,11 @@ export default function PlanLibrary( {
 												</Chip>
 											</td>
 											<td>
-												<div className="nutrio-row-actions">
+												<div className="merodiet-row-actions">
 													<IconButton
 														label={ __(
 															'Open plan',
-															'nutrio'
+															'merodiet'
 														) }
 														onClick={ () =>
 															onEdit( plan.id )
@@ -332,7 +341,7 @@ export default function PlanLibrary( {
 													<IconButton
 														label={ __(
 															'Remove plan',
-															'nutrio'
+															'merodiet'
 														) }
 														onClick={ () =>
 															onDelete( plan )

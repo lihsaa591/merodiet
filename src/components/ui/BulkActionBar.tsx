@@ -27,13 +27,13 @@ export default function BulkActionBar( {
 			<span className={ styles.count }>
 				{ sprintf(
 					/* translators: %d: number of selected rows */
-					__( '%d selected', 'nutrio' ),
+					__( '%d selected', 'merodiet' ),
 					count
 				) }
 			</span>
 			<div className={ styles.actions }>{ children }</div>
 			<button className={ styles.clear } onClick={ onClear }>
-				{ __( 'Clear', 'nutrio' ) }
+				{ __( 'Clear', 'merodiet' ) }
 			</button>
 		</div>
 	);

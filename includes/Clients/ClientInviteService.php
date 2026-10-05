@@ -2,14 +2,14 @@
 /**
  * Provisions a client's portal login and sends the invite.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Clients;
+namespace MeroDiet\Clients;
 
-use Nutrio\Repositories\ClientRepository;
+use MeroDiet\Repositories\ClientRepository;
 use WP_Error;
 
 /**
@@ -73,7 +73,7 @@ final class ClientInviteService {
 			$client = $this->clients->find( $client_id );
 
 			if ( null === $client ) {
-				return new WP_Error( 'nutrio_not_found', __( 'Client not found.', 'nutrio' ), array( 'status' => 404 ) );
+				return new WP_Error( 'merodiet_not_found', __( 'Client not found.', 'merodiet' ), array( 'status' => 404 ) );
 			}
 
 			if ( null !== $client['user_id'] ) {
@@ -96,8 +96,8 @@ final class ClientInviteService {
 
 			if ( false !== $existing ) {
 				return new WP_Error(
-					'nutrio_email_in_use',
-					__( 'A WordPress account with this email already exists. Link or resolve it manually before inviting this client.', 'nutrio' ),
+					'merodiet_email_in_use',
+					__( 'A WordPress account with this email already exists. Link or resolve it manually before inviting this client.', 'merodiet' ),
 					array( 'status' => 409 )
 				);
 			}
@@ -126,7 +126,7 @@ final class ClientInviteService {
 			}
 
 			// Fires after a client is invited to the portal.
-			do_action( 'nutrio_client_invited', $client_id, $user_id );
+			do_action( 'merodiet_client_invited', $client_id, $user_id );
 
 			return true;
 		} finally {

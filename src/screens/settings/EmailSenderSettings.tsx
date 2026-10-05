@@ -8,7 +8,7 @@ import { errorMessage, toast } from '../../utils/toast';
 import type { EmailSenderSettings as EmailSenderSettingsData } from '../../types';
 import styles from './EmailSenderSettings.module.css';
 
-const PRO_FEATURE_NAME = __( 'Custom email styling', 'nutrio' );
+const PRO_FEATURE_NAME = __( 'Custom email styling', 'merodiet' );
 
 // The form shows what emails will actually be sent from: the saved
 // override, or WordPress's own default when nothing is saved.
@@ -34,7 +34,7 @@ export default function EmailSenderSettings() {
 
 	useEffect( () => {
 		apiFetch< EmailSenderSettingsData >( {
-			path: '/nutrio/v1/settings/email-sender',
+			path: '/merodiet/v1/settings/email-sender',
 		} ).then( ( result ) => {
 			const values = toFormValues( result );
 			setSaved( result );
@@ -56,7 +56,7 @@ export default function EmailSenderSettings() {
 		event.preventDefault();
 
 		if ( ! isDirty ) {
-			toast.info( __( 'No changes to save.', 'nutrio' ) );
+			toast.info( __( 'No changes to save.', 'merodiet' ) );
 			return;
 		}
 
@@ -64,7 +64,7 @@ export default function EmailSenderSettings() {
 
 		try {
 			const result = await apiFetch< EmailSenderSettingsData >( {
-				path: '/nutrio/v1/settings/email-sender',
+				path: '/merodiet/v1/settings/email-sender',
 				method: 'PUT',
 				// Sending the default back would pin it as an override, so
 				// treat an unchanged default (or an empty field) as "unset".
@@ -83,12 +83,12 @@ export default function EmailSenderSettings() {
 			setSaved( result );
 			setFromName( values.fromName );
 			setFromAddress( values.fromAddress );
-			toast.success( __( 'Sender saved.', 'nutrio' ) );
+			toast.success( __( 'Sender saved.', 'merodiet' ) );
 		} catch ( error ) {
 			toast.error(
 				errorMessage(
 					error,
-					__( 'Could not save the sender.', 'nutrio' )
+					__( 'Could not save the sender.', 'merodiet' )
 				)
 			);
 		} finally {
@@ -100,23 +100,23 @@ export default function EmailSenderSettings() {
 		<>
 			<Panel className={ styles.panel }>
 				<PanelHead>
-					<h3>{ __( 'Sender', 'nutrio' ) }</h3>
+					<h3>{ __( 'Sender', 'merodiet' ) }</h3>
 				</PanelHead>
 				<PanelBody>
 					<p className={ styles.intro }>
 						{ __(
 							'Who your emails come from. Applies to every email below, for both practitioners and clients. Pre-filled with the WordPress default; change either to override it.',
-							'nutrio'
+							'merodiet'
 						) }
 					</p>
 					<form onSubmit={ handleSubmit } className={ styles.form }>
 						<div className={ styles.fields }>
-							<div className="nutrio-field">
-								<label htmlFor="nutrio-email-from-name">
-									{ __( 'From name', 'nutrio' ) }
+							<div className="merodiet-field">
+								<label htmlFor="merodiet-email-from-name">
+									{ __( 'From name', 'merodiet' ) }
 								</label>
 								<input
-									id="nutrio-email-from-name"
+									id="merodiet-email-from-name"
 									type="text"
 									value={ fromName }
 									placeholder={ saved.defaults.from_name }
@@ -125,29 +125,29 @@ export default function EmailSenderSettings() {
 									}
 								/>
 							</div>
-							<div className="nutrio-field">
-								<label htmlFor="nutrio-email-from-address">
-									{ __( 'From address', 'nutrio' ) }
+							<div className="merodiet-field">
+								<label htmlFor="merodiet-email-from-address">
+									{ __( 'From address', 'merodiet' ) }
 								</label>
 								<input
-									id="nutrio-email-from-address"
+									id="merodiet-email-from-address"
 									type="email"
 									value={ fromAddress }
 									placeholder={ saved.defaults.from_address }
 									onChange={ ( event ) =>
 										setFromAddress( event.target.value )
 									}
-									aria-describedby="nutrio-email-from-address-help"
+									aria-describedby="merodiet-email-from-address-help"
 								/>
 							</div>
 						</div>
 						<p
-							id="nutrio-email-from-address-help"
+							id="merodiet-email-from-address-help"
 							className={ styles.help }
 						>
 							{ __(
 								'Use an address on your own domain. Many mail servers reject or spam-folder mail sent from an address they do not recognise.',
-								'nutrio'
+								'merodiet'
 							) }
 						</p>
 						<div className={ styles.actions }>
@@ -156,7 +156,7 @@ export default function EmailSenderSettings() {
 								type="submit"
 								disabled={ isSaving }
 							>
-								{ __( 'Save', 'nutrio' ) }
+								{ __( 'Save', 'merodiet' ) }
 							</Button>
 						</div>
 					</form>
@@ -191,7 +191,7 @@ export default function EmailSenderSettings() {
 							<span className={ styles.proDetail }>
 								{ __(
 									'Header colour and your own logo',
-									'nutrio'
+									'merodiet'
 								) }
 							</span>
 						</span>
@@ -203,7 +203,7 @@ export default function EmailSenderSettings() {
 							<span className={ styles.logoBox } />
 						</span>
 						<span className={ styles.proBadge }>
-							{ __( 'Pro', 'nutrio' ) }
+							{ __( 'Pro', 'merodiet' ) }
 						</span>
 					</button>
 				</PanelBody>

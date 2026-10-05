@@ -6,14 +6,14 @@ test( 'portal theme choice persists across a reload', async ( {
 	await clientPage.goto( '/client-portal/?view=dashboard' );
 
 	const html = clientPage.locator( 'html' );
-	const toggle = clientPage.locator( '.nutrio-theme-toggle' );
+	const toggle = clientPage.locator( '.merodiet-theme-toggle' );
 
 	await toggle.click();
 	const chosen = await html.getAttribute( 'data-theme' );
 	expect( [ 'light', 'dark' ] ).toContain( chosen );
 
 	await clientPage.reload();
-	await expect( clientPage.locator( '.nutrio-rail' ) ).toBeVisible();
+	await expect( clientPage.locator( '.merodiet-rail' ) ).toBeVisible();
 	await expect( html ).toHaveAttribute( 'data-theme', chosen as string );
 
 	// Flip it back so a repeated local run (the seeded session's storage

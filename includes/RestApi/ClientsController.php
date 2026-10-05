@@ -2,20 +2,20 @@
 /**
  * Client roster REST endpoints.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\RestApi;
+namespace MeroDiet\RestApi;
 
-use Nutrio\Clients\ClientInviteService;
-use Nutrio\Clients\ComplianceCalculator;
-use Nutrio\Clients\LogEntryLabelResolver;
-use Nutrio\Email\Mailer;
-use Nutrio\Repositories\ClientRepository;
-use Nutrio\Repositories\LogEntryRepository;
-use Nutrio\Repositories\MeasurementRepository;
+use MeroDiet\Clients\ClientInviteService;
+use MeroDiet\Clients\ComplianceCalculator;
+use MeroDiet\Clients\LogEntryLabelResolver;
+use MeroDiet\Email\Mailer;
+use MeroDiet\Repositories\ClientRepository;
+use MeroDiet\Repositories\LogEntryRepository;
+use MeroDiet\Repositories\MeasurementRepository;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -23,7 +23,7 @@ use WP_REST_Server;
 
 /**
  * CRUD over a practitioner's own client roster. Every route requires
- * 'manage_nutrio_clients' (the parent class's default); ownership of
+ * 'manage_merodiet_clients' (the parent class's default); ownership of
  * the specific client row is additionally checked per-request via
  * assert_owns() — see AbstractPractitionerController's docblock for
  * why both layers matter.
@@ -31,7 +31,7 @@ use WP_REST_Server;
 final class ClientsController extends AbstractPractitionerController {
 
 	/**
-	 * Route base — registers under nutrio/v1/clients.
+	 * Route base — registers under merodiet/v1/clients.
 	 *
 	 * @var string
 	 */
@@ -79,7 +79,7 @@ final class ClientsController extends AbstractPractitionerController {
 					self::filter_route_args( self::LIST_FILTERS )
 				),
 			),
-			required_capability: 'manage_nutrio_clients'
+			required_capability: 'manage_merodiet_clients'
 		);
 
 		$this->register_route(
@@ -97,7 +97,7 @@ final class ClientsController extends AbstractPractitionerController {
 					)
 				),
 			),
-			required_capability: 'manage_nutrio_clients'
+			required_capability: 'manage_merodiet_clients'
 		);
 
 		$this->register_route(
@@ -106,7 +106,7 @@ final class ClientsController extends AbstractPractitionerController {
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( $this, 'get_client' ),
 			),
-			required_capability: 'manage_nutrio_clients'
+			required_capability: 'manage_merodiet_clients'
 		);
 
 		$this->register_route(
@@ -116,7 +116,7 @@ final class ClientsController extends AbstractPractitionerController {
 				'callback' => array( $this, 'update_client' ),
 				'args'     => self::client_write_args( require_all: false ),
 			),
-			required_capability: 'manage_nutrio_clients'
+			required_capability: 'manage_merodiet_clients'
 		);
 
 		$this->register_route(
@@ -125,7 +125,7 @@ final class ClientsController extends AbstractPractitionerController {
 				'methods'  => WP_REST_Server::DELETABLE,
 				'callback' => array( $this, 'delete_client' ),
 			),
-			required_capability: 'manage_nutrio_clients'
+			required_capability: 'manage_merodiet_clients'
 		);
 
 		$this->register_route(
@@ -134,7 +134,7 @@ final class ClientsController extends AbstractPractitionerController {
 				'methods'  => WP_REST_Server::CREATABLE,
 				'callback' => array( $this, 'invite_client' ),
 			),
-			required_capability: 'manage_nutrio_clients'
+			required_capability: 'manage_merodiet_clients'
 		);
 
 		$this->register_route(
@@ -153,7 +153,7 @@ final class ClientsController extends AbstractPractitionerController {
 					),
 				),
 			),
-			required_capability: 'manage_nutrio_clients'
+			required_capability: 'manage_merodiet_clients'
 		);
 
 		$this->register_route(
@@ -172,7 +172,7 @@ final class ClientsController extends AbstractPractitionerController {
 					),
 				),
 			),
-			required_capability: 'manage_nutrio_clients'
+			required_capability: 'manage_merodiet_clients'
 		);
 
 		$this->register_route(
@@ -191,7 +191,7 @@ final class ClientsController extends AbstractPractitionerController {
 					),
 				),
 			),
-			required_capability: 'manage_nutrio_clients'
+			required_capability: 'manage_merodiet_clients'
 		);
 	}
 
@@ -495,18 +495,18 @@ final class ClientsController extends AbstractPractitionerController {
 	 */
 	private static function invite_status_copy( bool $send_invite_requested, ?string $invite_error ): string {
 		if ( ! $send_invite_requested ) {
-			return __( 'not invited (added without sending an invite)', 'nutrio' );
+			return __( 'not invited (added without sending an invite)', 'merodiet' );
 		}
 
 		if ( null !== $invite_error ) {
 			return sprintf(
 				/* translators: %s: the reason the invite failed */
-				__( 'invite failed: %s', 'nutrio' ),
+				__( 'invite failed: %s', 'merodiet' ),
 				$invite_error
 			);
 		}
 
-		return __( 'invited', 'nutrio' );
+		return __( 'invited', 'merodiet' );
 	}
 
 	/**

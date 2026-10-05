@@ -2,12 +2,12 @@
 /**
  * Asset enqueue helpers.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Helper;
+namespace MeroDiet\Helper;
 
 /**
  * Thin wrapper around the dependency/version manifest that
@@ -22,8 +22,8 @@ final class Assets {
 	 * dependencies and version from the generated .asset.php file.
 	 *
 	 * @param string $handle    Script handle.
-	 * @param string $build_dir Absolute path to the plugin's build directory (e.g. NUTRIO_PATH . 'build').
-	 * @param string $build_url Public URL to the same directory (e.g. NUTRIO_URL . 'build').
+	 * @param string $build_dir Absolute path to the plugin's build directory (e.g. MERODIET_PATH . 'build').
+	 * @param string $build_url Public URL to the same directory (e.g. MERODIET_URL . 'build').
 	 * @param string $entry     Entry name without extension, e.g. "admin" for admin.js / admin.asset.php.
 	 * @param array  $extra_deps Additional script handles to depend on, beyond what the asset file declares.
 	 */
@@ -35,7 +35,7 @@ final class Assets {
 			wp_die(
 				esc_html(
 					sprintf(
-						'Nutrio: missing build asset "%s.asset.php" — run the JS build before activating this plugin.',
+						'MeroDiet: missing build asset "%s.asset.php" — run the JS build before activating this plugin.',
 						$entry
 					)
 				)
@@ -51,17 +51,17 @@ final class Assets {
 
 		// In development, load from the running dev server for hot updates
 		// instead of the last-built file.
-		$src  = NUTRIO_DEVELOPMENT
-			? NUTRIO_DEV_SERVER_URL . "/{$entry}.js"
+		$src  = MERODIET_DEVELOPMENT
+			? MERODIET_DEV_SERVER_URL . "/{$entry}.js"
 			: rtrim( $build_url, '/' ) . "/{$entry}.js";
 		$deps = array_merge( $asset['dependencies'], $extra_deps );
 
 		// `wp-scripts start --hot` splits webpack's runtime into runtime.js.
 		// Entry chunks only register themselves and never boot without it, so
 		// it must load first or the page stays blank.
-		if ( NUTRIO_DEVELOPMENT ) { // @phpstan-ignore if.alwaysFalse (constant is set per-site in wp-config.php)
-			wp_register_script( 'nutrio-runtime', NUTRIO_DEV_SERVER_URL . '/runtime.js', array(), NUTRIO_VERSION, true );
-			$deps[] = 'nutrio-runtime';
+		if ( MERODIET_DEVELOPMENT ) { // @phpstan-ignore if.alwaysFalse (constant is set per-site in wp-config.php)
+			wp_register_script( 'merodiet-runtime', MERODIET_DEV_SERVER_URL . '/runtime.js', array(), MERODIET_VERSION, true );
+			$deps[] = 'merodiet-runtime';
 		}
 
 		wp_enqueue_script(
@@ -90,9 +90,9 @@ final class Assets {
 		}
 
 		// In development, `wp-scripts start` rewrites this file in place
-		// without changing NUTRIO_VERSION, so the browser would otherwise
+		// without changing MERODIET_VERSION, so the browser would otherwise
 		// keep serving a stale cached copy across saves.
-		$version = NUTRIO_DEVELOPMENT ? (string) filemtime( $style_path ) : NUTRIO_VERSION;
+		$version = MERODIET_DEVELOPMENT ? (string) filemtime( $style_path ) : MERODIET_VERSION;
 
 		wp_enqueue_style( $handle, rtrim( $build_url, '/' ) . "/{$entry}.css", array(), $version );
 

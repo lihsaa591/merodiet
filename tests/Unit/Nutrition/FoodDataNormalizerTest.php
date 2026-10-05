@@ -1,14 +1,14 @@
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Nutrition;
+namespace MeroDiet\Tests\Unit\Nutrition;
 
-use Nutrio\Nutrition\FoodDataNormalizer;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Nutrition\FoodDataNormalizer;
+use MeroDiet\Tests\TestCase;
 
 /**
  * Every fixture here mirrors the actual shape confirmed against the

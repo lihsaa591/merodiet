@@ -42,7 +42,7 @@ export default function PasswordChangeModal( {
 				changed: boolean;
 				nonce: string;
 			} >( {
-				path: '/nutrio/v1/me/password',
+				path: '/merodiet/v1/me/password',
 				method: 'POST',
 				data: {
 					current_password: currentPassword,
@@ -58,7 +58,7 @@ export default function PasswordChangeModal( {
 			toast.error(
 				errorMessage(
 					error,
-					__( 'Something went wrong — please try again.', 'nutrio' )
+					__( 'Something went wrong — please try again.', 'merodiet' )
 				)
 			);
 		} finally {
@@ -71,7 +71,7 @@ export default function PasswordChangeModal( {
 			className={ styles.modalScrim }
 			role="button"
 			tabIndex={ -1 }
-			aria-label={ __( 'Close', 'nutrio' ) }
+			aria-label={ __( 'Close', 'merodiet' ) }
 			onClick={ ( e ) => e.target === e.currentTarget && handleClose() }
 			onKeyDown={ ( event ) => {
 				if ( 'Escape' === event.key ) {
@@ -80,27 +80,27 @@ export default function PasswordChangeModal( {
 			} }
 		>
 			<div className={ styles.modal }>
-				<h3>{ __( 'Change Password', 'nutrio' ) }</h3>
+				<h3>{ __( 'Change Password', 'merodiet' ) }</h3>
 				{ isDone ? (
 					<>
 						<p>
 							{ __(
 								'Your password has been changed.',
-								'nutrio'
+								'merodiet'
 							) }
 						</p>
 						<Button variant="primary" onClick={ handleClose }>
-							{ __( 'Done', 'nutrio' ) }
+							{ __( 'Done', 'merodiet' ) }
 						</Button>
 					</>
 				) : (
 					<form onSubmit={ submit } className={ styles.form }>
-						<div className="nutrio-field">
-							<label htmlFor="nutrio-current-password">
-								{ __( 'Current Password', 'nutrio' ) }
+						<div className="merodiet-field">
+							<label htmlFor="merodiet-current-password">
+								{ __( 'Current Password', 'merodiet' ) }
 							</label>
 							<input
-								id="nutrio-current-password"
+								id="merodiet-current-password"
 								type="password"
 								value={ currentPassword }
 								onChange={ ( event ) =>
@@ -109,12 +109,12 @@ export default function PasswordChangeModal( {
 								required
 							/>
 						</div>
-						<div className="nutrio-field">
-							<label htmlFor="nutrio-new-password">
-								{ __( 'New Password', 'nutrio' ) }
+						<div className="merodiet-field">
+							<label htmlFor="merodiet-new-password">
+								{ __( 'New Password', 'merodiet' ) }
 							</label>
 							<input
-								id="nutrio-new-password"
+								id="merodiet-new-password"
 								type="password"
 								value={ newPassword }
 								onChange={ ( event ) =>
@@ -124,12 +124,12 @@ export default function PasswordChangeModal( {
 								minLength={ 8 }
 							/>
 						</div>
-						<div className="nutrio-field">
-							<label htmlFor="nutrio-confirm-password">
-								{ __( 'Confirm New Password', 'nutrio' ) }
+						<div className="merodiet-field">
+							<label htmlFor="merodiet-confirm-password">
+								{ __( 'Confirm New Password', 'merodiet' ) }
 							</label>
 							<input
-								id="nutrio-confirm-password"
+								id="merodiet-confirm-password"
 								type="password"
 								value={ confirmPassword }
 								onChange={ ( event ) =>
@@ -145,7 +145,7 @@ export default function PasswordChangeModal( {
 								variant="primary"
 								disabled={ isSaving }
 							>
-								{ __( 'Save Password', 'nutrio' ) }
+								{ __( 'Save Password', 'merodiet' ) }
 							</Button>
 							<Button
 								type="button"
@@ -153,7 +153,7 @@ export default function PasswordChangeModal( {
 								onClick={ handleClose }
 								disabled={ isSaving }
 							>
-								{ __( 'Cancel', 'nutrio' ) }
+								{ __( 'Cancel', 'merodiet' ) }
 							</Button>
 						</div>
 					</form>

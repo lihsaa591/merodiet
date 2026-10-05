@@ -2,20 +2,20 @@
 /**
  * Custom (hand-entered) food data access.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
 // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Plugin's own custom tables; table names come from $wpdb->prefix and every value is bound via $wpdb->prepare().
 
-namespace Nutrio\Repositories;
+namespace MeroDiet\Repositories;
 
-use Nutrio\Database\QueryFilters;
-use Nutrio\Nutrition\CustomFoodNutrientMap;
+use MeroDiet\Database\QueryFilters;
+use MeroDiet\Nutrition\CustomFoodNutrientMap;
 
 /**
- * Custom foods live in the same `nutrio_foods` table as USDA-cached
+ * Custom foods live in the same `merodiet_foods` table as USDA-cached
  * foods (source = 'custom' instead of 'usda') — see
  * CustomFoodNutrientMap's docblock for why that keeps recipe/plan
  * nutrient totals working identically regardless of source. Unlike
@@ -39,7 +39,7 @@ class CustomFoodRepository {
 		$now = current_time( 'mysql' );
 
 		$wpdb->insert(
-			$wpdb->prefix . 'nutrio_foods',
+			$wpdb->prefix . 'merodiet_foods',
 			array(
 				'source'           => 'custom',
 				// Custom rows have no external source ID to key on — the
@@ -58,7 +58,7 @@ class CustomFoodRepository {
 
 		$id = (int) $wpdb->insert_id;
 
-		$wpdb->update( $wpdb->prefix . 'nutrio_foods', array( 'source_id' => $id ), array( 'id' => $id ) );
+		$wpdb->update( $wpdb->prefix . 'merodiet_foods', array( 'source_id' => $id ), array( 'id' => $id ) );
 
 		return $id;
 	}
@@ -76,7 +76,7 @@ class CustomFoodRepository {
 
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM {$wpdb->prefix}nutrio_foods WHERE id = %d AND source = 'custom' AND created_by = %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; values are parameterized.
+				"SELECT * FROM {$wpdb->prefix}merodiet_foods WHERE id = %d AND source = 'custom' AND created_by = %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; values are parameterized.
 				$id,
 				$practitioner_user_id
 			),
@@ -103,7 +103,7 @@ class CustomFoodRepository {
 	public function all_for_practitioner( int $practitioner_user_id, int $page = 1, int $per_page = 10, array $filters = array() ): array {
 		global $wpdb;
 
-		$table = $wpdb->prefix . 'nutrio_foods';
+		$table = $wpdb->prefix . 'merodiet_foods';
 
 		$params = array( $practitioner_user_id );
 
@@ -165,7 +165,7 @@ class CustomFoodRepository {
 
 		$fields['updated_at'] = current_time( 'mysql' );
 
-		$updated = $wpdb->update( $wpdb->prefix . 'nutrio_foods', $fields, array( 'id' => $id ) );
+		$updated = $wpdb->update( $wpdb->prefix . 'merodiet_foods', $fields, array( 'id' => $id ) );
 
 		return false !== $updated;
 	}
@@ -181,7 +181,7 @@ class CustomFoodRepository {
 		global $wpdb;
 
 		$count = $wpdb->get_var(
-			$wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}nutrio_recipe_items WHERE food_id = %d", $food_id ) // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
+			$wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}merodiet_recipe_items WHERE food_id = %d", $food_id ) // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
 		);
 
 		return (int) $count > 0;
@@ -195,7 +195,7 @@ class CustomFoodRepository {
 	public function delete( int $id ): bool {
 		global $wpdb;
 
-		return false !== $wpdb->delete( $wpdb->prefix . 'nutrio_foods', array( 'id' => $id ) );
+		return false !== $wpdb->delete( $wpdb->prefix . 'merodiet_foods', array( 'id' => $id ) );
 	}
 
 	/**

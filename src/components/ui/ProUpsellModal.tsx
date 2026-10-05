@@ -24,7 +24,7 @@ export default function ProUpsellModal( {
 			className={ styles.modalScrim }
 			role="button"
 			tabIndex={ -1 }
-			aria-label={ __( 'Close', 'nutrio' ) }
+			aria-label={ __( 'Close', 'merodiet' ) }
 			onClick={ ( e ) => e.target === e.currentTarget && onClose() }
 			onKeyDown={ ( event ) => {
 				if ( 'Escape' === event.key ) {
@@ -44,13 +44,13 @@ export default function ProUpsellModal( {
 						<path d="M8 11V8a4 4 0 0 1 8 0v3" />
 					</svg>
 				</div>
-				<h3>{ __( 'This is a Pro feature', 'nutrio' ) }</h3>
+				<h3>{ __( 'This is a Pro feature', 'merodiet' ) }</h3>
 				<p>
 					{ sprintf(
 						/* translators: %s: the locked feature's name */
 						__(
-							'%s is part of Nutrio Pro. Upgrade to unlock it for your practice.',
-							'nutrio'
+							'%s is part of MeroDiet Pro. Upgrade to unlock it for your practice.',
+							'merodiet'
 						),
 						featureName
 					) }
@@ -60,14 +60,14 @@ export default function ProUpsellModal( {
 						variant="primary"
 						style={ { justifyContent: 'center' } }
 					>
-						{ __( 'Upgrade to Pro', 'nutrio' ) }
+						{ __( 'Upgrade to Pro', 'merodiet' ) }
 					</Button>
 					<Button
 						variant="ghost"
 						style={ { justifyContent: 'center' } }
 						onClick={ onClose }
 					>
-						{ __( 'Maybe later', 'nutrio' ) }
+						{ __( 'Maybe later', 'merodiet' ) }
 					</Button>
 				</div>
 			</div>

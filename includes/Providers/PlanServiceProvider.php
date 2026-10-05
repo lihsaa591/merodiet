@@ -2,18 +2,18 @@
 /**
  * Plan domain-object wiring.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Providers;
+namespace MeroDiet\Providers;
 
 use League\Container\Container;
-use Nutrio\Nutrition\FoodCache;
-use Nutrio\Nutrition\PlanNutrientResolver;
-use Nutrio\Nutrition\RecipeNutrientResolver;
-use Nutrio\Repositories\PlanRepository;
+use MeroDiet\Nutrition\FoodCache;
+use MeroDiet\Nutrition\PlanNutrientResolver;
+use MeroDiet\Nutrition\RecipeNutrientResolver;
+use MeroDiet\Repositories\PlanRepository;
 
 /**
  * Registers PlanRepository and PlanNutrientResolver with their correct

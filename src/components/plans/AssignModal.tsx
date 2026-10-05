@@ -69,7 +69,10 @@ export default function AssignModal( {
 					'message' in error &&
 					typeof error.message === 'string'
 					? error.message
-					: __( 'Something went wrong — please try again.', 'nutrio' )
+					: __(
+							'Something went wrong — please try again.',
+							'merodiet'
+					  )
 			);
 		} finally {
 			setIsAssigning( false );
@@ -83,17 +86,17 @@ export default function AssignModal( {
 			onClick={ ( e ) => e.target === e.currentTarget && onClose() }
 		>
 			<div className={ styles.modal }>
-				<h3>{ __( 'Assign to client', 'nutrio' ) }</h3>
+				<h3>{ __( 'Assign to client', 'merodiet' ) }</h3>
 
 				<div
-					className="nutrio-field"
+					className="merodiet-field"
 					style={ { marginBottom: '14px' } }
 				>
-					<label htmlFor="nutrio-assign-client">
-						{ __( 'Client', 'nutrio' ) }
+					<label htmlFor="merodiet-assign-client">
+						{ __( 'Client', 'merodiet' ) }
 					</label>
 					<select
-						id="nutrio-assign-client"
+						id="merodiet-assign-client"
 						value={ selectedClientId ?? '' }
 						onChange={ ( e ) => {
 							setSelectedClientId(
@@ -103,7 +106,7 @@ export default function AssignModal( {
 						} }
 					>
 						<option value="">
-							{ __( 'Select a client…', 'nutrio' ) }
+							{ __( 'Select a client…', 'merodiet' ) }
 						</option>
 						{ clients.map( ( client ) => (
 							<option key={ client.id } value={ client.id }>
@@ -115,11 +118,11 @@ export default function AssignModal( {
 
 				{ selectedClient && selectedClient.allergies.length > 0 && (
 					<div
-						className="nutrio-field"
+						className="merodiet-field"
 						style={ { marginBottom: '14px' } }
 					>
-						<div className="nutrio-field-hint">
-							{ __( "Client's declared allergies", 'nutrio' ) }
+						<div className="merodiet-field-hint">
+							{ __( "Client's declared allergies", 'merodiet' ) }
 						</div>
 						<div
 							style={ {
@@ -147,7 +150,7 @@ export default function AssignModal( {
 							/* translators: %s: comma-separated list of the client's declared allergies found in this plan */
 							__(
 								"This plan contains an item matching this client's declared allergies: %s. Assignment is blocked.",
-								'nutrio'
+								'merodiet'
 							),
 							conflicts.join( ', ' )
 						) }
@@ -158,7 +161,7 @@ export default function AssignModal( {
 					<p className={ styles.lockNotice }>
 						{ __(
 							'Once assigned, this plan becomes read-only — its numbers are frozen and it can no longer be edited directly. To make changes later, unassign it or duplicate it as a new plan.',
-							'nutrio'
+							'merodiet'
 						) }
 					</p>
 				) }
@@ -174,7 +177,7 @@ export default function AssignModal( {
 						}
 						style={ { justifyContent: 'center' } }
 					>
-						{ __( 'Assign', 'nutrio' ) }
+						{ __( 'Assign', 'merodiet' ) }
 					</Button>
 					<Button
 						variant="ghost"
@@ -182,7 +185,7 @@ export default function AssignModal( {
 						disabled={ isAssigning }
 						style={ { justifyContent: 'center' } }
 					>
-						{ __( 'Cancel', 'nutrio' ) }
+						{ __( 'Cancel', 'merodiet' ) }
 					</Button>
 				</div>
 			</div>

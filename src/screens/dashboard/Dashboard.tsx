@@ -60,7 +60,7 @@ export default function Dashboard() {
 
 	useEffect( () => {
 		apiFetch< DashboardOverview >( {
-			path: '/nutrio/v1/dashboard/overview',
+			path: '/merodiet/v1/dashboard/overview',
 		} ).then( setOverview, () =>
 			setOverview( {
 				active_client_count: 0,
@@ -74,30 +74,30 @@ export default function Dashboard() {
 
 	return (
 		<>
-			<div className="nutrio-topbar">
+			<div className="merodiet-topbar">
 				<div>
 					<h1>
 						{ greeting() } { greetingEmoji() }
 					</h1>
-					<div className="nutrio-topbar-sub">
+					<div className="merodiet-topbar-sub">
 						{ new Date().toLocaleDateString( undefined, {
 							weekday: 'long',
 							month: 'long',
 							day: 'numeric',
 						} ) }
 						{ ' · ' }
-						{ clientCount } { __( 'active clients', 'nutrio' ) }
+						{ clientCount } { __( 'active clients', 'merodiet' ) }
 					</div>
 				</div>
 			</div>
 
-			<div className="nutrio-kpi-row">
+			<div className="merodiet-kpi-row">
 				<Kpi
-					label={ __( 'Active clients', 'nutrio' ) }
+					label={ __( 'Active clients', 'merodiet' ) }
 					value={ clientCount }
 				/>
 				<Kpi
-					label={ __( 'Logged today', 'nutrio' ) }
+					label={ __( 'Logged today', 'merodiet' ) }
 					value={
 						overview ? (
 							`${ overview.logged_today_count }/${
@@ -111,7 +111,7 @@ export default function Dashboard() {
 					tone="up"
 				/>
 				<Kpi
-					label={ __( 'Plans awaiting review', 'nutrio' ) }
+					label={ __( 'Plans awaiting review', 'merodiet' ) }
 					value={
 						overview ? (
 							overview.draft_plan_count
@@ -123,7 +123,7 @@ export default function Dashboard() {
 					tone="warn"
 				/>
 				<Kpi
-					label={ __( 'Recipe library', 'nutrio' ) }
+					label={ __( 'Recipe library', 'merodiet' ) }
 					value={ recipeCount }
 				/>
 			</div>
@@ -131,7 +131,7 @@ export default function Dashboard() {
 			<Panel>
 				<PanelHead>
 					<h3>
-						{ __( 'Client compliance, last 7 days', 'nutrio' ) }
+						{ __( 'Client compliance, last 7 days', 'merodiet' ) }
 					</h3>
 				</PanelHead>
 				<PanelBody>
@@ -144,7 +144,10 @@ export default function Dashboard() {
 					{ overview && overview.clients_without_plan_count > 0 && (
 						<p>
 							{ overview.clients_without_plan_count }{ ' ' }
-							{ __( 'client(s) have no active plan.', 'nutrio' ) }
+							{ __(
+								'client(s) have no active plan.',
+								'merodiet'
+							) }
 						</p>
 					) }
 				</PanelBody>
@@ -162,12 +165,12 @@ interface KpiProps {
 
 function Kpi( { label, value, delta, tone }: KpiProps ) {
 	return (
-		<div className="nutrio-kpi">
-			<div className="nutrio-kpi-label">{ label }</div>
-			<div className="nutrio-kpi-value">{ value }</div>
+		<div className="merodiet-kpi">
+			<div className="merodiet-kpi-label">{ label }</div>
+			<div className="merodiet-kpi-value">{ value }</div>
 			{ delta && (
 				<div
-					className={ `nutrio-kpi-delta ${
+					className={ `merodiet-kpi-delta ${
 						tone ? `is-${ tone }` : ''
 					}`.trim() }
 				>
@@ -244,7 +247,7 @@ function ComplianceRow( { client }: { client: ComplianceEntry } ) {
 				/>
 			</div>
 			<div
-				className="nutrio-mono"
+				className="merodiet-mono"
 				style={ {
 					fontSize: '12.5px',
 					fontWeight: 700,

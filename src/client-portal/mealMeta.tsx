@@ -12,10 +12,10 @@ export const MEAL_ORDER: MealType[] = [
 ];
 
 export const MEAL_LABELS: Record< MealType, string > = {
-	breakfast: __( 'Breakfast', 'nutrio' ),
-	lunch: __( 'Lunch', 'nutrio' ),
-	dinner: __( 'Dinner', 'nutrio' ),
-	snack: __( 'Snack', 'nutrio' ),
+	breakfast: __( 'Breakfast', 'merodiet' ),
+	lunch: __( 'Lunch', 'merodiet' ),
+	dinner: __( 'Dinner', 'merodiet' ),
+	snack: __( 'Snack', 'merodiet' ),
 };
 
 export const MEAL_ICONS: Record< MealType, JSX.Element > = {
@@ -61,14 +61,14 @@ export function itemQuantityLabel( item: PlanItem ): string | null {
 	if ( item.food_id ) {
 		return null === item.quantity_grams
 			? null
-			: `${ item.quantity_grams } ${ __( 'g', 'nutrio' ) }`;
+			: `${ item.quantity_grams } ${ __( 'g', 'merodiet' ) }`;
 	}
 
 	if ( null === item.servings ) {
 		return null;
 	}
 
-	const servings = `${ item.servings } ${ __( 'srv', 'nutrio' ) }`;
+	const servings = `${ item.servings } ${ __( 'srv', 'merodiet' ) }`;
 
 	// Recipes only have a serving *count*, which tells the client nothing
 	// about portion size — add the weight when the recipe has one.
@@ -76,7 +76,7 @@ export function itemQuantityLabel( item: PlanItem ): string | null {
 		const grams =
 			Math.round( item.recipe_serving_grams * item.servings * 10 ) / 10;
 
-		return `${ servings } · ${ grams } ${ __( 'g', 'nutrio' ) }`;
+		return `${ servings } · ${ grams } ${ __( 'g', 'merodiet' ) }`;
 	}
 
 	return servings;

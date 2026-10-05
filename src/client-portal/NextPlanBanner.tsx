@@ -15,7 +15,7 @@ export default function NextPlanBanner() {
 
 	useEffect( () => {
 		apiFetch< NextPlanSummary | null >( {
-			path: '/nutrio/v1/me/plan/next',
+			path: '/merodiet/v1/me/plan/next',
 		} )
 			.then( setNextPlan )
 			.catch( () => {} );
@@ -37,8 +37,9 @@ export default function NextPlanBanner() {
 				<path d="M3.5 9h17M8 3v3M16 3v3" />
 			</svg>
 			<span>
-				{ __( 'Next up:', 'nutrio' ) }{ ' ' }
-				<strong>{ nextPlan.title }</strong> { __( 'starts', 'nutrio' ) }{ ' ' }
+				{ __( 'Next up:', 'merodiet' ) }{ ' ' }
+				<strong>{ nextPlan.title }</strong>{ ' ' }
+				{ __( 'starts', 'merodiet' ) }{ ' ' }
 				{ formatShortDate( nextPlan.start_date ) }
 			</span>
 		</div>

@@ -2,14 +2,14 @@
 /**
  * Admin page + React mount helper.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Admin;
+namespace MeroDiet\Admin;
 
-use Nutrio\Helper\Assets;
+use MeroDiet\Helper\Assets;
 
 /**
  * Registers a top-level (or sub-menu) admin page whose body is a single
@@ -76,8 +76,8 @@ final class AdminPage {
 			'#toplevel_page_%1$s .wp-menu-image{display:flex;align-items:center;justify-content:center;}#toplevel_page_%1$s .wp-menu-image img{opacity:1;width:20px;height:20px;padding:0;}',
 			esc_attr( $this->menu_slug )
 		);
-		$handle = 'nutrio-menu-icon-' . $this->menu_slug;
-		wp_register_style( $handle, false, array(), NUTRIO_VERSION );
+		$handle = 'merodiet-menu-icon-' . $this->menu_slug;
+		wp_register_style( $handle, false, array(), MERODIET_VERSION );
 		wp_enqueue_style( $handle );
 		wp_add_inline_style( $handle, $css );
 	}
@@ -128,21 +128,21 @@ final class AdminPage {
 			return;
 		}
 
-		$handle = 'nutrio-' . $this->script_entry;
+		$handle = 'merodiet-' . $this->script_entry;
 
 		Assets::enqueue_script(
 			$handle,
-			NUTRIO_PATH . 'build',
-			NUTRIO_URL . 'build',
+			MERODIET_PATH . 'build',
+			MERODIET_URL . 'build',
 			$this->script_entry
 		);
-		Assets::enqueue_style( $handle, NUTRIO_PATH . 'build', NUTRIO_URL . 'build', $this->script_entry );
+		Assets::enqueue_style( $handle, MERODIET_PATH . 'build', MERODIET_URL . 'build', $this->script_entry );
 
 		$current_user = wp_get_current_user();
 
 		wp_localize_script(
 			$handle,
-			'nutrioAdmin',
+			'merodietAdmin',
 			array(
 				'restUrl'             => esc_url_raw( rest_url() ),
 				'restNonce'           => wp_create_nonce( 'wp_rest' ),
@@ -159,7 +159,7 @@ final class AdminPage {
 				// Used by the Email settings' visual editor to mirror the
 				// real email's header/footer (see Mailer::wrap_in_skeleton()).
 				'siteName'            => get_bloginfo( 'name' ),
-				'emailLogoUrl'        => esc_url_raw( NUTRIO_URL . 'assets/images/nutrio-leaf-email.png' ),
+				'emailLogoUrl'        => esc_url_raw( MERODIET_URL . 'assets/images/merodiet-leaf-email.png' ),
 			)
 		);
 	}

@@ -1,16 +1,16 @@
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Email;
+namespace MeroDiet\Tests\Unit\Email;
 
 use Brain\Monkey\Functions;
-use Nutrio\Email\EmailTemplateService;
-use Nutrio\Email\Mailer;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Email\EmailTemplateService;
+use MeroDiet\Email\Mailer;
+use MeroDiet\Tests\TestCase;
 
 final class MailerTest extends TestCase {
 

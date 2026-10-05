@@ -8,7 +8,7 @@
 	flex: 1;
 	max-width: 320px;
 }
-.searchWrap :global(.nutrio-field) {
+.searchWrap :global(.merodiet-field) {
 	margin: 0;
 }
 .searchWrap input {
@@ -18,7 +18,7 @@
 	padding: 0 12px;
 	font-size: 13.5px;
 }
-.statusWrap :global(.nutrio-field) {
+.statusWrap :global(.merodiet-field) {
 	margin: 0;
 }
 .statusWrap select {

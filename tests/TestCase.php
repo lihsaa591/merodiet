@@ -2,12 +2,12 @@
 /**
  * Base test case wiring up Brain Monkey.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests;
+namespace MeroDiet\Tests;
 
 use Brain\Monkey;
 use Brain\Monkey\Functions;

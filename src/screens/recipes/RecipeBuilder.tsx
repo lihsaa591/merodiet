@@ -92,7 +92,7 @@ export default function RecipeBuilder( {
 			toast.error(
 				errorMessage(
 					error,
-					__( 'Could not save this recipe.', 'nutrio' )
+					__( 'Could not save this recipe.', 'merodiet' )
 				)
 			);
 		} finally {
@@ -104,8 +104,8 @@ export default function RecipeBuilder( {
 		if (
 			! isDirty ||
 			( await confirmDialog( {
-				message: __( 'Discard unsaved changes?', 'nutrio' ),
-				confirmLabel: __( 'Discard', 'nutrio' ),
+				message: __( 'Discard unsaved changes?', 'merodiet' ),
+				confirmLabel: __( 'Discard', 'merodiet' ),
 				destructive: true,
 			} ) )
 		) {
@@ -122,7 +122,7 @@ export default function RecipeBuilder( {
 
 	return (
 		<>
-			<div className="nutrio-topbar">
+			<div className="merodiet-topbar">
 				<div
 					style={ {
 						display: 'flex',
@@ -131,7 +131,9 @@ export default function RecipeBuilder( {
 					} }
 				>
 					<h1>
-						{ recipe ? recipe.name : __( 'New recipe', 'nutrio' ) }
+						{ recipe
+							? recipe.name
+							: __( 'New recipe', 'merodiet' ) }
 					</h1>
 					{ isDirty && <UnsavedBadge /> }
 				</div>
@@ -141,7 +143,7 @@ export default function RecipeBuilder( {
 						onClick={ handleCancel }
 						disabled={ isSaving }
 					>
-						{ __( 'Cancel', 'nutrio' ) }
+						{ __( 'Cancel', 'merodiet' ) }
 					</Button>
 					<Button
 						variant="primary"
@@ -149,8 +151,8 @@ export default function RecipeBuilder( {
 						disabled={ isSaving || ! name || items.length === 0 }
 					>
 						{ recipe
-							? __( 'Save changes', 'nutrio' )
-							: __( 'Create recipe', 'nutrio' ) }
+							? __( 'Save changes', 'merodiet' )
+							: __( 'Create recipe', 'merodiet' ) }
 					</Button>
 				</div>
 			</div>
@@ -162,12 +164,12 @@ export default function RecipeBuilder( {
 							className={ styles.nameRow }
 							style={ { marginBottom: '16px' } }
 						>
-							<div className="nutrio-field">
-								<label htmlFor="nutrio-recipe-name">
-									{ __( 'Recipe name', 'nutrio' ) }
+							<div className="merodiet-field">
+								<label htmlFor="merodiet-recipe-name">
+									{ __( 'Recipe name', 'merodiet' ) }
 								</label>
 								<input
-									id="nutrio-recipe-name"
+									id="merodiet-recipe-name"
 									type="text"
 									value={ name }
 									onChange={ ( e ) =>
@@ -175,16 +177,16 @@ export default function RecipeBuilder( {
 									}
 									placeholder={ __(
 										'e.g. Lentil & Roast Vegetable Bowl',
-										'nutrio'
+										'merodiet'
 									) }
 								/>
 							</div>
-							<div className="nutrio-field">
-								<label htmlFor="nutrio-recipe-servings">
-									{ __( 'Servings', 'nutrio' ) }
+							<div className="merodiet-field">
+								<label htmlFor="merodiet-recipe-servings">
+									{ __( 'Servings', 'merodiet' ) }
 								</label>
 								<input
-									id="nutrio-recipe-servings"
+									id="merodiet-recipe-servings"
 									type="number"
 									min={ 1 }
 									value={ servings }
@@ -201,9 +203,9 @@ export default function RecipeBuilder( {
 						</div>
 
 						<div className={ styles.ingredientHeader }>
-							<div>{ __( 'Ingredient', 'nutrio' ) }</div>
-							<div>{ __( 'Qty (g)', 'nutrio' ) }</div>
-							<div>{ __( 'Food', 'nutrio' ) }</div>
+							<div>{ __( 'Ingredient', 'merodiet' ) }</div>
+							<div>{ __( 'Qty (g)', 'merodiet' ) }</div>
+							<div>{ __( 'Food', 'merodiet' ) }</div>
 							<div></div>
 						</div>
 
@@ -217,7 +219,7 @@ export default function RecipeBuilder( {
 							>
 								{ __(
 									'No ingredients yet — search for one on the right to add it.',
-									'nutrio'
+									'merodiet'
 								) }
 							</p>
 						) }
@@ -229,7 +231,7 @@ export default function RecipeBuilder( {
 							>
 								<div>
 									{ item.food_description ??
-										__( '(unknown food)', 'nutrio' ) }
+										__( '(unknown food)', 'merodiet' ) }
 								</div>
 								<input
 									className={ styles.qtyInput }
@@ -244,20 +246,20 @@ export default function RecipeBuilder( {
 									}
 								/>
 								<div
-									className="nutrio-mono"
+									className="merodiet-mono"
 									style={ {
 										fontSize: '12px',
 										color: 'var(--ink-faint)',
 									} }
 								>
-									{ __( 'g', 'nutrio' ) }
+									{ __( 'g', 'merodiet' ) }
 								</div>
 								<button
 									className={ styles.removeBtn }
 									onClick={ () => removeItem( index ) }
 									aria-label={ __(
 										'Remove ingredient',
-										'nutrio'
+										'merodiet'
 									) }
 								>
 									<svg
@@ -280,7 +282,7 @@ export default function RecipeBuilder( {
 									marginBottom: '10px',
 								} }
 							>
-								{ __( 'Per serving', 'nutrio' ) }
+								{ __( 'Per serving', 'merodiet' ) }
 							</h3>
 							{ items.length === 0 && (
 								<p
@@ -291,7 +293,7 @@ export default function RecipeBuilder( {
 								>
 									{ __(
 										'Add an ingredient to see estimated totals.',
-										'nutrio'
+										'merodiet'
 									) }
 								</p>
 							) }
@@ -305,7 +307,7 @@ export default function RecipeBuilder( {
 											) }
 										</div>
 										<div className={ styles.nutrientLbl }>
-											{ __( 'Kcal', 'nutrio' ) }
+											{ __( 'Kcal', 'merodiet' ) }
 										</div>
 									</div>
 									<div className={ styles.nutrientTile }>
@@ -313,7 +315,7 @@ export default function RecipeBuilder( {
 											{ formatAmount( summary.protein ) }
 										</div>
 										<div className={ styles.nutrientLbl }>
-											{ __( 'Protein', 'nutrio' ) }
+											{ __( 'Protein', 'merodiet' ) }
 										</div>
 									</div>
 									<div className={ styles.nutrientTile }>
@@ -321,7 +323,7 @@ export default function RecipeBuilder( {
 											{ formatAmount( summary.carbs ) }
 										</div>
 										<div className={ styles.nutrientLbl }>
-											{ __( 'Carbs', 'nutrio' ) }
+											{ __( 'Carbs', 'merodiet' ) }
 										</div>
 									</div>
 									<div className={ styles.nutrientTile }>
@@ -329,7 +331,7 @@ export default function RecipeBuilder( {
 											{ formatAmount( summary.fat ) }
 										</div>
 										<div className={ styles.nutrientLbl }>
-											{ __( 'Fat', 'nutrio' ) }
+											{ __( 'Fat', 'merodiet' ) }
 										</div>
 									</div>
 								</div>
@@ -367,7 +369,7 @@ export default function RecipeBuilder( {
 
 				<Panel>
 					<PanelHead>
-						<h3>{ __( 'Search foods', 'nutrio' ) }</h3>
+						<h3>{ __( 'Search foods', 'merodiet' ) }</h3>
 					</PanelHead>
 					<PanelBody>
 						<FoodSearch onResolve={ addItem } />

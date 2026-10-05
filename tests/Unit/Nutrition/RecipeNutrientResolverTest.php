@@ -1,16 +1,16 @@
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Nutrition;
+namespace MeroDiet\Tests\Unit\Nutrition;
 
-use Nutrio\Nutrition\FoodCache;
-use Nutrio\Nutrition\RecipeNutrientResolver;
-use Nutrio\Repositories\RecipeRepository;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Nutrition\FoodCache;
+use MeroDiet\Nutrition\RecipeNutrientResolver;
+use MeroDiet\Repositories\RecipeRepository;
+use MeroDiet\Tests\TestCase;
 
 final class RecipeNutrientResolverTest extends TestCase {
 

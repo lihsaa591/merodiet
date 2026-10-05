@@ -2,17 +2,17 @@
 /**
  * Local food-data cache reads/writes.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
 // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Plugin's own custom tables; table names come from $wpdb->prefix and every value is bound via $wpdb->prepare().
 
-namespace Nutrio\Nutrition;
+namespace MeroDiet\Nutrition;
 
 /**
- * The nutrio_foods table is the only place the rest of the app reads
+ * The merodiet_foods table is the only place the rest of the app reads
  * nutrient data from — nothing outside FoodDataService talks to
  * FoodDataClient directly. This keeps "where does nutrient data come
  * from" a single, swappable decision (see the source/source_id design
@@ -30,7 +30,7 @@ class FoodCache {
 	public function store( array $food ): int {
 		global $wpdb;
 
-		$table = $wpdb->prefix . 'nutrio_foods';
+		$table = $wpdb->prefix . 'merodiet_foods';
 		$now   = current_time( 'mysql' );
 
 		$existing_id = $this->find_internal_id( $food['source'], $food['source_id'] );
@@ -65,7 +65,7 @@ class FoodCache {
 	public function find_by_source( string $source, int $source_id ): ?array {
 		global $wpdb;
 
-		$table = $wpdb->prefix . 'nutrio_foods';
+		$table = $wpdb->prefix . 'merodiet_foods';
 
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
@@ -87,7 +87,7 @@ class FoodCache {
 	public function find( int $id ): ?array {
 		global $wpdb;
 
-		$table = $wpdb->prefix . 'nutrio_foods';
+		$table = $wpdb->prefix . 'merodiet_foods';
 
 		$row = $wpdb->get_row(
 			$wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
@@ -106,7 +106,7 @@ class FoodCache {
 	private function find_internal_id( string $source, int $source_id ): ?int {
 		global $wpdb;
 
-		$table = $wpdb->prefix . 'nutrio_foods';
+		$table = $wpdb->prefix . 'merodiet_foods';
 
 		$id = $wpdb->get_var(
 			$wpdb->prepare(

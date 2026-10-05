@@ -40,7 +40,7 @@ export default function FoodSearch( { onResolve }: FoodSearchProps ) {
 					}`.trim() }
 					onClick={ () => setTab( 'usda' ) }
 				>
-					{ __( 'USDA', 'nutrio' ) }
+					{ __( 'USDA', 'merodiet' ) }
 				</button>
 				<button
 					type="button"
@@ -49,7 +49,7 @@ export default function FoodSearch( { onResolve }: FoodSearchProps ) {
 					}`.trim() }
 					onClick={ () => setTab( 'custom' ) }
 				>
-					{ __( 'My custom foods', 'nutrio' ) }
+					{ __( 'My custom foods', 'merodiet' ) }
 				</button>
 			</div>
 
@@ -105,7 +105,7 @@ function UsdaSearch( { onResolve }: FoodSearchProps ) {
 
 		try {
 			const response: FoodSearchResponse = await apiFetch( {
-				path: `/nutrio/v1/foods/search?query=${ encodeURIComponent(
+				path: `/merodiet/v1/foods/search?query=${ encodeURIComponent(
 					value
 				) }&page=${ targetPage }${
 					withBranded ? '&include_branded=1' : ''
@@ -126,7 +126,7 @@ function UsdaSearch( { onResolve }: FoodSearchProps ) {
 			toast.error(
 				errorMessage(
 					error,
-					__( 'Something went wrong searching.', 'nutrio' )
+					__( 'Something went wrong searching.', 'merodiet' )
 				)
 			);
 		} finally {
@@ -165,7 +165,7 @@ function UsdaSearch( { onResolve }: FoodSearchProps ) {
 
 		try {
 			const food: ResolvedFood = await apiFetch( {
-				path: `/nutrio/v1/foods/${ fdcId }/resolve`,
+				path: `/merodiet/v1/foods/${ fdcId }/resolve`,
 				method: 'POST',
 			} );
 			onResolve( food );
@@ -178,7 +178,7 @@ function UsdaSearch( { onResolve }: FoodSearchProps ) {
 			toast.error(
 				errorMessage(
 					error,
-					__( 'Something went wrong adding this food.', 'nutrio' )
+					__( 'Something went wrong adding this food.', 'merodiet' )
 				)
 			);
 		} finally {
@@ -188,12 +188,12 @@ function UsdaSearch( { onResolve }: FoodSearchProps ) {
 
 	return (
 		<>
-			<div className="nutrio-field" style={ { marginBottom: '8px' } }>
+			<div className="merodiet-field" style={ { marginBottom: '8px' } }>
 				<input
 					type="text"
 					value={ query }
 					onChange={ handleChange }
-					placeholder={ __( 'Search ingredient…', 'nutrio' ) }
+					placeholder={ __( 'Search ingredient…', 'merodiet' ) }
 				/>
 			</div>
 
@@ -208,7 +208,7 @@ function UsdaSearch( { onResolve }: FoodSearchProps ) {
 				} }
 			>
 				<label
-					htmlFor="nutrio-include-branded"
+					htmlFor="merodiet-include-branded"
 					style={ {
 						display: 'flex',
 						alignItems: 'center',
@@ -216,18 +216,18 @@ function UsdaSearch( { onResolve }: FoodSearchProps ) {
 					} }
 				>
 					<input
-						id="nutrio-include-branded"
+						id="merodiet-include-branded"
 						type="checkbox"
 						checked={ includeBranded }
 						onChange={ handleIncludeBrandedChange }
 					/>
-					{ __( 'Include branded products', 'nutrio' ) }
+					{ __( 'Include branded products', 'merodiet' ) }
 				</label>
 				<Tooltip content={ BRANDED_FOODS_HELP_TEXT }>
 					<InfoIcon
 						label={ __(
 							'Why are branded products hidden?',
-							'nutrio'
+							'merodiet'
 						) }
 					/>
 				</Tooltip>
@@ -235,13 +235,13 @@ function UsdaSearch( { onResolve }: FoodSearchProps ) {
 
 			{ isSearching && (
 				<p style={ { fontSize: '12.5px', color: 'var(--ink-muted)' } }>
-					{ __( 'Searching…', 'nutrio' ) }
+					{ __( 'Searching…', 'merodiet' ) }
 				</p>
 			) }
 
 			{ ! isSearching && query && results.length === 0 && (
 				<p style={ { fontSize: '12.5px', color: 'var(--ink-muted)' } }>
-					{ __( 'No matches.', 'nutrio' ) }
+					{ __( 'No matches.', 'merodiet' ) }
 				</p>
 			) }
 
@@ -278,8 +278,8 @@ function UsdaSearch( { onResolve }: FoodSearchProps ) {
 					} }
 				>
 					{ isLoadingMore
-						? __( 'Loading…', 'nutrio' )
-						: __( 'Load more', 'nutrio' ) }
+						? __( 'Loading…', 'merodiet' )
+						: __( 'Load more', 'merodiet' ) }
 				</Button>
 			) }
 		</>
@@ -291,12 +291,12 @@ function chipLabel(
 	resolvingId: number | null
 ): string {
 	if ( resolvingId === food.fdcId ) {
-		return __( 'Adding…', 'nutrio' );
+		return __( 'Adding…', 'merodiet' );
 	}
 
 	return food.dataType === 'Branded'
-		? __( 'Branded', 'nutrio' )
-		: __( 'USDA', 'nutrio' );
+		? __( 'Branded', 'merodiet' )
+		: __( 'USDA', 'merodiet' );
 }
 
 function CustomFoodSearch( { onResolve }: FoodSearchProps ) {
@@ -329,12 +329,15 @@ function CustomFoodSearch( { onResolve }: FoodSearchProps ) {
 
 	return (
 		<>
-			<div className="nutrio-field" style={ { marginBottom: '12px' } }>
+			<div className="merodiet-field" style={ { marginBottom: '12px' } }>
 				<input
 					type="text"
 					value={ query }
 					onChange={ ( event ) => setQuery( event.target.value ) }
-					placeholder={ __( 'Search your custom foods…', 'nutrio' ) }
+					placeholder={ __(
+						'Search your custom foods…',
+						'merodiet'
+					) }
 				/>
 			</div>
 
@@ -343,9 +346,9 @@ function CustomFoodSearch( { onResolve }: FoodSearchProps ) {
 					{ foods.length === 0
 						? __(
 								'No custom foods yet — add one from the Food database screen.',
-								'nutrio'
+								'merodiet'
 						  )
-						: __( 'No matches.', 'nutrio' ) }
+						: __( 'No matches.', 'merodiet' ) }
 				</p>
 			) }
 
@@ -358,7 +361,7 @@ function CustomFoodSearch( { onResolve }: FoodSearchProps ) {
 					<div>
 						<div className={ styles.name }>{ food.name }</div>
 					</div>
-					<Chip tone="clay">{ __( 'Custom', 'nutrio' ) }</Chip>
+					<Chip tone="clay">{ __( 'Custom', 'merodiet' ) }</Chip>
 				</button>
 			) ) }
 		</>

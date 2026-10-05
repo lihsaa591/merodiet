@@ -6,7 +6,7 @@
  * Integration tests that need a real WordPress + database belong in a
  * separate suite run against `wp-env` (see .wp-env.json), not here.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
@@ -15,17 +15,17 @@ require_once dirname( __DIR__ ) . '/vendor/autoload.php';
 
 // A handful of constants the plugin file itself defines, that some
 // unit-tested classes reach for directly (e.g. Assets, migrations).
-if ( ! defined( 'NUTRIO_VERSION' ) ) {
-	define( 'NUTRIO_VERSION', '0.1.0-test' );
+if ( ! defined( 'MERODIET_VERSION' ) ) {
+	define( 'MERODIET_VERSION', '0.1.0-test' );
 }
-if ( ! defined( 'NUTRIO_PATH' ) ) {
-	define( 'NUTRIO_PATH', dirname( __DIR__ ) . '/' );
+if ( ! defined( 'MERODIET_PATH' ) ) {
+	define( 'MERODIET_PATH', dirname( __DIR__ ) . '/' );
 }
-if ( ! defined( 'NUTRIO_URL' ) ) {
-	define( 'NUTRIO_URL', 'https://example.test/wp-content/plugins/nutrio/' );
+if ( ! defined( 'MERODIET_URL' ) ) {
+	define( 'MERODIET_URL', 'https://example.test/wp-content/plugins/merodiet/' );
 }
-if ( ! defined( 'NUTRIO_DEVELOPMENT' ) ) {
-	define( 'NUTRIO_DEVELOPMENT', false );
+if ( ! defined( 'MERODIET_DEVELOPMENT' ) ) {
+	define( 'MERODIET_DEVELOPMENT', false );
 }
 if ( ! defined( 'ABSPATH' ) ) {
 	define( 'ABSPATH', sys_get_temp_dir() . '/' );
@@ -96,7 +96,7 @@ if ( ! class_exists( 'WP_User' ) ) {
 	}
 }
 
-if ( ! class_exists( 'Nutrio_Tests_PHPMailerStub' ) ) {
+if ( ! class_exists( 'MeroDiet_Tests_PHPMailerStub' ) ) {
 	/**
 	 * Minimal stand-in for WP core's bundled PHPMailer — just enough
 	 * surface (isHTML()) for PortalPage::force_html_email() to be
@@ -104,7 +104,7 @@ if ( ! class_exists( 'Nutrio_Tests_PHPMailerStub' ) ) {
 	 * the real class's namespace, since PortalPage type-hints against
 	 * that, not this stub, directly.
 	 */
-	class Nutrio_Tests_PHPMailerStub {
+	class MeroDiet_Tests_PHPMailerStub {
 		public bool $is_html = false;
 		public string $From = '';
 		public string $FromName = '';
@@ -122,7 +122,7 @@ if ( ! class_exists( 'Nutrio_Tests_PHPMailerStub' ) ) {
 }
 
 if ( ! class_exists( 'PHPMailer\PHPMailer\PHPMailer' ) ) {
-	class_alias( 'Nutrio_Tests_PHPMailerStub', 'PHPMailer\PHPMailer\PHPMailer' );
+	class_alias( 'MeroDiet_Tests_PHPMailerStub', 'PHPMailer\PHPMailer\PHPMailer' );
 }
 
 if ( ! class_exists( 'WP_REST_Request' ) ) {

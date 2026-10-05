@@ -14,11 +14,11 @@ interface EmailSettingsTabProps {
 // registry only sends machine keys (see EmailTemplateRegistry) and
 // this is the one place that turns them into copy a practitioner reads.
 const TYPE_LABELS: Record< string, string > = {
-	client_invite: __( 'Client invite', 'nutrio' ),
-	client_password_reset: __( 'Client password reset', 'nutrio' ),
-	client_plan_assigned: __( 'Plan assigned', 'nutrio' ),
-	practitioner_client_added: __( 'New client added', 'nutrio' ),
-	practitioner_daily_digest: __( 'Daily client activity digest', 'nutrio' ),
+	client_invite: __( 'Client invite', 'merodiet' ),
+	client_password_reset: __( 'Client password reset', 'merodiet' ),
+	client_plan_assigned: __( 'Plan assigned', 'merodiet' ),
+	practitioner_client_added: __( 'New client added', 'merodiet' ),
+	practitioner_daily_digest: __( 'Daily client activity digest', 'merodiet' ),
 };
 
 // client_invite/client_password_reset are triggered by WordPress core
@@ -41,12 +41,12 @@ export default function EmailSettingsTab( {
 	);
 	useEffect( () => {
 		apiFetch< EmailTemplate[] >( {
-			path: '/nutrio/v1/settings/email-templates',
+			path: '/merodiet/v1/settings/email-templates',
 		} ).then( setTemplates );
 
 		if ( 'practitioner' === audience ) {
 			apiFetch< EmailDigestSettings >( {
-				path: '/nutrio/v1/settings/email-digest',
+				path: '/merodiet/v1/settings/email-digest',
 			} ).then( setDigest );
 		}
 	}, [ audience ] );
@@ -64,7 +64,7 @@ export default function EmailSettingsTab( {
 				subject: string;
 				body: string;
 			} >( {
-				path: `/nutrio/v1/settings/email-templates/${ type }`,
+				path: `/merodiet/v1/settings/email-templates/${ type }`,
 				method: 'PUT',
 				data: { subject, body },
 			} );
@@ -72,7 +72,7 @@ export default function EmailSettingsTab( {
 			toast.error(
 				errorMessage(
 					error,
-					__( 'Could not save the email template.', 'nutrio' )
+					__( 'Could not save the email template.', 'merodiet' )
 				)
 			);
 			return;
@@ -90,7 +90,7 @@ export default function EmailSettingsTab( {
 			)
 		);
 
-		toast.success( __( 'Email template saved.', 'nutrio' ) );
+		toast.success( __( 'Email template saved.', 'merodiet' ) );
 	};
 
 	const handleToggleTemplate = async ( type: string, enabled: boolean ) => {
@@ -98,7 +98,7 @@ export default function EmailSettingsTab( {
 
 		try {
 			result = await apiFetch< { type: string; enabled: boolean } >( {
-				path: `/nutrio/v1/settings/email-templates/${ type }/enabled`,
+				path: `/merodiet/v1/settings/email-templates/${ type }/enabled`,
 				method: 'PUT',
 				data: { enabled },
 			} );
@@ -106,7 +106,7 @@ export default function EmailSettingsTab( {
 			toast.error(
 				errorMessage(
 					error,
-					__( 'Could not update this email.', 'nutrio' )
+					__( 'Could not update this email.', 'merodiet' )
 				)
 			);
 			return;
@@ -121,40 +121,40 @@ export default function EmailSettingsTab( {
 		);
 		toast.success(
 			result.enabled
-				? __( 'Email enabled.', 'nutrio' )
-				: __( 'Email disabled.', 'nutrio' )
+				? __( 'Email enabled.', 'merodiet' )
+				: __( 'Email disabled.', 'merodiet' )
 		);
 	};
 
 	const handleSaveDigest = async ( next: EmailDigestSettings ) => {
 		try {
 			const result = await apiFetch< EmailDigestSettings >( {
-				path: '/nutrio/v1/settings/email-digest',
+				path: '/merodiet/v1/settings/email-digest',
 				method: 'PUT',
 				data: next,
 			} );
 			setDigest( result );
 			if ( digest && next.enabled === digest.enabled ) {
-				toast.success( __( 'Digest send time saved.', 'nutrio' ) );
+				toast.success( __( 'Digest send time saved.', 'merodiet' ) );
 			} else {
 				toast.success(
 					next.enabled
-						? __( 'Daily digest enabled.', 'nutrio' )
-						: __( 'Daily digest disabled.', 'nutrio' )
+						? __( 'Daily digest enabled.', 'merodiet' )
+						: __( 'Daily digest disabled.', 'merodiet' )
 				);
 			}
 		} catch ( error ) {
 			toast.error(
 				errorMessage(
 					error,
-					__( 'Could not save the digest settings.', 'nutrio' )
+					__( 'Could not save the digest settings.', 'merodiet' )
 				)
 			);
 		}
 	};
 
 	if ( null === templates ) {
-		return <p>{ __( 'Loading…', 'nutrio' ) }</p>;
+		return <p>{ __( 'Loading…', 'merodiet' ) }</p>;
 	}
 
 	const visibleTemplates = templates.filter(
@@ -178,7 +178,7 @@ export default function EmailSettingsTab( {
 						handleToggleTemplate( template.type, enabled );
 				}
 
-				const digestTimeInputId = `nutrio-digest-send-time-${ template.type }`;
+				const digestTimeInputId = `merodiet-digest-send-time-${ template.type }`;
 
 				return (
 					<EmailTemplateEditor
@@ -193,7 +193,7 @@ export default function EmailSettingsTab( {
 									className={ styles.digestTimeRow }
 									htmlFor={ digestTimeInputId }
 								>
-									{ __( 'Send at', 'nutrio' ) }
+									{ __( 'Send at', 'merodiet' ) }
 									<input
 										id={ digestTimeInputId }
 										type="time"

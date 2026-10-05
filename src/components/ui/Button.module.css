@@ -53,7 +53,7 @@
 	color: var(--critical);
 	border-color: var(--critical);
 }
-.btnPro :global(.nutrio-pro-lock) {
+.btnPro :global(.merodiet-pro-lock) {
 	width: 13px;
 	height: 13px;
 	opacity: 0.7;

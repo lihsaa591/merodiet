@@ -6,7 +6,7 @@
  * intentionally contains no logic beyond that wiring — anything more
  * belongs in a provider.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
@@ -16,18 +16,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Nutrio\Plugin;
+use MeroDiet\Plugin;
 
-$nutrio_config = require NUTRIO_PATH . 'config/app.php';
+$merodiet_config = require MERODIET_PATH . 'config/app.php';
 
-$nutrio = Plugin::instance();
+$merodiet = Plugin::instance();
 
 // Bind config before any provider registers, so register()/boot() can
 // read it via $container->get( 'config' ).
-$nutrio->container()->add( 'config', $nutrio_config )->setShared( true );
+$merodiet->container()->add( 'config', $merodiet_config )->setShared( true );
 
-foreach ( $nutrio_config['providers'] as $nutrio_provider_class ) {
-	$nutrio->add_provider( $nutrio_provider_class );
+foreach ( $merodiet_config['providers'] as $merodiet_provider_class ) {
+	$merodiet->add_provider( $merodiet_provider_class );
 }
 
-$nutrio->run();
+$merodiet->run();

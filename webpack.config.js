@@ -16,7 +16,7 @@ const path = require( 'path' );
  * scoped names still read as ours in devtools instead of an opaque hash.
  * @param {import('webpack').Configuration} config
  */
-function withNutrioModuleNames( config ) {
+function withMeroDietModuleNames( config ) {
 	for ( const rule of config.module.rules ) {
 		if ( ! Array.isArray( rule.use ) ) {
 			continue;
@@ -30,7 +30,7 @@ function withNutrioModuleNames( config ) {
 			) {
 				use.options.modules = {
 					...use.options.modules,
-					localIdentName: 'nutrio-[name]__[local]',
+					localIdentName: 'merodiet-[name]__[local]',
 				};
 			}
 		}
@@ -40,7 +40,7 @@ function withNutrioModuleNames( config ) {
 }
 
 module.exports = {
-	...withNutrioModuleNames( defaultConfig ),
+	...withMeroDietModuleNames( defaultConfig ),
 	entry: {
 		admin: path.resolve( __dirname, 'src/admin/index.tsx' ),
 		'client-portal': path.resolve(

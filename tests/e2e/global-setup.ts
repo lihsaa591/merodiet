@@ -36,7 +36,7 @@ async function globalSetup(): Promise< void > {
 	} );
 
 	// base64 + `wp eval` sidesteps shell/SQL quoting issues with the raw JSON (see task-2-report.md).
-	const insertSql = `INSERT INTO wp_nutrio_foods (source, source_id, description, data_type, nutrients, source_synced_at, created_at, updated_at) VALUES ('usda', ${ SEED_FOOD_SOURCE_ID }, 'E2E Seed Oatmeal', 'Foundation', '${ nutrientsJson.replace(
+	const insertSql = `INSERT INTO wp_merodiet_foods (source, source_id, description, data_type, nutrients, source_synced_at, created_at, updated_at) VALUES ('usda', ${ SEED_FOOD_SOURCE_ID }, 'E2E Seed Oatmeal', 'Foundation', '${ nutrientsJson.replace(
 		/'/g,
 		"\\'"
 	) }', '${ nowSql }', '${ nowSql }', '${ nowSql }')`;
@@ -48,14 +48,14 @@ async function globalSetup(): Promise< void > {
 		`eval 'global $wpdb; $wpdb->query( base64_decode( "${ insertSqlBase64 }" ) );'`
 	);
 	const foodId = runWpCli(
-		`db query "SELECT id FROM wp_nutrio_foods WHERE source_id=${ SEED_FOOD_SOURCE_ID }" --skip-column-names`
+		`db query "SELECT id FROM wp_merodiet_foods WHERE source_id=${ SEED_FOOD_SOURCE_ID }" --skip-column-names`
 	);
 
 	// 2. Create the client record (as the practitioner — wp-env's default
 	// admin already has every practitioner capability, see
 	// includes/Roles/RoleRegistrar.php).
 	const client = await requestUtils.rest( {
-		path: '/nutrio/v1/clients',
+		path: '/merodiet/v1/clients',
 		method: 'POST',
 		data: {
 			first_name: 'E2E',
@@ -73,7 +73,7 @@ async function globalSetup(): Promise< void > {
 	// failure.
 	try {
 		await requestUtils.rest( {
-			path: `/nutrio/v1/clients/${ client.id }/invite`,
+			path: `/merodiet/v1/clients/${ client.id }/invite`,
 			method: 'POST',
 		} );
 	} catch ( error ) {
@@ -107,7 +107,7 @@ async function globalSetup(): Promise< void > {
 	// (150 g) and a recipe, so the specs can cover both item kinds: a
 	// 2-serving recipe weighing 300 g, i.e. 150 g per serving.
 	const recipe = await requestUtils.rest( {
-		path: '/nutrio/v1/recipes',
+		path: '/merodiet/v1/recipes',
 		method: 'POST',
 		data: {
 			name: 'E2E Seed Bowl',
@@ -117,7 +117,7 @@ async function globalSetup(): Promise< void > {
 	} );
 	const today = new Date().toISOString().slice( 0, 10 );
 	const plan = await requestUtils.rest( {
-		path: '/nutrio/v1/plans',
+		path: '/merodiet/v1/plans',
 		method: 'POST',
 		data: {
 			title: 'E2E Seed Plan',
@@ -144,7 +144,7 @@ async function globalSetup(): Promise< void > {
 	} );
 
 	await requestUtils.rest( {
-		path: `/nutrio/v1/plans/${ plan.id }/assign`,
+		path: `/merodiet/v1/plans/${ plan.id }/assign`,
 		method: 'POST',
 		data: { client_id: client.id, start_date: today, end_date: today },
 	} );
@@ -163,15 +163,15 @@ async function globalSetup(): Promise< void > {
 	// directly: this exact line timed out in CI on the very first live
 	// run, aborting the whole suite silently (see tests/e2e/fixtures/
 	// client-portal.ts's identical widening).
-	await page.waitForSelector( '.nutrio-rail', { timeout: 60000 } );
+	await page.waitForSelector( '.merodiet-rail', { timeout: 60000 } );
 
 	const restNonce = await page.evaluate(
 		() =>
 			(
 				window as unknown as {
-					nutrioClientPortal: { restNonce: string };
+					merodietClientPortal: { restNonce: string };
 				}
-			 ).nutrioClientPortal.restNonce
+			 ).merodietClientPortal.restNonce
 	);
 
 	const clientRequest = await playwrightRequest.newContext( {
@@ -183,7 +183,7 @@ async function globalSetup(): Promise< void > {
 	// closes the browser, instead of leaking them if the throw below fires.
 	try {
 		const measurementResponse = await clientRequest.post(
-			'/wp-json/nutrio/v1/me/measurements',
+			'/wp-json/merodiet/v1/me/measurements',
 			{
 				headers: { 'X-WP-Nonce': restNonce },
 				data: { measured_at: today, weight_grams: 75000 },

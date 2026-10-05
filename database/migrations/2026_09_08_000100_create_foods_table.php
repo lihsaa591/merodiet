@@ -29,12 +29,12 @@
  * row-touch timestamp (e.g. if a future admin tool lets a practitioner
  * manually correct an entry without re-syncing).
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-use Nutrio\Database\Migration;
+use MeroDiet\Database\Migration;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -48,7 +48,7 @@ return new class() extends Migration {
 	 * Create the foods table.
 	 */
 	public function up(): void {
-		$table           = $this->table( 'nutrio_foods' );
+		$table           = $this->table( 'merodiet_foods' );
 		$charset_collate = $this->wpdb->get_charset_collate();
 
 		$this->delta(
@@ -72,7 +72,7 @@ return new class() extends Migration {
 	 * Drop the foods table.
 	 */
 	public function down(): void {
-		$table = $this->table( 'nutrio_foods' );
+		$table = $this->table( 'merodiet_foods' );
 		$this->wpdb->query( "DROP TABLE IF EXISTS {$table}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input.
 	}
 };

@@ -42,7 +42,7 @@ export default function ItemSearch( {
 					}`.trim() }
 					onClick={ () => setTab( 'recipes' ) }
 				>
-					{ __( 'My Recipes', 'nutrio' ) }
+					{ __( 'My Recipes', 'merodiet' ) }
 				</button>
 				<button
 					className={ `${ styles.tab } ${
@@ -50,14 +50,14 @@ export default function ItemSearch( {
 					}`.trim() }
 					onClick={ () => setTab( 'foods' ) }
 				>
-					{ __( 'Foods', 'nutrio' ) }
+					{ __( 'Foods', 'merodiet' ) }
 				</button>
 			</div>
 
 			{ tab === 'recipes' && (
 				<>
 					<div
-						className="nutrio-field"
+						className="merodiet-field"
 						style={ { marginBottom: '12px' } }
 					>
 						<input
@@ -66,7 +66,7 @@ export default function ItemSearch( {
 							onChange={ ( e ) => setQuery( e.target.value ) }
 							placeholder={ __(
 								'Search your recipes…',
-								'nutrio'
+								'merodiet'
 							) }
 						/>
 					</div>
@@ -81,9 +81,9 @@ export default function ItemSearch( {
 							{ recipes.length === 0
 								? __(
 										'No recipes in your library yet.',
-										'nutrio'
+										'merodiet'
 								  )
-								: __( 'No matches.', 'nutrio' ) }
+								: __( 'No matches.', 'merodiet' ) }
 						</p>
 					) }
 
@@ -95,7 +95,7 @@ export default function ItemSearch( {
 						>
 							<div className={ styles.name }>{ recipe.name }</div>
 							<div className={ styles.meta }>
-								{ __( 'Servings:', 'nutrio' ) }{ ' ' }
+								{ __( 'Servings:', 'merodiet' ) }{ ' ' }
 								{ recipe.servings }
 							</div>
 						</button>

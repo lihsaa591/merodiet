@@ -1,16 +1,16 @@
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Providers;
+namespace MeroDiet\Tests\Unit\Providers;
 
 use Brain\Monkey\Functions;
 use League\Container\Container;
-use Nutrio\Providers\RestApiServiceProvider;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Providers\RestApiServiceProvider;
+use MeroDiet\Tests\TestCase;
 
 /**
  * Uses a real league/container instance rather than a mock — the whole
@@ -96,7 +96,7 @@ final class RestApiServiceProviderTest extends TestCase {
 }
 
 // -----------------------------------------------------------------------
-// Fixtures — deliberately not real Nutrio controllers, so this suite
+// Fixtures — deliberately not real MeroDiet controllers, so this suite
 // tests the wiring mechanism itself, independent of any real
 // controller's own behavior.
 // -----------------------------------------------------------------------

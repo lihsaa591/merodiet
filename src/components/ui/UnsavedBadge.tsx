@@ -4,7 +4,7 @@ import styles from './UnsavedBadge.module.css';
 export default function UnsavedBadge() {
 	return (
 		<span className={ styles.badge }>
-			{ __( 'Unsaved changes', 'nutrio' ) }
+			{ __( 'Unsaved changes', 'merodiet' ) }
 		</span>
 	);
 }

@@ -2,16 +2,16 @@
 /**
  * Client compliance-log data access.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
 // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Plugin's own custom tables; table names come from $wpdb->prefix and every value is bound via $wpdb->prepare().
 
-namespace Nutrio\Repositories;
+namespace MeroDiet\Repositories;
 
-use Nutrio\Database\QueryFilters;
+use MeroDiet\Database\QueryFilters;
 use WP_Error;
 
 /**
@@ -36,7 +36,7 @@ class LogEntryRepository {
 		global $wpdb;
 
 		$inserted = $wpdb->insert(
-			$wpdb->prefix . 'nutrio_log_entries',
+			$wpdb->prefix . 'merodiet_log_entries',
 			array(
 				'client_id'      => $client_id,
 				'plan_item_id'   => $data['plan_item_id'] ?? null,
@@ -53,13 +53,13 @@ class LogEntryRepository {
 		);
 
 		if ( false === $inserted ) {
-			return new WP_Error( 'nutrio_db_error', __( 'Could not save the entry.', 'nutrio' ), array( 'status' => 500 ) );
+			return new WP_Error( 'merodiet_db_error', __( 'Could not save the entry.', 'merodiet' ), array( 'status' => 500 ) );
 		}
 
 		$id = (int) $wpdb->insert_id;
 
 		// Fires after a client logs a compliance entry.
-		do_action( 'nutrio_log_entry_created', $id, $data, $client_id );
+		do_action( 'merodiet_log_entry_created', $id, $data, $client_id );
 
 		return $id;
 	}
@@ -76,7 +76,7 @@ class LogEntryRepository {
 	public function all_for_client( int $client_id, array $filters = array() ): array {
 		global $wpdb;
 
-		$table  = $wpdb->prefix . 'nutrio_log_entries';
+		$table  = $wpdb->prefix . 'merodiet_log_entries';
 		$params = array( $client_id );
 
 		$where = QueryFilters::combine(
@@ -111,7 +111,7 @@ class LogEntryRepository {
 		global $wpdb;
 
 		$row = $wpdb->get_row(
-			$wpdb->prepare( "SELECT * FROM {$wpdb->prefix}nutrio_log_entries WHERE id = %d", $id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
+			$wpdb->prepare( "SELECT * FROM {$wpdb->prefix}merodiet_log_entries WHERE id = %d", $id ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is derived from $wpdb->prefix, not user input; value is parameterized.
 			ARRAY_A
 		);
 

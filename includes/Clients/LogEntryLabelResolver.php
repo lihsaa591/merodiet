@@ -2,16 +2,16 @@
 /**
  * Resolves a human-readable food/recipe label for compliance log entries.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Clients;
+namespace MeroDiet\Clients;
 
-use Nutrio\Nutrition\FoodCache;
-use Nutrio\Repositories\PlanRepository;
-use Nutrio\Repositories\RecipeRepository;
+use MeroDiet\Nutrition\FoodCache;
+use MeroDiet\Repositories\PlanRepository;
+use MeroDiet\Repositories\RecipeRepository;
 
 /**
  * A log entry only stores IDs — the plan item it was logged against
