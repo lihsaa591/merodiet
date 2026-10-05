@@ -46,17 +46,17 @@ Create `tests/Unit/Clients/ComplianceCalculatorTest.php`:
 ```php
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Clients;
+namespace MeroDiet\Tests\Unit\Clients;
 
-use Nutrio\Clients\ComplianceCalculator;
-use Nutrio\Repositories\LogEntryRepository;
-use Nutrio\Repositories\PlanRepository;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Clients\ComplianceCalculator;
+use MeroDiet\Repositories\LogEntryRepository;
+use MeroDiet\Repositories\PlanRepository;
+use MeroDiet\Tests\TestCase;
 
 final class ComplianceCalculatorTest extends TestCase {
 
@@ -239,7 +239,7 @@ final class ComplianceCalculatorTest extends TestCase {
 - [ ] **Step 2: Run the tests to verify they fail**
 
 Run: `composer test -- --filter ComplianceCalculatorTest`
-Expected: FAIL — `Class "Nutrio\Clients\ComplianceCalculator" not found`.
+Expected: FAIL — `Class "MeroDiet\Clients\ComplianceCalculator" not found`.
 
 - [ ] **Step 3: Write the implementation**
 
@@ -250,16 +250,16 @@ Create `includes/Clients/ComplianceCalculator.php`:
 /**
  * Computes a client's plan compliance percentage over a date window.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Clients;
+namespace MeroDiet\Clients;
 
 use DateTimeImmutable;
-use Nutrio\Repositories\LogEntryRepository;
-use Nutrio\Repositories\PlanRepository;
+use MeroDiet\Repositories\LogEntryRepository;
+use MeroDiet\Repositories\PlanRepository;
 
 /**
  * "Compliance" here means: of the items scheduled on the client's
@@ -392,7 +392,7 @@ git commit -m "feat: add ComplianceCalculator for plan-compliance percentage"
 
 **Interfaces:**
 - Consumes: `ComplianceCalculator::calculate()` (Task 1), `LogEntryRepository::all_for_client()`, `MeasurementRepository::all_for_client()`, `AbstractPractitionerController::assert_owns()` (existing), `ClientRepository::find_for_practitioner()` (existing).
-- Produces: `GET /clients/{id}/logs?from=&to=`, `GET /clients/{id}/measurements?from=&to=`, `GET /clients/{id}/compliance?from=&to=` — all requiring `manage_nutrio_clients` and per-client ownership. Task 5 (frontend) calls these three routes by these exact paths.
+- Produces: `GET /clients/{id}/logs?from=&to=`, `GET /clients/{id}/measurements?from=&to=`, `GET /clients/{id}/compliance?from=&to=` — all requiring `manage_merodiet_clients` and per-client ownership. Task 5 (frontend) calls these three routes by these exact paths.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -401,20 +401,20 @@ Create `tests/Unit/RestApi/ClientsControllerComplianceTest.php`:
 ```php
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\RestApi;
+namespace MeroDiet\Tests\Unit\RestApi;
 
-use Nutrio\Clients\ClientInviteService;
-use Nutrio\Clients\ComplianceCalculator;
-use Nutrio\Repositories\ClientRepository;
-use Nutrio\Repositories\LogEntryRepository;
-use Nutrio\Repositories\MeasurementRepository;
-use Nutrio\RestApi\ClientsController;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Clients\ClientInviteService;
+use MeroDiet\Clients\ComplianceCalculator;
+use MeroDiet\Repositories\ClientRepository;
+use MeroDiet\Repositories\LogEntryRepository;
+use MeroDiet\Repositories\MeasurementRepository;
+use MeroDiet\RestApi\ClientsController;
+use MeroDiet\Tests\TestCase;
 use WP_REST_Request;
 
 /**
@@ -527,11 +527,11 @@ Expected: FAIL — `ClientsController::__construct()` doesn't accept 5 arguments
 Modify `includes/RestApi/ClientsController.php`. First, the constructor and imports (replace the existing constructor block):
 
 ```php
-use Nutrio\Clients\ClientInviteService;
-use Nutrio\Clients\ComplianceCalculator;
-use Nutrio\Repositories\ClientRepository;
-use Nutrio\Repositories\LogEntryRepository;
-use Nutrio\Repositories\MeasurementRepository;
+use MeroDiet\Clients\ClientInviteService;
+use MeroDiet\Clients\ComplianceCalculator;
+use MeroDiet\Repositories\ClientRepository;
+use MeroDiet\Repositories\LogEntryRepository;
+use MeroDiet\Repositories\MeasurementRepository;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -570,7 +570,7 @@ Then, inside `register_routes()`, after the existing `/invite` route registratio
 					'to'   => array( 'type' => 'string', 'format' => 'date' ),
 				),
 			),
-			required_capability: 'manage_nutrio_clients'
+			required_capability: 'manage_merodiet_clients'
 		);
 
 		$this->register_route(
@@ -583,7 +583,7 @@ Then, inside `register_routes()`, after the existing `/invite` route registratio
 					'to'   => array( 'type' => 'string', 'format' => 'date' ),
 				),
 			),
-			required_capability: 'manage_nutrio_clients'
+			required_capability: 'manage_merodiet_clients'
 		);
 
 		$this->register_route(
@@ -596,7 +596,7 @@ Then, inside `register_routes()`, after the existing `/invite` route registratio
 					'to'   => array( 'type' => 'string', 'format' => 'date' ),
 				),
 			),
-			required_capability: 'manage_nutrio_clients'
+			required_capability: 'manage_merodiet_clients'
 		);
 ```
 
@@ -684,12 +684,12 @@ Then add the 3 handlers (near `invite_client()`):
 Modify `config/app.php:38`:
 
 ```php
-			\Nutrio\RestApi\ClientsController::class     => array(
-				\Nutrio\Repositories\ClientRepository::class,
-				\Nutrio\Clients\ClientInviteService::class,
-				\Nutrio\Repositories\LogEntryRepository::class,
-				\Nutrio\Repositories\MeasurementRepository::class,
-				\Nutrio\Clients\ComplianceCalculator::class,
+			\MeroDiet\RestApi\ClientsController::class     => array(
+				\MeroDiet\Repositories\ClientRepository::class,
+				\MeroDiet\Clients\ClientInviteService::class,
+				\MeroDiet\Repositories\LogEntryRepository::class,
+				\MeroDiet\Repositories\MeasurementRepository::class,
+				\MeroDiet\Clients\ComplianceCalculator::class,
 			),
 ```
 
@@ -702,7 +702,7 @@ Expected: PASS (all `ClientsControllerComplianceTest` cases; also re-run the ful
 
 - [ ] **Step 6: Verify live against wp-env**
 
-Start `wp-env` if not running (`npx wp-env start`), log in as the seeded admin, and confirm via the browser's network tab (or `curl` with a valid nonce) that `GET /wp-json/nutrio/v1/clients/{a-real-client-id}/compliance` returns the expected shape. If no client has an assigned plan yet, create one via the existing Plan Builder UI first so `plan` is non-null in at least one manual check.
+Start `wp-env` if not running (`npx wp-env start`), log in as the seeded admin, and confirm via the browser's network tab (or `curl` with a valid nonce) that `GET /wp-json/merodiet/v1/clients/{a-real-client-id}/compliance` returns the expected shape. If no client has an assigned plan yet, create one via the existing Plan Builder UI first so `plan` is non-null in at least one manual check.
 
 - [ ] **Step 7: Run phpcs/phpstan and commit**
 
@@ -737,18 +737,18 @@ Create `tests/Unit/RestApi/DashboardControllerTest.php`:
 ```php
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\RestApi;
+namespace MeroDiet\Tests\Unit\RestApi;
 
-use Nutrio\Clients\ComplianceCalculator;
-use Nutrio\Repositories\ClientRepository;
-use Nutrio\Repositories\PlanRepository;
-use Nutrio\RestApi\DashboardController;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Clients\ComplianceCalculator;
+use MeroDiet\Repositories\ClientRepository;
+use MeroDiet\Repositories\PlanRepository;
+use MeroDiet\RestApi\DashboardController;
+use MeroDiet\Tests\TestCase;
 use WP_REST_Request;
 
 final class DashboardControllerTest extends TestCase {
@@ -822,7 +822,7 @@ final class DashboardControllerTest extends TestCase {
 - [ ] **Step 2: Run the test to verify it fails**
 
 Run: `composer test -- --filter DashboardControllerTest`
-Expected: FAIL — `Class "Nutrio\RestApi\DashboardController" not found`.
+Expected: FAIL — `Class "MeroDiet\RestApi\DashboardController" not found`.
 
 - [ ] **Step 3: Write `DashboardController`**
 
@@ -833,16 +833,16 @@ Create `includes/RestApi/DashboardController.php`:
 /**
  * Practitioner dashboard REST endpoint.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\RestApi;
+namespace MeroDiet\RestApi;
 
-use Nutrio\Clients\ComplianceCalculator;
-use Nutrio\Repositories\ClientRepository;
-use Nutrio\Repositories\PlanRepository;
+use MeroDiet\Clients\ComplianceCalculator;
+use MeroDiet\Repositories\ClientRepository;
+use MeroDiet\Repositories\PlanRepository;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
@@ -856,7 +856,7 @@ use WP_REST_Server;
 final class DashboardController extends AbstractPractitionerController {
 
 	/**
-	 * Route base — registers under nutrio/v1/dashboard.
+	 * Route base — registers under merodiet/v1/dashboard.
 	 *
 	 * @var string
 	 */
@@ -891,7 +891,7 @@ final class DashboardController extends AbstractPractitionerController {
 				'methods'  => WP_REST_Server::READABLE,
 				'callback' => array( $this, 'get_overview' ),
 			),
-			required_capability: 'manage_nutrio_clients'
+			required_capability: 'manage_merodiet_clients'
 		);
 	}
 
@@ -952,10 +952,10 @@ final class DashboardController extends AbstractPractitionerController {
 Add to the `'controllers'` array:
 
 ```php
-			\Nutrio\RestApi\DashboardController::class   => array(
-				\Nutrio\Repositories\ClientRepository::class,
-				\Nutrio\Repositories\PlanRepository::class,
-				\Nutrio\Clients\ComplianceCalculator::class,
+			\MeroDiet\RestApi\DashboardController::class   => array(
+				\MeroDiet\Repositories\ClientRepository::class,
+				\MeroDiet\Repositories\PlanRepository::class,
+				\MeroDiet\Clients\ComplianceCalculator::class,
 			),
 ```
 
@@ -966,7 +966,7 @@ Expected: PASS (2/2).
 
 - [ ] **Step 6: Verify live against wp-env**
 
-With wp-env running and at least 2-3 clients seeded (some with an assigned plan, some without), confirm `GET /wp-json/nutrio/v1/dashboard/overview` returns real, correctly-shaped data — check `clients_without_plan_count` matches the clients you left unassigned.
+With wp-env running and at least 2-3 clients seeded (some with an assigned plan, some without), confirm `GET /wp-json/merodiet/v1/dashboard/overview` returns real, correctly-shaped data — check `clients_without_plan_count` matches the clients you left unassigned.
 
 - [ ] **Step 7: Run phpcs/phpstan and commit**
 
@@ -1026,7 +1026,7 @@ export default function LogHistoryList( { entriesByDate }: LogHistoryListProps )
 	if ( 0 === dates.length ) {
 		return (
 			<p className={ styles.empty }>
-				{ __( 'No history in this range.', 'nutrio' ) }
+				{ __( 'No history in this range.', 'merodiet' ) }
 			</p>
 		);
 	}
@@ -1239,20 +1239,20 @@ export default function ClientDetail() {
 	const today = new Date().toISOString().slice( 0, 10 );
 
 	useEffect( () => {
-		apiFetch< Client >( { path: `/nutrio/v1/clients/${ clientId }` } ).then(
+		apiFetch< Client >( { path: `/merodiet/v1/clients/${ clientId }` } ).then(
 			setClient,
 			() => setClient( null )
 		);
 		apiFetch< ComplianceResult >( {
-			path: `/nutrio/v1/clients/${ clientId }/compliance?from=${ daysAgo( 6 ) }&to=${ today }`,
+			path: `/merodiet/v1/clients/${ clientId }/compliance?from=${ daysAgo( 6 ) }&to=${ today }`,
 		} ).then( setCompliance, () => setCompliance( undefined ) );
 		apiFetch< LogEntry[] >( {
-			path: `/nutrio/v1/clients/${ clientId }/logs?from=${ daysAgo(
+			path: `/merodiet/v1/clients/${ clientId }/logs?from=${ daysAgo(
 				HISTORY_DAYS - 1
 			) }&to=${ today }`,
 		} ).then( setLogs, () => setLogs( [] ) );
 		apiFetch< Measurement[] >( {
-			path: `/nutrio/v1/clients/${ clientId }/measurements?from=${ daysAgo(
+			path: `/merodiet/v1/clients/${ clientId }/measurements?from=${ daysAgo(
 				HISTORY_DAYS - 1
 			) }&to=${ today }`,
 		} ).then( setMeasurements, () => setMeasurements( [] ) );
@@ -1268,19 +1268,19 @@ export default function ClientDetail() {
 
 	return (
 		<>
-			<div className="nutrio-topbar">
+			<div className="merodiet-topbar">
 				<div>
 					<button
 						type="button"
 						className={ styles.backLink }
 						onClick={ () => setViewParam( 'clients' ) }
 					>
-						{ __( '← Back to roster', 'nutrio' ) }
+						{ __( '← Back to roster', 'merodiet' ) }
 					</button>
 					<h1>
 						{ client
 							? `${ client.first_name } ${ client.last_name }`
-							: __( 'Client', 'nutrio' ) }
+							: __( 'Client', 'merodiet' ) }
 					</h1>
 				</div>
 			</div>
@@ -1297,24 +1297,24 @@ export default function ClientDetail() {
 					<Panel>
 						<PanelBody>
 							<h3 className={ styles.sectionTitle }>
-								{ __( 'Compliance', 'nutrio' ) }
+								{ __( 'Compliance', 'merodiet' ) }
 							</h3>
 							{ compliance && null === compliance.plan && (
 								<p className={ styles.empty }>
-									{ __( 'No active plan assigned.', 'nutrio' ) }
+									{ __( 'No active plan assigned.', 'merodiet' ) }
 								</p>
 							) }
 							{ compliance && compliance.plan && (
-								<div className="nutrio-kpi">
-									<div className="nutrio-kpi-label">
+								<div className="merodiet-kpi">
+									<div className="merodiet-kpi-label">
 										{ compliance.plan.title }
 									</div>
-									<div className="nutrio-kpi-value">
+									<div className="merodiet-kpi-value">
 										{ compliance.percent }%
 									</div>
-									<div className="nutrio-kpi-delta">
+									<div className="merodiet-kpi-delta">
 										{ compliance.logged_count } / { compliance.total_count }{ ' ' }
-										{ __( 'items logged', 'nutrio' ) }
+										{ __( 'items logged', 'merodiet' ) }
 									</div>
 								</div>
 							) }
@@ -1324,7 +1324,7 @@ export default function ClientDetail() {
 					<Panel>
 						<PanelBody>
 							<h3 className={ styles.sectionTitle }>
-								{ __( 'Log history', 'nutrio' ) }
+								{ __( 'Log history', 'merodiet' ) }
 							</h3>
 							<LogHistoryList entriesByDate={ logsByDate } />
 						</PanelBody>
@@ -1333,7 +1333,7 @@ export default function ClientDetail() {
 					<Panel>
 						<PanelBody>
 							<h3 className={ styles.sectionTitle }>
-								{ __( 'Measurements', 'nutrio' ) }
+								{ __( 'Measurements', 'merodiet' ) }
 							</h3>
 							<MeasurementHistoryList
 								measurements={ measurements ?? [] }
@@ -1407,7 +1407,7 @@ interface DashboardOverview {
 const [ overview, setOverview ] = useState< DashboardOverview | undefined >( undefined );
 
 useEffect( () => {
-	apiFetch< DashboardOverview >( { path: '/nutrio/v1/dashboard/overview' } ).then(
+	apiFetch< DashboardOverview >( { path: '/merodiet/v1/dashboard/overview' } ).then(
 		setOverview,
 		() =>
 			setOverview( {

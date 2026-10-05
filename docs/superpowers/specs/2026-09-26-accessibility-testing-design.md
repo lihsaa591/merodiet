@@ -2,7 +2,7 @@
 
 ## Context
 
-Nutrio has no automated accessibility testing today. `ci.yml` runs
+MeroDiet has no automated accessibility testing today. `ci.yml` runs
 phpcs, phpstan, phpunit, lint-js, and a production build, but nothing
 checks that the admin app or the client portal are usable with
 assistive technology. The product plan's Phase 6 (release readiness)
@@ -44,7 +44,7 @@ none of which exist in the repo yet.
   (logical focus order across a full task, screen-reader announcement
   quality). Manual passes remain a separate activity.
 - Not touching `wp-login.php` (WordPress core's own login screen) —
-  out of Nutrio's control to fix, so scanning it provides no
+  out of MeroDiet's control to fix, so scanning it provides no
   actionable signal for this project.
 
 ## Architecture
@@ -124,7 +124,7 @@ running wp-env instance:
   form (`POST` to `/client-portal/` with the seeded client's
   credentials) and returns a logged-in `page`, since the official
   package's `admin` fixture is wp-admin-specific and doesn't know
-  about Nutrio's separate client-portal login.
+  about MeroDiet's separate client-portal login.
 
 ### Screens covered (8, "core flows" scope)
 

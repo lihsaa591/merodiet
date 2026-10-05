@@ -22,13 +22,13 @@ Per explicit instruction, this is built as a reusable pattern, not a one-off:
   - Else: creates a WP user via `wp_insert_user()` with role `nutrition_client`, `user_login` derived from the email (sanitized, uniqued with a numeric suffix on collision), `user_email` = client's email, a random unusable password (client never uses it directly — they set their own via the reset link).
   - Calls `retrieve_password( $user->user_login )` (WordPress core) to send the "set your password" email via the standard `wp-login.php?action=rp` flow — no custom token storage, reusing a mechanism WordPress core already secures and maintains.
   - Persists the new `user_id` onto the client row via `ClientRepository::set_user_id()`.
-  - Fires `do_action( 'nutrio_client_invited', $client_id, $user_id )` for symmetry with the existing `nutrio_client_created` hook.
+  - Fires `do_action( 'merodiet_client_invited', $client_id, $user_id )` for symmetry with the existing `merodiet_client_created` hook.
 
 ### 2. `AbstractClientController` (`includes/RestApi/AbstractClientController.php`)
 
-- Extends `AbstractController`. Namespace `nutrio/v1`.
-- `current_client_id(): int|WP_Error` — looks up `nutrio_clients` row where `user_id = get_current_user_id()`; returns its `id`, or a `nutrio_not_found` WP_Error (404) if the logged-in user has no linked client row (defends against a `nutrition_client`-role user somehow existing without a client record).
-- Routes register with capability `view_own_nutrio_plan` (passed as `$required_capability` to `register_route()`, matching the existing pattern).
+- Extends `AbstractController`. Namespace `merodiet/v1`.
+- `current_client_id(): int|WP_Error` — looks up `merodiet_clients` row where `user_id = get_current_user_id()`; returns its `id`, or a `merodiet_not_found` WP_Error (404) if the logged-in user has no linked client row (defends against a `nutrition_client`-role user somehow existing without a client record).
+- Routes register with capability `view_own_merodiet_plan` (passed as `$required_capability` to `register_route()`, matching the existing pattern).
 - No `assert_owns()` equivalent is needed at the repository-return level because every repository method here takes the resolved `client_id` from `current_client_id()` directly — the client never supplies a client_id in the request, so there's nothing to spoof.
 
 ### 3. `LogEntryRepository` (`includes/Repositories/LogEntryRepository.php`)
@@ -50,7 +50,7 @@ Per explicit instruction, this is built as a reusable pattern, not a one-off:
 ### 6. REST endpoints
 
 **On `ClientsController`** (existing, practitioner-side):
-- `POST /clients/{id}/invite` — capability `manage_nutrio_clients`, `assert_owns()` first, then delegates to `ClientInviteService::invite()`.
+- `POST /clients/{id}/invite` — capability `manage_merodiet_clients`, `assert_owns()` first, then delegates to `ClientInviteService::invite()`.
 
 **New `MeController` (`includes/RestApi/MeController.php`)**, `rest_base = 'me'`, extends `AbstractClientController`:
 - `GET /me/plan` — today's assigned plan for this client (delegates to `PlanRepository`; needs a small `find_active_for_client( int $client_id, string $date )` addition there — the existing plan-fetch methods are practitioner-scoped only).
@@ -65,9 +65,9 @@ Client logs in (WP core auth, role `nutrition_client`) → every `/me/*` request
 
 ## Error handling
 
-- Missing client row for a logged-in `nutrition_client` user → 404 `nutrio_not_found` (same "don't leak existence" posture as `assert_owns()`).
+- Missing client row for a logged-in `nutrition_client` user → 404 `merodiet_not_found` (same "don't leak existence" posture as `assert_owns()`).
 - Invite on a client that already has a linked user → not an error, resends reset email (see idempotency above).
-- Invite on a client whose email collides with an existing WP user's email → `WP_Error` surfaced as 409 `nutrio_email_in_use`; practitioner must resolve manually (out of scope to auto-link).
+- Invite on a client whose email collides with an existing WP user's email → `WP_Error` surfaced as 409 `merodiet_email_in_use`; practitioner must resolve manually (out of scope to auto-link).
 
 ## Testing
 

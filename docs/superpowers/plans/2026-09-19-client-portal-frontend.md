@@ -4,7 +4,7 @@
 
 **Goal:** Build the client-facing front-end (outside wp-admin) that lets a `nutrition_client` view their assigned plan, log compliance, and log measurements against the already-built `/me/*` REST endpoints (PR #5).
 
-**Architecture:** A PHP `PortalRewrite` class registers a permalink-structure-agnostic route (`/client-portal/` when pretty permalinks are on, `?nutrio_portal=1` always), a `PortalPage` class handles the request on `template_redirect` (login form / React mount / redirect-away), and a new webpack entry `client-portal` builds a small React app (`App.tsx` + three tab screens) that talks to `/me/*` via `@wordpress/api-fetch`, mirroring the practitioner admin app's existing patterns throughout.
+**Architecture:** A PHP `PortalRewrite` class registers a permalink-structure-agnostic route (`/client-portal/` when pretty permalinks are on, `?merodiet_portal=1` always), a `PortalPage` class handles the request on `template_redirect` (login form / React mount / redirect-away), and a new webpack entry `client-portal` builds a small React app (`App.tsx` + three tab screens) that talks to `/me/*` via `@wordpress/api-fetch`, mirroring the practitioner admin app's existing patterns throughout.
 
 **Tech Stack:** PHP 8.1, WordPress rewrite API, React 18 (`@wordpress/element`), `@wordpress/api-fetch`, `@wordpress/i18n`, `@wordpress/hooks` (new dependency use, already a transitive package), CSS Modules, PHPUnit + Brain Monkey.
 
@@ -13,7 +13,7 @@
 ## Global Constraints
 
 - PHP 8.1, `declare( strict_types=1 );` at the top of every new/modified PHP file.
-- Every user-facing string goes through `__( '...', 'nutrio' )` from `@wordpress/i18n` (JS) or WordPress's own `__()` (PHP) — no hardcoded English strings.
+- Every user-facing string goes through `__( '...', 'merodiet' )` from `@wordpress/i18n` (JS) or WordPress's own `__()` (PHP) — no hardcoded English strings.
 - The portal must be reachable under ANY permalink structure (Plain or pretty) — never assume `get_option( 'permalink_structure' )` is non-empty.
 - `PortalPage`/`PortalRewrite` must never accept a client identifier from the URL or query string — the logged-in user's own linked client row (via `ClientRepository::find_for_user()`) is the only source of identity, matching the `/me/*` REST layer's own posture.
 - No React Router — single mount, tab state in `App.tsx`, matching the practitioner admin app's existing `App.tsx` pattern.
@@ -31,23 +31,23 @@
 - Test: `tests/Unit/Clients/PortalRewriteTest.php`
 
 **Interfaces:**
-- Produces: `PortalRewrite::register(): void` (registers the query var + rewrite rule; called both from a provider's `init` hook and directly from `Activation::activate()`), `PortalRewrite::url(): string` (used by `PortalPage` in Task 2 and the login-redirect filter), `PortalRewrite::QUERY_VAR` constant (string `'nutrio_portal'`, used by `PortalPage` to detect the route).
+- Produces: `PortalRewrite::register(): void` (registers the query var + rewrite rule; called both from a provider's `init` hook and directly from `Activation::activate()`), `PortalRewrite::url(): string` (used by `PortalPage` in Task 2 and the login-redirect filter), `PortalRewrite::QUERY_VAR` constant (string `'merodiet_portal'`, used by `PortalPage` to detect the route).
 
 - [ ] **Step 1: Write the failing test**
 
 ```php
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Clients;
+namespace MeroDiet\Tests\Unit\Clients;
 
 use Brain\Monkey\Functions;
-use Nutrio\Clients\PortalRewrite;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Clients\PortalRewrite;
+use MeroDiet\Tests\TestCase;
 
 final class PortalRewriteTest extends TestCase {
 
@@ -62,11 +62,11 @@ final class PortalRewriteTest extends TestCase {
 		Functions\when( 'get_option' )->justReturn( '' );
 		Functions\when( 'home_url' )->alias( static fn( string $path ) => 'https://example.test' . $path );
 
-		self::assertSame( 'https://example.test/?nutrio_portal=1', PortalRewrite::url() );
+		self::assertSame( 'https://example.test/?merodiet_portal=1', PortalRewrite::url() );
 	}
 
 	public function test_query_var_constant_matches_the_registered_var(): void {
-		self::assertSame( 'nutrio_portal', PortalRewrite::QUERY_VAR );
+		self::assertSame( 'merodiet_portal', PortalRewrite::QUERY_VAR );
 	}
 }
 ```
@@ -74,7 +74,7 @@ final class PortalRewriteTest extends TestCase {
 - [ ] **Step 2: Run the test to verify it fails**
 
 Run: `composer test -- --filter PortalRewriteTest`
-Expected: FAIL — class `Nutrio\Clients\PortalRewrite` not found.
+Expected: FAIL — class `MeroDiet\Clients\PortalRewrite` not found.
 
 - [ ] **Step 3: Implement `PortalRewrite`**
 
@@ -83,12 +83,12 @@ Expected: FAIL — class `Nutrio\Clients\PortalRewrite` not found.
 /**
  * Permalink-structure-agnostic routing for the client portal.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Clients;
+namespace MeroDiet\Clients;
 
 /**
  * A rewrite rule alone does nothing under WordPress's "Plain" permalink
@@ -108,7 +108,7 @@ final class PortalRewrite {
 	 * this route, regardless of which permalink structure produced the
 	 * request.
 	 */
-	public const QUERY_VAR = 'nutrio_portal';
+	public const QUERY_VAR = 'merodiet_portal';
 
 	/**
 	 * Register the query var and, when relevant, the pretty rewrite
@@ -156,7 +156,7 @@ Expected: PASS (3 tests).
 Read `includes/Activation.php` first — it currently calls `RoleRegistrar::register()` then `flush_rewrite_rules()`. Add the new call between those two, and the import:
 
 ```php
-use Nutrio\Clients\PortalRewrite;
+use MeroDiet\Clients\PortalRewrite;
 ```
 
 ```php
@@ -204,17 +204,17 @@ EOF
 ```php
 <?php
 /**
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Tests\Unit\Clients;
+namespace MeroDiet\Tests\Unit\Clients;
 
 use Brain\Monkey\Functions;
-use Nutrio\Clients\PortalPage;
-use Nutrio\Repositories\ClientRepository;
-use Nutrio\Tests\TestCase;
+use MeroDiet\Clients\PortalPage;
+use MeroDiet\Repositories\ClientRepository;
+use MeroDiet\Tests\TestCase;
 use WP_User;
 
 final class PortalPageTest extends TestCase {
@@ -227,11 +227,11 @@ final class PortalPageTest extends TestCase {
 		$page    = new PortalPage( $clients );
 
 		$user = $this->createMock( WP_User::class );
-		$user->method( 'has_cap' )->with( 'view_own_nutrio_plan' )->willReturn( true );
+		$user->method( 'has_cap' )->with( 'view_own_merodiet_plan' )->willReturn( true );
 
 		$result = $page->filter_login_redirect( 'https://example.test/wp-admin/', '', $user );
 
-		self::assertSame( 'https://example.test/?nutrio_portal=1', $result );
+		self::assertSame( 'https://example.test/?merodiet_portal=1', $result );
 	}
 
 	public function test_filter_login_redirect_leaves_a_practitioner_untouched(): void {
@@ -239,7 +239,7 @@ final class PortalPageTest extends TestCase {
 		$page    = new PortalPage( $clients );
 
 		$user = $this->createMock( WP_User::class );
-		$user->method( 'has_cap' )->with( 'view_own_nutrio_plan' )->willReturn( false );
+		$user->method( 'has_cap' )->with( 'view_own_merodiet_plan' )->willReturn( false );
 
 		$result = $page->filter_login_redirect( 'https://example.test/wp-admin/', '', $user );
 
@@ -251,7 +251,7 @@ final class PortalPageTest extends TestCase {
 - [ ] **Step 2: Run the test to verify it fails**
 
 Run: `composer test -- --filter PortalPageTest`
-Expected: FAIL — class `Nutrio\Clients\PortalPage` not found.
+Expected: FAIL — class `MeroDiet\Clients\PortalPage` not found.
 
 - [ ] **Step 3: Implement `PortalPage`**
 
@@ -260,15 +260,15 @@ Expected: FAIL — class `Nutrio\Clients\PortalPage` not found.
 /**
  * The client portal's front-end request handler.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Clients;
+namespace MeroDiet\Clients;
 
-use Nutrio\Helper\Assets;
-use Nutrio\Repositories\ClientRepository;
+use MeroDiet\Helper\Assets;
+use MeroDiet\Repositories\ClientRepository;
 use WP_Error;
 use WP_User;
 
@@ -283,7 +283,7 @@ use WP_User;
  */
 final class PortalPage {
 
-	private const MOUNT_ELEMENT_ID = 'nutrio-client-portal-app';
+	private const MOUNT_ELEMENT_ID = 'merodiet-client-portal-app';
 	private const SCRIPT_ENTRY     = 'client-portal';
 
 	/**
@@ -307,7 +307,7 @@ final class PortalPage {
 
 		$current_user = wp_get_current_user();
 
-		if ( ! $current_user->has_cap( 'view_own_nutrio_plan' ) ) {
+		if ( ! $current_user->has_cap( 'view_own_merodiet_plan' ) ) {
 			wp_safe_redirect( admin_url() );
 			exit;
 		}
@@ -330,7 +330,7 @@ final class PortalPage {
 			return $redirect_to;
 		}
 
-		if ( ! $user->has_cap( 'view_own_nutrio_plan' ) ) {
+		if ( ! $user->has_cap( 'view_own_merodiet_plan' ) ) {
 			return $redirect_to;
 		}
 
@@ -349,11 +349,11 @@ final class PortalPage {
 		<head>
 			<meta charset="<?php bloginfo( 'charset' ); ?>" />
 			<meta name="viewport" content="width=device-width, initial-scale=1" />
-			<title><?php echo esc_html( get_bloginfo( 'name' ) ); ?> — <?php esc_html_e( 'Client Portal', 'nutrio' ); ?></title>
+			<title><?php echo esc_html( get_bloginfo( 'name' ) ); ?> — <?php esc_html_e( 'Client Portal', 'merodiet' ); ?></title>
 		</head>
-		<body class="nutrio-portal-login">
-			<main class="nutrio-portal-login-card">
-				<h1><?php esc_html_e( 'Client Portal', 'nutrio' ); ?></h1>
+		<body class="merodiet-portal-login">
+			<main class="merodiet-portal-login-card">
+				<h1><?php esc_html_e( 'Client Portal', 'merodiet' ); ?></h1>
 				<?php
 				wp_login_form(
 					array(
@@ -376,14 +376,14 @@ final class PortalPage {
 		$this->enqueue_assets( $current_user );
 
 		// Lets an add-on enqueue its own script on this exact page load.
-		do_action( 'nutrio_client_portal_render', $current_user );
+		do_action( 'merodiet_client_portal_render', $current_user );
 		?>
 		<!DOCTYPE html>
 		<html <?php language_attributes(); ?>>
 		<head>
 			<meta charset="<?php bloginfo( 'charset' ); ?>" />
 			<meta name="viewport" content="width=device-width, initial-scale=1" />
-			<title><?php echo esc_html( get_bloginfo( 'name' ) ); ?> — <?php esc_html_e( 'Client Portal', 'nutrio' ); ?></title>
+			<title><?php echo esc_html( get_bloginfo( 'name' ) ); ?> — <?php esc_html_e( 'Client Portal', 'merodiet' ); ?></title>
 			<?php wp_head(); ?>
 		</head>
 		<body>
@@ -400,21 +400,21 @@ final class PortalPage {
 	 * @param WP_User $current_user The logged-in client's WP user.
 	 */
 	private function enqueue_assets( WP_User $current_user ): void {
-		$handle         = 'nutrio-' . self::SCRIPT_ENTRY;
+		$handle         = 'merodiet-' . self::SCRIPT_ENTRY;
 		$runtime_handle = $handle . '-runtime';
 
-		if ( NUTRIO_DEVELOPMENT ) {
-			Assets::enqueue_script( $runtime_handle, NUTRIO_PATH . 'build', NUTRIO_URL . 'build', 'runtime' );
+		if ( MERODIET_DEVELOPMENT ) {
+			Assets::enqueue_script( $runtime_handle, MERODIET_PATH . 'build', MERODIET_URL . 'build', 'runtime' );
 		}
 
 		Assets::enqueue_script(
 			$handle,
-			NUTRIO_PATH . 'build',
-			NUTRIO_URL . 'build',
+			MERODIET_PATH . 'build',
+			MERODIET_URL . 'build',
 			self::SCRIPT_ENTRY,
-			NUTRIO_DEVELOPMENT ? array( $runtime_handle ) : array()
+			MERODIET_DEVELOPMENT ? array( $runtime_handle ) : array()
 		);
-		Assets::enqueue_style( $handle, NUTRIO_PATH . 'build', NUTRIO_URL . 'build', self::SCRIPT_ENTRY );
+		Assets::enqueue_style( $handle, MERODIET_PATH . 'build', MERODIET_URL . 'build', self::SCRIPT_ENTRY );
 
 		$bootstrap_data = array(
 			'restUrl'   => esc_url_raw( rest_url() ),
@@ -431,9 +431,9 @@ final class PortalPage {
 		 * @param array<string, mixed> $bootstrap_data The default bootstrap payload.
 		 * @param WP_User              $current_user   The logged-in client's WP user.
 		 */
-		$bootstrap_data = apply_filters( 'nutrio_client_portal_bootstrap_data', $bootstrap_data, $current_user );
+		$bootstrap_data = apply_filters( 'merodiet_client_portal_bootstrap_data', $bootstrap_data, $current_user );
 
-		wp_localize_script( $handle, 'nutrioClientPortal', $bootstrap_data );
+		wp_localize_script( $handle, 'merodietClientPortal', $bootstrap_data );
 	}
 }
 ```
@@ -450,16 +450,16 @@ Expected: PASS (2 tests).
 /**
  * Client-portal service provider.
  *
- * @package Nutrio
+ * @package MeroDiet
  */
 
 declare( strict_types=1 );
 
-namespace Nutrio\Providers;
+namespace MeroDiet\Providers;
 
 use League\Container\Container;
-use Nutrio\Clients\PortalPage;
-use Nutrio\Clients\PortalRewrite;
+use MeroDiet\Clients\PortalPage;
+use MeroDiet\Clients\PortalRewrite;
 
 /**
  * Wires the client portal's rewrite registration, request handling, and
@@ -475,13 +475,13 @@ final class PortalServiceProvider extends AbstractServiceProvider {
 	 * @param Container $container The DI container.
 	 */
 	public function register( Container $container ): void {
-		if ( ! $container->has( \Nutrio\Repositories\ClientRepository::class ) ) {
-			$container->add( \Nutrio\Repositories\ClientRepository::class )->setShared( true );
+		if ( ! $container->has( \MeroDiet\Repositories\ClientRepository::class ) ) {
+			$container->add( \MeroDiet\Repositories\ClientRepository::class )->setShared( true );
 		}
 
 		$container->add( PortalPage::class )
 			->setShared( true )
-			->addArgument( \Nutrio\Repositories\ClientRepository::class );
+			->addArgument( \MeroDiet\Repositories\ClientRepository::class );
 	}
 
 	/**
@@ -525,7 +525,7 @@ final class PortalServiceProvider extends AbstractServiceProvider {
 
 - [ ] **Step 6: Register the provider in `config/app.php`**
 
-Add `\Nutrio\Providers\PortalServiceProvider::class,` to the `'providers'` array, after `AdminServiceProvider::class`.
+Add `\MeroDiet\Providers\PortalServiceProvider::class,` to the `'providers'` array, after `AdminServiceProvider::class`.
 
 - [ ] **Step 7: Verify with phpcs, phpstan, and the full suite**
 
@@ -554,7 +554,7 @@ EOF
 - Create: `src/client-portal/index.tsx`
 
 **Interfaces:**
-- Produces: `LogEntry`, `LogEntryInput`, `Measurement`, `MeasurementInput` types, `Window.nutrioClientPortal` global shape — used by every remaining task.
+- Produces: `LogEntry`, `LogEntryInput`, `Measurement`, `MeasurementInput` types, `Window.merodietClientPortal` global shape — used by every remaining task.
 
 - [ ] **Step 1: Add types to `src/types.ts`**
 
@@ -604,10 +604,10 @@ export interface MeasurementInput {
 }
 ```
 
-Also add, inside the existing `declare global { interface Window { ... } }` block, a sibling to `nutrioAdmin`:
+Also add, inside the existing `declare global { interface Window { ... } }` block, a sibling to `merodietAdmin`:
 
 ```ts
-		nutrioClientPortal?: {
+		merodietClientPortal?: {
 			restUrl?: string;
 			restNonce?: string;
 			mountId?: string;
@@ -647,7 +647,7 @@ import '../styles/tokens.css';
 import '../styles/base.css';
 import App from './App';
 
-const settings = window.nutrioClientPortal ?? {};
+const settings = window.merodietClientPortal ?? {};
 
 // Point api-fetch at this site's REST root and authenticate as the logged-in user.
 if ( settings.restUrl ) {
@@ -659,7 +659,7 @@ if ( settings.restNonce ) {
 
 domReady( () => {
 	const el = document.getElementById(
-		settings.mountId ?? 'nutrio-client-portal-app'
+		settings.mountId ?? 'merodiet-client-portal-app'
 	);
 
 	if ( el ) {
@@ -707,7 +707,7 @@ EOF
 - Create: `src/client-portal/App.module.css`
 
 **Interfaces:**
-- Consumes: `window.nutrioClientPortal` (Task 3).
+- Consumes: `window.merodietClientPortal` (Task 3).
 - Produces: the `App` default export Task 3's `index.tsx` renders; a `Section` type (`{ id: string; label: string; component: () => JSX.Element }`) that Tasks 5-7's tab screens are registered under.
 
 - [ ] **Step 1: Create `App.tsx`**
@@ -728,38 +728,38 @@ export interface Section {
 }
 
 // The built-in tabs. A future add-on's own bundle (enqueued via the
-// PHP `nutrio_client_portal_render` action) can append, remove, or
-// reorder entries here via the `nutrio.clientPortal.sections` filter
+// PHP `merodiet_client_portal_render` action) can append, remove, or
+// reorder entries here via the `merodiet.clientPortal.sections` filter
 // below — the JS-side counterpart to the PHP
-// `nutrio_client_portal_bootstrap_data` filter.
+// `merodiet_client_portal_bootstrap_data` filter.
 const DEFAULT_SECTIONS: Section[] = [
-	{ id: 'plan', label: __( 'My Plan', 'nutrio' ), component: PlanTab },
-	{ id: 'log', label: __( 'Log', 'nutrio' ), component: LogTab },
+	{ id: 'plan', label: __( 'My Plan', 'merodiet' ), component: PlanTab },
+	{ id: 'log', label: __( 'Log', 'merodiet' ), component: LogTab },
 	{
 		id: 'measurements',
-		label: __( 'Measurements', 'nutrio' ),
+		label: __( 'Measurements', 'merodiet' ),
 		component: MeasurementsTab,
 	},
 ];
 
 export default function App() {
 	const sections: Section[] = applyFilters(
-		'nutrio.clientPortal.sections',
+		'merodiet.clientPortal.sections',
 		DEFAULT_SECTIONS
 	) as Section[];
 
 	const [ activeId, setActiveId ] = useState( sections[ 0 ]?.id ?? 'plan' );
 	const active = sections.find( ( section ) => section.id === activeId );
 
-	doAction( 'nutrio.clientPortal.mounted' );
+	doAction( 'merodiet.clientPortal.mounted' );
 
-	const clientName = window.nutrioClientPortal?.clientName ?? '';
+	const clientName = window.merodietClientPortal?.clientName ?? '';
 
 	return (
 		<div className={ styles.shell }>
 			<header className={ styles.header }>
 				<h1 className={ styles.title }>
-					{ __( 'Client Portal', 'nutrio' ) }
+					{ __( 'Client Portal', 'merodiet' ) }
 				</h1>
 				{ clientName && (
 					<span className={ styles.greeting }>
@@ -903,14 +903,14 @@ export default function PlanTab() {
 	);
 
 	useEffect( () => {
-		apiFetch< Plan | null >( { path: '/nutrio/v1/me/plan' } ).then(
+		apiFetch< Plan | null >( { path: '/merodiet/v1/me/plan' } ).then(
 			setPlan,
 			() => setPlan( null )
 		);
 	}, [] );
 
 	if ( undefined === plan ) {
-		return <p>{ __( 'Loading…', 'nutrio' ) }</p>;
+		return <p>{ __( 'Loading…', 'merodiet' ) }</p>;
 	}
 
 	if ( null === plan ) {
@@ -918,7 +918,7 @@ export default function PlanTab() {
 			<p className={ styles.empty }>
 				{ __(
 					'No plan assigned yet — check back once your practitioner assigns one.',
-					'nutrio'
+					'merodiet'
 				) }
 			</p>
 		);
@@ -933,7 +933,7 @@ export default function PlanTab() {
 			{ plan.days.map( ( day ) => (
 				<div key={ day.day_offset } className={ styles.day }>
 					<h3 className={ styles.dayTitle }>
-						{ __( 'Day', 'nutrio' ) } { day.day_offset + 1 }
+						{ __( 'Day', 'merodiet' ) } { day.day_offset + 1 }
 					</h3>
 					<ul className={ styles.itemList }>
 						{ day.items.map( ( item ) => (
@@ -944,7 +944,7 @@ export default function PlanTab() {
 								{ ' — ' }
 								{ item.food_description ??
 									item.recipe_name ??
-									__( 'Item', 'nutrio' ) }
+									__( 'Item', 'merodiet' ) }
 							</li>
 						) ) }
 					</ul>
@@ -1020,7 +1020,7 @@ EOF
 
 **Interfaces:**
 - Consumes: `Plan`, `PlanItem`, `LogEntryInput` types, `GET /me/plan`, `POST /me/logs`.
-- Produces: fires `doAction( 'nutrio.clientPortal.logCreated', entry )` after each successful POST (per the spec's JS-hooks section).
+- Produces: fires `doAction( 'merodiet.clientPortal.logCreated', entry )` after each successful POST (per the spec's JS-hooks section).
 
 - [ ] **Step 1: Implement `LogTab.tsx`**
 
@@ -1046,7 +1046,7 @@ export default function LogTab() {
 	);
 
 	useEffect( () => {
-		apiFetch< Plan | null >( { path: '/nutrio/v1/me/plan' } ).then(
+		apiFetch< Plan | null >( { path: '/merodiet/v1/me/plan' } ).then(
 			setPlan,
 			() => setPlan( null )
 		);
@@ -1069,11 +1069,11 @@ export default function LogTab() {
 
 		try {
 			const entry = await apiFetch< LogEntry >( {
-				path: '/nutrio/v1/me/logs',
+				path: '/merodiet/v1/me/logs',
 				method: 'POST',
 				data: payload,
 			} );
-			doAction( 'nutrio.clientPortal.logCreated', entry );
+			doAction( 'merodiet.clientPortal.logCreated', entry );
 		} finally {
 			setPendingItemId( null );
 		}
@@ -1085,7 +1085,7 @@ export default function LogTab() {
 
 		try {
 			const entry = await apiFetch< LogEntry >( {
-				path: '/nutrio/v1/me/logs',
+				path: '/merodiet/v1/me/logs',
 				method: 'POST',
 				data: {
 					log_date: today,
@@ -1093,7 +1093,7 @@ export default function LogTab() {
 					notes,
 				} as LogEntryInput,
 			} );
-			doAction( 'nutrio.clientPortal.logCreated', entry );
+			doAction( 'merodiet.clientPortal.logCreated', entry );
 			setNotes( '' );
 		} finally {
 			setIsSubmittingAdHoc( false );
@@ -1107,13 +1107,13 @@ export default function LogTab() {
 
 	return (
 		<div>
-			{ undefined === plan && <p>{ __( 'Loading…', 'nutrio' ) }</p> }
+			{ undefined === plan && <p>{ __( 'Loading…', 'merodiet' ) }</p> }
 
 			{ null === plan && (
 				<p className={ styles.empty }>
 					{ __(
 						'No plan assigned yet — check back once your practitioner assigns one.',
-						'nutrio'
+						'merodiet'
 					) }
 				</p>
 			) }
@@ -1125,7 +1125,7 @@ export default function LogTab() {
 							<span>
 								{ item.food_description ??
 									item.recipe_name ??
-									__( 'Item', 'nutrio' ) }
+									__( 'Item', 'merodiet' ) }
 							</span>
 							<div className={ styles.actions }>
 								<Button
@@ -1135,7 +1135,7 @@ export default function LogTab() {
 										logPlanItem( item, 'eaten' )
 									}
 								>
-									{ __( 'Mark eaten', 'nutrio' ) }
+									{ __( 'Mark eaten', 'merodiet' ) }
 								</Button>
 								<Button
 									variant="ghost"
@@ -1144,7 +1144,7 @@ export default function LogTab() {
 										logPlanItem( item, 'substituted' )
 									}
 								>
-									{ __( 'Substituted', 'nutrio' ) }
+									{ __( 'Substituted', 'merodiet' ) }
 								</Button>
 								<Button
 									variant="ghost"
@@ -1153,7 +1153,7 @@ export default function LogTab() {
 										logPlanItem( item, 'skipped' )
 									}
 								>
-									{ __( 'Skip', 'nutrio' ) }
+									{ __( 'Skip', 'merodiet' ) }
 								</Button>
 							</div>
 						</li>
@@ -1162,16 +1162,16 @@ export default function LogTab() {
 			) }
 
 			<form onSubmit={ logAdHoc } className={ styles.adHocForm }>
-				<label htmlFor="nutrio-log-notes">
-					{ __( 'Log something else', 'nutrio' ) }
+				<label htmlFor="merodiet-log-notes">
+					{ __( 'Log something else', 'merodiet' ) }
 				</label>
 				<textarea
-					id="nutrio-log-notes"
+					id="merodiet-log-notes"
 					value={ notes }
 					onChange={ ( event ) => setNotes( event.target.value ) }
 					placeholder={ __(
 						'What did you eat?',
-						'nutrio'
+						'merodiet'
 					) }
 					required
 				/>
@@ -1180,7 +1180,7 @@ export default function LogTab() {
 					variant="primary"
 					disabled={ isSubmittingAdHoc }
 				>
-					{ __( 'Log it', 'nutrio' ) }
+					{ __( 'Log it', 'merodiet' ) }
 				</Button>
 			</form>
 		</div>
@@ -1246,7 +1246,7 @@ EOF
 
 **Interfaces:**
 - Consumes: `Measurement`, `MeasurementInput` types, `GET /me/measurements`, `POST /me/measurements`.
-- Produces: fires `doAction( 'nutrio.clientPortal.measurementCreated', entry )` after each successful POST.
+- Produces: fires `doAction( 'merodiet.clientPortal.measurementCreated', entry )` after each successful POST.
 
 - [ ] **Step 1: Implement `MeasurementsTab.tsx`**
 
@@ -1263,7 +1263,7 @@ import styles from './MeasurementsTab.module.css';
 
 type Unit = 'kg' | 'lb';
 
-const UNIT_STORAGE_KEY = 'nutrio-client-portal-weight-unit';
+const UNIT_STORAGE_KEY = 'merodiet-client-portal-weight-unit';
 
 function readStoredUnit(): Unit {
 	try {
@@ -1302,7 +1302,7 @@ export default function MeasurementsTab() {
 
 	const loadMeasurements = () => {
 		apiFetch< Measurement[] >( {
-			path: '/nutrio/v1/me/measurements',
+			path: '/merodiet/v1/me/measurements',
 		} ).then( setMeasurements, () => setMeasurements( [] ) );
 	};
 
@@ -1329,11 +1329,11 @@ export default function MeasurementsTab() {
 				weight_grams: displayToGrams( value, unit ),
 			};
 			const entry = await apiFetch< Measurement >( {
-				path: '/nutrio/v1/me/measurements',
+				path: '/merodiet/v1/me/measurements',
 				method: 'POST',
 				data: payload,
 			} );
-			doAction( 'nutrio.clientPortal.measurementCreated', entry );
+			doAction( 'merodiet.clientPortal.measurementCreated', entry );
 			setWeightInput( '' );
 			loadMeasurements();
 		} finally {
@@ -1344,12 +1344,12 @@ export default function MeasurementsTab() {
 	return (
 		<div>
 			<form onSubmit={ submit } className={ styles.form }>
-				<label htmlFor="nutrio-weight-input">
-					{ __( 'Weight', 'nutrio' ) }
+				<label htmlFor="merodiet-weight-input">
+					{ __( 'Weight', 'merodiet' ) }
 				</label>
 				<div className={ styles.weightRow }>
 					<input
-						id="nutrio-weight-input"
+						id="merodiet-weight-input"
 						type="number"
 						step="0.1"
 						min="0"
@@ -1365,24 +1365,24 @@ export default function MeasurementsTab() {
 							changeUnit( event.target.value as Unit )
 						}
 					>
-						<option value="kg">{ __( 'kg', 'nutrio' ) }</option>
-						<option value="lb">{ __( 'lb', 'nutrio' ) }</option>
+						<option value="kg">{ __( 'kg', 'merodiet' ) }</option>
+						<option value="lb">{ __( 'lb', 'merodiet' ) }</option>
 					</select>
 				</div>
 				<Button type="submit" variant="primary" disabled={ isSubmitting }>
-					{ __( 'Log weight', 'nutrio' ) }
+					{ __( 'Log weight', 'merodiet' ) }
 				</Button>
 			</form>
 
 			<h3 className={ styles.historyTitle }>
-				{ __( 'History', 'nutrio' ) }
+				{ __( 'History', 'merodiet' ) }
 			</h3>
 			{ undefined === measurements && (
-				<p>{ __( 'Loading…', 'nutrio' ) }</p>
+				<p>{ __( 'Loading…', 'merodiet' ) }</p>
 			) }
 			{ measurements && 0 === measurements.length && (
 				<p className={ styles.empty }>
-					{ __( 'No measurements logged yet.', 'nutrio' ) }
+					{ __( 'No measurements logged yet.', 'merodiet' ) }
 				</p>
 			) }
 			{ measurements && measurements.length > 0 && (
