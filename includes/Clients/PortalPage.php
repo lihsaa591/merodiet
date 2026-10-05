@@ -757,8 +757,7 @@ final class PortalPage {
 	 * click handler, since this page has no React runtime to attach one.
 	 */
 	private function render_theme_init_script(): void {
-		wp_print_inline_script_tag(
-			<<<'JS'
+		$script = <<<'JS'
 			( function () {
 				try {
 					var saved = window.localStorage.getItem( 'merodiet-theme' );
@@ -783,8 +782,13 @@ final class PortalPage {
 					}
 				};
 			} )();
-JS
-		);
+JS;
+
+		// Handle-only script (no src), printed in <head> by the wp_head()
+		// that follows every call to this method.
+		wp_register_script( 'merodiet-portal-theme', false, array(), MERODIET_VERSION, false );
+		wp_enqueue_script( 'merodiet-portal-theme' );
+		wp_add_inline_script( 'merodiet-portal-theme', $script );
 	}
 
 	/**
