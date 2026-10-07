@@ -122,6 +122,7 @@ final class DashboardController extends AbstractPractitionerController {
 				'client_id'  => (int) $client['id'],
 				'first_name' => (string) ( $client['first_name'] ?? '' ),
 				'last_name'  => (string) ( $client['last_name'] ?? '' ),
+				'avatar_url' => $client['avatar_url'] ?? null,
 				'percent'    => (int) $result['percent'],
 			);
 		}
