@@ -1,0 +1,28 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "landingPage": "/wp-admin/admin.php?page=merodiet",
+  "preferredVersions": {
+    "php": "8.2",
+    "wp": "latest"
+  },
+  "features": {
+    "networking": true
+  },
+  "login": true,
+  "steps": [
+    {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "wordpress.org/plugins",
+        "slug": "merodiet"
+      },
+      "options": {
+        "activate": true
+      }
+    },
+    {
+      "step": "runPHP",
+      "code": "<?php\nrequire_once '/wordpress/wp-load.php';\n\nuse MeroDiet\\Repositories\\ClientRepository;\nuse MeroDiet\\Repositories\\CustomFoodRepository;\nuse MeroDiet\\Repositories\\PlanRepository;\nuse MeroDiet\\Repositories\\RecipeRepository;\n\n$practitioner = 1;\n$clients      = new ClientRepository();\n$foods        = new CustomFoodRepository();\n$recipes      = new RecipeRepository();\n$plans        = new PlanRepository();\n\nforeach ( array(\n\tarray( 'Priya', 'Thapa', 'Lose 6 kg with a steady routine', 'Vegetarian', array( 'peanuts' ) ),\n\tarray( 'Rohan', 'Karki', 'Gain lean muscle, 2,800 kcal target', '', array() ),\n\tarray( 'Sita', 'Gurung', 'Manage blood sugar with balanced meals', 'Low sugar', array( 'shellfish' ) ),\n\tarray( 'Arjun', 'Shrestha', 'Marathon prep: carb periodisation', '', array() ),\n) as $c ) {\n\t$clients->create( $practitioner, array(\n\t\t'first_name'           => $c[0],\n\t\t'last_name'            => $c[1],\n\t\t'email'                => strtolower( $c[0] ) . '@example.test',\n\t\t'goals'                => $c[2],\n\t\t'dietary_restrictions' => $c[3],\n\t\t'allergies'            => $c[4],\n\t) );\n}\n\n$f = array();\nforeach ( array(\n\t'Rolled oats'          => array( 379, 13.2, 67.7, 6.5 ),\n\t'Greek yogurt'         => array( 59, 10.2, 3.6, 0.4 ),\n\t'Blueberries'          => array( 57, 0.7, 14.5, 0.3 ),\n\t'Chicken breast'       => array( 165, 31, 0, 3.6 ),\n\t'Brown rice, cooked'   => array( 123, 2.7, 25.6, 1 ),\n\t'Broccoli'             => array( 34, 2.8, 6.6, 0.4 ),\n) as $name => $v ) {\n\t$f[ $name ] = $foods->create( $practitioner, array(\n\t\t'name' => $name, 'calories' => $v[0], 'protein' => $v[1], 'carbs' => $v[2], 'fat' => $v[3],\n\t) );\n}\n\n$bowl = $recipes->create( $practitioner, array(\n\t'name'        => 'Lemon herb chicken bowl',\n\t'description' => 'Grilled chicken over brown rice with steamed broccoli.',\n\t'servings'    => 1,\n\t'items'       => array(\n\t\tarray( 'food_id' => $f['Chicken breast'], 'quantity_grams' => 150.0 ),\n\t\tarray( 'food_id' => $f['Brown rice, cooked'], 'quantity_grams' => 150.0 ),\n\t\tarray( 'food_id' => $f['Broccoli'], 'quantity_grams' => 100.0 ),\n\t),\n) );\n\n$days = array();\nfor ( $i = 0; $i < 3; $i++ ) {\n\t$days[] = array(\n\t\t'day_offset' => $i,\n\t\t'items'      => array(\n\t\t\tarray( 'meal_type' => 'breakfast', 'food_id' => $f['Rolled oats'], 'quantity_grams' => 60.0 ),\n\t\t\tarray( 'meal_type' => 'breakfast', 'food_id' => $f['Greek yogurt'], 'quantity_grams' => 150.0 ),\n\t\t\tarray( 'meal_type' => 'lunch', 'recipe_id' => $bowl, 'servings' => 1.0 ),\n\t\t),\n\t);\n}\n$plans->create( $practitioner, array(\n\t'title'      => 'Balanced starter plan',\n\t'start_date' => gmdate( 'Y-m-d' ),\n\t'end_date'   => gmdate( 'Y-m-d', strtotime( '+2 days' ) ),\n\t'days'       => $days,\n) );\n"
+    }
+  ]
+}
