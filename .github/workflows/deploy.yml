@@ -1,0 +1,52 @@
+name: Deploy to WordPress.org
+
+# Runs when a version tag (e.g. v0.1.1) is pushed. Requires the repository
+# secrets SVN_USERNAME and SVN_PASSWORD (the WordPress.org SVN password, set
+# under Account & Security on the WordPress.org profile).
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check that the tag matches the plugin version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          HEADER=$(grep -m1 -E '^\s*\*\s*Version:' merodiet.php | sed -E 's/.*Version:\s*//' | tr -d '[:space:]')
+          STABLE=$(grep -m1 -E '^Stable tag:' readme.txt | sed -E 's/Stable tag:\s*//' | tr -d '[:space:]')
+          echo "tag=$VERSION header=$HEADER stable=$STABLE"
+          if [ "$VERSION" != "$HEADER" ] || [ "$VERSION" != "$STABLE" ]; then
+            echo "::error::Tag, merodiet.php Version and readme.txt Stable tag must all match."
+            exit 1
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: composer
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install production dependencies and build assets
+        run: |
+          composer install --no-dev --optimize-autoloader --no-progress --prefer-dist
+          npm ci
+          npm run build
+
+      - name: Deploy to WordPress.org
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: merodiet
+          VERSION: ${{ env.VERSION }}
+          ASSETS_DIR: .wordpress-org
