@@ -101,9 +101,16 @@ WordPress 6.9+ and PHP 8.1+.
 
 == Screenshots ==
 
-1. Practitioner dashboard.
-2. Plan builder.
-3. Client portal.
+1. Dashboard with active clients, today's logging, plans awaiting review and 7-day client compliance.
+2. Client roster with photos, portal account status, search and filters.
+3. Client detail with plan compliance, current weight, log history and measurements.
+4. Meal plan library showing draft and assigned plans with average daily calories.
+5. Plan builder with meals per day, foods and recipes, and live nutrient totals.
+6. Custom food database with calories and macronutrients per 100 g.
+7. Client portal dashboard showing today's plan, meals logged and current weight.
+8. Client portal "My Plan" with each day's meals, quantities and nutrition totals.
+9. Client portal log where clients mark meals as eaten, substituted or skipped.
+10. Client portal measurements with weight history over time.
 
 == Changelog ==
 
