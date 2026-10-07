@@ -16,6 +16,7 @@ interface ComplianceEntry {
 	client_id: number;
 	first_name: string;
 	last_name: string;
+	avatar_url?: string | null;
 	percent: number;
 }
 
@@ -212,6 +213,7 @@ function ComplianceRow( { client }: { client: ComplianceEntry } ) {
 				id={ client.client_id }
 				firstName={ client.first_name }
 				lastName={ client.last_name }
+				avatarUrl={ client.avatar_url }
 				size="lg"
 			/>
 			<div style={ { width: '110px', minWidth: 0 } }>
