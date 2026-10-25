@@ -9,7 +9,7 @@
 
 declare( strict_types=1 );
 
-define( 'MERODIET_VERSION', '0.1.2' );
+define( 'MERODIET_VERSION', '0.1.3' );
 define( 'MERODIET_FILE', dirname( __DIR__ ) . '/merodiet.php' );
 define( 'MERODIET_PATH', dirname( __DIR__ ) . '/' );
 define( 'MERODIET_URL', 'https://example.test/wp-content/plugins/merodiet/' );
