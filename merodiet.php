@@ -3,7 +3,7 @@
  * Plugin Name:       MeroDiet – Meal Planner & Client Management for Dietitians
  * Plugin URI:        https://github.com/lihsaa591/merodiet
  * Description:       Meal plans, client portal and food logs for dietitians and nutritionists, with USDA nutrition data and a dashboard of client progress.
- * Version:           0.1.1
+ * Version:           0.1.2
  * Requires at least: 6.9
  * Requires PHP:      8.1
  * Author:            Aashil
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'MERODIET_VERSION', '0.1.1' );
+define( 'MERODIET_VERSION', '0.1.2' );
 define( 'MERODIET_FILE', __FILE__ );
 define( 'MERODIET_PATH', plugin_dir_path( __FILE__ ) );
 define( 'MERODIET_URL', plugin_dir_url( __FILE__ ) );

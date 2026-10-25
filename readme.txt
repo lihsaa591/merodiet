@@ -1,10 +1,10 @@
 === MeroDiet – Meal Planner & Client Management for Dietitians ===
 Contributors: lihsaa
-Tags: dietitian, nutritionist, meal planner, nutrition, client portal
+Tags: client management, client portal, meal planner, nutrition, health
 Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.1.1
+Stable tag: 0.1.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -114,6 +114,9 @@ WordPress 6.9+ and PHP 8.1+.
 
 == Changelog ==
 
+= 0.1.2 =
+* Updated directory tags.
+
 = 0.1.1 =
 * Fix: client avatars now show in the dashboard compliance list.
 * Improved plugin title, tags and description for the directory listing.
@@ -123,6 +126,9 @@ WordPress 6.9+ and PHP 8.1+.
 * Pre-release; first submission to the WordPress.org directory (review version).
 
 == Upgrade Notice ==
+
+= 0.1.2 =
+Listing metadata only; no functional changes.
 
 = 0.1.1 =
 Fixes client avatars on the dashboard and updates the listing details.
