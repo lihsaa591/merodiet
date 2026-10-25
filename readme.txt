@@ -4,7 +4,7 @@ Tags: client management, client portal, meal planner, nutrition, health
 Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.1.2
+Stable tag: 0.1.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -114,6 +114,9 @@ WordPress 6.9+ and PHP 8.1+.
 
 == Changelog ==
 
+= 0.1.3 =
+* Restored the animated plugin icon in the directory listing.
+
 = 0.1.2 =
 * Updated directory tags.
 
@@ -126,6 +129,9 @@ WordPress 6.9+ and PHP 8.1+.
 * Pre-release; first submission to the WordPress.org directory (review version).
 
 == Upgrade Notice ==
+
+= 0.1.3 =
+Listing assets only; no functional changes.
 
 = 0.1.2 =
 Listing metadata only; no functional changes.
